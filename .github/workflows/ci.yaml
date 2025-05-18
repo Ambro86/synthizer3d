@@ -7,19 +7,21 @@ jobs:
   # Job per costruire le wheel su Windows
   windows-build:
     name: Build Windows (${{ matrix.CI_ARCH }}) Python ${{ matrix.PYVERSION }}
-    # Seleziona il runner corretto per l'architettura
-    runs-on: ${{ matrix.CI_ARCH == 'arm64' && 'windows-11-arm' || 'windows-latest' }} # CORRETTO: usa windows-11-arm
+    runs-on: ${{ matrix.CI_ARCH == 'arm64' && 'windows-11-arm' || 'windows-latest' }}
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
-      # CI_ARCH_LOWER è usato per setup-python che si aspetta 'x86', 'x64', o 'arm64'
-      CI_ARCH_LOWER: ${{ matrix.CI_ARCH == 'arm64' && 'arm64' || (matrix.CI_ARCH == 'x86' && 'x86' || 'x64') }}
+      CI_ARCH_LOWER: ${{ matrix.CI_ARCH == 'arm64' && 'arm64' || (matrix.CI_ARCH == 'x86' && 'x86' || 'x64') }} 
       CI_WINDOWS: "1"
-      CI_ARCH_ENV: ${{ matrix.CI_ARCH }} # Usato per lo script di configurazione MSVC
+      CI_ARCH_ENV: ${{ matrix.CI_ARCH }} 
     strategy:
       fail-fast: false
       matrix:
         PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
         CI_ARCH: ["x64", "x86", "arm64"] 
+        exclude:
+          # Python 3.8 for Windows ARM64 is not available via actions/setup-python
+          - CI_ARCH: "arm64"
+            PYVERSION: "3.8"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -55,9 +57,6 @@ jobs:
             set VCVARS_ARG=x86
           ) else if "${{ env.CI_ARCH_ENV }}" == "arm64" (
             set VCVARS_ARG=amd64_arm64
-            REM Per i runner windows-11-arm nativi, se la toolchain VS è nativa ARM,
-            REM l'argomento potrebbe essere solo "arm64".
-            REM "amd64_arm64" è per la cross-compilazione da un host x64.
           )
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" %VCVARS_ARG%
           echo "MSVC configured for %VCVARS_ARG%"
@@ -71,8 +70,13 @@ jobs:
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
 
       - name: Build Python Wheels (Windows ${{ matrix.CI_ARCH }})
+        # Per Windows ARM64, disabilita NEON in dr_mp3 per evitare errori di compilazione
+        # se __ARM_NEON__ non è rilevato correttamente dal compilatore MSVC ARM64.
+        env:
+          CMAKE_ARGS: ${{ matrix.CI_ARCH == 'arm64' && '-DDR_MP3_NO_NEON=1' || '' }}
         shell: powershell
         run: |
+          Write-Host "CMAKE_ARGS for this build: $Env:CMAKE_ARGS"
           Set-Location $Env:GITHUB_WORKSPACE
           python setup.py bdist_wheel
 
@@ -85,7 +89,7 @@ jobs:
   # Job per costruire le wheel su Linux
   linux-build:
     name: Build Linux (x64) Python ${{ matrix.PYVERSION }}
-    runs-on: ubuntu-22.04 
+    runs-on: ubuntu-latest 
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
       CI_ARCH: "x64" 
@@ -141,7 +145,7 @@ jobs:
   # Job per costruire le wheel su macOS (x64 - Intel Runner)
   macos-x64-build:
     name: Build macOS (x64) Python ${{ matrix.PYVERSION }} 
-    runs-on: macos-13 # Intel Runner
+    runs-on: macos-13 
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
       TARGET_ARCH: "x64" 
@@ -193,7 +197,7 @@ jobs:
   # Job per costruire le wheel su macOS (ARM64 - ARM Runner)
   macos-arm64-build:
     name: Build macOS (arm64) Python ${{ matrix.PYVERSION }} 
-    runs-on: macos-latest # Should be macos-14 (ARM64)
+    runs-on: macos-latest 
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
       TARGET_ARCH: "arm64" 

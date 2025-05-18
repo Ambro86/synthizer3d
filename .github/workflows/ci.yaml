@@ -8,7 +8,7 @@ jobs:
   windows-build:
     name: Build Windows (${{ matrix.CI_ARCH }}) Python ${{ matrix.PYVERSION }}
     # Seleziona il runner corretto per l'architettura
-    runs-on: ${{ matrix.CI_ARCH == 'arm64' && 'windows-latest-arm64' || 'windows-latest' }}
+    runs-on: ${{ matrix.CI_ARCH == 'arm64' && 'windows-11-arm' || 'windows-latest' }} # CORRETTO: usa windows-11-arm
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
       # CI_ARCH_LOWER è usato per setup-python che si aspetta 'x86', 'x64', o 'arm64'
@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-        CI_ARCH: ["x64", "x86", "arm64"] # Aggiunta architettura ARM64
+        CI_ARCH: ["x64", "x86", "arm64"] 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -55,9 +55,9 @@ jobs:
             set VCVARS_ARG=x86
           ) else if "${{ env.CI_ARCH_ENV }}" == "arm64" (
             set VCVARS_ARG=amd64_arm64
-            REM Per i runner windows-latest-arm64 nativi, potrebbe essere solo "arm64"
-            REM amd64_arm64 è per la cross-compilazione da un host x64.
-            REM Controlla la documentazione del runner specifico se questo non funziona.
+            REM Per i runner windows-11-arm nativi, se la toolchain VS è nativa ARM,
+            REM l'argomento potrebbe essere solo "arm64".
+            REM "amd64_arm64" è per la cross-compilazione da un host x64.
           )
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" %VCVARS_ARG%
           echo "MSVC configured for %VCVARS_ARG%"
@@ -85,7 +85,7 @@ jobs:
   # Job per costruire le wheel su Linux
   linux-build:
     name: Build Linux (x64) Python ${{ matrix.PYVERSION }}
-    runs-on: ubuntu-22.04 # Specificato ubuntu-22.04 come da versione precedente di successo
+    runs-on: ubuntu-22.04 
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
       CI_ARCH: "x64" 
@@ -137,7 +137,7 @@ jobs:
         with:
           name: python-wheels-linux-x64-${{ matrix.PYVERSION }}
           path: dist/*.whl
-
+          
   # Job per costruire le wheel su macOS (x64 - Intel Runner)
   macos-x64-build:
     name: Build macOS (x64) Python ${{ matrix.PYVERSION }} 

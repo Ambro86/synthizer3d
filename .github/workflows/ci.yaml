@@ -4,6 +4,7 @@ on:
     branches:
       - main # O il tuo branch di sviluppo principale
       - 'release/**'
+      - 'correction-python313-and-new-cython-version' # Aggiunto per il tuo branch di lavoro
   pull_request:
     branches:
       - main # O il tuo branch di sviluppo principale
@@ -42,8 +43,6 @@ jobs:
             ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ env.CI_ARCH }}-
 
       - name: Configure MSVC 64-bit Environment Variables
-        # Necessario per compilare estensioni C/C++
-        # Adatta il percorso se usi una versione diversa di Visual Studio o se non è Enterprise
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
@@ -60,13 +59,15 @@ jobs:
           # pip install -r requirements-build.txt
 
       - name: Build Python Wheels (Windows)
-        # Assicurati che il tuo script ./ci/build_python.ps1 gestisca correttamente
-        # la build per la versione di Python e architettura specificate.
+        # Assicurati che il tuo script ./ci/build_python.ps1 (o simile) esista e funzioni.
         # Se non hai uno script, un comando tipico potrebbe essere: python setup.py bdist_wheel
         shell: powershell
         run: |
           Set-Location $Env:GITHUB_WORKSPACE
-          ./ci/build_python.ps1
+          # Se hai uno script specifico per Windows, chiamalo qui:
+          # ./ci/build_python.ps1
+          # Altrimenti, usa un comando standard:
+          python setup.py bdist_wheel
 
       - name: Upload Python Wheel Artifact (Windows)
         uses: actions/upload-artifact@v4
@@ -104,10 +105,10 @@ jobs:
             ${{ runner.os }}-pip-${{ env.PYVERSION }}-
 
       - name: Install system build dependencies (Linux)
-        # Aggiungi qui altri pacchetti di sistema necessari per la compilazione
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential # Per compilatori C/C++ e make
+          # Aggiungi qui altri pacchetti di sistema necessari per la compilazione (es. per libsndfile, ecc.)
 
       - name: Install Python build dependencies
         run: |
@@ -117,8 +118,7 @@ jobs:
       - name: Build Python Wheels (Linux)
         # Se hai uno script ./ci/build_linux.sh, usalo.
         # Altrimenti, un comando tipico è: python setup.py bdist_wheel
-        # Per many_linux wheels, avresti bisogno di un container Docker come quelli di PyPA.
-        # Questo esempio crea una wheel standard per la Glibc del runner.
+        # Per many_linux wheels, avresti bisogno di un container Docker.
         run: |
           python setup.py bdist_wheel
 
@@ -131,10 +131,7 @@ jobs:
   # Job per costruire le wheel su macOS
   macos-build:
     name: Build macOS (x64) Python ${{ matrix.PYVERSION }}
-    # macos-latest attualmente usa Intel (x64). Per Apple Silicon (arm64),
-    # potresti aver bisogno di runner specifici o configurazioni cross-compilation.
-    # Per semplicità, questo usa il default x64.
-    runs-on: macos-latest
+    runs-on: macos-latest # Attualmente Intel (x64)
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
     strategy:
@@ -188,10 +185,9 @@ jobs:
           submodules: recursive
 
       - name: Set up Python (for sdist)
-        # Usa una versione Python stabile per creare la sdist, es. 3.9 o 3.10
         uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.9' # Usa una versione Python stabile per creare la sdist
 
       - name: Install Python build dependencies
         run: |
@@ -205,7 +201,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: python-sdist
-          path: dist/*.tar.gz
+          path: dist/*.tar.gz # La sdist è solitamente un .tar.gz
 
   # Job per il deployment su PyPI
   deploy_pypi:
@@ -214,22 +210,18 @@ jobs:
     needs: [windows-build, linux-build, macos-build, sdist-build] # Dipende da tutte le build
     runs-on: ubuntu-latest
     permissions:
-      # Necessario per scaricare artefatti se il repository è privato
       contents: read
-      # Necessario per pubblicare usando OIDC (Trusted Publishing) su PyPI - metodo raccomandato
-      id-token: write
+      id-token: write # Per Trusted Publishing su PyPI
     steps:
       - name: Download all build artifacts
         uses: actions/download-artifact@v4
         with:
-          # Scarica tutti gli artefatti nella directory specificata
-          # Ogni artefatto verrà scaricato in una sottocartella con il suo nome
-          path: ~/artifacts
+          path: ~/artifacts # Scarica tutti gli artefatti
 
       - name: Set up Python for Twine
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x' # Una versione qualsiasi di Python per Twine
+          python-version: '3.x' 
 
       - name: Install Twine
         run: python -m pip install --upgrade twine
@@ -239,15 +231,13 @@ jobs:
 
       - name: Upload to PyPI
         env:
-          # Metodo raccomandato: Trusted Publishing con OIDC.
-          # Configura PyPI per fidarsi di GitHub Actions per questo repository/workflow.
-          # Se usi questo, non servono TWINE_USERNAME/TWINE_PASSWORD nei segreti.
-          # TWINE_USERNAME: __token__ # Non necessario con OIDC
-          # TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }} # Non necessario con OIDC
+          # Per Trusted Publishing (raccomandato):
+          # Non servono TWINE_USERNAME/TWINE_PASSWORD nei segreti GitHub.
+          # Configura PyPI per fidarsi di questo repository/workflow.
           #
-          # Se usi ancora username/password con un token API (meno sicuro):
+          # Per il metodo tradizionale con token API:
           TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }} # Di solito '__token__'
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }} # Il tuo token API da GitHub Secrets
         run: |
-          # Carica tutti i file wheel e sdist trovati nelle sottocartelle degli artefatti
+          # Carica tutti i file wheel e sdist
           python -m twine upload --skip-existing ~/artifacts/*/*

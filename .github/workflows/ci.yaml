@@ -6,27 +6,28 @@ on:
 jobs:
   # Job per costruire le wheel su Windows
   windows-build:
-    name: Build Windows (x64) Python ${{ matrix.PYVERSION }}
+    name: Build Windows (${{ matrix.CI_ARCH }}) Python ${{ matrix.PYVERSION }}
     runs-on: windows-latest
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
-      CI_ARCH: "64" 
+      CI_ARCH: ${{ matrix.CI_ARCH }} # Ora dalla matrice
       CI_WINDOWS: "1"
     strategy:
       fail-fast: false
       matrix:
         PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        CI_ARCH: ["x64", "x86"] # Aggiunta architettura 32-bit (x86)
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Set up Python ${{ matrix.PYVERSION }} (x64)
+      - name: Set up Python ${{ matrix.PYVERSION }} (${{ matrix.CI_ARCH }})
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.PYVERSION }}
-          architecture: 'x64'
+          architecture: ${{ matrix.CI_ARCH }} # Usa l'architettura dalla matrice
 
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
@@ -38,15 +39,21 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~\AppData\Local\pip\Cache
-          key: ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ env.CI_ARCH }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }}
+          key: ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ matrix.CI_ARCH }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }} # Aggiornata chiave cache
           restore-keys: |
-            ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ env.CI_ARCH }}-
+            ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ matrix.CI_ARCH }}-
 
-      - name: Configure MSVC 64-bit Environment Variables
+      - name: Configure MSVC Environment Variables (${{ matrix.CI_ARCH }})
         shell: cmd
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          echo "Configured MSVC for x64"
+          echo "Configuring MSVC for target architecture: ${{ matrix.CI_ARCH }}"
+          REM Determina l'argomento corretto per vcvarsall.bat
+          set VCVARS_ARG=amd64
+          if "${{ matrix.CI_ARCH }}" == "x86" (
+            set VCVARS_ARG=x86
+          )
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" %VCVARS_ARG%
+          echo "MSVC configured for %VCVARS_ARG%"
           set PATH >> %GITHUB_ENV%
           set INCLUDE >> %GITHUB_ENV%
           set LIB >> %GITHUB_ENV%
@@ -56,16 +63,16 @@ jobs:
           python -m pip install --upgrade pip 
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
 
-      - name: Build Python Wheels (Windows)
+      - name: Build Python Wheels (Windows ${{ matrix.CI_ARCH }})
         shell: powershell
         run: |
           Set-Location $Env:GITHUB_WORKSPACE
           python setup.py bdist_wheel
 
-      - name: Upload Python Wheel Artifact (Windows)
+      - name: Upload Python Wheel Artifact (Windows ${{ matrix.CI_ARCH }})
         uses: actions/upload-artifact@v4
         with:
-          name: python-wheels-win-x64-${{ matrix.PYVERSION }}
+          name: python-wheels-win-${{ matrix.CI_ARCH }}-${{ matrix.PYVERSION }} # Nome artefatto aggiornato
           path: dist/*.whl
 
   # Job per costruire le wheel su Linux
@@ -74,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
-      CI_ARCH: "64" 
+      CI_ARCH: "x64" # Linux è solo x64 in questo esempio
     strategy:
       fail-fast: false
       matrix:
@@ -124,28 +131,79 @@ jobs:
           name: python-wheels-linux-x64-${{ matrix.PYVERSION }}
           path: dist/*.whl
 
-  # Job per costruire le wheel su macOS (x64 - Intel Runner)
-  macos-x64-build:
-    name: Build macOS (x64) Python ${{ matrix.PYVERSION }} 
-    runs-on: macos-13 # Intel Runner
+  # Job per costruire le wheel su macOS
+  macos-build:
+    name: Build macOS (${{ matrix.ARCH }}) Python ${{ matrix.PYVERSION }} 
+    runs-on: macos-latest # Runner ARM64 (macos-14)
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
-      TARGET_ARCH: "x64" 
+      TARGET_ARCH: ${{ matrix.ARCH }} 
     strategy:
       fail-fast: false
       matrix:
         PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        ARCH: ["arm64", "x64"] 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Set up Python ${{ matrix.PYVERSION }} (x64)
+      - name: Check for x64 Homebrew and attempt to install/set up gettext
+        if: matrix.ARCH == 'x64' && (matrix.PYVERSION == '3.8' || matrix.PYVERSION == '3.9' || matrix.PYVERSION == '3.10')
+        shell: bash -e {0} 
+        run: |
+          echo "Checking for x64 Homebrew and attempting to set up gettext for x64 Python..."
+          X64_BREW_EXECUTABLE="/usr/local/bin/brew" 
+          if [ ! -f "$X64_BREW_EXECUTABLE" ] || [ ! -x "$X64_BREW_EXECUTABLE" ]; then
+            echo "::warning::x86_64 Homebrew executable not found or not executable at $X64_BREW_EXECUTABLE."
+            echo "Listing /usr/local/bin/ for diagnostics:"
+            ls -la /usr/local/bin || echo "/usr/local/bin not found or empty."
+            echo "Skipping gettext installation for x64 as the required Homebrew instance is missing."
+            echo "The Python setup for ${{ matrix.PYVERSION }} x64 might fail if it requires libintl from gettext."
+          else
+            echo "Found x86_64 Homebrew at $X64_BREW_EXECUTABLE. Proceeding with gettext setup..."
+            X64_BREW_COMMAND="arch -x86_64 $X64_BREW_EXECUTABLE"
+            echo "Updating x86_64 Homebrew using: $X64_BREW_COMMAND update"
+            $X64_BREW_COMMAND update || echo "::warning::Brew update (x64) failed, continuing with install attempt..."
+            echo "Reinstalling/Installing gettext (x64 context) using: $X64_BREW_COMMAND reinstall/install gettext"
+            $X64_BREW_COMMAND reinstall gettext || $X64_BREW_COMMAND install gettext
+            echo "Forcing link for gettext (x64 context) using: $X64_BREW_COMMAND link --force gettext"
+            $X64_BREW_COMMAND link --force gettext || echo "::warning::Brew link --force gettext (x64) failed."
+            GETTEXT_X64_PREFIX_CMD="$X64_BREW_COMMAND --prefix gettext"
+            echo "Getting gettext prefix using: ${GETTEXT_X64_PREFIX_CMD}"
+            GETTEXT_X64_PREFIX=$($GETTEXT_X64_PREFIX_CMD)
+            echo "Detected x64 gettext prefix: ${GETTEXT_X64_PREFIX}"
+            EXPECTED_GETTEXT_X64_OPT_PREFIX="/usr/local/opt/gettext"
+            if [[ "${GETTEXT_X64_PREFIX}" != "${EXPECTED_GETTEXT_X64_OPT_PREFIX}" ]]; then
+               echo "::warning::Detected gettext prefix '${GETTEXT_X64_PREFIX}' is not the expected symlinked opt path '${EXPECTED_GETTEXT_X64_OPT_PREFIX}'."
+            fi
+            if [ -n "${GETTEXT_X64_PREFIX}" ] && [ -d "${GETTEXT_X64_PREFIX}/lib" ] && [ -d "${GETTEXT_X64_PREFIX}/bin" ]; then
+              GETTEXT_LIB_DIR="${GETTEXT_X64_PREFIX}/lib"
+              GETTEXT_BIN_DIR="${GETTEXT_X64_PREFIX}/bin"
+              echo "Found gettext lib for x64 at ${GETTEXT_LIB_DIR}"
+              echo "Found gettext bin for x64 at ${GETTEXT_BIN_DIR}"
+              echo "Setting DYLD_LIBRARY_PATH to include ${GETTEXT_LIB_DIR}"
+              echo "DYLD_LIBRARY_PATH=${GETTEXT_LIB_DIR}${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" >> $GITHUB_ENV
+              echo "Setting DYLD_FALLBACK_LIBRARY_PATH to include ${GETTEXT_LIB_DIR}"
+              echo "DYLD_FALLBACK_LIBRARY_PATH=${GETTEXT_LIB_DIR}${DYLD_FALLBACK_LIBRARY_PATH:+:$DYLD_FALLBACK_LIBRARY_PATH}" >> $GITHUB_ENV
+              echo "Adding ${GETTEXT_BIN_DIR} to GITHUB_PATH"
+              echo "${GETTEXT_BIN_DIR}" >> $GITHUB_PATH
+              echo "Verifying libintl.8.dylib exists at ${GETTEXT_LIB_DIR}/libintl.8.dylib:"
+              ls -l "${GETTEXT_LIB_DIR}/libintl.8.dylib" || (echo "::error::libintl.8.dylib NOT FOUND at ${GETTEXT_LIB_DIR} after install!" && exit 1)
+            else
+              echo "::error::gettext x64 prefix or its lib/bin directory not found after attempting brew (re)install and link."
+              echo "Detected prefix was: '${GETTEXT_X64_PREFIX}'"
+              exit 1 
+            fi
+          fi
+          echo "--- End of gettext setup ---"
+
+      - name: Set up Python ${{ matrix.PYVERSION }} (${{ matrix.ARCH }})
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.PYVERSION }}
-          architecture: 'x64' 
+          architecture: ${{ matrix.ARCH }} 
 
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
@@ -153,79 +211,30 @@ jobs:
       - name: Run C/C++ code vendoring script
         run: python synthizer-c/vendor.py synthizer-vendored
 
-      - name: Cache Pip (macOS x64)
+      - name: Cache Pip (macOS ${{ matrix.ARCH }})
         uses: actions/cache@v4
         with:
           path: ~/Library/Caches/pip
-          key: ${{ runner.os }}-x64-pip-${{ env.PYVERSION }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }} 
+          key: ${{ runner.os }}-pip-${{ matrix.ARCH }}-${{ env.PYVERSION }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }} 
           restore-keys: |
-            ${{ runner.os }}-x64-pip-${{ env.PYVERSION }}-
+            ${{ runner.os }}-pip-${{ matrix.ARCH }}-${{ env.PYVERSION }}-
 
       - name: Install Python build dependencies (macOS)
         run: |
           python -m pip install --upgrade pip 
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
           
-      - name: Build Python Wheels (macOS x64)
+      - name: Build Python Wheels (macOS ${{ matrix.ARCH }})
         run: |
+          echo "Current DYLD_LIBRARY_PATH (at build time): $DYLD_LIBRARY_PATH" 
+          echo "Current DYLD_FALLBACK_LIBRARY_PATH (at build time): $DYLD_FALLBACK_LIBRARY_PATH" 
+          echo "Current PATH (at build time): $PATH" 
           python setup.py bdist_wheel
 
-      - name: Upload Python Wheel Artifact (macOS x64)
+      - name: Upload Python Wheel Artifact (macOS ${{ matrix.ARCH }})
         uses: actions/upload-artifact@v4
         with:
-          name: python-wheels-macos-x64-${{ matrix.PYVERSION }} 
-          path: dist/*.whl
-          
-  # Job per costruire le wheel su macOS (ARM64 - ARM Runner)
-  macos-arm64-build:
-    name: Build macOS (arm64) Python ${{ matrix.PYVERSION }} 
-    runs-on: macos-latest # Should be macos-14 (ARM64)
-    env:
-      PYVERSION: ${{ matrix.PYVERSION }}
-      TARGET_ARCH: "arm64" 
-    strategy:
-      fail-fast: false
-      matrix:
-        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Set up Python ${{ matrix.PYVERSION }} (arm64)
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.PYVERSION }}
-          architecture: 'arm64' 
-
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
-
-      - name: Run C/C++ code vendoring script
-        run: python synthizer-c/vendor.py synthizer-vendored
-
-      - name: Cache Pip (macOS arm64)
-        uses: actions/cache@v4
-        with:
-          path: ~/Library/Caches/pip
-          key: ${{ runner.os }}-arm64-pip-${{ env.PYVERSION }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }} 
-          restore-keys: |
-            ${{ runner.os }}-arm64-pip-${{ env.PYVERSION }}-
-
-      - name: Install Python build dependencies (macOS)
-        run: |
-          python -m pip install --upgrade pip 
-          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
-          
-      - name: Build Python Wheels (macOS arm64)
-        run: |
-          python setup.py bdist_wheel
-
-      - name: Upload Python Wheel Artifact (macOS arm64)
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-wheels-macos-arm64-${{ matrix.PYVERSION }} 
+          name: python-wheels-macos-${{ matrix.ARCH }}-${{ matrix.PYVERSION }} 
           path: dist/*.whl
 
   # Job per creare la sdist (source distribution)
@@ -267,7 +276,7 @@ jobs:
   deploy_pypi:
     name: Deploy to PyPI
     if: startsWith(github.ref, 'refs/tags') 
-    needs: [windows-build, linux-build, macos-x64-build, macos-arm64-build, sdist-build] # Aggiornato needs
+    needs: [windows-build, linux-build, macos-build, sdist-build] 
     runs-on: ubuntu-latest
     permissions:
       contents: read

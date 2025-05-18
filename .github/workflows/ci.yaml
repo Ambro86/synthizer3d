@@ -19,9 +19,13 @@ jobs:
         PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
         CI_ARCH: ["x64", "x86", "arm64"] 
         exclude:
-          # Python 3.8 for Windows ARM64 is not available via actions/setup-python
+          # Python 3.8, 3.9, and 3.10 for Windows ARM64 are not available via actions/setup-python
           - CI_ARCH: "arm64"
             PYVERSION: "3.8"
+          - CI_ARCH: "arm64"
+            PYVERSION: "3.9"
+          - CI_ARCH: "arm64"
+            PYVERSION: "3.10"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -70,13 +74,14 @@ jobs:
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
 
       - name: Build Python Wheels (Windows ${{ matrix.CI_ARCH }})
-        # Per Windows ARM64, disabilita NEON in dr_mp3 per evitare errori di compilazione
-        # se __ARM_NEON__ non è rilevato correttamente dal compilatore MSVC ARM64.
         env:
-          CMAKE_ARGS: ${{ matrix.CI_ARCH == 'arm64' && '-DDR_MP3_NO_NEON=1' || '' }}
+          # Pass compiler flags directly to disable NEON and SIMD for dr_mp3 on ARM64
+          CMAKE_C_FLAGS: ${{ matrix.CI_ARCH == 'arm64' && '/DDR_MP3_NO_NEON=1 /DDR_MP3_NO_SIMD=1' || '' }}
+          CMAKE_CXX_FLAGS: ${{ matrix.CI_ARCH == 'arm64' && '/DDR_MP3_NO_NEON=1 /DDR_MP3_NO_SIMD=1' || '' }}
         shell: powershell
         run: |
-          Write-Host "CMAKE_ARGS for this build: $Env:CMAKE_ARGS"
+          Write-Host "CMAKE_C_FLAGS for this build: $Env:CMAKE_C_FLAGS"
+          Write-Host "CMAKE_CXX_FLAGS for this build: $Env:CMAKE_CXX_FLAGS"
           Set-Location $Env:GITHUB_WORKSPACE
           python setup.py bdist_wheel
 

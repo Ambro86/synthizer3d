@@ -85,6 +85,8 @@ jobs:
       fail-fast: false
       matrix:
         PYTHON_TAG: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313"]
+        # Using a specific recent tag for the manylinux image
+        MANYLINUX_IMAGE_TAG: ["2024-05-01-39eda5c"] 
         include:
           - PYTHON_TAG: "cp38-cp38"
             PYTHON_VERSION_SHORT: "3.8"
@@ -113,7 +115,7 @@ jobs:
       - name: Build wheels using manylinux_2_17_x86_64 container
         shell: bash -e {0}
         run: |
-          DOCKER_IMAGE="quay.io/pypa/manylinux_2_17_x86_64:latest"
+          DOCKER_IMAGE="quay.io/pypa/manylinux_2_17_x86_64:${{ matrix.MANYLINUX_IMAGE_TAG }}"
           echo "Pulling Docker image: $DOCKER_IMAGE"
           docker pull $DOCKER_IMAGE
           
@@ -149,6 +151,8 @@ jobs:
       fail-fast: false
       matrix:
         PYTHON_TAG: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313"]
+        # Using a specific recent tag for the manylinux image
+        MANYLINUX_IMAGE_TAG: ["2024-05-01-39eda5c"] 
         include:
           - PYTHON_TAG: "cp38-cp38"
             PYTHON_VERSION_SHORT: "3.8"
@@ -182,7 +186,7 @@ jobs:
       - name: Build wheels using manylinux_2_17_aarch64 container
         shell: bash -e {0}
         run: |
-          DOCKER_IMAGE="quay.io/pypa/manylinux_2_17_aarch64:latest"
+          DOCKER_IMAGE="quay.io/pypa/manylinux_2_17_aarch64:${{ matrix.MANYLINUX_IMAGE_TAG }}"
           echo "Pulling Docker image: $DOCKER_IMAGE"
           docker pull $DOCKER_IMAGE
 
@@ -343,50 +347,4 @@ jobs:
       - name: Build Python sdist
         run: python setup.py sdist
 
-      - name: Upload Python sdist Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-sdist
-          path: dist/*.tar.gz 
-
-  # Job per il deployment su PyPI
-  deploy_pypi:
-    name: Deploy to PyPI
-    if: startsWith(github.ref, 'refs/tags') 
-    needs: 
-      - windows-build
-      - linux-x64-manylinux-build 
-      - linux-arm64-manylinux-build 
-      - macos-x64-build
-      - macos-arm64-build
-      - sdist-build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write 
-    steps:
-      - name: Download all build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ~/artifacts 
-
-      - name: Set up Python for Twine
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x' 
-      
-      - name: Upgrade pip for Twine step 
-        run: python -m pip install --upgrade pip
-
-      - name: Install Twine
-        run: python -m pip install --upgrade twine
-
-      - name: Display downloaded artifacts structure
-        run: ls -R ~/artifacts
-
-      - name: Upload to PyPI
-        env:
-          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }} 
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }} 
-        run: |
-          python -m twine upload --skip-existing ~/artifacts/*/*
+      - name: Upl

@@ -85,7 +85,6 @@ jobs:
       fail-fast: false
       matrix:
         PYTHON_TAG: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313"]
-        # Using a specific recent tag for the manylinux image
         MANYLINUX_IMAGE_TAG: ["2024-05-01-39eda5c"] 
         include:
           - PYTHON_TAG: "cp38-cp38"
@@ -106,20 +105,34 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Set up Python for vendoring script (on host) # Step 1: Setup Python
+      - name: Set up Python for vendoring script (on host)
         uses: actions/setup-python@v5
         with:
           python-version: '3.9' 
       
-      - name: Run C/C++ code vendoring script (on host) # Step 2: Run the script
+      - name: Run C/C++ code vendoring script (on host)
         run: python synthizer-c/vendor.py synthizer-vendored
         
       - name: Build wheels using manylinux_2_17_x86_64 container
         shell: bash -e {0}
         run: |
           DOCKER_IMAGE="quay.io/pypa/manylinux_2_17_x86_64:${{ matrix.MANYLINUX_IMAGE_TAG }}"
-          echo "Pulling Docker image: $DOCKER_IMAGE"
-          docker pull $DOCKER_IMAGE
+          echo "Attempting to pull Docker image: $DOCKER_IMAGE with retries..."
+          
+          MAX_ATTEMPTS=3
+          RETRY_DELAY=15 # seconds
+          attempt_num=1
+          
+          until docker pull $DOCKER_IMAGE; do
+            if [ $attempt_num -eq $MAX_ATTEMPTS ]; then
+              echo "::error::Failed to pull Docker image $DOCKER_IMAGE after $MAX_ATTEMPTS attempts."
+              exit 1
+            fi
+            echo "Docker pull attempt $attempt_num failed. Retrying in $RETRY_DELAY seconds..."
+            sleep $RETRY_DELAY
+            attempt_num=$((attempt_num+1))
+          done
+          echo "Docker image pulled successfully: $DOCKER_IMAGE"
           
           echo "Running build in Docker container..."
           docker run --rm -v "${{ github.workspace }}:/github/workspace" -w /github/workspace \
@@ -153,7 +166,6 @@ jobs:
       fail-fast: false
       matrix:
         PYTHON_TAG: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313"]
-        # Using a specific recent tag for the manylinux image
         MANYLINUX_IMAGE_TAG: ["2024-05-01-39eda5c"] 
         include:
           - PYTHON_TAG: "cp38-cp38"
@@ -179,20 +191,34 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Set up Python for vendoring script (on host) # Step 1: Setup Python
+      - name: Set up Python for vendoring script (on host)
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
 
-      - name: Run C/C++ code vendoring script (on host) # Step 2: Run the script
+      - name: Run C/C++ code vendoring script (on host)
         run: python synthizer-c/vendor.py synthizer-vendored
 
       - name: Build wheels using manylinux_2_17_aarch64 container
         shell: bash -e {0}
         run: |
           DOCKER_IMAGE="quay.io/pypa/manylinux_2_17_aarch64:${{ matrix.MANYLINUX_IMAGE_TAG }}"
-          echo "Pulling Docker image: $DOCKER_IMAGE"
-          docker pull $DOCKER_IMAGE
+          echo "Attempting to pull Docker image: $DOCKER_IMAGE with retries..."
+          
+          MAX_ATTEMPTS=3
+          RETRY_DELAY=15 # seconds
+          attempt_num=1
+          
+          until docker pull $DOCKER_IMAGE; do
+            if [ $attempt_num -eq $MAX_ATTEMPTS ]; then
+              echo "::error::Failed to pull Docker image $DOCKER_IMAGE after $MAX_ATTEMPTS attempts."
+              exit 1
+            fi
+            echo "Docker pull attempt $attempt_num failed. Retrying in $RETRY_DELAY seconds..."
+            sleep $RETRY_DELAY
+            attempt_num=$((attempt_num+1))
+          done
+          echo "Docker image pulled successfully: $DOCKER_IMAGE"
 
           echo "Running build in Docker container (aarch64)..."
           docker run --rm -v "${{ github.workspace }}:/github/workspace" -w /github/workspace \

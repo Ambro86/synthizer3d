@@ -54,13 +54,11 @@ jobs:
       - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install wheel setuptools # Aggiungi altre dipendenze di build (es. cython, scikit-build)
-          # Se hai un requirements-build.txt:
+          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
+          # Se hai un requirements-build.txt che include queste dipendenze:
           # pip install -r requirements-build.txt
 
       - name: Build Python Wheels (Windows)
-        # Assicurati che il tuo script ./ci/build_python.ps1 (o simile) esista e funzioni.
-        # Se non hai uno script, un comando tipico potrebbe essere: python setup.py bdist_wheel
         shell: powershell
         run: |
           Set-Location $Env:GITHUB_WORKSPACE
@@ -108,17 +106,17 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential # Per compilatori C/C++ e make
-          # Aggiungi qui altri pacchetti di sistema necessari per la compilazione (es. per libsndfile, ecc.)
+          # Aggiungi qui altri pacchetti di sistema necessari per la compilazione (es. cmake, ninja-build se non installati via pip)
+          # sudo apt-get install -y cmake ninja-build # Esempio se preferisci versioni di sistema
 
       - name: Install Python build dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install wheel setuptools # Aggiungi altre dipendenze di build
+          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
+          # Se hai un requirements-build.txt che include queste dipendenze:
+          # pip install -r requirements-build.txt
 
       - name: Build Python Wheels (Linux)
-        # Se hai uno script ./ci/build_linux.sh, usalo.
-        # Altrimenti, un comando tipico è: python setup.py bdist_wheel
-        # Per many_linux wheels, avresti bisogno di un container Docker.
         run: |
           python setup.py bdist_wheel
 
@@ -131,7 +129,7 @@ jobs:
   # Job per costruire le wheel su macOS
   macos-build:
     name: Build macOS (x64) Python ${{ matrix.PYVERSION }}
-    runs-on: macos-latest # Attualmente Intel (x64)
+    runs-on: macos-latest 
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
     strategy:
@@ -160,11 +158,11 @@ jobs:
       - name: Install Python build dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install wheel setuptools # Aggiungi altre dipendenze di build
+          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
+          # Se hai un requirements-build.txt che include queste dipendenze:
+          # pip install -r requirements-build.txt
 
       - name: Build Python Wheels (macOS)
-        # Se hai uno script ./ci/build_macos.sh, usalo.
-        # Altrimenti, un comando tipico è: python setup.py bdist_wheel
         run: |
           python setup.py bdist_wheel
 
@@ -187,12 +185,14 @@ jobs:
       - name: Set up Python (for sdist)
         uses: actions/setup-python@v5
         with:
-          python-version: '3.9' # Usa una versione Python stabile per creare la sdist
+          python-version: '3.9' 
 
       - name: Install Python build dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install wheel setuptools
+          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
+          # Se hai un requirements-build.txt che include queste dipendenze:
+          # pip install -r requirements-build.txt
 
       - name: Build Python sdist
         run: python setup.py sdist
@@ -201,22 +201,22 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: python-sdist
-          path: dist/*.tar.gz # La sdist è solitamente un .tar.gz
+          path: dist/*.tar.gz 
 
   # Job per il deployment su PyPI
   deploy_pypi:
     name: Deploy to PyPI
-    if: startsWith(github.ref, 'refs/tags') # Esegue solo quando viene creato un tag
-    needs: [windows-build, linux-build, macos-build, sdist-build] # Dipende da tutte le build
+    if: startsWith(github.ref, 'refs/tags') 
+    needs: [windows-build, linux-build, macos-build, sdist-build] 
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write # Per Trusted Publishing su PyPI
+      id-token: write 
     steps:
       - name: Download all build artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ~/artifacts # Scarica tutti gli artefatti
+          path: ~/artifacts 
 
       - name: Set up Python for Twine
         uses: actions/setup-python@v5
@@ -231,13 +231,7 @@ jobs:
 
       - name: Upload to PyPI
         env:
-          # Per Trusted Publishing (raccomandato):
-          # Non servono TWINE_USERNAME/TWINE_PASSWORD nei segreti GitHub.
-          # Configura PyPI per fidarsi di questo repository/workflow.
-          #
-          # Per il metodo tradizionale con token API:
-          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }} # Di solito '__token__'
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }} # Il tuo token API da GitHub Secrets
+          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }} 
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }} 
         run: |
-          # Carica tutti i file wheel e sdist
           python -m twine upload --skip-existing ~/artifacts/*/*

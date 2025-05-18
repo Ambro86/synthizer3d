@@ -1,22 +1,16 @@
 # Trigger del workflow: si attiva ad ogni push e pull request
 on:
-  push:
-    branches:
-      - main # O il tuo branch di sviluppo principale
-      - 'release/**'
-      - 'correction-python313-and-new-cython-version' # Aggiunto per il tuo branch di lavoro
-  pull_request:
-    branches:
-      - main # O il tuo branch di sviluppo principale
+  push: {} # Si attiva su push a qualsiasi branch
+  pull_request: {} # Si attiva su pull request verso qualsiasi branch
 
 jobs:
   # Job per costruire le wheel su Windows
-  windows-build:
+  windows-build: # Rinominato da 'windows' per coerenza
     name: Build Windows (x64) Python ${{ matrix.PYVERSION }}
     runs-on: windows-latest
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
-      CI_ARCH: "64" # Fisso a 64-bit per Windows in questo esempio
+      CI_ARCH: "64" 
       CI_WINDOWS: "1"
     strategy:
       fail-fast: false
@@ -33,6 +27,11 @@ jobs:
         with:
           python-version: ${{ matrix.PYVERSION }}
           architecture: 'x64'
+
+      - name: Run C/C++ code vendoring script
+        # Questo script prepara la directory 'synthizer-vendored' con il codice C/C++
+        # Assicurati che il percorso 'synthizer-c/vendor.py' sia corretto.
+        run: python synthizer-c/vendor.py synthizer-vendored
 
       - name: Cache Pip (Windows)
         uses: actions/cache@v4
@@ -51,20 +50,20 @@ jobs:
           set INCLUDE >> %GITHUB_ENV%
           set LIB >> %GITHUB_ENV%
 
-      - name: Install build dependencies
+      - name: Install build dependencies (Windows)
         run: |
           python -m pip install --upgrade pip
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
-          # Se hai un requirements-build.txt che include queste dipendenze:
-          # pip install -r requirements-build.txt
 
       - name: Build Python Wheels (Windows)
+        # Se hai uno script ./ci/build_python.ps1, usalo.
+        # Altrimenti, il comando standard è 'python setup.py bdist_wheel'.
         shell: powershell
         run: |
           Set-Location $Env:GITHUB_WORKSPACE
-          # Se hai uno script specifico per Windows, chiamalo qui:
+          # Esempio se hai uno script specifico:
           # ./ci/build_python.ps1
-          # Altrimenti, usa un comando standard:
+          # Altrimenti, comando standard:
           python setup.py bdist_wheel
 
       - name: Upload Python Wheel Artifact (Windows)
@@ -79,6 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
+      CI_ARCH: "64" # Per coerenza, anche se non usato direttamente come in Windows
     strategy:
       fail-fast: false
       matrix:
@@ -93,6 +93,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.PYVERSION }}
+          # architecture: 'x64' # Di default per ubuntu-latest
+
+      - name: Run C/C++ code vendoring script
+        run: python synthizer-c/vendor.py synthizer-vendored
 
       - name: Cache Pip (Linux)
         uses: actions/cache@v4
@@ -106,17 +110,16 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential # Per compilatori C/C++ e make
-          # Aggiungi qui altri pacchetti di sistema necessari per la compilazione (es. cmake, ninja-build se non installati via pip)
-          # sudo apt-get install -y cmake ninja-build # Esempio se preferisci versioni di sistema
+          # Aggiungi qui altri pacchetti se necessari (es. per dipendenze C di Synthizer)
 
-      - name: Install Python build dependencies
+      - name: Install Python build dependencies (Linux)
         run: |
           python -m pip install --upgrade pip
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
-          # Se hai un requirements-build.txt che include queste dipendenze:
-          # pip install -r requirements-build.txt
 
       - name: Build Python Wheels (Linux)
+        # Per many_linux wheels, sarebbe necessario un setup più complesso con Docker.
+        # Questo crea una wheel per la glibc del runner.
         run: |
           python setup.py bdist_wheel
 
@@ -129,9 +132,10 @@ jobs:
   # Job per costruire le wheel su macOS
   macos-build:
     name: Build macOS (x64) Python ${{ matrix.PYVERSION }}
-    runs-on: macos-latest 
+    runs-on: macos-latest # Attualmente Intel (x64)
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
+      CI_ARCH: "64" # Per coerenza
     strategy:
       fail-fast: false
       matrix:
@@ -146,6 +150,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.PYVERSION }}
+          # architecture: 'x64' # Di default per macos-latest x64
+
+      - name: Run C/C++ code vendoring script
+        run: python synthizer-c/vendor.py synthizer-vendored
 
       - name: Cache Pip (macOS)
         uses: actions/cache@v4
@@ -155,12 +163,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-${{ env.PYVERSION }}-
 
-      - name: Install Python build dependencies
+      - name: Install Python build dependencies (macOS)
         run: |
           python -m pip install --upgrade pip
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
-          # Se hai un requirements-build.txt che include queste dipendenze:
-          # pip install -r requirements-build.txt
 
       - name: Build Python Wheels (macOS)
         run: |
@@ -185,14 +191,15 @@ jobs:
       - name: Set up Python (for sdist)
         uses: actions/setup-python@v5
         with:
-          python-version: '3.9' 
+          python-version: '3.9' # Una versione stabile per la sdist
 
-      - name: Install Python build dependencies
+      - name: Run C/C++ code vendoring script
+        run: python synthizer-c/vendor.py synthizer-vendored
+
+      - name: Install Python build dependencies (sdist)
         run: |
           python -m pip install --upgrade pip
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
-          # Se hai un requirements-build.txt che include queste dipendenze:
-          # pip install -r requirements-build.txt
 
       - name: Build Python sdist
         run: python setup.py sdist
@@ -206,12 +213,12 @@ jobs:
   # Job per il deployment su PyPI
   deploy_pypi:
     name: Deploy to PyPI
-    if: startsWith(github.ref, 'refs/tags') 
-    needs: [windows-build, linux-build, macos-build, sdist-build] 
+    if: startsWith(github.ref, 'refs/tags') # Esegue solo quando viene creato un tag
+    needs: [windows-build, linux-build, macos-build, sdist-build] # Dipende da tutte le build
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write 
+      id-token: write # Per Trusted Publishing su PyPI
     steps:
       - name: Download all build artifacts
         uses: actions/download-artifact@v4
@@ -231,7 +238,7 @@ jobs:
 
       - name: Upload to PyPI
         env:
-          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }} 
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }} 
+          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }} # Di solito '__token__'
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }} # Il tuo token API da GitHub Secrets
         run: |
           python -m twine upload --skip-existing ~/artifacts/*/*

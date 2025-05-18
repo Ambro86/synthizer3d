@@ -145,30 +145,36 @@ jobs:
           submodules: recursive
 
       - name: Install and set up gettext for x64 Python
-        # Applica per Python 3.8, 3.9, e 3.10 su x64, che sono le versioni problematiche
         if: matrix.ARCH == 'x64' && (matrix.PYVERSION == '3.8' || matrix.PYVERSION == '3.9' || matrix.PYVERSION == '3.10')
-        shell: bash -e {0} # Use bash and exit on error
+        shell: bash -e {0} 
         run: |
-          echo "Attempting to install/reinstall x64 gettext for x64 Python environment on ARM64 runner..."
-          # Ensure PATH includes Homebrew's x64 path first for subsequent brew commands if needed,
-          # though arch -x86_64 should handle this.
-          # if [ -d "/usr/local/bin" ]; then export PATH="/usr/local/bin:$PATH"; fi
+          echo "Attempting to install/reinstall x64 gettext using /usr/local/bin/brew..."
           
-          echo "Updating Homebrew for x86_64..."
-          arch -x86_64 brew update
+          # Define the path to the x86_64 Homebrew executable
+          X64_BREW_PATH="/usr/local/bin/brew"
+
+          if [ ! -f "$X64_BREW_PATH" ]; then
+            echo "Error: x86_64 Homebrew not found at $X64_BREW_PATH. This setup assumes it exists for x64 packages on ARM runners."
+            exit 1
+          fi
+
+          echo "Using x86_64 Homebrew at $X64_BREW_PATH"
+          
+          echo "Updating x86_64 Homebrew..."
+          arch -x86_64 "$X64_BREW_PATH" update
           
           echo "Reinstalling/Installing gettext for x86_64..."
-          arch -x86_64 brew reinstall gettext || arch -x86_64 brew install gettext
+          arch -x86_64 "$X64_BREW_PATH" reinstall gettext || arch -x86_64 "$X64_BREW_PATH" install gettext
           
           echo "Forcing link for gettext for x86_64..."
-          arch -x86_64 brew link --force gettext
+          arch -x86_64 "$X64_BREW_PATH" link --force gettext
           
-          GETTEXT_X64_PREFIX_CMD="arch -x86_64 brew --prefix gettext"
+          GETTEXT_X64_PREFIX_CMD="arch -x86_64 $X64_BREW_PATH --prefix gettext"
           echo "Running: ${GETTEXT_X64_PREFIX_CMD}"
           GETTEXT_X64_PREFIX=$($GETTEXT_X64_PREFIX_CMD)
           echo "Detected x64 gettext prefix: ${GETTEXT_X64_PREFIX}"
           
-          if [ -n "${GETTEXT_X64_PREFIX}" ] && [ -d "${GETTEXT_X64_PREFIX}/lib" ]; then
+          if [ -n "${GETTEXT_X64_PREFIX}" ] && [ -d "${GETTEXT_X64_PREFIX}/lib" ] && [ -d "${GETTEXT_X64_PREFIX}/bin" ]; then
             GETTEXT_LIB_DIR="${GETTEXT_X64_PREFIX}/lib"
             GETTEXT_BIN_DIR="${GETTEXT_X64_PREFIX}/bin"
             echo "Found gettext lib for x64 at ${GETTEXT_LIB_DIR}"
@@ -176,7 +182,7 @@ jobs:
             echo "Setting DYLD_LIBRARY_PATH to include ${GETTEXT_LIB_DIR}"
             echo "DYLD_LIBRARY_PATH=${GETTEXT_LIB_DIR}${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" >> $GITHUB_ENV
             
-            echo "Setting DYLD_FALLBACK_LIBRARY_PATH to include ${GETTEXT_LIB_DIR}" # Added fallback
+            echo "Setting DYLD_FALLBACK_LIBRARY_PATH to include ${GETTEXT_LIB_DIR}"
             echo "DYLD_FALLBACK_LIBRARY_PATH=${GETTEXT_LIB_DIR}${DYLD_FALLBACK_LIBRARY_PATH:+:$DYLD_FALLBACK_LIBRARY_PATH}" >> $GITHUB_ENV
 
             echo "Adding ${GETTEXT_BIN_DIR} to GITHUB_PATH"
@@ -189,9 +195,9 @@ jobs:
             echo "DYLD_FALLBACK_LIBRARY_PATH will be set to include: ${GETTEXT_LIB_DIR}"
             echo "PATH will be set to include: ${GETTEXT_BIN_DIR}"
           else
-            echo "Error: gettext x64 prefix or its lib directory not found after attempting brew (re)install and link."
+            echo "Error: gettext x64 prefix or its lib/bin directory not found after attempting brew (re)install and link."
             echo "Detected prefix was: '${GETTEXT_X64_PREFIX}'"
-            echo "Listing files in /usr/local/opt/gettext/lib if it exists:"
+            echo "Listing files in /usr/local/opt/gettext if it exists:"
             ls -lR "/usr/local/opt/gettext" || echo "/usr/local/opt/gettext not found or empty."
             exit 1 
           fi

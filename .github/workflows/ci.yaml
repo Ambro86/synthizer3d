@@ -5,7 +5,7 @@ on:
 
 jobs:
   # Job per costruire le wheel su Windows
-  windows-build: # Rinominato da 'windows' per coerenza
+  windows-build:
     name: Build Windows (x64) Python ${{ matrix.PYVERSION }}
     runs-on: windows-latest
     env:
@@ -59,14 +59,9 @@ jobs:
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
 
       - name: Build Python Wheels (Windows)
-        # Se hai uno script ./ci/build_python.ps1, usalo.
-        # Altrimenti, il comando standard è 'python setup.py bdist_wheel'.
         shell: powershell
         run: |
           Set-Location $Env:GITHUB_WORKSPACE
-          # Esempio se hai uno script specifico:
-          # ./ci/build_python.ps1
-          # Altrimenti, comando standard:
           python setup.py bdist_wheel
 
       - name: Upload Python Wheel Artifact (Windows)
@@ -81,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
-      CI_ARCH: "64" # Per coerenza, anche se non usato direttamente come in Windows
+      CI_ARCH: "64" 
     strategy:
       fail-fast: false
       matrix:
@@ -96,7 +91,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.PYVERSION }}
-          # architecture: 'x64' # Di default per ubuntu-latest
 
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
@@ -115,17 +109,14 @@ jobs:
       - name: Install system build dependencies (Linux)
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential # Per compilatori C/C++ e make
-          # Aggiungi qui altri pacchetti se necessari (es. per dipendenze C di Synthizer)
+          sudo apt-get install -y build-essential 
 
       - name: Install Python build dependencies (Linux)
         run: |
-          python -m pip install --upgrade pip # Ridondante ma innocuo
+          python -m pip install --upgrade pip 
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
 
       - name: Build Python Wheels (Linux)
-        # Per many_linux wheels, sarebbe necessario un setup più complesso con Docker.
-        # Questo crea una wheel per la glibc del runner.
         run: |
           python setup.py bdist_wheel
 
@@ -137,26 +128,27 @@ jobs:
 
   # Job per costruire le wheel su macOS
   macos-build:
-    name: Build macOS (x64) Python ${{ matrix.PYVERSION }}
-    runs-on: macos-latest # Attualmente Intel (x64)
+    name: Build macOS (${{ matrix.ARCH }}) Python ${{ matrix.PYVERSION }} # Nome job aggiornato
+    runs-on: macos-latest # Questo runner può essere arm64 (es. macos-14)
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
-      CI_ARCH: "64" # Per coerenza
+      TARGET_ARCH: ${{ matrix.ARCH }} # Usato per chiarezza e potenzialmente negli script di build
     strategy:
       fail-fast: false
       matrix:
         PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        ARCH: ["arm64", "x64"] # Aggiunta matrice per architettura
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Set up Python ${{ matrix.PYVERSION }}
+      - name: Set up Python ${{ matrix.PYVERSION }} (${{ matrix.ARCH }})
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.PYVERSION }}
-          # architecture: 'x64' # Di default per macos-latest x64
+          architecture: ${{ matrix.ARCH }} # Specifica l'architettura
 
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
@@ -164,27 +156,33 @@ jobs:
       - name: Run C/C++ code vendoring script
         run: python synthizer-c/vendor.py synthizer-vendored
 
-      - name: Cache Pip (macOS)
+      - name: Cache Pip (macOS ${{ matrix.ARCH }})
         uses: actions/cache@v4
         with:
           path: ~/Library/Caches/pip
-          key: ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }}
+          key: ${{ runner.os }}-pip-${{ matrix.ARCH }}-${{ env.PYVERSION }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }} # Chiave cache aggiornata
           restore-keys: |
-            ${{ runner.os }}-pip-${{ env.PYVERSION }}-
+            ${{ runner.os }}-pip-${{ matrix.ARCH }}-${{ env.PYVERSION }}-
 
       - name: Install Python build dependencies (macOS)
         run: |
-          python -m pip install --upgrade pip # Ridondante ma innocuo
+          python -m pip install --upgrade pip 
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
+          # Per build x64 su runner arm64, potresti aver bisogno di impostare variabili d'ambiente
+          # come CMAKE_OSX_ARCHITECTURES="x86_64" se il tuo setup.py non lo gestisce.
 
-      - name: Build Python Wheels (macOS)
+      - name: Build Python Wheels (macOS ${{ matrix.ARCH }})
+        # Se il tuo setup.py non gestisce automaticamente l'architettura target,
+        # potresti aver bisogno di impostare variabili d'ambiente qui, ad esempio:
+        # env:
+        #   CMAKE_OSX_ARCHITECTURES: ${{ matrix.ARCH == 'x64' && 'x86_64' || 'arm64' }}
         run: |
           python setup.py bdist_wheel
 
-      - name: Upload Python Wheel Artifact (macOS)
+      - name: Upload Python Wheel Artifact (macOS ${{ matrix.ARCH }})
         uses: actions/upload-artifact@v4
         with:
-          name: python-wheels-macos-x64-${{ matrix.PYVERSION }}
+          name: python-wheels-macos-${{ matrix.ARCH }}-${{ matrix.PYVERSION }} # Nome artefatto aggiornato
           path: dist/*.whl
 
   # Job per creare la sdist (source distribution)
@@ -200,7 +198,7 @@ jobs:
       - name: Set up Python (for sdist)
         uses: actions/setup-python@v5
         with:
-          python-version: '3.9' # Una versione stabile per la sdist
+          python-version: '3.9' 
       
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
@@ -210,7 +208,7 @@ jobs:
 
       - name: Install Python build dependencies (sdist)
         run: |
-          python -m pip install --upgrade pip # Ridondante ma innocuo
+          python -m pip install --upgrade pip 
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
 
       - name: Build Python sdist
@@ -225,12 +223,12 @@ jobs:
   # Job per il deployment su PyPI
   deploy_pypi:
     name: Deploy to PyPI
-    if: startsWith(github.ref, 'refs/tags') # Esegue solo quando viene creato un tag
-    needs: [windows-build, linux-build, macos-build, sdist-build] # Dipende da tutte le build
+    if: startsWith(github.ref, 'refs/tags') 
+    needs: [windows-build, linux-build, macos-build, sdist-build] 
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write # Per Trusted Publishing su PyPI
+      id-token: write 
     steps:
       - name: Download all build artifacts
         uses: actions/download-artifact@v4
@@ -242,7 +240,7 @@ jobs:
         with:
           python-version: '3.x' 
       
-      - name: Upgrade pip for Twine step # Aggiunto anche qui per consistenza
+      - name: Upgrade pip for Twine step 
         run: python -m pip install --upgrade pip
 
       - name: Install Twine
@@ -253,7 +251,7 @@ jobs:
 
       - name: Upload to PyPI
         env:
-          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }} # Di solito '__token__'
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }} # Il tuo token API da GitHub Secrets
+          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }} 
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }} 
         run: |
           python -m twine upload --skip-existing ~/artifacts/*/*

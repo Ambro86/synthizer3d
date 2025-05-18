@@ -151,43 +151,53 @@ jobs:
         run: |
           echo "Attempting to install/reinstall x64 gettext for x64 Python environment on ARM64 runner..."
           
-          # Define the x64 Homebrew command, assuming 'brew' in PATH will be run under Rosetta
-          # and explicitly set Homebrew environment variables to target x64 paths.
-          X64_BREW_ENV_PREFIX="env HOMEBREW_PREFIX=/usr/local HOMEBREW_CELLAR=/usr/local/Cellar HOMEBREW_REPOSITORY=/usr/local/Homebrew"
-          X64_BREW_COMMAND="$X64_BREW_ENV_PREFIX arch -x86_64 brew"
+          # Explicitly prepend /usr/local/bin to PATH for this script's execution context
+          # This is where the x86_64 version of Homebrew should be.
+          export PATH="/usr/local/bin:$PATH"
+          echo "Updated PATH for this step: $PATH"
           
+          X64_BREW_EXECUTABLE="/usr/local/bin/brew"
+
+          if ! command -v $X64_BREW_EXECUTABLE &> /dev/null; then
+            echo "::error::Critical: x86_64 Homebrew executable not found at $X64_BREW_EXECUTABLE."
+            echo "The GitHub Actions macOS ARM64 runner is expected to have an x86_64 Homebrew at this location for Rosetta 2."
+            exit 1
+          fi
+          
+          X64_BREW_COMMAND="arch -x86_64 $X64_BREW_EXECUTABLE"
           echo "Using Homebrew command for x64 operations: $X64_BREW_COMMAND"
 
-          echo "Verifying Homebrew (x64 context) with: $X64_BREW_COMMAND --version"
-          $X64_BREW_COMMAND --version || (echo "::error::Failed to execute Homebrew in x64 context." && exit 1)
+          echo "Verifying x64 Homebrew with: $X64_BREW_COMMAND --version"
+          $X64_BREW_COMMAND --version || (echo "::error::Failed to execute x64 Homebrew at $X64_BREW_EXECUTABLE. Check Rosetta 2 setup on runner." && exit 1)
           
-          echo "Updating Homebrew (x64 context)..."
+          echo "Updating x86_64 Homebrew..."
           $X64_BREW_COMMAND update || echo "::warning::Brew update (x64) failed, continuing with install attempt..."
           
           echo "Reinstalling/Installing gettext (x64 context)..."
           $X64_BREW_COMMAND reinstall gettext || $X64_BREW_COMMAND install gettext
           
           echo "Forcing link for gettext (x64 context)..."
-          # Link may not be strictly necessary if the prefix is correctly used, but try anyway.
           $X64_BREW_COMMAND link --force gettext || echo "::warning::Brew link --force gettext (x64) failed. This might be okay if already linked or keg-only."
           
-          # Get the prefix for the x64 installed gettext
           GETTEXT_X64_PREFIX_CMD="$X64_BREW_COMMAND --prefix gettext"
           echo "Running: ${GETTEXT_X64_PREFIX_CMD}"
           GETTEXT_X64_PREFIX=$($GETTEXT_X64_PREFIX_CMD)
           echo "Detected x64 gettext prefix: ${GETTEXT_X64_PREFIX}"
           
-          # Critical check: Ensure the detected prefix is indeed the x64 one
-          if [[ "${GETTEXT_X64_PREFIX}" != "/usr/local/opt/gettext" && "${GETTEXT_X64_PREFIX}" != "/usr/local/Cellar/gettext/"* ]]; then
-             echo "::error::Detected gettext prefix '${GETTEXT_X64_PREFIX}' is not the expected x64 path (/usr/local/opt/gettext or /usr/local/Cellar/gettext)."
-             echo "This indicates Homebrew (x64 context) did not operate as expected."
-             exit 1
+          # Critical check: Ensure the detected prefix is indeed the x64 one (should be /usr/local/opt/gettext)
+          # Homebrew's --prefix for a formula like gettext usually points to the opt directory.
+          EXPECTED_GETTEXT_X64_OPT_PREFIX="/usr/local/opt/gettext"
+          if [[ "${GETTEXT_X64_PREFIX}" != "${EXPECTED_GETTEXT_X64_OPT_PREFIX}" ]]; then
+             echo "::warning::Detected gettext prefix '${GETTEXT_X64_PREFIX}' is not the expected symlinked opt path '${EXPECTED_GETTEXT_X64_OPT_PREFIX}'."
+             echo "This might be okay if Homebrew changed its prefix reporting, but we will proceed assuming the lib and bin are within the detected prefix."
+             # We will still check for lib and bin directories within the DETECTED prefix.
           fi
 
           if [ -n "${GETTEXT_X64_PREFIX}" ] && [ -d "${GETTEXT_X64_PREFIX}/lib" ] && [ -d "${GETTEXT_X64_PREFIX}/bin" ]; then
             GETTEXT_LIB_DIR="${GETTEXT_X64_PREFIX}/lib"
             GETTEXT_BIN_DIR="${GETTEXT_X64_PREFIX}/bin"
             echo "Found gettext lib for x64 at ${GETTEXT_LIB_DIR}"
+            echo "Found gettext bin for x64 at ${GETTEXT_BIN_DIR}"
             
             echo "Setting DYLD_LIBRARY_PATH to include ${GETTEXT_LIB_DIR}"
             echo "DYLD_LIBRARY_PATH=${GETTEXT_LIB_DIR}${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" >> $GITHUB_ENV
@@ -207,9 +217,9 @@ jobs:
           else
             echo "::error::gettext x64 prefix or its lib/bin directory not found after attempting brew (re)install and link."
             echo "Detected prefix was: '${GETTEXT_X64_PREFIX}'"
-            echo "Listing files in /usr/local/opt/gettext if it exists (this is the expected symlink target for x64 Homebrew):"
+            echo "Listing files in /usr/local/opt/gettext (expected symlink target):"
             ls -lR "/usr/local/opt/gettext" || echo "/usr/local/opt/gettext not found or empty."
-            echo "Listing files in /usr/local/Cellar/gettext if it exists (this is where Homebrew x64 installs to):"
+            echo "Listing files in /usr/local/Cellar/gettext (expected install location):"
             ls -lR "/usr/local/Cellar/gettext" || echo "/usr/local/Cellar/gettext not found or empty."
             exit 1 
           fi

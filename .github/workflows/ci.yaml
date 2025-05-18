@@ -55,7 +55,7 @@ jobs:
 
       - name: Install build dependencies (Windows)
         run: |
-          python -m pip install --upgrade pip # Questo è ridondante ora, ma innocuo
+          python -m pip install --upgrade pip 
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
 
       - name: Build Python Wheels (Windows)
@@ -128,27 +128,46 @@ jobs:
 
   # Job per costruire le wheel su macOS
   macos-build:
-    name: Build macOS (${{ matrix.ARCH }}) Python ${{ matrix.PYVERSION }} # Nome job aggiornato
-    runs-on: macos-latest # Questo runner può essere arm64 (es. macos-14)
+    name: Build macOS (${{ matrix.ARCH }}) Python ${{ matrix.PYVERSION }} 
+    runs-on: macos-latest 
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
-      TARGET_ARCH: ${{ matrix.ARCH }} # Usato per chiarezza e potenzialmente negli script di build
+      TARGET_ARCH: ${{ matrix.ARCH }} 
     strategy:
       fail-fast: false
       matrix:
         PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-        ARCH: ["arm64", "x64"] # Aggiunta matrice per architettura
+        ARCH: ["arm64", "x64"] 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
+      - name: Install gettext (for libintl dependency)
+        # CORREZIONE: Applica per Python 3.8, 3.9, e 3.10 su x64
+        if: matrix.ARCH == 'x64' && (matrix.PYVERSION == '3.8' || matrix.PYVERSION == '3.9' || matrix.PYVERSION == '3.10')
+        run: |
+          brew install gettext
+          echo "Installed gettext. Attempting to update PATH for Homebrew gettext."
+          # Aggiunge i percorsi di Homebrew per gettext al GITHUB_PATH
+          # Questo aiuta gli step successivi a trovare le librerie e i binari di gettext
+          # Per Intel Macs (o Rosetta su ARM)
+          if [ -d "/usr/local/opt/gettext/bin" ]; then echo "/usr/local/opt/gettext/bin" >> $GITHUB_PATH; fi
+          if [ -d "/usr/local/opt/gettext/lib" ]; then export DYLD_LIBRARY_PATH="/usr/local/opt/gettext/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"; echo "DYLD_LIBRARY_PATH set for /usr/local/opt/gettext/lib"; fi
+          # Per ARM64 Macs (Homebrew installa in /opt/homebrew)
+          if [ -d "/opt/homebrew/opt/gettext/bin" ]; then echo "/opt/homebrew/opt/gettext/bin" >> $GITHUB_PATH; fi
+          if [ -d "/opt/homebrew/opt/gettext/lib" ]; then export DYLD_LIBRARY_PATH="/opt/homebrew/opt/gettext/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"; echo "DYLD_LIBRARY_PATH set for /opt/homebrew/opt/gettext/lib"; fi
+          echo "gettext path (if found): $(which gettext || echo 'not found in PATH')"
+          echo "Updated GITHUB_PATH: $GITHUB_PATH"
+          echo "Updated DYLD_LIBRARY_PATH: $DYLD_LIBRARY_PATH"
+
+
       - name: Set up Python ${{ matrix.PYVERSION }} (${{ matrix.ARCH }})
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.PYVERSION }}
-          architecture: ${{ matrix.ARCH }} # Specifica l'architettura
+          architecture: ${{ matrix.ARCH }} 
 
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
@@ -160,7 +179,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/Library/Caches/pip
-          key: ${{ runner.os }}-pip-${{ matrix.ARCH }}-${{ env.PYVERSION }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }} # Chiave cache aggiornata
+          key: ${{ runner.os }}-pip-${{ matrix.ARCH }}-${{ env.PYVERSION }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }} 
           restore-keys: |
             ${{ runner.os }}-pip-${{ matrix.ARCH }}-${{ env.PYVERSION }}-
 
@@ -168,21 +187,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip 
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
-          # Per build x64 su runner arm64, potresti aver bisogno di impostare variabili d'ambiente
-          # come CMAKE_OSX_ARCHITECTURES="x86_64" se il tuo setup.py non lo gestisce.
-
+          
       - name: Build Python Wheels (macOS ${{ matrix.ARCH }})
-        # Se il tuo setup.py non gestisce automaticamente l'architettura target,
-        # potresti aver bisogno di impostare variabili d'ambiente qui, ad esempio:
-        # env:
-        #   CMAKE_OSX_ARCHITECTURES: ${{ matrix.ARCH == 'x64' && 'x86_64' || 'arm64' }}
         run: |
           python setup.py bdist_wheel
 
       - name: Upload Python Wheel Artifact (macOS ${{ matrix.ARCH }})
         uses: actions/upload-artifact@v4
         with:
-          name: python-wheels-macos-${{ matrix.ARCH }}-${{ matrix.PYVERSION }} # Nome artefatto aggiornato
+          name: python-wheels-macos-${{ matrix.ARCH }}-${{ matrix.PYVERSION }} 
           path: dist/*.whl
 
   # Job per creare la sdist (source distribution)

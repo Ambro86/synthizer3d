@@ -1,94 +1,229 @@
 # Trigger del workflow: si attiva ad ogni push e pull request
 on:
-  push: {}
-  pull_request: {}
+  push:
+    branches:
+      - main # O il tuo branch di sviluppo principale
+      - 'release/**'
+  pull_request:
+    branches:
+      - main # O il tuo branch di sviluppo principale
 
 jobs:
-  # Job per sistemi Windows (solo 64-bit)
-  windows:
+  # Job per costruire le wheel su Windows
+  windows-build:
     name: Build Windows (x64) Python ${{ matrix.PYVERSION }}
-    runs-on: windows-latest # Usa l'ultima versione di Windows runner (attualmente windows-2022)
+    runs-on: windows-latest
     env:
-      CI_ARCH: "64" # Impostato fisso a 64-bit
-      CI_WINDOWS: "1"
       PYVERSION: ${{ matrix.PYVERSION }}
+      CI_ARCH: "64" # Fisso a 64-bit per Windows in questo esempio
+      CI_WINDOWS: "1"
     strategy:
-      fail-fast: false # Continua gli altri job della matrice anche se uno fallisce
+      fail-fast: false
       matrix:
-        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"] # Versioni Python (rimosso 3.7 EOL)
+        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
-      - name: Checkout # Scarica il codice del repository
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive # Include i sottomoduli, se presenti
+          submodules: recursive
 
       - name: Set up Python ${{ matrix.PYVERSION }} (x64)
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.PYVERSION }}
-          architecture: 'x64' # Specifica architettura x64 per setup-python
+          architecture: 'x64'
 
-      - name: Cache Pip # Memorizza nella cache le dipendenze Pip
+      - name: Cache Pip (Windows)
         uses: actions/cache@v4
         with:
-          path: ~\AppData\Local\pip\Cache # Percorso cache Pip su Windows
-          # La chiave di cache include versione Python, architettura e hash dei file di dipendenze
-          key: ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ env.CI_ARCH }}-${{ hashFiles('**/requirements.txt') }}
+          path: ~\AppData\Local\pip\Cache
+          key: ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ env.CI_ARCH }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }}
           restore-keys: |
             ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ env.CI_ARCH }}-
 
       - name: Configure MSVC 64-bit Environment Variables
-        # Questo step configura l'ambiente per la compilazione a 64 bit.
-        # Utilizza il percorso standard di Visual Studio 2022 Enterprise sui runner GitHub.
-        # Se il tuo progetto non necessita di MSVC per Python >= 3.12, puoi aggiungere una condizione:
-        # if: matrix.PYVERSION < '3.12'
+        # Necessario per compilare estensioni C/C++
+        # Adatta il percorso se usi una versione diversa di Visual Studio o se non è Enterprise
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           echo "Configured MSVC for x64"
-          set PATH >> %GITHUB_ENV% # Esporta il PATH modificato per i passi successivi
+          set PATH >> %GITHUB_ENV%
           set INCLUDE >> %GITHUB_ENV%
           set LIB >> %GITHUB_ENV%
 
-      - name: Install build dependencies (esempio)
+      - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install wheel setuptools # Aggiungi altre dipendenze di build come cython, scikit-build etc.
-          # Se hai un requirements.txt per le dipendenze di build:
+          pip install wheel setuptools # Aggiungi altre dipendenze di build (es. cython, scikit-build)
+          # Se hai un requirements-build.txt:
           # pip install -r requirements-build.txt
 
-      - name: Build Python Wheels (x64)
+      - name: Build Python Wheels (Windows)
+        # Assicurati che il tuo script ./ci/build_python.ps1 gestisca correttamente
+        # la build per la versione di Python e architettura specificate.
+        # Se non hai uno script, un comando tipico potrebbe essere: python setup.py bdist_wheel
         shell: powershell
         run: |
           Set-Location $Env:GITHUB_WORKSPACE
-          # Assicurati che il tuo script build_python.ps1 usi PYVERSION e CI_ARCH se necessario
-          # Esempio: python setup.py bdist_wheel
           ./ci/build_python.ps1
 
-      - name: Upload Python Wheel Artifact (x64)
+      - name: Upload Python Wheel Artifact (Windows)
         uses: actions/upload-artifact@v4
         with:
-          name: python-wheels-win64-${{ matrix.PYVERSION }}
-          path: dist/*.whl # Carica solo i file .whl dalla cartella dist
+          name: python-wheels-win-x64-${{ matrix.PYVERSION }}
+          path: dist/*.whl
+
+  # Job per costruire le wheel su Linux
+  linux-build:
+    name: Build Linux (x64) Python ${{ matrix.PYVERSION }}
+    runs-on: ubuntu-latest
+    env:
+      PYVERSION: ${{ matrix.PYVERSION }}
+    strategy:
+      fail-fast: false
+      matrix:
+        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python ${{ matrix.PYVERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.PYVERSION }}
+
+      - name: Cache Pip (Linux)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ env.PYVERSION }}-
+
+      - name: Install system build dependencies (Linux)
+        # Aggiungi qui altri pacchetti di sistema necessari per la compilazione
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential # Per compilatori C/C++ e make
+
+      - name: Install Python build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install wheel setuptools # Aggiungi altre dipendenze di build
+
+      - name: Build Python Wheels (Linux)
+        # Se hai uno script ./ci/build_linux.sh, usalo.
+        # Altrimenti, un comando tipico è: python setup.py bdist_wheel
+        # Per many_linux wheels, avresti bisogno di un container Docker come quelli di PyPA.
+        # Questo esempio crea una wheel standard per la Glibc del runner.
+        run: |
+          python setup.py bdist_wheel
+
+      - name: Upload Python Wheel Artifact (Linux)
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-wheels-linux-x64-${{ matrix.PYVERSION }}
+          path: dist/*.whl
+
+  # Job per costruire le wheel su macOS
+  macos-build:
+    name: Build macOS (x64) Python ${{ matrix.PYVERSION }}
+    # macos-latest attualmente usa Intel (x64). Per Apple Silicon (arm64),
+    # potresti aver bisogno di runner specifici o configurazioni cross-compilation.
+    # Per semplicità, questo usa il default x64.
+    runs-on: macos-latest
+    env:
+      PYVERSION: ${{ matrix.PYVERSION }}
+    strategy:
+      fail-fast: false
+      matrix:
+        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python ${{ matrix.PYVERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.PYVERSION }}
+
+      - name: Cache Pip (macOS)
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/pip
+          key: ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ env.PYVERSION }}-
+
+      - name: Install Python build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install wheel setuptools # Aggiungi altre dipendenze di build
+
+      - name: Build Python Wheels (macOS)
+        # Se hai uno script ./ci/build_macos.sh, usalo.
+        # Altrimenti, un comando tipico è: python setup.py bdist_wheel
+        run: |
+          python setup.py bdist_wheel
+
+      - name: Upload Python Wheel Artifact (macOS)
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-wheels-macos-x64-${{ matrix.PYVERSION }}
+          path: dist/*.whl
+
+  # Job per creare la sdist (source distribution)
+  sdist-build:
+    name: Build Python sdist
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python (for sdist)
+        # Usa una versione Python stabile per creare la sdist, es. 3.9 o 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install Python build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install wheel setuptools
+
+      - name: Build Python sdist
+        run: python setup.py sdist
+
+      - name: Upload Python sdist Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-sdist
+          path: dist/*.tar.gz
 
   # Job per il deployment su PyPI
   deploy_pypi:
     name: Deploy to PyPI
-    # Esegue solo se il ref inizia con 'refs/tags' (cioè quando viene creato un tag)
-    if: startsWith(github.ref, 'refs/tags')
-    needs: [windows] # Dipende dal successo di tutti i job nella matrice 'windows'
-    runs-on: ubuntu-latest # Puoi usare ubuntu-latest o windows-latest per il deploy
+    if: startsWith(github.ref, 'refs/tags') # Esegue solo quando viene creato un tag
+    needs: [windows-build, linux-build, macos-build, sdist-build] # Dipende da tutte le build
+    runs-on: ubuntu-latest
     permissions:
-      # Necessario per scaricare artefatti se sono in un repository privato e il workflow non ha accesso di default
+      # Necessario per scaricare artefatti se il repository è privato
       contents: read
       # Necessario per pubblicare usando OIDC (Trusted Publishing) su PyPI - metodo raccomandato
       id-token: write
     steps:
-      - name: Download all Windows wheel artifacts
+      - name: Download all build artifacts
         uses: actions/download-artifact@v4
         with:
-          # Nessun 'name' specificato per scaricare tutti gli artefatti
-          # Verranno scaricati in directory con il nome dell'artefatto
+          # Scarica tutti gli artefatti nella directory specificata
+          # Ogni artefatto verrà scaricato in una sottocartella con il suo nome
           path: ~/artifacts
 
       - name: Set up Python for Twine
@@ -99,17 +234,20 @@ jobs:
       - name: Install Twine
         run: python -m pip install --upgrade twine
 
+      - name: Display downloaded artifacts structure
+        run: ls -R ~/artifacts
+
       - name: Upload to PyPI
         env:
           # Metodo raccomandato: Trusted Publishing con OIDC.
-          # Configura PyPI per fidarsi di GitHub Actions.
-          # Non servono TWINE_USERNAME/TWINE_PASSWORD in questo caso.
-          # TWINE_REPOSITORY_URL: https://upload.pypi.org/legacy/ (o il tuo testpypi)
-          # Se usi ancora username/password (meno sicuro):
-          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }} # O __token__ se usi un API token
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }} # Il tuo token API da PyPI Secrets
+          # Configura PyPI per fidarsi di GitHub Actions per questo repository/workflow.
+          # Se usi questo, non servono TWINE_USERNAME/TWINE_PASSWORD nei segreti.
+          # TWINE_USERNAME: __token__ # Non necessario con OIDC
+          # TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }} # Non necessario con OIDC
+          #
+          # Se usi ancora username/password con un token API (meno sicuro):
+          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }} # Di solito '__token__'
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }} # Il tuo token API da GitHub Secrets
         run: |
-          # Stampa i file scaricati per debug
-          ls -R ~/artifacts
-          # Carica tutti i file .whl trovati nelle sottocartelle degli artefatti
-          python -m twine upload --skip-existing ~/artifacts/*/*.whl
+          # Carica tutti i file wheel e sdist trovati nelle sottocartelle degli artefatti
+          python -m twine upload --skip-existing ~/artifacts/*/*

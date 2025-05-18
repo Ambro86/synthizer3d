@@ -79,14 +79,13 @@ jobs:
 
   # Job per costruire le wheel manylinux x86_64
   linux-x64-manylinux-build:
-    name: Build Manylinux2014 (x64) Python ${{ matrix.PYTHON_VERSION_SHORT }}
-    runs-on: ubuntu-latest
+    name: Build Manylinux (x64) Python ${{ matrix.PYTHON_VERSION_SHORT }}
+    runs-on: ubuntu-22.04 # Modificato da ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         PYTHON_TAG: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313"]
-        # Using a specific recent tag for the manylinux2014 image from Docker Hub
-        MANYLINUX_IMAGE_TAG: ["2024-01-24"] 
+        MANYLINUX_IMAGE_TAG: ["2024-05-01-39eda5c"] # Tag specifico per quay.io/pypa/manylinux_2_17
         include:
           - PYTHON_TAG: "cp38-cp38"
             PYTHON_VERSION_SHORT: "3.8"
@@ -114,11 +113,12 @@ jobs:
       - name: Run C/C++ code vendoring script (on host)
         run: python synthizer-c/vendor.py synthizer-vendored
         
-      - name: Build wheels using manylinux2014_x86_64 container (Docker Hub)
+      - name: Build wheels using manylinux_2_17_x86_64 container
         shell: bash -e {0}
         run: |
-          DOCKER_IMAGE="pypa/manylinux2014_x86_64:${{ matrix.MANYLINUX_IMAGE_TAG }}"
+          DOCKER_IMAGE="quay.io/pypa/manylinux_2_17_x86_64:${{ matrix.MANYLINUX_IMAGE_TAG }}"
           echo "Attempting to pull Docker image: $DOCKER_IMAGE with retries..."
+          
           MAX_ATTEMPTS=3
           RETRY_DELAY=15 # seconds
           attempt_num=1
@@ -155,19 +155,18 @@ jobs:
       - name: Upload Python Wheel Artifact (Linux x64 Manylinux)
         uses: actions/upload-artifact@v4
         with:
-          name: python-wheels-manylinux2014-x64-${{ matrix.PYTHON_VERSION_SHORT }} # Updated name
+          name: python-wheels-manylinux_2_17-x64-${{ matrix.PYTHON_VERSION_SHORT }} # Nome artefatto aggiornato
           path: dist/*.whl
           
   # Job per costruire le wheel manylinux aarch64 (ARM64)
   linux-arm64-manylinux-build:
-    name: Build Manylinux2014 (aarch64) Python ${{ matrix.PYTHON_VERSION_SHORT }}
-    runs-on: ubuntu-latest 
+    name: Build Manylinux (aarch64) Python ${{ matrix.PYTHON_VERSION_SHORT }}
+    runs-on: ubuntu-22.04 # Modificato da ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         PYTHON_TAG: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313"]
-        # Using a specific recent tag for the manylinux2014 image from Docker Hub
-        MANYLINUX_IMAGE_TAG: ["2024-01-24"] 
+        MANYLINUX_IMAGE_TAG: ["2024-05-01-39eda5c"] # Tag specifico per quay.io/pypa/manylinux_2_17
         include:
           - PYTHON_TAG: "cp38-cp38"
             PYTHON_VERSION_SHORT: "3.8"
@@ -200,10 +199,10 @@ jobs:
       - name: Run C/C++ code vendoring script (on host)
         run: python synthizer-c/vendor.py synthizer-vendored
 
-      - name: Build wheels using manylinux2014_aarch64 container (Docker Hub)
+      - name: Build wheels using manylinux_2_17_aarch64 container
         shell: bash -e {0}
         run: |
-          DOCKER_IMAGE="pypa/manylinux2014_aarch64:${{ matrix.MANYLINUX_IMAGE_TAG }}"
+          DOCKER_IMAGE="quay.io/pypa/manylinux_2_17_aarch64:${{ matrix.MANYLINUX_IMAGE_TAG }}"
           echo "Attempting to pull Docker image: $DOCKER_IMAGE with retries..."
           MAX_ATTEMPTS=3
           RETRY_DELAY=15 # seconds
@@ -241,7 +240,7 @@ jobs:
       - name: Upload Python Wheel Artifact (Linux aarch64 Manylinux)
         uses: actions/upload-artifact@v4
         with:
-          name: python-wheels-manylinux2014-aarch64-${{ matrix.PYTHON_VERSION_SHORT }} # Updated name
+          name: python-wheels-manylinux_2_17-aarch64-${{ matrix.PYTHON_VERSION_SHORT }} # Nome artefatto aggiornato
           path: dist/*.whl
 
   # Job per costruire le wheel su macOS (x64 - Intel Runner)

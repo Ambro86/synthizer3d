@@ -117,8 +117,10 @@ jobs:
         shell: bash -e {0}
         run: |
           DOCKER_IMAGE="quay.io/pypa/manylinux_2_17_x86_64:${{ matrix.MANYLINUX_IMAGE_TAG }}"
-          echo "Attempting to pull Docker image: $DOCKER_IMAGE with retries..."
+          echo "Logging out of quay.io to ensure clean pull..."
+          docker logout quay.io || echo "Logout from quay.io failed or not logged in, continuing..."
           
+          echo "Attempting to pull Docker image: $DOCKER_IMAGE with retries..."
           MAX_ATTEMPTS=3
           RETRY_DELAY=15 # seconds
           attempt_num=1
@@ -203,8 +205,10 @@ jobs:
         shell: bash -e {0}
         run: |
           DOCKER_IMAGE="quay.io/pypa/manylinux_2_17_aarch64:${{ matrix.MANYLINUX_IMAGE_TAG }}"
+          echo "Logging out of quay.io to ensure clean pull..."
+          docker logout quay.io || echo "Logout from quay.io failed or not logged in, continuing..."
+
           echo "Attempting to pull Docker image: $DOCKER_IMAGE with retries..."
-          
           MAX_ATTEMPTS=3
           RETRY_DELAY=15 # seconds
           attempt_num=1

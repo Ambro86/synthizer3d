@@ -85,8 +85,8 @@ jobs:
       fail-fast: false
       matrix:
         PYTHON_TAG: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313"]
-        # Using a specific stable tag for the manylinux2014 image from Quay.io
-        MANYLINUX_IMAGE_TAG: ["2024-01-24-bb5dd33"] 
+        # Using a different recent tag for the manylinux2014 image from Quay.io
+        MANYLINUX_IMAGE_TAG: ["2024-05-01-39eda5c"] 
         include:
           - PYTHON_TAG: "cp38-cp38"
             PYTHON_VERSION_SHORT: "3.8"
@@ -166,8 +166,8 @@ jobs:
       fail-fast: false
       matrix:
         PYTHON_TAG: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313"]
-        # Using a specific stable tag for the manylinux2014 image from Quay.io
-        MANYLINUX_IMAGE_TAG: ["2024-01-24-bb5dd33"] 
+        # Using a different recent tag for the manylinux2014 image from Quay.io
+        MANYLINUX_IMAGE_TAG: ["2024-05-01-39eda5c"] 
         include:
           - PYTHON_TAG: "cp38-cp38"
             PYTHON_VERSION_SHORT: "3.8"

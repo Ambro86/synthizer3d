@@ -74,16 +74,20 @@ jobs:
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
 
       - name: Build Python Wheels (Windows ${{ matrix.CI_ARCH }})
-        env:
-          # Pass compiler flags directly to disable NEON and SIMD for dr_mp3 on ARM64
-          CMAKE_C_FLAGS: ${{ matrix.CI_ARCH == 'arm64' && '/DDR_MP3_NO_NEON=1 /DDR_MP3_NO_SIMD=1' || '' }}
-          CMAKE_CXX_FLAGS: ${{ matrix.CI_ARCH == 'arm64' && '/DDR_MP3_NO_NEON=1 /DDR_MP3_NO_SIMD=1' || '' }}
         shell: powershell
         run: |
-          Write-Host "CMAKE_C_FLAGS for this build: $Env:CMAKE_C_FLAGS"
-          Write-Host "CMAKE_CXX_FLAGS for this build: $Env:CMAKE_CXX_FLAGS"
+          $cmake_extra_args = ""
+          if ("${{ matrix.CI_ARCH }}" -eq "arm64") {
+            # Pass CMake definitions directly to disable NEON/SIMD for dr_mp3
+            $cmake_extra_args = "-DDR_MP3_NO_NEON=1 -DDR_MP3_NO_SIMD=1"
+            Write-Host "Windows ARM64: Adding CMake args: $cmake_extra_args"
+          }
           Set-Location $Env:GITHUB_WORKSPACE
-          python setup.py bdist_wheel
+          if ($cmake_extra_args) {
+            python setup.py bdist_wheel -- $cmake_extra_args
+          } else {
+            python setup.py bdist_wheel
+          }
 
       - name: Upload Python Wheel Artifact (Windows ${{ matrix.CI_ARCH }})
         uses: actions/upload-artifact@v4

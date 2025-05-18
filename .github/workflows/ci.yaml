@@ -144,84 +144,66 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install and set up gettext for x64 Python
+      - name: Check for x64 Homebrew and attempt to install/set up gettext
         # Applica per Python 3.8, 3.9, e 3.10 su x64, che sono le versioni problematiche
         if: matrix.ARCH == 'x64' && (matrix.PYVERSION == '3.8' || matrix.PYVERSION == '3.9' || matrix.PYVERSION == '3.10')
         shell: bash -e {0} 
         run: |
-          echo "Attempting to install/reinstall x64 gettext for x64 Python environment on ARM64 runner..."
+          echo "Checking for x64 Homebrew and attempting to set up gettext for x64 Python..."
           
-          # Explicitly define the path to the x86_64 Homebrew and ensure its bin is in PATH for this step
-          X64_BREW_BIN_DIR="/usr/local/bin"
-          export PATH="${X64_BREW_BIN_DIR}:$PATH"
-          echo "Updated PATH for this step: $PATH"
-          
-          X64_BREW_EXECUTABLE="${X64_BREW_BIN_DIR}/brew"
+          X64_BREW_EXECUTABLE="/usr/local/bin/brew" # Expected path for x64 Homebrew on ARM runners
 
-          echo "Checking for x64 Homebrew executable at ${X64_BREW_EXECUTABLE}..."
           if [ ! -f "$X64_BREW_EXECUTABLE" ] || [ ! -x "$X64_BREW_EXECUTABLE" ]; then
-            echo "::error::Critical: x86_64 Homebrew executable not found or not executable at $X64_BREW_EXECUTABLE."
-            echo "Listing /usr/local/bin/:"
-            ls -la /usr/local/bin || echo "/usr/local/bin not found or empty"
-            echo "The GitHub Actions macOS ARM64 runner is expected to have an x86_64 Homebrew at this location for Rosetta 2."
-            exit 1
-          fi
-          
-          X64_BREW_COMMAND="arch -x86_64 $X64_BREW_EXECUTABLE"
-          echo "Using Homebrew command for x64 operations: $X64_BREW_COMMAND"
-
-          echo "Verifying x64 Homebrew with: $X64_BREW_COMMAND --version"
-          $X64_BREW_COMMAND --version || (echo "::error::Failed to execute x64 Homebrew at $X64_BREW_EXECUTABLE. Check Rosetta 2 setup on runner." && exit 1)
-          
-          echo "Updating x86_64 Homebrew..."
-          $X64_BREW_COMMAND update || echo "::warning::Brew update (x64) failed, continuing with install attempt..."
-          
-          echo "Reinstalling/Installing gettext (x64 context)..."
-          $X64_BREW_COMMAND reinstall gettext || $X64_BREW_COMMAND install gettext
-          
-          echo "Forcing link for gettext (x64 context)..."
-          $X64_BREW_COMMAND link --force gettext || echo "::warning::Brew link --force gettext (x64) failed. This might be okay if already linked or keg-only."
-          
-          GETTEXT_X64_PREFIX_CMD="$X64_BREW_COMMAND --prefix gettext"
-          echo "Running: ${GETTEXT_X64_PREFIX_CMD}"
-          GETTEXT_X64_PREFIX=$($GETTEXT_X64_PREFIX_CMD)
-          echo "Detected x64 gettext prefix: ${GETTEXT_X64_PREFIX}"
-          
-          EXPECTED_GETTEXT_X64_OPT_PREFIX="/usr/local/opt/gettext"
-          if [[ "${GETTEXT_X64_PREFIX}" != "${EXPECTED_GETTEXT_X64_OPT_PREFIX}" ]]; then
-             echo "::warning::Detected gettext prefix '${GETTEXT_X64_PREFIX}' is not the expected symlinked opt path '${EXPECTED_GETTEXT_X64_OPT_PREFIX}'."
-             echo "This might be okay if Homebrew changed its prefix reporting. Will check for lib and bin in detected prefix."
-          fi
-
-          if [ -n "${GETTEXT_X64_PREFIX}" ] && [ -d "${GETTEXT_X64_PREFIX}/lib" ] && [ -d "${GETTEXT_X64_PREFIX}/bin" ]; then
-            GETTEXT_LIB_DIR="${GETTEXT_X64_PREFIX}/lib"
-            GETTEXT_BIN_DIR="${GETTEXT_X64_PREFIX}/bin"
-            echo "Found gettext lib for x64 at ${GETTEXT_LIB_DIR}"
-            echo "Found gettext bin for x64 at ${GETTEXT_BIN_DIR}"
-            
-            echo "Setting DYLD_LIBRARY_PATH to include ${GETTEXT_LIB_DIR}"
-            echo "DYLD_LIBRARY_PATH=${GETTEXT_LIB_DIR}${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" >> $GITHUB_ENV
-            
-            echo "Setting DYLD_FALLBACK_LIBRARY_PATH to include ${GETTEXT_LIB_DIR}"
-            echo "DYLD_FALLBACK_LIBRARY_PATH=${GETTEXT_LIB_DIR}${DYLD_FALLBACK_LIBRARY_PATH:+:$DYLD_FALLBACK_LIBRARY_PATH}" >> $GITHUB_ENV
-
-            echo "Adding ${GETTEXT_BIN_DIR} to GITHUB_PATH"
-            echo "${GETTEXT_BIN_DIR}" >> $GITHUB_PATH
-            
-            echo "Verifying libintl.8.dylib exists at ${GETTEXT_LIB_DIR}/libintl.8.dylib:"
-            ls -l "${GETTEXT_LIB_DIR}/libintl.8.dylib" || (echo "::error::libintl.8.dylib NOT FOUND at ${GETTEXT_LIB_DIR} after install!" && exit 1)
-            
-            echo "DYLD_LIBRARY_PATH will be set to include: ${GETTEXT_LIB_DIR}"
-            echo "DYLD_FALLBACK_LIBRARY_PATH will be set to include: ${GETTEXT_LIB_DIR}"
-            echo "PATH will be set to include: ${GETTEXT_BIN_DIR}"
+            echo "::warning::x86_64 Homebrew executable not found or not executable at $X64_BREW_EXECUTABLE."
+            echo "Listing /usr/local/bin/ for diagnostics:"
+            ls -la /usr/local/bin || echo "/usr/local/bin not found or empty."
+            echo "Skipping gettext installation for x64 as the required Homebrew instance is missing."
+            echo "The Python setup for ${{ matrix.PYVERSION }} x64 might fail if it requires libintl from gettext."
           else
-            echo "::error::gettext x64 prefix or its lib/bin directory not found after attempting brew (re)install and link."
-            echo "Detected prefix was: '${GETTEXT_X64_PREFIX}'"
-            echo "Listing /usr/local/opt/gettext (expected symlink target):"
-            ls -lR "/usr/local/opt/gettext" || echo "/usr/local/opt/gettext not found or empty."
-            echo "Listing /usr/local/Cellar/gettext (expected install location):"
-            ls -lR "/usr/local/Cellar/gettext" || echo "/usr/local/Cellar/gettext not found or empty."
-            exit 1 
+            echo "Found x86_64 Homebrew at $X64_BREW_EXECUTABLE. Proceeding with gettext setup..."
+            X64_BREW_COMMAND="arch -x86_64 $X64_BREW_EXECUTABLE"
+            
+            echo "Updating x86_64 Homebrew using: $X64_BREW_COMMAND update"
+            $X64_BREW_COMMAND update || echo "::warning::Brew update (x64) failed, continuing with install attempt..."
+            
+            echo "Reinstalling/Installing gettext (x64 context) using: $X64_BREW_COMMAND reinstall/install gettext"
+            $X64_BREW_COMMAND reinstall gettext || $X64_BREW_COMMAND install gettext
+            
+            echo "Forcing link for gettext (x64 context) using: $X64_BREW_COMMAND link --force gettext"
+            $X64_BREW_COMMAND link --force gettext || echo "::warning::Brew link --force gettext (x64) failed. This might be okay if already linked or keg-only."
+            
+            GETTEXT_X64_PREFIX_CMD="$X64_BREW_COMMAND --prefix gettext"
+            echo "Getting gettext prefix using: ${GETTEXT_X64_PREFIX_CMD}"
+            GETTEXT_X64_PREFIX=$($GETTEXT_X64_PREFIX_CMD)
+            echo "Detected x64 gettext prefix: ${GETTEXT_X64_PREFIX}"
+            
+            EXPECTED_GETTEXT_X64_OPT_PREFIX="/usr/local/opt/gettext"
+            if [[ "${GETTEXT_X64_PREFIX}" != "${EXPECTED_GETTEXT_X64_OPT_PREFIX}" ]]; then
+               echo "::warning::Detected gettext prefix '${GETTEXT_X64_PREFIX}' is not the expected symlinked opt path '${EXPECTED_GETTEXT_X64_OPT_PREFIX}'."
+            fi
+
+            if [ -n "${GETTEXT_X64_PREFIX}" ] && [ -d "${GETTEXT_X64_PREFIX}/lib" ] && [ -d "${GETTEXT_X64_PREFIX}/bin" ]; then
+              GETTEXT_LIB_DIR="${GETTEXT_X64_PREFIX}/lib"
+              GETTEXT_BIN_DIR="${GETTEXT_X64_PREFIX}/bin"
+              echo "Found gettext lib for x64 at ${GETTEXT_LIB_DIR}"
+              echo "Found gettext bin for x64 at ${GETTEXT_BIN_DIR}"
+              
+              echo "Setting DYLD_LIBRARY_PATH to include ${GETTEXT_LIB_DIR}"
+              echo "DYLD_LIBRARY_PATH=${GETTEXT_LIB_DIR}${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" >> $GITHUB_ENV
+              
+              echo "Setting DYLD_FALLBACK_LIBRARY_PATH to include ${GETTEXT_LIB_DIR}"
+              echo "DYLD_FALLBACK_LIBRARY_PATH=${GETTEXT_LIB_DIR}${DYLD_FALLBACK_LIBRARY_PATH:+:$DYLD_FALLBACK_LIBRARY_PATH}" >> $GITHUB_ENV
+
+              echo "Adding ${GETTEXT_BIN_DIR} to GITHUB_PATH"
+              echo "${GETTEXT_BIN_DIR}" >> $GITHUB_PATH
+              
+              echo "Verifying libintl.8.dylib exists at ${GETTEXT_LIB_DIR}/libintl.8.dylib:"
+              ls -l "${GETTEXT_LIB_DIR}/libintl.8.dylib" || (echo "::error::libintl.8.dylib NOT FOUND at ${GETTEXT_LIB_DIR} after install!" && exit 1)
+            else
+              echo "::error::gettext x64 prefix or its lib/bin directory not found after attempting brew (re)install and link."
+              echo "Detected prefix was: '${GETTEXT_X64_PREFIX}'"
+              exit 1 
+            fi
           fi
           echo "--- End of gettext setup ---"
 

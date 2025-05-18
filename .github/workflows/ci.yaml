@@ -129,7 +129,7 @@ jobs:
   # Job per costruire le wheel su macOS
   macos-build:
     name: Build macOS (${{ matrix.ARCH }}) Python ${{ matrix.PYVERSION }} 
-    runs-on: macos-latest 
+    runs-on: macos-latest # Questo runner è macos-14-arm64
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
       TARGET_ARCH: ${{ matrix.ARCH }} 
@@ -144,24 +144,39 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install gettext (for libintl dependency)
-        # CORREZIONE: Applica per Python 3.8, 3.9, e 3.10 su x64
+      - name: Install and set up gettext for x64 Python
+        # Applica per Python 3.8, 3.9, e 3.10 su x64, che sono le versioni problematiche
         if: matrix.ARCH == 'x64' && (matrix.PYVERSION == '3.8' || matrix.PYVERSION == '3.9' || matrix.PYVERSION == '3.10')
         run: |
+          echo "Attempting to install gettext for x64 environment on ARM64 runner..."
+          # Su un runner ARM64 (come macos-14-arm64), per installare pacchetti x86_64 con Homebrew,
+          # Homebrew stesso deve essere eseguito sotto l'emulazione Rosetta 2.
+          # Il prefisso di installazione per i pacchetti x86_64 di Homebrew su un Mac Apple Silicon è /usr/local.
+          # Il prefisso per i pacchetti arm64 nativi è /opt/homebrew.
+          # L'errore indica che Python x64 cerca in /usr/local/opt/gettext.
+          
+          # Assicuriamoci che brew installi la versione corretta (potrebbe essere necessario arch -x86_64 brew install)
+          # Tuttavia, GitHub Actions runner potrebbero già avere un setup di Homebrew per x86_64.
+          # Per ora, proviamo un semplice brew install. Se fallisce, potrebbe essere necessario forzare l'architettura.
           brew install gettext
-          echo "Installed gettext. Attempting to update PATH for Homebrew gettext."
-          # Aggiunge i percorsi di Homebrew per gettext al GITHUB_PATH
-          # Questo aiuta gli step successivi a trovare le librerie e i binari di gettext
-          # Per Intel Macs (o Rosetta su ARM)
-          if [ -d "/usr/local/opt/gettext/bin" ]; then echo "/usr/local/opt/gettext/bin" >> $GITHUB_PATH; fi
-          if [ -d "/usr/local/opt/gettext/lib" ]; then export DYLD_LIBRARY_PATH="/usr/local/opt/gettext/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"; echo "DYLD_LIBRARY_PATH set for /usr/local/opt/gettext/lib"; fi
-          # Per ARM64 Macs (Homebrew installa in /opt/homebrew)
-          if [ -d "/opt/homebrew/opt/gettext/bin" ]; then echo "/opt/homebrew/opt/gettext/bin" >> $GITHUB_PATH; fi
-          if [ -d "/opt/homebrew/opt/gettext/lib" ]; then export DYLD_LIBRARY_PATH="/opt/homebrew/opt/gettext/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"; echo "DYLD_LIBRARY_PATH set for /opt/homebrew/opt/gettext/lib"; fi
-          echo "gettext path (if found): $(which gettext || echo 'not found in PATH')"
-          echo "Updated GITHUB_PATH: $GITHUB_PATH"
-          echo "Updated DYLD_LIBRARY_PATH: $DYLD_LIBRARY_PATH"
-
+          
+          GETTEXT_X64_PREFIX="/usr/local/opt/gettext" # Percorso per pacchetti x64 su macOS (Intel o Rosetta)
+          
+          if [ -d "${GETTEXT_X64_PREFIX}/lib" ]; then
+            echo "Found gettext lib for x64 at ${GETTEXT_X64_PREFIX}/lib"
+            echo "Prepending ${GETTEXT_X64_PREFIX}/lib to DYLD_LIBRARY_PATH"
+            echo "DYLD_LIBRARY_PATH=${GETTEXT_X64_PREFIX}/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" >> $GITHUB_ENV
+            
+            echo "Prepending ${GETTEXT_X64_PREFIX}/bin to PATH"
+            echo "${GETTEXT_X64_PREFIX}/bin" >> $GITHUB_PATH
+            echo "DYLD_LIBRARY_PATH (from GITHUB_ENV will be): ${GETTEXT_X64_PREFIX}/lib"
+          else
+            echo "Error: ${GETTEXT_X64_PREFIX}/lib not found after attempting brew install."
+            echo "This might indicate an issue with Homebrew setup for x64 packages on this runner or gettext installation."
+            # Considera di fallire lo step se gettext non può essere configurato correttamente
+            # exit 1 
+          fi
+          echo "--- End of gettext setup ---"
 
       - name: Set up Python ${{ matrix.PYVERSION }} (${{ matrix.ARCH }})
         uses: actions/setup-python@v5
@@ -190,6 +205,8 @@ jobs:
           
       - name: Build Python Wheels (macOS ${{ matrix.ARCH }})
         run: |
+          echo "Current DYLD_LIBRARY_PATH: $DYLD_LIBRARY_PATH" # Per debug
+          echo "Current PATH: $PATH" # Per debug
           python setup.py bdist_wheel
 
       - name: Upload Python Wheel Artifact (macOS ${{ matrix.ARCH }})

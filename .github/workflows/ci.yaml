@@ -145,26 +145,25 @@ jobs:
           submodules: recursive
 
       - name: Install and set up gettext for x64 Python
+        # Applica per Python 3.8, 3.9, e 3.10 su x64, che sono le versioni problematiche
         if: matrix.ARCH == 'x64' && (matrix.PYVERSION == '3.8' || matrix.PYVERSION == '3.9' || matrix.PYVERSION == '3.10')
         shell: bash -e {0} 
         run: |
           echo "Attempting to install/reinstall x64 gettext for x64 Python environment on ARM64 runner..."
           
-          X64_BREW_EXECUTABLE=""
-          if [ -f "/usr/local/bin/brew" ]; then
-            echo "Found Homebrew for x86_64 at /usr/local/bin/brew."
-            X64_BREW_EXECUTABLE="/usr/local/bin/brew"
-          elif command -v brew &> /dev/null; then
-            echo "Warning: /usr/local/bin/brew not found. Falling back to 'brew' in PATH for x86_64 context."
-            echo "This might use the ARM64 Homebrew (/opt/homebrew/bin/brew) under Rosetta, which can be problematic."
-            X64_BREW_EXECUTABLE="brew" # This might still point to /opt/homebrew/bin/brew
-          else
-            echo "::error::No Homebrew executable found. Cannot install gettext for x64."
+          # Explicitly define the path to the x86_64 Homebrew and ensure it's in PATH for arch command
+          X64_BREW_BIN_DIR="/usr/local/bin"
+          if [ ! -f "${X64_BREW_BIN_DIR}/brew" ]; then
+            echo "::error::x86_64 Homebrew executable not found at ${X64_BREW_BIN_DIR}/brew."
+            echo "This workflow assumes an x86_64 Homebrew installation is present at /usr/local on ARM64 runners."
             exit 1
           fi
-
-          X64_BREW_COMMAND="arch -x86_64 $X64_BREW_EXECUTABLE"
+          
+          X64_BREW_COMMAND="env PATH=\"${X64_BREW_BIN_DIR}:$PATH\" arch -x86_64 ${X64_BREW_BIN_DIR}/brew"
           echo "Using Homebrew command for x64 operations: $X64_BREW_COMMAND"
+
+          echo "Verifying x64 Homebrew with: $X64_BREW_COMMAND --version"
+          $X64_BREW_COMMAND --version || (echo "::error::Failed to execute x64 Homebrew at $X64_BREW_BIN_DIR/brew" && exit 1)
           
           echo "Updating x86_64 Homebrew..."
           $X64_BREW_COMMAND update || echo "::warning::Brew update (x64) failed, continuing with install attempt..."
@@ -173,7 +172,7 @@ jobs:
           $X64_BREW_COMMAND reinstall gettext || $X64_BREW_COMMAND install gettext
           
           echo "Forcing link for gettext for x86_64..."
-          $X64_BREW_COMMAND link --force gettext || echo "::warning::Brew link (x64) failed, gettext might already be linked or keg-only."
+          $X64_BREW_COMMAND link --force gettext || echo "::warning::Brew link --force gettext (x64) failed. This might be okay if already linked or keg-only."
           
           GETTEXT_X64_PREFIX_CMD="$X64_BREW_COMMAND --prefix gettext"
           echo "Running: ${GETTEXT_X64_PREFIX_CMD}"
@@ -203,9 +202,9 @@ jobs:
           else
             echo "::error::gettext x64 prefix or its lib/bin directory not found after attempting brew (re)install and link."
             echo "Detected prefix was: '${GETTEXT_X64_PREFIX}'"
-            echo "Listing files in /usr/local/opt/gettext if it exists:"
+            echo "Listing files in /usr/local/opt/gettext if it exists (this is the expected symlink target):"
             ls -lR "/usr/local/opt/gettext" || echo "/usr/local/opt/gettext not found or empty."
-            echo "Listing files in /usr/local/Cellar/gettext if it exists:"
+            echo "Listing files in /usr/local/Cellar/gettext if it exists (this is where Homebrew installs to):"
             ls -lR "/usr/local/Cellar/gettext" || echo "/usr/local/Cellar/gettext not found or empty."
             exit 1 
           fi

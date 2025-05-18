@@ -148,28 +148,34 @@ jobs:
         if: matrix.ARCH == 'x64' && (matrix.PYVERSION == '3.8' || matrix.PYVERSION == '3.9' || matrix.PYVERSION == '3.10')
         shell: bash -e {0} 
         run: |
-          echo "Attempting to install/reinstall x64 gettext using /usr/local/bin/brew..."
+          echo "Attempting to install/reinstall x64 gettext for x64 Python environment on ARM64 runner..."
           
-          # Define the path to the x86_64 Homebrew executable
-          X64_BREW_PATH="/usr/local/bin/brew"
-
-          if [ ! -f "$X64_BREW_PATH" ]; then
-            echo "Error: x86_64 Homebrew not found at $X64_BREW_PATH. This setup assumes it exists for x64 packages on ARM runners."
+          X64_BREW_EXECUTABLE=""
+          if [ -f "/usr/local/bin/brew" ]; then
+            echo "Found Homebrew for x86_64 at /usr/local/bin/brew."
+            X64_BREW_EXECUTABLE="/usr/local/bin/brew"
+          elif command -v brew &> /dev/null; then
+            echo "Warning: /usr/local/bin/brew not found. Falling back to 'brew' in PATH for x86_64 context."
+            echo "This might use the ARM64 Homebrew (/opt/homebrew/bin/brew) under Rosetta, which can be problematic."
+            X64_BREW_EXECUTABLE="brew" # This might still point to /opt/homebrew/bin/brew
+          else
+            echo "::error::No Homebrew executable found. Cannot install gettext for x64."
             exit 1
           fi
 
-          echo "Using x86_64 Homebrew at $X64_BREW_PATH"
+          X64_BREW_COMMAND="arch -x86_64 $X64_BREW_EXECUTABLE"
+          echo "Using Homebrew command for x64 operations: $X64_BREW_COMMAND"
           
           echo "Updating x86_64 Homebrew..."
-          arch -x86_64 "$X64_BREW_PATH" update
+          $X64_BREW_COMMAND update || echo "::warning::Brew update (x64) failed, continuing with install attempt..."
           
           echo "Reinstalling/Installing gettext for x86_64..."
-          arch -x86_64 "$X64_BREW_PATH" reinstall gettext || arch -x86_64 "$X64_BREW_PATH" install gettext
+          $X64_BREW_COMMAND reinstall gettext || $X64_BREW_COMMAND install gettext
           
           echo "Forcing link for gettext for x86_64..."
-          arch -x86_64 "$X64_BREW_PATH" link --force gettext
+          $X64_BREW_COMMAND link --force gettext || echo "::warning::Brew link (x64) failed, gettext might already be linked or keg-only."
           
-          GETTEXT_X64_PREFIX_CMD="arch -x86_64 $X64_BREW_PATH --prefix gettext"
+          GETTEXT_X64_PREFIX_CMD="$X64_BREW_COMMAND --prefix gettext"
           echo "Running: ${GETTEXT_X64_PREFIX_CMD}"
           GETTEXT_X64_PREFIX=$($GETTEXT_X64_PREFIX_CMD)
           echo "Detected x64 gettext prefix: ${GETTEXT_X64_PREFIX}"
@@ -189,16 +195,18 @@ jobs:
             echo "${GETTEXT_BIN_DIR}" >> $GITHUB_PATH
             
             echo "Verifying libintl.8.dylib exists at ${GETTEXT_LIB_DIR}/libintl.8.dylib:"
-            ls -l "${GETTEXT_LIB_DIR}/libintl.8.dylib" || (echo "libintl.8.dylib NOT FOUND at ${GETTEXT_LIB_DIR} after install!" && exit 1)
+            ls -l "${GETTEXT_LIB_DIR}/libintl.8.dylib" || (echo "::error::libintl.8.dylib NOT FOUND at ${GETTEXT_LIB_DIR} after install!" && exit 1)
             
             echo "DYLD_LIBRARY_PATH will be set to include: ${GETTEXT_LIB_DIR}"
             echo "DYLD_FALLBACK_LIBRARY_PATH will be set to include: ${GETTEXT_LIB_DIR}"
             echo "PATH will be set to include: ${GETTEXT_BIN_DIR}"
           else
-            echo "Error: gettext x64 prefix or its lib/bin directory not found after attempting brew (re)install and link."
+            echo "::error::gettext x64 prefix or its lib/bin directory not found after attempting brew (re)install and link."
             echo "Detected prefix was: '${GETTEXT_X64_PREFIX}'"
             echo "Listing files in /usr/local/opt/gettext if it exists:"
             ls -lR "/usr/local/opt/gettext" || echo "/usr/local/opt/gettext not found or empty."
+            echo "Listing files in /usr/local/Cellar/gettext if it exists:"
+            ls -lR "/usr/local/Cellar/gettext" || echo "/usr/local/Cellar/gettext not found or empty."
             exit 1 
           fi
           echo "--- End of gettext setup ---"

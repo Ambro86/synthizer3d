@@ -151,27 +151,21 @@ jobs:
         run: |
           echo "Attempting to install/reinstall x64 gettext for x64 Python environment on ARM64 runner..."
           
-          # Explicitly define the path to the x86_64 Homebrew and ensure it's in PATH for arch command
-          X64_BREW_BIN_DIR="/usr/local/bin"
-          if [ ! -f "${X64_BREW_BIN_DIR}/brew" ]; then
-            echo "::error::x86_64 Homebrew executable not found at ${X64_BREW_BIN_DIR}/brew."
-            echo "This workflow assumes an x86_64 Homebrew installation is present at /usr/local on ARM64 runners."
-            exit 1
-          fi
-          
-          X64_BREW_COMMAND="env PATH=\"${X64_BREW_BIN_DIR}:$PATH\" arch -x86_64 ${X64_BREW_BIN_DIR}/brew"
+          # We will use 'brew' from PATH, but execute it under 'arch -x86_64'
+          # This relies on Homebrew correctly handling x86_64 installations when run this way.
+          X64_BREW_COMMAND="arch -x86_64 brew"
           echo "Using Homebrew command for x64 operations: $X64_BREW_COMMAND"
 
-          echo "Verifying x64 Homebrew with: $X64_BREW_COMMAND --version"
-          $X64_BREW_COMMAND --version || (echo "::error::Failed to execute x64 Homebrew at $X64_BREW_BIN_DIR/brew" && exit 1)
+          echo "Verifying Homebrew (x64 context) with: $X64_BREW_COMMAND --version"
+          $X64_BREW_COMMAND --version || (echo "::error::Failed to execute Homebrew in x64 context." && exit 1)
           
-          echo "Updating x86_64 Homebrew..."
+          echo "Updating Homebrew (x64 context)..."
           $X64_BREW_COMMAND update || echo "::warning::Brew update (x64) failed, continuing with install attempt..."
           
-          echo "Reinstalling/Installing gettext for x86_64..."
+          echo "Reinstalling/Installing gettext (x64 context)..."
           $X64_BREW_COMMAND reinstall gettext || $X64_BREW_COMMAND install gettext
           
-          echo "Forcing link for gettext for x86_64..."
+          echo "Forcing link for gettext (x64 context)..."
           $X64_BREW_COMMAND link --force gettext || echo "::warning::Brew link --force gettext (x64) failed. This might be okay if already linked or keg-only."
           
           GETTEXT_X64_PREFIX_CMD="$X64_BREW_COMMAND --prefix gettext"
@@ -202,9 +196,9 @@ jobs:
           else
             echo "::error::gettext x64 prefix or its lib/bin directory not found after attempting brew (re)install and link."
             echo "Detected prefix was: '${GETTEXT_X64_PREFIX}'"
-            echo "Listing files in /usr/local/opt/gettext if it exists (this is the expected symlink target):"
+            echo "Listing files in /usr/local/opt/gettext if it exists (this is the expected symlink target for x64 Homebrew):"
             ls -lR "/usr/local/opt/gettext" || echo "/usr/local/opt/gettext not found or empty."
-            echo "Listing files in /usr/local/Cellar/gettext if it exists (this is where Homebrew installs to):"
+            echo "Listing files in /usr/local/Cellar/gettext if it exists (this is where Homebrew x64 installs to):"
             ls -lR "/usr/local/Cellar/gettext" || echo "/usr/local/Cellar/gettext not found or empty."
             exit 1 
           fi

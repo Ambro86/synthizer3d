@@ -6,28 +6,31 @@ on:
 jobs:
   # Job per costruire le wheel su Windows
   windows-build:
-    name: Build Windows (${{ matrix.CI_ARCH }}) Python ${{ matrix.PYVERSION }} # Nome aggiornato
-    runs-on: windows-latest
+    name: Build Windows (${{ matrix.CI_ARCH }}) Python ${{ matrix.PYVERSION }}
+    # Use a more specific runner for ARM64 if available and needed,
+    # otherwise 'windows-latest' might be an x64 runner that can cross-compile or use an ARM64 VM.
+    # For actual ARM64 native compilation, a dedicated ARM64 runner is best.
+    runs-on: ${{ matrix.CI_ARCH == 'arm64' && 'windows-latest-arm64' || 'windows-latest' }}
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
-      CI_ARCH: ${{ matrix.CI_ARCH }} # Ora dalla matrice
+      CI_ARCH_LOWER: ${{ matrix.CI_ARCH == 'arm64' && 'arm64' || (matrix.CI_ARCH == 'x86' && 'x86' || 'x64') }} # Ensure lowercase for setup-python
       CI_WINDOWS: "1"
     strategy:
       fail-fast: false
       matrix:
         PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-        CI_ARCH: ["x64", "x86"] # Aggiunta architettura 32-bit
+        CI_ARCH: ["x64", "x86", "arm64"] # Aggiunta architettura ARM64
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Set up Python ${{ matrix.PYVERSION }} (${{ matrix.CI_ARCH }}) # Nome step aggiornato
+      - name: Set up Python ${{ matrix.PYVERSION }} (${{ env.CI_ARCH_LOWER }})
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.PYVERSION }}
-          architecture: ${{ matrix.CI_ARCH }} # Usa l'architettura dalla matrice
+          architecture: ${{ env.CI_ARCH_LOWER }}
 
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
@@ -35,21 +38,27 @@ jobs:
       - name: Run C/C++ code vendoring script
         run: python synthizer-c/vendor.py synthizer-vendored
 
-      - name: Cache Pip (Windows ${{ matrix.CI_ARCH }}) # Nome step aggiornato
+      - name: Cache Pip (Windows ${{ matrix.CI_ARCH }})
         uses: actions/cache@v4
         with:
           path: ~\AppData\Local\pip\Cache
-          key: ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ matrix.CI_ARCH }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }} # Chiave aggiornata
+          key: ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ matrix.CI_ARCH }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }}
           restore-keys: |
             ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ matrix.CI_ARCH }}-
 
-      - name: Configure MSVC Environment Variables (${{ matrix.CI_ARCH }}) # Nome step aggiornato
+      - name: Configure MSVC Environment Variables (${{ matrix.CI_ARCH }})
         shell: cmd
         run: |
           echo "Configuring MSVC for target architecture: ${{ matrix.CI_ARCH }}"
           set VCVARS_ARG=amd64
           if "${{ matrix.CI_ARCH }}" == "x86" (
             set VCVARS_ARG=x86
+          ) else if "${{ matrix.CI_ARCH }}" == "arm64" (
+            set VCVARS_ARG=amd64_arm64
+            REM Or 'arm64' if on a native ARM64 VS build environment,
+            REM but amd64_arm64 is for cross-compilation from an x64 host,
+            REM which is common for GitHub x64 runners building for ARM64.
+            REM If 'windows-latest-arm64' runner is truly native ARM, this might need to be just 'arm64'.
           )
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" %VCVARS_ARG%
           echo "MSVC configured for %VCVARS_ARG%"
@@ -62,72 +71,122 @@ jobs:
           python -m pip install --upgrade pip 
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
 
-      - name: Build Python Wheels (Windows ${{ matrix.CI_ARCH }}) # Nome step aggiornato
+      - name: Build Python Wheels (Windows ${{ matrix.CI_ARCH }})
         shell: powershell
         run: |
           Set-Location $Env:GITHUB_WORKSPACE
           python setup.py bdist_wheel
 
-      - name: Upload Python Wheel Artifact (Windows ${{ matrix.CI_ARCH }}) # Nome step aggiornato
+      - name: Upload Python Wheel Artifact (Windows ${{ matrix.CI_ARCH }})
         uses: actions/upload-artifact@v4
         with:
-          name: python-wheels-win-${{ matrix.CI_ARCH }}-${{ matrix.PYVERSION }} # Nome artefatto aggiornato
+          name: python-wheels-win-${{ matrix.CI_ARCH }}-${{ matrix.PYVERSION }}
           path: dist/*.whl
 
-  # Job per costruire le wheel su Linux
-  linux-build:
-    name: Build Linux (x64) Python ${{ matrix.PYVERSION }}
+  # Job per costruire le wheel manylinux x86_64
+  linux-x64-manylinux-build:
+    name: Build Manylinux (x64) Python ${{ matrix.PYTHON_VERSION_SHORT }}
     runs-on: ubuntu-latest
-    env:
-      PYVERSION: ${{ matrix.PYVERSION }}
-      CI_ARCH: "x64" 
     strategy:
       fail-fast: false
       matrix:
-        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        # Specify Python versions by their path in manylinux images
+        # Example: cp38-cp38, cp39-cp39, etc.
+        # We'll map these to short versions for naming.
+        PYTHON_TAG: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313"]
+        include:
+          - PYTHON_TAG: "cp38-cp38"
+            PYTHON_VERSION_SHORT: "3.8"
+          - PYTHON_TAG: "cp39-cp39"
+            PYTHON_VERSION_SHORT: "3.9"
+          - PYTHON_TAG: "cp310-cp310"
+            PYTHON_VERSION_SHORT: "3.10"
+          - PYTHON_TAG: "cp311-cp311"
+            PYTHON_VERSION_SHORT: "3.11"
+          - PYTHON_TAG: "cp312-cp312"
+            PYTHON_VERSION_SHORT: "3.12"
+          - PYTHON_TAG: "cp313-cp313"
+            PYTHON_VERSION_SHORT: "3.13"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Set up Python ${{ matrix.PYVERSION }}
+      - name: Run C/C++ code vendoring script (on host)
+        # setup-python not strictly needed here if only running a python script available on runner
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.PYVERSION }}
-
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
-
-      - name: Run C/C++ code vendoring script
-        run: python synthizer-c/vendor.py synthizer-vendored
-
-      - name: Cache Pip (Linux)
-        uses: actions/cache@v4
+          python-version: '3.9' # Use a host python for the vendoring script
+      - run: python synthizer-c/vendor.py synthizer-vendored
+        
+      - name: Build wheels using manylinux_2_17_x86_64 container
+        # quay.io/pypa/manylinux_2_17_x86_64 is a common choice for broad compatibility
+        uses: docker://quay.io/pypa/manylinux_2_17_x86_64
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ env.PYVERSION }}-
+          entrypoint: "/bin/bash"
+          args: -c "cd /github/workspace && /opt/python/${{ matrix.PYTHON_TAG }}/bin/pip install --upgrade pip && /opt/python/${{ matrix.PYTHON_TAG }}/bin/pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython && /opt/python/${{ matrix.PYTHON_TAG }}/bin/python setup.py bdist_wheel && auditwheel repair dist/*.whl -w repaired_wheels && rm dist/*.whl && mv repaired_wheels/* dist/"
+          # The 'args' does the following inside the container:
+          # 1. Navigates to the workspace (where code is checked out)
+          # 2. Installs build dependencies using the specific Python version from the container
+          # 3. Builds the wheel using that Python
+          # 4. Repairs the wheel with auditwheel, placing it in 'repaired_wheels'
+          # 5. Cleans original wheel and moves repaired wheel to 'dist'
 
-      - name: Install system build dependencies (Linux)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential 
-
-      - name: Install Python build dependencies (Linux)
-        run: |
-          python -m pip install --upgrade pip 
-          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
-
-      - name: Build Python Wheels (Linux)
-        run: |
-          python setup.py bdist_wheel
-
-      - name: Upload Python Wheel Artifact (Linux)
+      - name: Upload Python Wheel Artifact (Linux x64 Manylinux)
         uses: actions/upload-artifact@v4
         with:
-          name: python-wheels-linux-x64-${{ matrix.PYVERSION }}
+          name: python-wheels-manylinux-x64-${{ matrix.PYTHON_VERSION_SHORT }}
+          path: dist/*.whl
+          
+  # Job per costruire le wheel manylinux aarch64 (ARM64)
+  linux-arm64-manylinux-build:
+    name: Build Manylinux (aarch64) Python ${{ matrix.PYTHON_VERSION_SHORT }}
+    runs-on: ubuntu-latest # Needs a runner that can run aarch64 Docker containers (e.g., via QEMU or native ARM)
+    strategy:
+      fail-fast: false
+      matrix:
+        PYTHON_TAG: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313"]
+        include:
+          - PYTHON_TAG: "cp38-cp38"
+            PYTHON_VERSION_SHORT: "3.8"
+          - PYTHON_TAG: "cp39-cp39"
+            PYTHON_VERSION_SHORT: "3.9"
+          - PYTHON_TAG: "cp310-cp310"
+            PYTHON_VERSION_SHORT: "3.10"
+          - PYTHON_TAG: "cp311-cp311"
+            PYTHON_VERSION_SHORT: "3.11"
+          - PYTHON_TAG: "cp312-cp312"
+            PYTHON_VERSION_SHORT: "3.12"
+          - PYTHON_TAG: "cp313-cp313"
+            PYTHON_VERSION_SHORT: "3.13"
+    steps:
+      - name: Set up QEMU (for running aarch64 Docker on x64 runner)
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Run C/C++ code vendoring script (on host)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - run: python synthizer-c/vendor.py synthizer-vendored
+
+      - name: Build wheels using manylinux_2_17_aarch64 container
+        uses: docker://quay.io/pypa/manylinux_2_17_aarch64
+        with:
+          entrypoint: "/bin/bash"
+          args: -c "cd /github/workspace && /opt/python/${{ matrix.PYTHON_TAG }}/bin/pip install --upgrade pip && /opt/python/${{ matrix.PYTHON_TAG }}/bin/pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython && /opt/python/${{ matrix.PYTHON_TAG }}/bin/python setup.py bdist_wheel && auditwheel repair dist/*.whl -w repaired_wheels && rm dist/*.whl && mv repaired_wheels/* dist/"
+
+      - name: Upload Python Wheel Artifact (Linux aarch64 Manylinux)
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-wheels-manylinux-aarch64-${{ matrix.PYTHON_VERSION_SHORT }}
           path: dist/*.whl
 
   # Job per costruire le wheel su macOS (x64 - Intel Runner)
@@ -273,7 +332,13 @@ jobs:
   deploy_pypi:
     name: Deploy to PyPI
     if: startsWith(github.ref, 'refs/tags') 
-    needs: [windows-build, linux-build, macos-x64-build, macos-arm64-build, sdist-build] # Aggiornato needs
+    needs: 
+      - windows-build
+      - linux-x64-manylinux-build # Aggiornato
+      - linux-arm64-manylinux-build # Aggiunto
+      - macos-x64-build
+      - macos-arm64-build
+      - sdist-build
     runs-on: ubuntu-latest
     permissions:
       contents: read

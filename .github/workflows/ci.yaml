@@ -148,14 +148,18 @@ jobs:
         # Applica per Python 3.8, 3.9, e 3.10 su x64, che sono le versioni problematiche
         if: matrix.ARCH == 'x64' && (matrix.PYVERSION == '3.8' || matrix.PYVERSION == '3.9' || matrix.PYVERSION == '3.10')
         run: |
-          echo "Attempting to install x64 gettext for x64 Python environment on ARM64 runner..."
-          # On an ARM64 runner, force Homebrew to install the x86_64 version of gettext.
-          # This should place it in /usr/local/opt/gettext, which is where the x64 Python is looking.
-          arch -x86_64 brew install gettext
+          echo "Attempting to install/reinstall x64 gettext for x64 Python environment on ARM64 runner..."
+          # Force Homebrew to (re)install the x86_64 version of gettext.
+          # This should ensure it's placed in the x64 Homebrew prefix (usually /usr/local).
+          arch -x86_64 brew reinstall gettext || arch -x86_64 brew install gettext
           
-          GETTEXT_X64_PREFIX="/usr/local/opt/gettext" # Standard Homebrew prefix for x64 packages
+          # Dynamically get the prefix for x64 gettext
+          GETTEXT_X64_PREFIX_CMD="arch -x86_64 brew --prefix gettext"
+          echo "Running: ${GETTEXT_X64_PREFIX_CMD}"
+          GETTEXT_X64_PREFIX=$($GETTEXT_X64_PREFIX_CMD)
+          echo "Detected x64 gettext prefix: ${GETTEXT_X64_PREFIX}"
           
-          if [ -d "${GETTEXT_X64_PREFIX}/lib" ]; then
+          if [ -n "${GETTEXT_X64_PREFIX}" ] && [ -d "${GETTEXT_X64_PREFIX}/lib" ]; then
             echo "Found gettext lib for x64 at ${GETTEXT_X64_PREFIX}/lib"
             echo "Setting DYLD_LIBRARY_PATH to include ${GETTEXT_X64_PREFIX}/lib for subsequent steps."
             echo "DYLD_LIBRARY_PATH=${GETTEXT_X64_PREFIX}/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" >> $GITHUB_ENV
@@ -164,11 +168,11 @@ jobs:
             echo "${GETTEXT_X64_PREFIX}/bin" >> $GITHUB_PATH
             
             echo "Verifying libintl.8.dylib exists:"
-            ls -l "${GETTEXT_X64_PREFIX}/lib/libintl.8.dylib" || echo "libintl.8.dylib NOT FOUND at expected location after install!"
+            ls -l "${GETTEXT_X64_PREFIX}/lib/libintl.8.dylib" || echo "libintl.8.dylib NOT FOUND at ${GETTEXT_X64_PREFIX}/lib after install!"
           else
-            echo "Error: ${GETTEXT_X64_PREFIX}/lib not found after attempting arch -x86_64 brew install gettext."
+            echo "Error: gettext x64 prefix or its lib directory not found after attempting brew (re)install."
+            echo "Detected prefix was: '${GETTEXT_X64_PREFIX}'"
             echo "This indicates an issue with Homebrew setup for x64 packages on this runner or gettext installation."
-            # Consider failing the step if gettext cannot be configured correctly
             exit 1 
           fi
           echo "--- End of gettext setup ---"

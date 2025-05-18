@@ -28,6 +28,9 @@ jobs:
           python-version: ${{ matrix.PYVERSION }}
           architecture: 'x64'
 
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
       - name: Run C/C++ code vendoring script
         # Questo script prepara la directory 'synthizer-vendored' con il codice C/C++
         # Assicurati che il percorso 'synthizer-c/vendor.py' sia corretto.
@@ -52,7 +55,7 @@ jobs:
 
       - name: Install build dependencies (Windows)
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade pip # Questo è ridondante ora, ma innocuo
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
 
       - name: Build Python Wheels (Windows)
@@ -95,6 +98,9 @@ jobs:
           python-version: ${{ matrix.PYVERSION }}
           # architecture: 'x64' # Di default per ubuntu-latest
 
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
       - name: Run C/C++ code vendoring script
         run: python synthizer-c/vendor.py synthizer-vendored
 
@@ -114,7 +120,7 @@ jobs:
 
       - name: Install Python build dependencies (Linux)
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade pip # Ridondante ma innocuo
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
 
       - name: Build Python Wheels (Linux)
@@ -152,6 +158,9 @@ jobs:
           python-version: ${{ matrix.PYVERSION }}
           # architecture: 'x64' # Di default per macos-latest x64
 
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
       - name: Run C/C++ code vendoring script
         run: python synthizer-c/vendor.py synthizer-vendored
 
@@ -165,7 +174,7 @@ jobs:
 
       - name: Install Python build dependencies (macOS)
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade pip # Ridondante ma innocuo
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
 
       - name: Build Python Wheels (macOS)
@@ -192,13 +201,16 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.9' # Una versione stabile per la sdist
+      
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
 
       - name: Run C/C++ code vendoring script
         run: python synthizer-c/vendor.py synthizer-vendored
 
       - name: Install Python build dependencies (sdist)
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade pip # Ridondante ma innocuo
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
 
       - name: Build Python sdist
@@ -229,6 +241,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.x' 
+      
+      - name: Upgrade pip for Twine step # Aggiunto anche qui per consistenza
+        run: python -m pip install --upgrade pip
 
       - name: Install Twine
         run: python -m pip install --upgrade twine

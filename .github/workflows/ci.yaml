@@ -148,33 +148,28 @@ jobs:
         # Applica per Python 3.8, 3.9, e 3.10 su x64, che sono le versioni problematiche
         if: matrix.ARCH == 'x64' && (matrix.PYVERSION == '3.8' || matrix.PYVERSION == '3.9' || matrix.PYVERSION == '3.10')
         run: |
-          echo "Attempting to install gettext for x64 environment on ARM64 runner..."
-          # Su un runner ARM64 (come macos-14-arm64), per installare pacchetti x86_64 con Homebrew,
-          # Homebrew stesso deve essere eseguito sotto l'emulazione Rosetta 2.
-          # Il prefisso di installazione per i pacchetti x86_64 di Homebrew su un Mac Apple Silicon è /usr/local.
-          # Il prefisso per i pacchetti arm64 nativi è /opt/homebrew.
-          # L'errore indica che Python x64 cerca in /usr/local/opt/gettext.
+          echo "Attempting to install x64 gettext for x64 Python environment on ARM64 runner..."
+          # On an ARM64 runner, force Homebrew to install the x86_64 version of gettext.
+          # This should place it in /usr/local/opt/gettext, which is where the x64 Python is looking.
+          arch -x86_64 brew install gettext
           
-          # Assicuriamoci che brew installi la versione corretta (potrebbe essere necessario arch -x86_64 brew install)
-          # Tuttavia, GitHub Actions runner potrebbero già avere un setup di Homebrew per x86_64.
-          # Per ora, proviamo un semplice brew install. Se fallisce, potrebbe essere necessario forzare l'architettura.
-          brew install gettext
-          
-          GETTEXT_X64_PREFIX="/usr/local/opt/gettext" # Percorso per pacchetti x64 su macOS (Intel o Rosetta)
+          GETTEXT_X64_PREFIX="/usr/local/opt/gettext" # Standard Homebrew prefix for x64 packages
           
           if [ -d "${GETTEXT_X64_PREFIX}/lib" ]; then
             echo "Found gettext lib for x64 at ${GETTEXT_X64_PREFIX}/lib"
-            echo "Prepending ${GETTEXT_X64_PREFIX}/lib to DYLD_LIBRARY_PATH"
+            echo "Setting DYLD_LIBRARY_PATH to include ${GETTEXT_X64_PREFIX}/lib for subsequent steps."
             echo "DYLD_LIBRARY_PATH=${GETTEXT_X64_PREFIX}/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" >> $GITHUB_ENV
             
-            echo "Prepending ${GETTEXT_X64_PREFIX}/bin to PATH"
+            echo "Adding ${GETTEXT_X64_PREFIX}/bin to GITHUB_PATH for subsequent steps."
             echo "${GETTEXT_X64_PREFIX}/bin" >> $GITHUB_PATH
-            echo "DYLD_LIBRARY_PATH (from GITHUB_ENV will be): ${GETTEXT_X64_PREFIX}/lib"
+            
+            echo "Verifying libintl.8.dylib exists:"
+            ls -l "${GETTEXT_X64_PREFIX}/lib/libintl.8.dylib" || echo "libintl.8.dylib NOT FOUND at expected location after install!"
           else
-            echo "Error: ${GETTEXT_X64_PREFIX}/lib not found after attempting brew install."
-            echo "This might indicate an issue with Homebrew setup for x64 packages on this runner or gettext installation."
-            # Considera di fallire lo step se gettext non può essere configurato correttamente
-            # exit 1 
+            echo "Error: ${GETTEXT_X64_PREFIX}/lib not found after attempting arch -x86_64 brew install gettext."
+            echo "This indicates an issue with Homebrew setup for x64 packages on this runner or gettext installation."
+            # Consider failing the step if gettext cannot be configured correctly
+            exit 1 
           fi
           echo "--- End of gettext setup ---"
 
@@ -205,8 +200,8 @@ jobs:
           
       - name: Build Python Wheels (macOS ${{ matrix.ARCH }})
         run: |
-          echo "Current DYLD_LIBRARY_PATH: $DYLD_LIBRARY_PATH" # Per debug
-          echo "Current PATH: $PATH" # Per debug
+          echo "Current DYLD_LIBRARY_PATH (at build time): $DYLD_LIBRARY_PATH" # For debug
+          echo "Current PATH (at build time): $PATH" # For debug
           python setup.py bdist_wheel
 
       - name: Upload Python Wheel Artifact (macOS ${{ matrix.ARCH }})

@@ -62,11 +62,14 @@ extensions = [
 ]
 
 setup(
-    name="synthizer",
+    name="synthizer3d",
     version=VERSION,
-    author="Synthizer Developers",
-    author_email="ahicks@ahicks.io",
-    url="https://synthizer.github.io",
+    author="Ambro86, originally by Synthizer Developers",
+    author_email="ambro86@gmail.com",
+    url="https://github.com/Ambro86/synthizer3d",
+    description="A 3D audio library for Python, forked and maintained by Ambro86. Originally developed by Synthizer Developers.",
+    long_description="Fork of synthizer-python, now maintained and updated by Ambro86. Adds new features and compatibility fixes for modern Python and platforms.",
+    long_description_content_type="text/markdown",
     ext_modules=cythonize(extensions, language_level=3),
     zip_safe=False,
     include_package_data=True,

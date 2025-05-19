@@ -74,18 +74,23 @@ jobs:
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
 
       - name: Build Python Wheels (Windows ${{ matrix.CI_ARCH }})
-        env:
-          # Set CFLAGS and CXXFLAGS to pass preprocessor definitions for ARM64
-          # DR_MP3_NO_INTRINSICS should disable all SIMD.
-          # DR_MP3_NO_NEON specifically disables NEON. Adding both for robustness.
-          CFLAGS: ${{ matrix.CI_ARCH == 'arm64' && '/DDR_MP3_NO_INTRINSICS=1 /DDR_MP3_NO_NEON=1' || '' }}
-          CXXFLAGS: ${{ matrix.CI_ARCH == 'arm64' && '/DDR_MP3_NO_INTRINSICS=1 /DDR_MP3_NO_NEON=1' || '' }}
         shell: powershell
         run: |
-          Write-Host "Effective CFLAGS for this build step: $Env:CFLAGS"
-          Write-Host "Effective CXXFLAGS for this build step: $Env:CXXFLAGS"
+          $cmake_custom_args = ""
+          if ("${{ matrix.CI_ARCH }}" -eq "arm64") {
+            # Pass CMake options from synthizer-c to disable NEON for dr_mp3 and dr_flac
+            # These options should make synthizer-c's CMakeLists.txt define DRMP3_NO_NEON and DRFLAC_NO_NEON
+            # and prevent it from defining DRMP3_TARGET_ARM_NEON or DRFLAC_TARGET_ARM_NEON.
+            $cmake_custom_args = "-DSYZ_DR_MP3_NEON=OFF -DSYZ_DR_FLAC_NEON=OFF"
+            Write-Host "Windows ARM64: Adding CMake args for scikit-build: $cmake_custom_args"
+          }
           Set-Location $Env:GITHUB_WORKSPACE
-          python setup.py bdist_wheel
+          if ($cmake_custom_args) {
+            # The '--' separates setup.py args from CMake args for scikit-build
+            python setup.py bdist_wheel -- $cmake_custom_args
+          } else {
+            python setup.py bdist_wheel
+          }
 
       - name: Upload Python Wheel Artifact (Windows ${{ matrix.CI_ARCH }})
         uses: actions/upload-artifact@v4

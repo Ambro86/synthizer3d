@@ -76,8 +76,9 @@ jobs:
       - name: Build Python Wheels (Windows ${{ matrix.CI_ARCH }})
         env:
           # Set CFLAGS and CXXFLAGS to pass preprocessor definitions for ARM64
-          CFLAGS: ${{ matrix.CI_ARCH == 'arm64' && '/DDR_MP3_NO_NEON=1 /DDR_MP3_NO_SIMD=1' || '' }}
-          CXXFLAGS: ${{ matrix.CI_ARCH == 'arm64' && '/DDR_MP3_NO_NEON=1 /DDR_MP3_NO_SIMD=1' || '' }}
+          # DR_MP3_NO_INTRINSICS should disable all SIMD, including NEON.
+          CFLAGS: ${{ matrix.CI_ARCH == 'arm64' && '/DDR_MP3_NO_INTRINSICS=1' || '' }}
+          CXXFLAGS: ${{ matrix.CI_ARCH == 'arm64' && '/DDR_MP3_NO_INTRINSICS=1' || '' }}
         shell: powershell
         run: |
           Write-Host "Effective CFLAGS for this build step: $Env:CFLAGS"

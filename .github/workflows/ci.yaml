@@ -7,25 +7,20 @@ jobs:
   # Job per costruire le wheel su Windows
   windows-build:
     name: Build Windows (${{ matrix.CI_ARCH }}) Python ${{ matrix.PYVERSION }}
-    runs-on: ${{ matrix.CI_ARCH == 'arm64' && 'windows-11-arm' || 'windows-latest' }}
+    runs-on: windows-latest # Semplificato, dato che arm64 è stato rimosso
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
-      CI_ARCH_LOWER: ${{ matrix.CI_ARCH == 'arm64' && 'arm64' || (matrix.CI_ARCH == 'x86' && 'x86' || 'x64') }} 
+      # Semplificata la logica dato che arm64 è stato rimosso
+      CI_ARCH_LOWER: ${{ (matrix.CI_ARCH == 'x86' && 'x86' || 'x64') }} 
       CI_WINDOWS: "1"
       CI_ARCH_ENV: ${{ matrix.CI_ARCH }} 
     strategy:
       fail-fast: false
       matrix:
         PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-        CI_ARCH: ["x64", "x86", "arm64"] 
-        exclude:
-          # Python 3.8, 3.9, and 3.10 for Windows ARM64 are not available via actions/setup-python
-          - CI_ARCH: "arm64"
-            PYVERSION: "3.8"
-          - CI_ARCH: "arm64"
-            PYVERSION: "3.9"
-          - CI_ARCH: "arm64"
-            PYVERSION: "3.10"
+        # Rimosso "arm64" dalla lista delle architetture
+        CI_ARCH: ["x64", "x86"] 
+        # Il blocco exclude per arm64 non è più necessario
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -59,9 +54,8 @@ jobs:
           set VCVARS_ARG=amd64
           if "${{ env.CI_ARCH_ENV }}" == "x86" (
             set VCVARS_ARG=x86
-          ) else if "${{ env.CI_ARCH_ENV }}" == "arm64" (
-            set VCVARS_ARG=amd64_arm64
           )
+          # La condizione per arm64 è stata rimossa dalla logica di VCVARS_ARG
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" %VCVARS_ARG%
           echo "MSVC configured for %VCVARS_ARG%"
           set PATH >> %GITHUB_ENV%
@@ -77,17 +71,9 @@ jobs:
         shell: powershell
         run: |
           Set-Location $Env:GITHUB_WORKSPACE
-          $cmake_configure_args = ""
-          if ("${{ matrix.CI_ARCH }}" -eq "arm64") {
-            # Pass CMake options for the synthizer-c subproject to disable NEON and SIMD optimizations.
-            # -DSYZ_OPTIMIZE_DR_LIBS=OFF should prevent DR_MP3_ONLY_SIMD / DR_FLAC_ONLY_SIMD from being defined.
-            # -DSYZ_DR_MP3_NEON=OFF and -DSYZ_DR_FLAC_NEON=OFF ensure NEON is explicitly off for these components.
-            $cmake_configure_args = "-DSYZ_OPTIMIZE_DR_LIBS=OFF -DSYZ_DR_MP3_NEON=OFF -DSYZ_DR_FLAC_NEON=OFF"
-            Write-Host "Windows ARM64: Passing CMake args to scikit-build: $cmake_configure_args"
-            python setup.py bdist_wheel -- $cmake_configure_args
-          } else {
-            python setup.py bdist_wheel
-          }
+          # La logica condizionale per $cmake_configure_args per arm64 è stata rimossa
+          # dato che la build arm64 non è più presente.
+          python setup.py bdist_wheel
 
       - name: Upload Python Wheel Artifact (Windows ${{ matrix.CI_ARCH }})
         uses: actions/upload-artifact@v4

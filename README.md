@@ -1,42 +1,90 @@
-# Synthizer Python Bindings
+# Synthizer3D
 
-These are the [Synthizer](https://github.com/synthizer/synthizer) Python
-bindings.  Se the Synthizer manual for more details and example usage.
+![Forked from Synthizer](https://img.shields.io/badge/forked%20from-synthizer-blue)
 
-## Installing From This Repository
+This is a maintained and updated fork of the [Synthizer](https://github.com/synthizer/synthizer) Python bindings, now developed by [Ambro86](https://github.com/Ambro86).
 
-You probably want the Pypi version, which will just `pip install` for you
-without a problem.  But if you want to install from this repository it's sadly
-more involved than just depending on it, since the Python bindings need to
-produce a vendored version of Synthizer itself.  It's possible to get source
-distributions and wheels from the [CI
-runs](https://github.com/synthizer/synthizer-python/actions), or you can follow
-the following procedure:
+Originally developed by the Synthizer Developers, now maintained and improved by Ambro86.
 
-- Clone this repo including the submodule: `git clone --recursive
-  https://github.com/synthizer/synthizer-python`
-- From the root of this repo, `python synthizer-c/vendor.py synthizer-vendored`
-- Then `python setup.py install` or `bdist_wheel` or whatever.
+---
 
-## Maintainers Wanted
+## What is Synthizer3D?
 
-I (@ahicks92) don't have the bandwidth to maintain all bindings we might want
-and have primarily moved on to Rust.  Consequently the Python bindings can be
-expected to lag behind Synthizer proper unless maintainers step up.  You'll need
-to know C and Cython to get anywhere fast.  Otherwise I'll just be adding to
-this as I have extra time.  How this works is as follows:
+Synthizer3D provides advanced Python bindings for 3D audio, leveraging the Synthizer C library.  
+This fork keeps the library up to date for modern Python, improves compatibility with new platforms, and adds new features.
 
-- You decide to add something.
-- if whatever you're adding is going to take more than 5 minutes and/or you
-  don't want to be told no after the fact, open an issue and propose a design.
-  - Or if someone else made an issue, use that one.
-- add the thing and submit a PR.
-- I review your PR.
-- We land your PR.
-- anyone who needs to use Synthizer without a release can use the instructions
-  above for installing from the repository.
-- At some point, usually around the time of a Synthizer release, I tag a release
-  here as well and your changes go out to Pypi.
+---
 
-We're tracking things that need to be added as issues on this repository, if
-you're looking for ideas or a task list.
+## Supported Python Versions and Platforms
+
+Synthizer3D provides pre-built wheels for **Python 3.8 to 3.13** on all major platforms:
+
+- Windows x64
+- Windows x86 (32-bit)
+- Linux x64
+- macOS x64 (Intel)
+- macOS arm64 (Apple Silicon)
+
+Source distribution (`sdist`) is also available.
+
+---
+
+## Installation
+
+**From PyPI (recommended):**
+```sh
+pip install synthizer3d
+```
+
+**Or, to install directly from this repository for development/testing:**
+
+1. Clone the repository with submodules:
+    ```sh
+    git clone --recursive https://github.com/Ambro86/synthizer3d
+    ```
+
+2. From the project root, run:
+    ```sh
+    python synthizer-c/vendor.py synthizer-vendored
+    ```
+
+3. Then install with:
+    ```sh
+    python setup.py install
+    ```
+    Or build a wheel:
+    ```sh
+    python setup.py bdist_wheel
+    ```
+
+---
+
+## For Developers
+
+This fork is based on an unmaintained project. Goals include:
+
+- Support for Python 3.8–3.13 and future versions
+- Wheels for all major platforms (Windows x64/x86, Linux x64, macOS x64/arm64)
+- Updated CI/build scripts
+- New features and compatibility improvements
+
+---
+
+## Maintainer
+
+- Ambro86 – ambro86@gmail.com
+
+Feel free to open issues or pull requests for bugs, suggestions, or contributions!
+
+---
+
+## Credits
+
+- Original project by Synthizer Developers: https://github.com/synthizer/synthizer
+- Forked, maintained, and updated by Ambro86
+
+---
+
+## License
+
+Distributed under the same license as the original Synthizer project (see included license file).

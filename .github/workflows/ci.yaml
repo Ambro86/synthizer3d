@@ -74,16 +74,20 @@ jobs:
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
 
       - name: Build Python Wheels (Windows ${{ matrix.CI_ARCH }})
-        env:
-          # For ARM64, pass CMake arguments via SKBUILD_CMAKE_ARGS to disable NEON and SIMD optimizations in synthizer-c.
-          # -DSYZ_OPTIMIZE_DR_LIBS=OFF prevents defining DR_MP3_ONLY_SIMD / DR_FLAC_ONLY_SIMD.
-          # -DSYZ_DR_MP3_NEON=OFF and -DSYZ_DR_FLAC_NEON=OFF ensure DRMP3_NO_NEON / DRFLAC_NO_NEON are defined.
-          SKBUILD_CMAKE_ARGS: ${{ matrix.CI_ARCH == 'arm64' && '-DSYZ_OPTIMIZE_DR_LIBS=OFF -DSYZ_DR_MP3_NEON=OFF -DSYZ_DR_FLAC_NEON=OFF' || '' }}
         shell: powershell
         run: |
-          Write-Host "Effective SKBUILD_CMAKE_ARGS for this build step: $Env:SKBUILD_CMAKE_ARGS"
           Set-Location $Env:GITHUB_WORKSPACE
-          python setup.py bdist_wheel
+          $cmake_configure_args = ""
+          if ("${{ matrix.CI_ARCH }}" -eq "arm64") {
+            # Pass CMake options for the synthizer-c subproject to disable NEON and SIMD optimizations.
+            # -DSYZ_OPTIMIZE_DR_LIBS=OFF should prevent DR_MP3_ONLY_SIMD / DR_FLAC_ONLY_SIMD from being defined.
+            # -DSYZ_DR_MP3_NEON=OFF and -DSYZ_DR_FLAC_NEON=OFF ensure NEON is explicitly off for these components.
+            $cmake_configure_args = "-DSYZ_OPTIMIZE_DR_LIBS=OFF -DSYZ_DR_MP3_NEON=OFF -DSYZ_DR_FLAC_NEON=OFF"
+            Write-Host "Windows ARM64: Passing CMake args to scikit-build: $cmake_configure_args"
+            python setup.py bdist_wheel -- $cmake_configure_args
+          } else {
+            python setup.py bdist_wheel
+          }
 
       - name: Upload Python Wheel Artifact (Windows ${{ matrix.CI_ARCH }})
         uses: actions/upload-artifact@v4

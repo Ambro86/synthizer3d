@@ -78,7 +78,7 @@ jobs:
           echo "Determined PRIMARY_VCPKG_TRIPLET: $TRIPLET"
 
       - name: Set up vcpkg and dependencies
-        uses: lukka/run-vcpkg@v11.6 # Specify a version
+        uses: lukka/run-vcpkg@v11.5 # Specify a version
         with:
           vcpkgTriplet: ${{ env.PRIMARY_VCPKG_TRIPLET }}
           # vcpkgJsonGlob: 'vcpkg.json' # if your vcpkg.json is in the root

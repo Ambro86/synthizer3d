@@ -1,0 +1,4 @@
+recursive-include synthizer *.pyx
+recursive-include synthizer *.pxd
+recursive-include synthizer-vendored *
+prune synthizer-c

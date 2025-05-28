@@ -1352,7 +1352,10 @@ synthizer-vendored/include/synthizer/data/hrtf.hpp
 synthizer-vendored/include/synthizer/decoders/flac.hpp
 synthizer-vendored/include/synthizer/decoders/libsndfile.hpp
 synthizer-vendored/include/synthizer/decoders/mp3.hpp
+synthizer-vendored/include/synthizer/decoders/ogg.cpp
 synthizer-vendored/include/synthizer/decoders/ogg.hpp
+synthizer-vendored/include/synthizer/decoders/opus.cpp
+synthizer-vendored/include/synthizer/decoders/opus.hpp
 synthizer-vendored/include/synthizer/decoders/raw_decoder.hpp
 synthizer-vendored/include/synthizer/decoders/wav.hpp
 synthizer-vendored/include/synthizer/effects/base_effect.hpp

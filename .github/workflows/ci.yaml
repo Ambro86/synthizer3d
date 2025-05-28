@@ -467,7 +467,7 @@ jobs:
   # Job per il deployment su PyPI
   deploy_pypi:
     name: Deploy to PyPI
-    needs: [windows-build, linux-build, macos-x64-build, macos-arm64-build, sdist-build]
+    needs: [windows-build, macos-x64-build, macos-arm64-build]
     runs-on: ubuntu-latest
     permissions:
       contents: read

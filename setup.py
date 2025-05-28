@@ -47,13 +47,39 @@ extension_args = {
     "libraries": ["synthizer"],
 }
 
-# Windows: aggiungi anche le .lib delle dipendenze manuali, se serve
-if os.name == "nt":
-    vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "x64-windows", "lib")
+import platform
+
+system = platform.system()
+arch, _ = platform.architecture()
+machine = platform.machine()
+
+vcpkg_lib_dir = None
+
+if system == "Windows":
+    if arch == "64bit":
+        vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "x64-windows", "lib")
+    else:
+        vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "x86-windows", "lib")
+elif system == "Darwin":
+    # ARM (Apple Silicon)
+    if machine in ("arm64", "aarch64"):
+        vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "arm64-osx", "lib")
+    else:
+        vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "x64-osx", "lib")
+elif system == "Linux":
+    if machine in ("arm64", "aarch64"):
+        vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "arm64-linux", "lib")
+    elif arch == "64bit":
+        vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "x64-linux", "lib")
+    else:
+        vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "x86-linux", "lib")
+
+if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
     extension_args["library_dirs"].append(vcpkg_lib_dir)
     extension_args["libraries"].extend([
         "ogg", "vorbis", "vorbisfile", "opus", "opusfile", "vorbisenc"
     ])
+    print(f"Using vcpkg lib dir: {vcpkg_lib_dir} for {system} {machine or arch}")
 
 extensions = [
     Extension("synthizer.synthizer", ["synthizer/synthizer.pyx"], **extension_args),

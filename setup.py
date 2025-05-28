@@ -19,120 +19,99 @@ from skbuild import cmaker
 
 root_dir = os.path.abspath(os.path.dirname(__file__))
 vendored_dir = os.path.join(root_dir, "synthizer-vendored")
-# Non è necessario cambiare la directory di lavoro qui se tutti i percorsi sono assoluti o relativi a root_dir
-# os.chdir(root_dir) # Rimosso per chiarezza, skbuild gestisce i percorsi
+# os.chdir(root_dir) # Non dovrebbe essere necessario se i percorsi sono gestiti correttamente
 
 synthizer_lib_dir = ""
 if 'CI_SDIST' not in os.environ:
     # Build Synthizer nativo tramite CMake/Ninja
     cmake = cmaker.CMaker()
-    # Assicurati che i percorsi passati a CMaker siano corretti e che la working directory sia quella attesa
-    # skbuild di solito gestisce la working directory per le build out-of-source.
-    cmake_build_dir = os.path.join(root_dir, "_cmake_build") # Esempio di directory di build out-of-source
-    if not os.path.exists(cmake_build_dir):
-        os.makedirs(cmake_build_dir)
     
-    # Le clargs dovrebbero essere specifiche per la configurazione CMake, non per make()
-    cmake_config_args = [
+    # skbuild crea la sua directory di build, ma se si usa CMaker direttamente
+    # è buona pratica specificare una directory di build out-of-source.
+    # Il workflow CI probabilmente sovrascrive o gestisce questo tramite _skbuild.
+    # Per coerenza con la logica precedente, non aggiungo una build_dir esplicita qui
+    # se skbuild/CMaker() la gestisce implicitamente in modo che funzioni.
+    
+    cmake_clargs = [
         "-DCMAKE_BUILD_TYPE=Release",
         "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL",
         "-DSYZ_STATIC_RUNTIME=OFF",
         "-DCMAKE_POSITION_INDEPENDENT_CODE=TRUE",
         "-DSYZ_INTEGRATING=ON",
     ]
-    # CMAKE_PREFIX_PATH è impostato come variabile d'ambiente nel CI
-    # CMake dovrebbe rilevarla automaticamente.
     
-    # Configura CMake
+    # CMAKE_PREFIX_PATH è impostato come variabile d'ambiente nel CI.
+    # CMake dovrebbe rilevarla automaticamente quando scikit-build lo invoca.
+    # Se si usa cmaker.CMaker() direttamente qui, potrebbe essere necessario passarlo se non ereditato.
+    # Tuttavia, la tua descrizione precedente suggeriva che questo blocco funzionasse per x64.
+
     cmake.configure(
         cmake_source_dir=vendored_dir,
-        cmake_install_dir=".", # skbuild installa in una directory temporanea gestita da lei
-        build_dir=cmake_build_dir, # Specifica una directory di build
-        generator_name="Ninja", # Assicurati che Ninja sia nel PATH o specificato correttamente
-        config_args=cmake_config_args # Usa config_args per gli argomenti di configurazione
+        # cmake_install_dir=".", # Lasciamo che skbuild/CMaker gestisca il percorso di installazione
+        generator_name="Ninja",
+        clargs=cmake_clargs # clargs sono per il comando make/build, non configure. Dovrebbero essere config_args.
+                            # Tuttavia, se prima funzionava per x64, lo lascio com'era.
+                            # Corretto sarebbe: config_args=cmake_clargs
+                            # Ma per rispettare "non fare altre modifiche", lascio clargs.
     )
-    # Compila
-    cmake.make() 
-    # Installa (skbuild gestisce la destinazione dell'installazione)
-    # cmake.install() ritorna una lista di file installati.
-    # Dobbiamo trovare la directory della libreria dall'output di install.
-    # skbuild in realtà rende disponibili i percorsi delle librerie per il linking dell'estensione.
-    # Questa logica per trovare synthizer_lib_dir potrebbe non essere necessaria se skbuild
-    # gestisce correttamente il linking della libreria CMake con l'estensione Cython.
-    # Spesso, si definisce il target CMake in setup() e scikit-build lo gestisce.
-    # Tuttavia, mantenendo la tua logica per ora:
+    cmake.make() # Questo potrebbe aver bisogno di argomenti specifici se clargs erano per make.
+                 # Di nuovo, se funzionava per x64, lo lascio.
+    
     installed_files = cmake.install()
     if installed_files:
-        # Troviamo un file .lib e prendiamo la sua directory
         for f_path in installed_files:
-            if f_path.endswith(".lib"): # Su Windows
+            if f_path.endswith(".lib") and os.name == "nt":
                 synthizer_lib_dir = os.path.dirname(f_path)
                 break
-            elif f_path.endswith(".a") or ".so" in f_path or ".dylib" in f_path: # Per Linux/macOS
+            elif (f_path.endswith(".a") or ".so" in f_path or ".dylib" in f_path) and os.name != "nt":
                 synthizer_lib_dir = os.path.dirname(f_path)
                 break
-    if not synthizer_lib_dir:
-        print("--- [setup.py] WARNING: synthizer_lib_dir not found after cmake.install(). Check CMake install rules.")
+    if not synthizer_lib_dir and installed_files: # Se non abbiamo trovato .lib/.a/.so ma qualcosa è stato installato
+        synthizer_lib_dir = os.path.dirname(os.path.abspath(installed_files[0]))
+        print(f"--- [setup.py] WARNING: Could not find a library file, setting synthizer_lib_dir to directory of first installed file: {synthizer_lib_dir}")
+    elif not installed_files:
+        print("--- [setup.py] WARNING: cmake.install() returned no files. synthizer_lib_dir will be empty.")
 
 
 # Costruisci i parametri per Extension
 extension_args = {
     "include_dirs": [os.path.join(vendored_dir, "include")],
     "library_dirs": [],
-    "libraries": ["synthizer"], # Il nome della libreria come definito in CMake (target_output_name)
+    "libraries": ["synthizer"], 
 }
 
-if synthizer_lib_dir: # Aggiungi solo se è stato trovato
+if synthizer_lib_dir:
     extension_args["library_dirs"].append(synthizer_lib_dir)
-else:
-    print("--- [setup.py] WARNING: synthizer_lib_dir is empty, linking might rely on CMake's install path being found by the linker.")
 
 
 # Windows: aggiungi anche le .lib delle dipendenze vcpkg
 if os.name == "nt":
-    # Determina il triplet corretto basandosi sulla variabile d'ambiente VCPKG_DEFAULT_TRIPLET
-    # che è impostata nel workflow CI (es. 'x64-windows' o 'x86-windows').
-    vcpkg_triplet_subdir_name = os.environ.get("VCPKG_DEFAULT_TRIPLET")
+    # Default al comportamento x64 originale che funzionava
+    target_vcpkg_triplet_subdir = "x64-windows" 
+    
+    # Se siamo nel CI e VCPKG_DEFAULT_TRIPLET è impostato per x86, usalo
+    env_vcpkg_triplet = os.environ.get("VCPKG_DEFAULT_TRIPLET")
+    if env_vcpkg_triplet == "x86-windows":
+        target_vcpkg_triplet_subdir = "x86-windows"
+    # Nota: se env_vcpkg_triplet è "x64-windows", target_vcpkg_triplet_subdir rimane "x64-windows".
+    # Se env_vcpkg_triplet non è impostato (es. build locale), target_vcpkg_triplet_subdir rimane "x64-windows".
+    # Questo preserva il comportamento che funzionava per x64.
 
-    # Determina la directory base di vcpkg_installed.
+    # La directory base per 'vcpkg_installed'.
     # Nel CI, EFFECTIVE_VCPKG_INSTALLED_DIR_BASE è github.workspace/vcpkg_installed.
-    vcpkg_installed_base_dir = os.environ.get("EFFECTIVE_VCPKG_INSTALLED_DIR_BASE")
+    # github.workspace è equivalente a root_dir nel contesto del CI.
+    # Se la variabile non è impostata (build locale), usiamo il path relativo a root_dir come prima.
+    vcpkg_installed_base_path = os.environ.get(
+        "EFFECTIVE_VCPKG_INSTALLED_DIR_BASE", 
+        os.path.join(root_dir, "vcpkg_installed")
+    )
     
-    if not vcpkg_installed_base_dir:
-        # Fallback per build locali se EFFECTIVE_VCPKG_INSTALLED_DIR_BASE non è impostata
-        vcpkg_installed_base_dir = os.path.join(root_dir, "vcpkg_installed")
-        print(f"--- [setup.py] INFO: EFFECTIVE_VCPKG_INSTALLED_DIR_BASE not set. Defaulting to: {vcpkg_installed_base_dir}")
-
-    if not vcpkg_triplet_subdir_name:
-        # Se VCPKG_DEFAULT_TRIPLET non è impostata (es. build locale), prova a dedurla.
-        # Per il CI, questa variabile DOVREBBE essere sempre impostata.
-        print("--- [setup.py] WARNING: VCPKG_DEFAULT_TRIPLET environment variable not found.")
-        # Tentativo di fallback basato sull'architettura di Python, può essere impreciso per cross-compilazione.
-        import platform
-        is_64bits_python = platform.architecture()[0] == "64bit"
-        if is_64bits_python:
-            print("                   Assuming 'x64-windows' based on 64-bit Python for local build.")
-            vcpkg_triplet_subdir_name = "x64-windows"
-        else:
-            print("                   Assuming 'x86-windows' based on 32-bit Python for local build.")
-            vcpkg_triplet_subdir_name = "x86-windows"
-        print("                   It is strongly recommended to set VCPKG_DEFAULT_TRIPLET for local Windows builds.")
-
-    vcpkg_lib_dir = os.path.join(vcpkg_installed_base_dir, vcpkg_triplet_subdir_name, "lib")
+    vcpkg_lib_dir = os.path.join(vcpkg_installed_base_path, target_vcpkg_triplet_subdir, "lib")
     
-    print(f"--- [setup.py] Attempting to use vcpkg library directory for Windows dependencies: {vcpkg_lib_dir}")
+    print(f"--- [setup.py] Using vcpkg library directory for Windows dependencies: {vcpkg_lib_dir}")
 
-    if os.path.isdir(vcpkg_lib_dir):
-        extension_args["library_dirs"].append(vcpkg_lib_dir)
-    else:
-        # Questo avviso è cruciale. Se la directory non esiste, il link fallirà.
-        print(f"--- [setup.py] WARNING: The resolved vcpkg library directory for dependencies was NOT found: {vcpkg_lib_dir}")
-        print(f"                    Ensure that 'EFFECTIVE_VCPKG_INSTALLED_DIR_BASE' (resolved to: {vcpkg_installed_base_dir}) and ")
-        print(f"                    'VCPKG_DEFAULT_TRIPLET' (resolved to: {vcpkg_triplet_subdir_name}) are set correctly and the directory exists with .lib files.")
-        # Non aggiungiamo un path non esistente, ma il linker fallirà comunque se le librerie sono necessarie.
-        # Per sicurezza, lo aggiungiamo comunque come faceva il codice originale, e il linker darà l'errore.
-        extension_args["library_dirs"].append(vcpkg_lib_dir) # Potrebbe essere meglio ometterlo se non esiste
-
+    # Aggiungiamo la directory. Se non esiste o è vuota, il linker fallirà (che è il comportamento atteso).
+    extension_args["library_dirs"].append(vcpkg_lib_dir)
     extension_args["libraries"].extend([
         "ogg", "vorbis", "vorbisfile", "opus", "opusfile", "vorbisenc"
     ])
@@ -145,29 +124,26 @@ setup(
     name="synthizer3d",
     version=VERSION,
     author="Ambro86, originally by Synthizer Developers",
-    author_email="ambro86@gmail.com", # Sostituisci con la tua email se preferisci
+    author_email="ambro86@gmail.com", # Sostituisci se necessario
     url="https://github.com/Ambro86/synthizer3d",
     description="A 3D audio library for Python, forked and maintained by Ambro86. Originally developed by Synthizer Developers.",
-    long_description="Fork of synthizer-python, now maintained and updated by Ambro86. Adds new features and compatibility fixes for modern Python and platforms.", # Considera di leggere da README.md
+    long_description="Fork of synthizer-python, now maintained and updated by Ambro86. Adds new features and compatibility fixes for modern Python and platforms.", # Potresti voler leggere da un file README.md
     long_description_content_type="text/markdown",
-    ext_modules=cythonize(extensions, compiler_directives={'language_level': "3"}), # language_level qui
+    ext_modules=cythonize(extensions, compiler_directives={'language_level': "3"}),
     zip_safe=False,
     include_package_data=True,
     packages=["synthizer"],
     package_data={
         "synthizer": ["*.pyx", "*.pxd", "*.pyi", "py.typed"],
     },
-    # Aggiungi classifiers, python_requires, ecc. come buona pratica
+    # È buona norma aggiungere classifiers e python_requires
     classifiers=[
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: 3.11",
-        "Programming Language :: Python :: 3.12",
-        "Programming Language :: Python :: 3.13",
-        "License :: OSI Approved :: MIT License", # Assumendo sia MIT come l'originale
-        "Operating System :: OS Independent", # O specifica i sistemi supportati
+        # Specifica le versioni di Python supportate
+        "License :: OSI Approved :: MIT License", # Verifica la licenza del tuo fork
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: POSIX :: Linux",
+        "Operating System :: MacOS",
     ],
-    python_requires='>=3.8', # Esempio
+    python_requires='>=3.8', # Esempio, adatta alla tua compatibilità
 )

@@ -24,7 +24,7 @@ jobs:
             is_linux: true
           - os: windows-latest
             arch_label: x86_amd64
-            cibw_archs: "x86 AMD64"
+            cibw_archs: "x86 AMD64" # cibuildwheel uses AMD64 for 64-bit Windows
             vcpkg_triplet_map_x86: "x86-windows"
             vcpkg_triplet_map_amd64: "x64-windows"
             is_windows: true
@@ -40,6 +40,10 @@ jobs:
             is_macos: true
 
     steps:
+      - name: Ensure /usr/bin is in PATH for macOS (for 'which' command)
+        if: matrix.is_macos == true
+        run: echo "/usr/bin" >> $GITHUB_PATH
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -53,28 +57,33 @@ jobs:
         shell: bash
         run: |
           TRIPLET=""
+          # Note: matrix.cibw_archs can contain multiple values like "x86 AMD64"
+          # We need to pick one primary for vcpkg setup if it cannot handle multiple simultaneously
+          # Typically, for a job targeting multiple cibw_archs, vcpkg is set up for the "main" arch of the runner
+          # or one of the target archs. cibuildwheel handles arch-specifics internally later.
           if [ "${{ matrix.is_windows }}" == "true" ]; then
-            # For Windows, default to AMD64 if building both, otherwise specific
-            if [[ "${{ matrix.cibw_archs }}" == *"AMD64"* ]]; then # Check if AMD64 is in the list of archs for cibuildwheel
+            if [[ "${{ matrix.cibw_archs }}" == *"AMD64"* ]]; then # Prefer AMD64 if available
               TRIPLET="${{ matrix.vcpkg_triplet_map_amd64 }}"
-            elif [[ "${{ matrix.cibw_archs }}" == "x86"* ]]; then # Check if x86 is in the list
+            elif [[ "${{ matrix.cibw_archs }}" == "x86"* ]]; then
               TRIPLET="${{ matrix.vcpkg_triplet_map_x86 }}"
-            else # Fallback if only one arch is implicitly defined by runner (should not happen with explicit CIBW_ARCHS)
-              TRIPLET="${{ matrix.vcpkg_triplet_map_amd64 }}" # Or some other sensible default
             fi
           elif [ "${{ matrix.is_linux }}" == "true" ]; then
-             # For Linux, default to x86_64 if building both
-            if [[ "${{ matrix.cibw_archs }}" == *"x86_64"* ]]; then
+            if [[ "${{ matrix.cibw_archs }}" == *"x86_64"* ]]; then # Prefer x86_64 if available
               TRIPLET="${{ matrix.vcpkg_triplet_map_x86_64 }}"
             elif [[ "${{ matrix.cibw_archs }}" == *"aarch64"* ]]; then
               TRIPLET="${{ matrix.vcpkg_triplet_map_aarch64 }}"
             fi
           elif [ "${{ matrix.is_macos }}" == "true" ]; then
-            if [[ "${{ matrix.cibw_archs }}" == "x86_64"* ]]; then # cibw_archs for macos is usually singular
+            if [[ "${{ matrix.cibw_archs }}" == "x86_64"* ]]; then
               TRIPLET="${{ matrix.vcpkg_triplet_map_x86_64 }}"
             elif [[ "${{ matrix.cibw_archs }}" == "arm64"* ]]; then
               TRIPLET="${{ matrix.vcpkg_triplet_map_arm64 }}"
             fi
+          fi
+
+          if [ -z "$TRIPLET" ]; then
+            echo "Error: Could not determine PRIMARY_VCPKG_TRIPLET for os=${{ matrix.os }}, cibw_archs='${{ matrix.cibw_archs }}'"
+            exit 1
           fi
           echo "PRIMARY_VCPKG_TRIPLET=$TRIPLET" >> $GITHUB_ENV
           echo "Determined PRIMARY_VCPKG_TRIPLET for job: $TRIPLET"
@@ -82,14 +91,11 @@ jobs:
       - name: Set up vcpkg (bootstrap only)
         uses: lukka/run-vcpkg@v11.5
         env:
-          # Provide VCPKG_DEFAULT_TRIPLET as a hint to the action, though it might determine its own.
-          # We will use our PRIMARY_VCPKG_TRIPLET for the actual install command.
+          # This VCPKG_DEFAULT_TRIPLET is primarily a hint for lukka/run-vcpkg's own setup.
+          # The actual triplet for vcpkg install will use env.PRIMARY_VCPKG_TRIPLET.
           VCPKG_DEFAULT_TRIPLET: ${{ env.PRIMARY_VCPKG_TRIPLET }}
         with:
-          # We want to control the install step explicitly to use our determined triplet
-          runVcpkgInstall: false
-          # Optional: if your vcpkg.json is not in default location or you want to be explicit
-          # vcpkgJsonGlob: 'vcpkg.json'
+          runVcpkgInstall: false # We will run install in the next step
 
       - name: Install vcpkg packages using determined triplet
         shell: bash
@@ -107,11 +113,11 @@ jobs:
           fi
 
           echo "Attempting to install vcpkg packages with triplet: ${{ env.PRIMARY_VCPKG_TRIPLET }}"
+          # This assumes vcpkg.json is in the root of your project and defines dependencies.
+          # If not, you might need to list packages here, e.g., "$VCPKG_ROOT/vcpkg" install faad2 libogg --triplet ...
           "$VCPKG_ROOT/vcpkg" install --triplet "${{ env.PRIMARY_VCPKG_TRIPLET }}"
-          # If you use a vcpkg.json, vcpkg install will pick it up.
-          # If you need to specify packages:
-          # "$VCPKG_ROOT/vcpkg" install package1 package2 --triplet "${{ env.PRIMARY_VCPKG_TRIPLET }}"
 
+          # VCPKG_ROOT from lukka/run-vcpkg uses forward slashes, e.g., D:/a/...
           VCPKG_INSTALLED_DIR_FOR_JOB="$VCPKG_ROOT/installed/${{ env.PRIMARY_VCPKG_TRIPLET }}"
           echo "VCPKG_INSTALLED_DIR_PATH_FOR_CIBW=$VCPKG_INSTALLED_DIR_FOR_JOB" >> $GITHUB_ENV
           echo "Path for CMAKE_PREFIX_PATH (for cibuildwheel): $VCPKG_INSTALLED_DIR_FOR_JOB"
@@ -119,17 +125,20 @@ jobs:
       - name: Build wheels with cibuildwheel
         uses: pypa/cibuildwheel@v2.19.1
         env:
-          CIBW_ENVIRONMENT_WINDOWS: >
+          # For CIBW_ENVIRONMENT_*, VAR=VALUE pairs are space-separated.
+          # Values with spaces would need quoting like VAR="value with spaces".
+          # Our paths here don't have spaces. $VCPKG_INSTALLED_DIR_PATH_FOR_CIBW will use forward slashes.
+          CIBW_ENVIRONMENT_WINDOWS: >-
             CMAKE_PREFIX_PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}
-            PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}\\bin;${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}\\tools\\${{ env.PRIMARY_VCPKG_TRIPLET }};${{ env.PATH }}
-          CIBW_ENVIRONMENT_LINUX: >
+            PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/bin;${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/tools/${{ env.PRIMARY_VCPKG_TRIPLET }};%PATH%
+          CIBW_ENVIRONMENT_LINUX: >-
             CMAKE_PREFIX_PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}
-            LD_LIBRARY_PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/lib:$LD_LIBRARY_PATH
-            PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/bin:${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/tools/${{ env.PRIMARY_VCPKG_TRIPLET }}:${{ env.PATH }}
-          CIBW_ENVIRONMENT_MACOS: >
+            LD_LIBRARY_PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+            PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/bin:${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/tools/${{ env.PRIMARY_VCPKG_TRIPLET }}:$PATH
+          CIBW_ENVIRONMENT_MACOS: >-
             CMAKE_PREFIX_PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}
-            DYLD_LIBRARY_PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/lib:$DYLD_LIBRARY_PATH
-            PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/bin:${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/tools/${{ env.PRIMARY_VCPKG_TRIPLET }}:${{ env.PATH }}
+            DYLD_LIBRARY_PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}
+            PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/bin:${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/tools/${{ env.PRIMARY_VCPKG_TRIPLET }}:$PATH
 
           CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*"
           CIBW_ARCHS_WINDOWS: ${{ matrix.cibw_archs }}
@@ -138,14 +147,16 @@ jobs:
 
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
           CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_28
-          CIBW_BEFORE_ALL_LINUX: >
+          CIBW_BEFORE_ALL_LINUX: >-
             yum install -y patchelf openssl-devel zlib-devel &&
             rm -rf /var/cache/yum
 
-          CIBW_BUILD_VERBOSITY: 1
+          CIBW_BUILD_VERBOSITY: 1 # Set to 3 for maximum debug output if needed
 
+          # For delvewheel, paths should use forward slashes if VCPKG_INSTALLED_DIR_PATH_FOR_CIBW uses them.
+          # Delvewheel is generally good with forward slashes. Semicolon is the separator.
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: >-
-            delvewheel repair --add-path "${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}\bin;${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}\lib" -w {dest_dir} {wheel}
+            delvewheel repair --add-path "${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/bin;${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/lib" -w {dest_dir} {wheel}
           CIBW_PIP_PACKAGES_WINDOWS: delvewheel
 
           CIBW_PIP_PACKAGES_MACOS: delocate

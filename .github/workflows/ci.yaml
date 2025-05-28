@@ -284,8 +284,6 @@ jobs:
           pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build
 
       - name: Build Python Wheels (Linux)
-        env:
-          # CMAKE_PREFIX_PATH e LD_LIBRARY_PATH sono ereditati da GITHUB_ENV
         run: |
           echo "Building with CMAKE_PREFIX_PATH = $CMAKE_PREFIX_PATH"
           echo "Current LD_LIBRARY_PATH for build = $LD_LIBRARY_PATH"

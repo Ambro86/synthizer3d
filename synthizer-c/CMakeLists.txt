@@ -144,7 +144,7 @@ add_library(synthizer ${SYNTHIZER_LIB_TYPE}
 )
 if(MSVC)
   # Remove /WX only for stb_vorbis.c
-  set_source_files_properties(src/stb_vorbis.c PROPERTIES COMPILE_FLAGS "/W4 /wd4245 /wd4456 /wd4457 /wd4701")
+  set_source_files_properties(src/stb_vorbis.c src/decoding.cpp PROPERTIES COMPILE_FLAGS "/W4 /wd4245 /wd4456 /wd4457 /wd4701 /wd4245 /WX-")
 endif()
 target_compile_features(synthizer PUBLIC cxx_std_17)
 target_link_libraries(synthizer ${SYZ_DEPS} Threads::Threads ${CMAKE_DL_LIBS})

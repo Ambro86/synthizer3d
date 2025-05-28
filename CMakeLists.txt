@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 17)
 add_subdirectory(deps)
 
 # Synthizer version.
-add_compile_definitions(SYZ_MAJOR=0 SYZ_MINOR=11 SYZ_PATCH=13)
+add_compile_definitions(SYZ_MAJOR=0 SYZ_MINOR=1 SYZ_PATCH=9)
 
 include(CTest)
 include(CheckCXXSourceRuns)
@@ -137,10 +137,15 @@ add_library(synthizer ${SYNTHIZER_LIB_TYPE}
   src/streams/custom_stream.cpp
   src/streams/file.cpp
   src/streams/memory_stream.cpp
+  src/stb_vorbis.c      # <---- QUESTA È L'UNICA AGGIUNTA
 
   $<TARGET_OBJECTS:wdl_objlib>
   $<TARGET_OBJECTS:synthizer_single_file_libs>
 )
+if(MSVC)
+  # Remove /WX only for stb_vorbis.c
+  set_source_files_properties(src/stb_vorbis.c src/decoding.cpp PROPERTIES COMPILE_FLAGS "/W4 /wd4245 /wd4456 /wd4457 /wd4701 /wd4245 /WX-")
+endif()
 target_compile_features(synthizer PUBLIC cxx_std_17)
 target_link_libraries(synthizer ${SYZ_DEPS} Threads::Threads ${CMAKE_DL_LIBS})
 target_include_directories(synthizer PRIVATE $<TARGET_PROPERTY:wdl_objlib,INTERFACE_INCLUDE_DIRECTORIES>)
@@ -157,7 +162,7 @@ endif()
 if(MSVC)
   target_compile_options(synthizer PRIVATE /W4 /WX)
 else()
-  target_compile_options(synthizer PRIVATE -Wall -Wextra)
+  target_compile_options(synthizer PRIVATE -Wall -Wextra -Werror)
 endif()
 
 set_property(TARGET synthizer PROPERTY POSITION_INDEPENDENT_CODE ON)

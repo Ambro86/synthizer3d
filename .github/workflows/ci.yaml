@@ -24,23 +24,24 @@ jobs:
             is_linux: true
           - os: windows-latest
             arch_label: x86_amd64
-            cibw_archs: "x86 AMD64" 
+            cibw_archs: "x86 AMD64"
             vcpkg_triplet_map_x86: "x86-windows"
             vcpkg_triplet_map_amd64: "x64-windows"
+            msvc_arch: "x86_amd64" # Per msvc-dev-cmd, cibuildwheel gestirà la selezione interna
             is_windows: true
-          - os: macos-13 
+          - os: macos-13
             arch_label: x64
             cibw_archs: "x86_64"
             vcpkg_triplet_map_x86_64: "x64-osx"
             is_macos: true
-          - os: macos-14 
+          - os: macos-14
             arch_label: arm64
             cibw_archs: "arm64"
             vcpkg_triplet_map_arm64: "arm64-osx"
             is_macos: true
 
     steps:
-      - name: Ensure /usr/bin is in PATH for macOS (for 'which' command)
+      - name: Ensure /usr/bin is in PATH for macOS
         if: matrix.is_macos == true
         run: echo "/usr/bin" >> $GITHUB_PATH
 
@@ -57,22 +58,12 @@ jobs:
         shell: bash
         run: |
           TRIPLET=""
+          # Per Windows e Linux, impostiamo un triplet "primario" per l'installazione di vcpkg.
+          # cibuildwheel gestirà le architetture multiple internamente.
           if [ "${{ matrix.is_windows }}" == "true" ]; then
-            # Per Windows, cibuildwheel eseguirà build separate per x86 e AMD64 se specificato in cibw_archs.
-            # Lo step vcpkg install viene eseguito una volta per il job, quindi scegliamo un triplet primario.
-            # CIBW_BUILD_ARCHITECTURE sarà disponibile all'interno di CIBW_BEFORE_BUILD_WINDOWS.
-            if [[ "${{ matrix.cibw_archs }}" == *"AMD64"* ]]; then
-              TRIPLET="${{ matrix.vcpkg_triplet_map_amd64 }}"
-            elif [[ "${{ matrix.cibw_archs }}" == "x86"* ]]; then
-              TRIPLET="${{ matrix.vcpkg_triplet_map_x86 }}"
-            fi
+            TRIPLET="${{ matrix.vcpkg_triplet_map_amd64 }}" # Default a 64-bit per vcpkg install
           elif [ "${{ matrix.is_linux }}" == "true" ]; then
-            # Per Linux, stessa logica, scegliamo un triplet primario per l'installazione vcpkg.
-            if [[ "${{ matrix.cibw_archs }}" == *"x86_64"* ]]; then
-              TRIPLET="${{ matrix.vcpkg_triplet_map_x86_64 }}"
-            elif [[ "${{ matrix.cibw_archs }}" == *"aarch64"* ]]; then # Se si costruisce solo per aarch64
-              TRIPLET="${{ matrix.vcpkg_triplet_map_aarch64 }}"
-            fi
+            TRIPLET="${{ matrix.vcpkg_triplet_map_x86_64 }}" # Default a x86_64 per vcpkg install
           elif [ "${{ matrix.is_macos }}" == "true" ]; then
             if [[ "${{ matrix.cibw_archs }}" == "x86_64"* ]]; then
               TRIPLET="${{ matrix.vcpkg_triplet_map_x86_64 }}"
@@ -88,6 +79,13 @@ jobs:
           echo "PRIMARY_VCPKG_TRIPLET=$TRIPLET" >> $GITHUB_ENV
           echo "Determined PRIMARY_VCPKG_TRIPLET for job: $TRIPLET"
 
+      # Imposta l'ambiente MSVC per l'intero job Windows PRIMA di cibuildwheel
+      - name: Setup MSVC Developer Command Prompt (Windows only)
+        if: matrix.is_windows == true
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.msvc_arch }} # Usiamo x86_amd64 per coprire entrambi, o specifichiamo se necessario
+
       - name: Set up vcpkg (bootstrap only)
         uses: lukka/run-vcpkg@v11.5
         env:
@@ -100,7 +98,6 @@ jobs:
         run: |
           echo "VCPKG_ROOT (from lukka/run-vcpkg) is $VCPKG_ROOT"
           echo "PRIMARY_VCPKG_TRIPLET (determined by us for this install) is ${{ env.PRIMARY_VCPKG_TRIPLET }}"
-
           if [ -z "$VCPKG_ROOT" ]; then
             echo "Error: VCPKG_ROOT is not set."
             exit 1
@@ -109,10 +106,8 @@ jobs:
             echo "Error: Our PRIMARY_VCPKG_TRIPLET is not set. Cannot install."
             exit 1
           fi
-
           echo "Attempting to install vcpkg packages with triplet: ${{ env.PRIMARY_VCPKG_TRIPLET }}"
           "$VCPKG_ROOT/vcpkg" install --triplet "${{ env.PRIMARY_VCPKG_TRIPLET }}"
-
           VCPKG_INSTALLED_DIR_FOR_JOB="$VCPKG_ROOT/installed/${{ env.PRIMARY_VCPKG_TRIPLET }}"
           echo "VCPKG_INSTALLED_DIR_PATH_FOR_CIBW=$VCPKG_INSTALLED_DIR_FOR_JOB" >> $GITHUB_ENV
           echo "Path for CMAKE_PREFIX_PATH (for cibuildwheel): $VCPKG_INSTALLED_DIR_FOR_JOB"
@@ -131,25 +126,19 @@ jobs:
           if __name__ == "__main__":
               wheel_file_path_str = sys.argv[1]
               dest_dir_str = sys.argv[2]
-
               vcpkg_installed_raw = os.environ.get('VCPKG_INSTALLED_DIR_PATH_FOR_CIBW') 
-
               if not vcpkg_installed_raw:
                   print(f"::error::Variabile d'ambiente VCPKG_INSTALLED_DIR_PATH_FOR_CIBW non impostata per lo script di riparazione.")
                   sys.exit(1)
-
               vcpkg_installed_path = str(pathlib.Path(vcpkg_installed_raw).resolve())
               add_path_arg = f"{vcpkg_installed_path}\\bin;{vcpkg_installed_path}\\lib"
-              
               pathlib.Path(dest_dir_str).mkdir(parents=True, exist_ok=True)
-
               delvewheel_cmd_module = [
                   sys.executable, "-m", "delvewheel", "repair",
                   "--add-path", add_path_arg,
                   "-w", dest_dir_str,
                   wheel_file_path_str
               ]
-              
               print(f"Tentativo di riparazione delvewheel con comando: {' '.join(delvewheel_cmd_module)}")
               try:
                   process = subprocess.run(delvewheel_cmd_module, check=True, capture_output=True, text=True, encoding='utf-8')
@@ -160,25 +149,26 @@ jobs:
                       print(process.stderr)
               except subprocess.CalledProcessError as e_retry:
                   print(f"::error::Delvewheel (tramite python -m) fallito con codice {e_retry.returncode}")
-                  print("Stdout Delvewheel (python -m):")
-                  print(e_retry.stdout)
-                  print("Stderr Delvewheel (python -m):")
-                  print(e_retry.stderr)
+                  print(f"Stdout Delvewheel (python -m): {e_retry.stdout}")
+                  print(f"Stderr Delvewheel (python -m): {e_retry.stderr}")
                   sys.exit(e_retry.returncode)
               except FileNotFoundError as e_fnf_retry:
                   print(f"::error::Delvewheel (tramite python -m) fallito, eseguibile python non trovato o modulo delvewheel mancante: {e_fnf_retry}")
                   sys.exit(1)
-              
               print(f"Riparazione Delvewheel presumibilmente completata con successo per {wheel_file_path_str}")
           EOF
 
       - name: Build wheels with cibuildwheel
         uses: pypa/cibuildwheel@v2.19.1
         env:
-          VCPKG_INSTALLED_DIR_PATH_FOR_CIBW: ${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}
-          PRIMARY_VCPKG_TRIPLET: ${{ env.PRIMARY_VCPKG_TRIPLET }}
-
-          CIBW_ENVIRONMENT_WINDOWS: "CMAKE_PREFIX_PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}"
+          # Queste variabili sono impostate da step precedenti tramite GITHUB_ENV e saranno ereditate
+          # VCPKG_INSTALLED_DIR_PATH_FOR_CIBW: ${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}
+          # PRIMARY_VCPKG_TRIPLET: ${{ env.PRIMARY_VCPKG_TRIPLET }}
+          # L'ambiente MSVC (INCLUDE, LIB, PATH per cl.exe) dovrebbe essere ereditato dallo step "Setup MSVC Developer Command Prompt"
+          
+          # Per Windows, CMAKE_PREFIX_PATH è cruciale. Il PATH per i tool vcpkg viene aggiunto.
+          # L'ambiente MSVC (INCLUDE, LIB) dovrebbe essere ereditato dallo step msvc-dev-cmd.
+          CIBW_ENVIRONMENT_WINDOWS: "CMAKE_PREFIX_PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }};PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/bin;${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/tools/${{ env.PRIMARY_VCPKG_TRIPLET }}/bin;%PATH%"
           
           CIBW_ENVIRONMENT_LINUX: >-
             CMAKE_PREFIX_PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}
@@ -200,46 +190,10 @@ jobs:
             yum install -y openssl-devel &&
             rm -rf /var/cache/yum
           
-          CIBW_BEFORE_BUILD_WINDOWS: |
-            rem CIBW_BUILD_ARCHITECTURE è impostata da cibuildwheel a 'x86', 'AMD64', o 'ARM64'
-            set VCVARS_ARCH=
-            if "%CIBW_BUILD_ARCHITECTURE%"=="x86" set VCVARS_ARCH=x86
-            if "%CIBW_BUILD_ARCHITECTURE%"=="AMD64" set VCVARS_ARCH=amd64
-            if "%CIBW_BUILD_ARCHITECTURE%"=="ARM64" set VCVARS_ARCH=arm64
-
-            rem Cerca vcvarsall.bat nei percorsi comuni dei runner GitHub
-            set VCVARS_PATH_ENT="C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
-            set VCVARS_PATH_PRO="C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Auxiliary\Build\vcvarsall.bat"
-            set VCVARS_PATH_COMM="C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat"
-            set VCVARS_PATH_BUILDTOOLS="C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvarsall.bat"
-
-            set VCVARS_TO_CALL=
-            if exist %VCVARS_PATH_ENT% (set VCVARS_TO_CALL=%VCVARS_PATH_ENT%)
-            if exist %VCVARS_PATH_PRO% (if not defined VCVARS_TO_CALL set VCVARS_TO_CALL=%VCVARS_PATH_PRO%)
-            if exist %VCVARS_PATH_COMM% (if not defined VCVARS_TO_CALL set VCVARS_TO_CALL=%VCVARS_PATH_COMM%)
-            if exist %VCVARS_PATH_BUILDTOOLS% (if not defined VCVARS_TO_CALL set VCVARS_TO_CALL=%VCVARS_PATH_BUILDTOOLS%)
-            
-            if defined VCVARS_TO_CALL (
-              if defined VCVARS_ARCH (
-                echo Calling %VCVARS_TO_CALL% %VCVARS_ARCH%
-                call %VCVARS_TO_CALL% %VCVARS_ARCH%
-                echo Successfully called vcvarsall.bat for %VCVARS_ARCH%
-              ) else (
-                echo ::warning::CIBW_BUILD_ARCHITECTURE ('%CIBW_BUILD_ARCHITECTURE%') non riconosciuta per vcvarsall.bat. L'ambiente MSVC potrebbe non essere impostato.
-              )
-            ) else (
-              echo ::error::vcvarsall.bat not found in common locations. MSVC environment cannot be set up.
-              exit /B 1
-            )
-            
-            echo Adding VCPKG paths to PATH for build process
-            rem Converti VCPKG_INSTALLED_DIR_PATH_FOR_CIBW in backslashes per Windows PATH
-            set VCPKG_INSTALLED_DIR_WIN_TEMP=%VCPKG_INSTALLED_DIR_PATH_FOR_CIBW%
-            set VCPKG_INSTALLED_WIN_PATH=%VCPKG_INSTALLED_DIR_WIN_TEMP:/=\%
-            set VCPKG_TOOLS_DIR_WIN_TEMP=%VCPKG_INSTALLED_WIN_PATH%\tools\%PRIMARY_VCPKG_TRIPLET%
-            
-            set PATH=%VCPKG_INSTALLED_WIN_PATH%\bin;%VCPKG_TOOLS_DIR_WIN_TEMP%\bin;%PATH%
-            echo Updated PATH in CIBW_BEFORE_BUILD_WINDOWS is %PATH%
+          # CIBW_BEFORE_BUILD_WINDOWS non è più usato per impostare PATH o vcvarsall,
+          # ci affidiamo all'ereditarietà dallo step msvc-dev-cmd e a CIBW_ENVIRONMENT_WINDOWS per il PATH di vcpkg.
+          # Se necessario, può essere usato per altri comandi pre-build specifici.
+          CIBW_BEFORE_BUILD_WINDOWS: "" 
 
           CIBW_BUILD_VERBOSITY: 3
 

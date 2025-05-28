@@ -1,24 +1,32 @@
 cmake_minimum_required(VERSION 3.15.0)
+
+# -- VCPKG TOOLCHAIN: va PRIMA di project()! --
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE AND EXISTS "${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake")
+  set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+elseif(NOT DEFINED CMAKE_TOOLCHAIN_FILE AND EXISTS "${CMAKE_SOURCE_DIR}/../vcpkg/scripts/buildsystems/vcpkg.cmake")
+  set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/../vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+endif()
+
 project(synthizer VERSION 0.1.0 LANGUAGES C CXX)
-
-set(BENCHMARK_ENABLE_TESTING OFF)
-
-OPTION(SYZ_INTEGRATING "Set to ON to avoid linking examples etc. when integrating into a language's bindings" OFF)
-
-# Do this first; some things will quietly pick it up and it's
-# really hard to tell which.
 set(CMAKE_CXX_STANDARD 17)
 
-add_subdirectory(deps)
+set(BENCHMARK_ENABLE_TESTING OFF)
+option(SYZ_INTEGRATING "Set to ON to avoid linking examples etc. when integrating into a language's bindings" OFF)
 
-# Synthizer version.
+add_subdirectory(deps)
 add_compile_definitions(SYZ_MAJOR=0 SYZ_MINOR=1 SYZ_PATCH=9)
 
 include(CTest)
 include(CheckCXXSourceRuns)
 enable_testing()
 
-find_package(Threads)
+find_package(Threads REQUIRED)
+
+# --- VCPKG Packages: libvorbis, libogg, opus, opusfile ---
+find_package(Vorbis REQUIRED)
+find_package(Ogg REQUIRED)
+find_package(Opus REQUIRED)
+find_package(OpusFile REQUIRED)
 
 set(SYZ_DEPS
   boost_partial
@@ -28,8 +36,6 @@ set(SYZ_DEPS
   hedley
   miniaudio
   pdqsort
-  # wdl is special because it's an object library.
-  #wdl
 )
 
 if(NOT "${SYZ_INTEGRATING}")
@@ -46,50 +52,21 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     -Wno-deprecated-declarations
     -Wno-logical-op-parentheses
     -Wno-unknown-pragmas
-    # We have warning pragmas that are GCC specific.
     -Wno-unknown-warning-option
   )
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   add_compile_options(
-    # Lets us use Clang pragmas.
-    /wd4068
-    # Lets us use non-MSVC attributes.
-    /wd5030
-    # allows implicit casts to smaller types. We need this because we can't i.e. std::copy(double, float) without
-    # hitting it.
-    /wd4244
-    /wd4267
-    # Lets property generation work, namely property_impl.hpp
-    /Zc:preprocessor
-    # And now we need to silence a winbase.h warning because it's got a macro expanding to undefined somehow. Noe that
-    # this isn't our code:
-    /wd5105
-    # Not all compilers give us constexpr if, but MSVC likes to warn us when we can use it.
-    /wd4127
-    # Documented here: https://devblogs.microsoft.com/cppblog/broken-warnings-theory/
-    # By using this and putting Synthizer dependency headers behind <>, we can suppress warnings in dependencies.
-    /experimental:external
-    /external:W0
-    /external:anglebrackets
-    # Apparently we have to globally disable unreachable code warnings; MSVC isn't letting us do it in a
-    # targeted fashion.
-    /wd4702
+    /wd4068 /wd5030 /wd4244 /wd4267 /Zc:preprocessor /wd5105 /wd4127
+    /experimental:external /external:W0 /external:anglebrackets /wd4702
   )
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  ADD_COMPILE_OPTIONS(-Wno-unknown-pragmas)
+  add_compile_options(-Wno-unknown-pragmas)
 endif()
 
-# Inspired by the module in https://github.com/vector-of-bool/CMakeCM/
-# Determine whether or not filesystem is non-experimental and doesn't need -lstdc++fs
-#
-# This makes things work on GCC < 9.0
-#
-# This is one of the places which requires the global CXX_STANDARD be set.
 check_cxx_source_runs([[
   #include <cstdio>
   #include <cstdlib>
   #include <filesystem>
-
   int main() {
     auto cwd = std::filesystem::current_path();
     std::printf("%s", cwd.c_str());
@@ -103,9 +80,6 @@ else()
   message(STATUS "Found C++17 filesystem support")
 endif()
 
-
-
-# Needs to be factored out so that -Wall doesn't apply to third-party deps.
 add_library(synthizer_single_file_libs OBJECT
   src/single_file_libs.c
 )
@@ -117,7 +91,6 @@ add_library(synthizer ${SYNTHIZER_LIB_TYPE}
   src/audio_output.cpp
   src/base_object.cpp
   src/byte_stream.cpp
-  # includes our C API source files into a unity build.
   src/c_api/unity.cpp
   src/context.cpp
   src/decoding.cpp
@@ -137,21 +110,42 @@ add_library(synthizer ${SYNTHIZER_LIB_TYPE}
   src/streams/custom_stream.cpp
   src/streams/file.cpp
   src/streams/memory_stream.cpp
-  src/stb_vorbis.c      # <---- QUESTA È L'UNICA AGGIUNTA
-
+  include/synthizer/decoders/ogg.cpp
+  include/synthizer/decoders/opus.cpp
   $<TARGET_OBJECTS:wdl_objlib>
   $<TARGET_OBJECTS:synthizer_single_file_libs>
 )
+
 if(MSVC)
-  # Remove /WX only for stb_vorbis.c
-  set_source_files_properties(src/stb_vorbis.c src/decoding.cpp PROPERTIES COMPILE_FLAGS "/W4 /wd4245 /wd4456 /wd4457 /wd4701 /wd4245 /WX-")
+  set_source_files_properties(src/decoding.cpp PROPERTIES COMPILE_FLAGS "/W4 /wd4245 /wd4456 /wd4457 /wd4701 /wd4245 /WX-")
 endif()
 target_compile_features(synthizer PUBLIC cxx_std_17)
-target_link_libraries(synthizer ${SYZ_DEPS} Threads::Threads ${CMAKE_DL_LIBS})
+
+# --- Link a tutte le librerie (CMake e .lib) in modo unificato ---
+set(SYZ_LIBRARIES
+  ${SYZ_DEPS}
+  Threads::Threads
+  ${CMAKE_DL_LIBS}
+  Vorbis::vorbis
+  Vorbis::vorbisfile
+  Ogg::ogg
+  Opus::opus
+  OpusFile::opusfile
+)
+if(WIN32)
+  list(APPEND SYZ_LIBRARIES
+    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/ogg.lib"
+    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/vorbis.lib"
+    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/vorbisfile.lib"
+    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/opus.lib"
+    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/opusfile.lib"
+    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/vorbisenc.lib"
+  )
+endif()
+target_link_libraries(synthizer PRIVATE ${SYZ_LIBRARIES})
+
 target_include_directories(synthizer PRIVATE $<TARGET_PROPERTY:wdl_objlib,INTERFACE_INCLUDE_DIRECTORIES>)
 target_compile_definitions(synthizer PRIVATE BUILDING_SYNTHIZER WDL_RESAMPLE_TYPE=float)
-# tells synthizer.h to define SYZ_CAPI for exporting shared object/dll symbols.
-# On windows this is dllexport.
 if("${SYNTHIZER_LIB_TYPE}" STREQUAL "SHARED")
   target_compile_definitions(synthizer PRIVATE SYNTHIZER_SHARED)
 endif()
@@ -166,21 +160,18 @@ else()
 endif()
 
 set_property(TARGET synthizer PROPERTY POSITION_INDEPENDENT_CODE ON)
-
 if (WIN32)
-  # Don't let MSVC define min and max from windows.h.
   target_compile_definitions(synthizer PRIVATE NOMINMAX)
 endif()
 
-# For CI artifacts:
 if(DEFINED CI_SYNTHIZER_NAME)
   set_target_properties(synthizer PROPERTIES OUTPUT_NAME ${CI_SYNTHIZER_NAME})
 endif()
 
 add_custom_target(data
-python "${CMAKE_SOURCE_DIR}/data_processor/main.py")
+  COMMAND python "${CMAKE_SOURCE_DIR}/data_processor/main.py"
+)
 
-# Not linked to C examples by default. on Linux.
 find_library(MATH_LIBRARY m)
 
 function(example NAME EXT)
@@ -205,9 +196,7 @@ example(play_note c)
 example(print_version c)
 example(scalar_panned_source cpp)
 example(simple_automation c)
-# The following won't work on Windows unless compiled against a static build of Synthizer because we don't want to
-# expose the C++ internals from the DLL. Since these are just test programs and not actual utilities, disable them on
-# all platforms if the build isn't static.
+
 if(("${SYNTHIZER_LIB_TYPE}" STREQUAL "STATIC") AND (NOT "${SYZ_INTEGRATING}"))
   add_executable(file_test file_test.cpp)
   target_link_libraries(file_test synthizer)
@@ -231,13 +220,6 @@ if(("${SYNTHIZER_LIB_TYPE}" STREQUAL "STATIC") AND (NOT "${SYZ_INTEGRATING}"))
   list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
   INCLUDE(Catch)
 
-  # Set up benchmarks for things we can benchmark.
-  #
-  # Unfortunately Synthizer's state is too global for us to do this reliably until we pull the math out to a library,
-  # but we can at least group some things under Google's benchmarking library which is better than nothing.
-
-  # Apparently we have to do this globally because CMake won't let us set a define for a subdirectory. Without it
-  # google/benchmark wants gtest.
   set(BENCHMARK_ENABLE_TESTING OFF)
 
   add_executable(gbench
@@ -274,14 +256,12 @@ if(("${SYNTHIZER_LIB_TYPE}" STREQUAL "STATIC") AND (NOT "${SYZ_INTEGRATING}"))
   target_include_directories(tests PRIVATE $<TARGET_PROPERTY:wdl_objlib,INTERFACE_INCLUDE_DIRECTORIES>)
   target_compile_definitions(tests PRIVATE WDL_RESAMPLE_TYPE=float)
   if (WIN32)
-    # Don't let MSVC define min and max from windows.h.
     target_compile_definitions(tests PRIVATE NOMINMAX)
   endif()
 
-
   catch_discover_tests(tests)
-
 endif()
+
 
 install(
   TARGETS synthizer
@@ -289,4 +269,4 @@ install(
   ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}"
   RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}"
   INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-  )
+)

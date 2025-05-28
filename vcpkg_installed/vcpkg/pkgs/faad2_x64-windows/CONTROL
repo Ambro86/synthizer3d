@@ -1,0 +1,7 @@
+Package: faad2
+Version: 2.11.1
+Depends: vcpkg-cmake
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 59cfcfcd66332360d2f29ae2e05a3a5e86217a64f00baf3a0685d7d4a8640452
+Description: Freeware Advanced Audio (AAC) Decoder

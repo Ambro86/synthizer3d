@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: synthizer3d
+Version: 0.12.6
+Summary: A 3D audio library for Python, forked and maintained by Ambro86. Originally developed by Synthizer Developers.
+Home-page: https://github.com/Ambro86/synthizer3d
+Author: Ambro86, originally by Synthizer Developers
+Author-email: ambro86@gmail.com
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: author
+Dynamic: author-email
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: summary
+
+Fork of synthizer-python, now maintained and updated by Ambro86. Adds new features and compatibility fixes for modern Python and platforms.

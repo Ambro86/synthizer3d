@@ -52,19 +52,19 @@ jobs:
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
-        with:
-          # runVcpkgInstall: true # vcpkg.json in root will be used
-          vcpkgTriplet: ${{ env.VCPKG_DEFAULT_TRIPLET }} # Ensure this triplet is used by vcpkg install by default
-          # GITHUB_TOKEN is needed for vcpkg asset caching, usually available by default.
+        # L'input 'vcpkgTriplet' è stato rimosso perché non valido per questa action.
+        # L'action utilizza VCPKG_DEFAULT_TRIPLET dall'ambiente se necessario,
+        # e imposta VCPKG_ROOT e aggiunge vcpkg al PATH.
 
       - name: Install dependencies using vcpkg (Windows)
         shell: pwsh
         run: |
           Write-Host "VCPKG_ROOT is $env:VCPKG_ROOT"
-          # run-vcpkg action with runVcpkgInstall: true (default if vcpkg.json exists) should handle this.
-          # Explicit install if needed or for more control:
-          $env:VCPKG_ROOT\vcpkg.exe install --triplet $env:VCPKG_DEFAULT_TRIPLET
-          # Set CMAKE_PREFIX_PATH for subsequent steps
+          Write-Host "VCPKG_DEFAULT_TRIPLET is $env:VCPKG_DEFAULT_TRIPLET"
+          # vcpkg.exe è nel PATH grazie allo step precedente 'Setup vcpkg'
+          # VCPKG_DEFAULT_TRIPLET è una variabile d'ambiente che vcpkg.exe rispetta.
+          # Specificare --triplet esplicitamente è più sicuro.
+          vcpkg.exe install --triplet $env:VCPKG_DEFAULT_TRIPLET
           $vcpkgInstalledPath = "$env:VCPKG_ROOT/installed/$env:VCPKG_DEFAULT_TRIPLET"
           echo "CMAKE_PREFIX_PATH=$vcpkgInstalledPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           Write-Host "CMAKE_PREFIX_PATH set to $vcpkgInstalledPath"
@@ -92,6 +92,7 @@ jobs:
           $wheelPath = $wheelFile.FullName
           Write-Host "Modifying wheel: $wheelPath"
 
+          # Assumendo che VCPKG_ROOT sia impostato correttamente dallo step precedente
           $vcpkgTripletBinDir = "$env:VCPKG_ROOT/installed/$env:VCPKG_DEFAULT_TRIPLET/bin"
           Write-Host "Source directory for DLLs: $vcpkgTripletBinDir"
 

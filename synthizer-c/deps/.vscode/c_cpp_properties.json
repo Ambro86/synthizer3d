@@ -1,0 +1,28 @@
+{
+  "configurations": [
+    {
+      "name": "Win32",
+      "includePath": [
+        "${workspaceFolder}/deps/third_party/boost_partial",
+        "${workspaceFolder}/deps/third_party/cpp11-on-multicore/common",
+        "${workspaceFolder}/deps/third_party/dr_libs",
+        "${workspaceFolder}/deps/third_party/wdl",
+        "${workspaceFolder}/deps/third_party/miniaudio",
+        "${workspaceFolder}/deps/third_party/concurrentqueue",
+        "${workspaceFolder}/deps/third_party/pdqsort"
+      ],
+      "defines": [
+        "_DEBUG",
+        "UNICODE",
+        "_UNICODE",
+        "WDL_RESAMPLE_TYPE=float"
+      ],
+      "windowsSdkVersion": "10.0.18362.0",
+      "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Tools/MSVC/14.29.30037/bin/Hostx64/x64/cl.exe",
+      "cStandard": "c11",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "windows-msvc-x64"
+    }
+  ],
+  "version": 4
+}

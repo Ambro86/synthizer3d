@@ -1,3 +1,4 @@
+# Workflow for Synthizer3d, by Ambro86
 # Trigger del workflow: si attiva ad ogni push e pull request
 on:
   push: {} # Si attiva su push a qualsiasi branch

@@ -1,78 +1,90 @@
-# Synthizer
+# Synthizer3D
 
-![GitHub Actions](https://github.com/synthizer/synthizer/actions/workflows/ci.yaml/badge.svg)
+![Forked from Synthizer](https://img.shields.io/badge/forked%20from-synthizer-blue)
 
-[Documentation](https://synthizer.github.io/)
+This is a maintained and updated fork of the [Synthizer](https://github.com/synthizer/synthizer) Python bindings, now developed by [Ambro86](https://github.com/Ambro86).
 
-[Python bindings](https://pypi.org/project/synthizer/)
+Originally developed by the Synthizer Developers, now maintained and improved by Ambro86.
 
-[GitHub Sponsors](https://github.com/sponsors/ahicks92)
+---
 
-Synthizer is a library for game/VR audio applications.  The goal is that you statically link it and it does everything
-you need from file decoding and asset caching all the way down the stack.  Current features include:
+## What is Synthizer3D?
 
-- MP3, Wav, and Flac decoding
-- Support for Libsndfile
-- HRTF and stereo panning
-- An FDN reverb model.
-- Noise generators
-- Fast, though benchmarks haven't been produced yet.  Suffice it to say that debug builds are fast enough for practical
-  usage.
-- Calls on the hot path don't block, and in general effort is made to prevent both allocation and other forms of
-  syscall/kernel transitions.
-- Public domain.  Credit is appreciated, but you can just drop it into your project without attribution if you want.
+Synthizer3D provides advanced Python bindings for 3D audio, leveraging the Synthizer C library.  
+This fork keeps the library up to date for modern Python, improves compatibility with new platforms, and adds new features.
 
-This is still beta-quality software, currently tracking a [1.0
-milestone](https://github.com/synthizer/synthizer/milestone/2).  As of 0.9 most of what is intended to be in 1.0 exists:
-you can certainly use this for a game or something.  But it's still pre-1.0 for a reason.
+---
 
-## Building and Platform Support
+## Supported Python Versions and Platforms
 
-We currently support:
+Synthizer3D provides pre-built wheels for **Python 3.8 to 3.13** on all major platforms:
 
-- Windows, using MSVC 2019 or Clang 9.
-- Linux, using Clang 9 or GCC 9
-- OSX catalina and later
+- Windows x64
+- Windows x86 (32-bit)
+- Linux x64
+- macOS x64 (Intel)
+- macOS arm64 (Apple Silicon)
 
-For all platforms, a simple:
+Source distribution (`sdist`) is also available.
 
-```
-mkdir build
-cd build
-cmake -G Ninja ..
-ninja
+---
+
+## Installation
+
+**From PyPI (recommended):**
+```sh
+pip install synthizer3d
 ```
 
-Suffices.  You may need manual intervention in order to set things such as the MSVC runtime, but all of that goes
-through the standard CMake processes.
+**Or, to install directly from this repository for development/testing:**
 
-On Windows, you may need to run the above under an MSVC command prompt.
+1. Clone the repository with submodules:
+    ```sh
+    git clone --recursive https://github.com/Ambro86/synthizer3d
+    ```
 
-If you want to build a shared library:
+2. From the project root, run:
+    ```sh
+    python synthizer-c/vendor.py synthizer-vendored
+    ```
 
-```
-cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release -DSYNTHIZER_LIB_TYPE=SHARED
-```
+3. Then install with:
+    ```sh
+    python setup.py install
+    ```
+    Or build a wheel:
+    ```sh
+    python setup.py bdist_wheel
+    ```
 
-For windows, also add `-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL` if you want to statically link the MSVC runtime,
-and avoid needing external dependencies.
+---
 
-For the Python bindings, one of the following applies:
+## For Developers
 
-- use the Windows wheels.  This is the easiest path for Windows.
-- `pip install synthizer` will decide to use a source distribution on Linux and Mac, which will try to build Synthizer
-  inline.  This requires that you have `git` but doesn't have any other external dependencies, not even CMake.
+This fork is based on an unmaintained project. Goals include:
 
+- Support for Python 3.8–3.13 and future versions
+- Wheels for all major platforms (Windows x64/x86, Linux x64, macOS x64/arm64)
+- Updated CI/build scripts
+- New features and compatibility improvements
 
-## Licensing
+---
 
-Licensed under the Unlicense (i.e. public domain, i.e. do anything you want with this code).  Credit is always nice but
-not required.
+## Maintainer
 
-If you want to contribute, see CONTRIBUTING.md for directions, especially w.r.t. licensing.  IIf you aren't an
-individual or in the position to name/get sign off from all contributors, I consider that a good problem to have and we
-can talk about how to accommodate your contributions.
+- Ambro86 – ambro86@gmail.com
 
-Third party dependencies (i.e. things which aren't under the unlicense) are in the `third_party` directory and may
-require attribution in source form.  It is a goal of this project to avoid third party dependencies which require
-attribution in binary form.  Should this prove impractical, any such exceptions will be tracked.
+Feel free to open issues or pull requests for bugs, suggestions, or contributions!
+
+---
+
+## Credits
+
+- Original project by Synthizer Developers: https://github.com/synthizer/synthizer
+- Forked, maintained, and updated by Ambro86
+
+---
+
+## License
+
+Distributed under the same license as the original Synthizer project (see included license file).

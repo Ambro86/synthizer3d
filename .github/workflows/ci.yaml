@@ -27,7 +27,7 @@ jobs:
             cibw_archs: "x86 AMD64" 
             vcpkg_triplet_map_x86: "x86-windows"
             vcpkg_triplet_map_amd64: "x64-windows"
-            msvc_dev_cmd_arch: "x64" # Per ilammy/msvc-dev-cmd, cibuildwheel gestirà la selezione interna
+            msvc_dev_cmd_arch: "x64" # Architettura host per msvc-dev-cmd
             is_windows: true
           - os: macos-13 
             arch_label: x64
@@ -59,7 +59,7 @@ jobs:
         run: |
           TRIPLET=""
           if [ "${{ matrix.is_windows }}" == "true" ]; then
-            TRIPLET="${{ matrix.vcpkg_triplet_map_amd64 }}"
+            TRIPLET="${{ matrix.vcpkg_triplet_map_amd64 }}" 
           elif [ "${{ matrix.is_linux }}" == "true" ]; then
             TRIPLET="${{ matrix.vcpkg_triplet_map_x86_64 }}"
           elif [ "${{ matrix.is_macos }}" == "true" ]; then
@@ -76,6 +76,14 @@ jobs:
           echo "PRIMARY_VCPKG_TRIPLET=$TRIPLET" >> $GITHUB_ENV
           echo "Determinato PRIMARY_VCPKG_TRIPLET per il job: $TRIPLET"
 
+      # Per Windows, configura l'ambiente MSVC PRIMA di vcpkg e cibuildwheel
+      - name: Setup MSVC Developer Command Prompt (Windows only)
+        if: matrix.is_windows == true
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.msvc_dev_cmd_arch }}
+          # Questa azione aggiorna l'ambiente dello step, inclusi INCLUDE, LIB, PATH
+
       - name: Set up vcpkg (bootstrap only)
         uses: lukka/run-vcpkg@v11.5
         env:
@@ -91,13 +99,14 @@ jobs:
           "$VCPKG_ROOT/vcpkg" install --triplet "${{ env.PRIMARY_VCPKG_TRIPLET }}"
           
           VCPKG_INSTALLED_DIR_FOR_JOB="$VCPKG_ROOT/installed/${{ env.PRIMARY_VCPKG_TRIPLET }}"
-          # Assicurati che i percorsi usino forward slashes per coerenza e per CMAKE_PREFIX_PATH
           VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE=$(echo "$VCPKG_INSTALLED_DIR_FOR_JOB" | sed 's_\\_/_g')
-          echo "VCPKG_INSTALLED_DIR_PATH_FOR_CIBW=$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE" >> $GITHUB_ENV
-          echo "CMAKE_PREFIX_PATH=$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE" >> $GITHUB_ENV # Per CMake al di fuori di cibuildwheel, se necessario
           
+          echo "VCPKG_INSTALLED_DIR_PATH_FOR_CIBW=$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE" >> $GITHUB_ENV
+          echo "Set VCPKG_INSTALLED_DIR_PATH_FOR_CIBW to $VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE"
+
+          # Aggiungi i percorsi vcpkg al GITHUB_PATH per renderli disponibili agli step successivi (incluso cibuildwheel)
           VCPKG_BIN_DIR_UNIX_STYLE="$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE/bin"
-          VCPKG_TOOLS_TRIPLET_DIR_UNIX_STYLE="$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE/tools/${{ env.PRIMARY_VCPKG_TRIPLET }}/bin" # Assumendo /bin qui
+          VCPKG_TOOLS_TRIPLET_DIR_UNIX_STYLE="$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE/tools/${{ env.PRIMARY_VCPKG_TRIPLET }}/bin"
           
           echo "Adding to GITHUB_PATH: $VCPKG_BIN_DIR_UNIX_STYLE"
           echo "$VCPKG_BIN_DIR_UNIX_STYLE" >> $GITHUB_PATH
@@ -105,20 +114,12 @@ jobs:
           echo "$VCPKG_TOOLS_TRIPLET_DIR_UNIX_STYLE" >> $GITHUB_PATH
           
           if [ "${{ matrix.is_windows }}" == "true" ]; then
-            echo "LD_LIBRARY_PATH_FOR_CIBW=" >> $GITHUB_ENV # Non usato su Windows
+            echo "LD_LIBRARY_PATH_FOR_CIBW=" >> $GITHUB_ENV 
           else
             echo "LD_LIBRARY_PATH_FOR_CIBW=$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE/lib" >> $GITHUB_ENV
           fi
-          echo "Paths set for subsequent steps."
-
-      # Imposta l'ambiente MSVC per l'intero job Windows DOPO vcpkg (perché vcpkg potrebbe necessitare di un ambiente pulito)
-      # e prima di cibuildwheel.
-      - name: Setup MSVC Developer Command Prompt (Windows only)
-        if: matrix.is_windows == true
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: ${{ matrix.msvc_dev_cmd_arch }} 
-          # Questa azione modifica l'ambiente dello step, che dovrebbe essere ereditato da cibuildwheel.
+          echo "Paths set for subsequent steps. Current GITHUB_PATH:"
+          cat $GITHUB_PATH
 
       - name: Create Windows repair script
         if: matrix.is_windows == true
@@ -169,13 +170,13 @@ jobs:
       - name: Build wheels with cibuildwheel
         uses: pypa/cibuildwheel@v2.19.1
         env:
-          # Le variabili INCLUDE, LIB, PATH (per MSVC) sono ereditate dallo step msvc-dev-cmd su Windows.
-          # VCPKG_INSTALLED_DIR_PATH_FOR_CIBW e PRIMARY_VCPKG_TRIPLET sono ereditate da GITHUB_ENV.
-          # I percorsi VCPKG bin/tools sono stati aggiunti a GITHUB_PATH.
+          # Le variabili d'ambiente necessarie (VCPKG_INSTALLED_DIR_PATH_FOR_CIBW, PRIMARY_VCPKG_TRIPLET)
+          # sono impostate tramite GITHUB_ENV negli step precedenti e dovrebbero essere ereditate.
+          # Per Windows, l'ambiente MSVC (INCLUDE, LIB, PATH per cl.exe) è impostato dallo step 'ilammy/msvc-dev-cmd'.
+          # Anche i percorsi bin/tools di VCPKG sono stati aggiunti a GITHUB_PATH.
           
-          # Per Windows, CMAKE_PREFIX_PATH è fondamentale.
-          # Il PATH esteso con i percorsi vcpkg e MSVC dovrebbe essere ereditato.
-          # Non sovrascriviamo PATH qui per Windows.
+          # CIBW_ENVIRONMENT_WINDOWS imposta solo CMAKE_PREFIX_PATH.
+          # Ci si aspetta che PATH, INCLUDE, LIB siano ereditati correttamente.
           CIBW_ENVIRONMENT_WINDOWS: "CMAKE_PREFIX_PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}"
           
           CIBW_ENVIRONMENT_LINUX: >-
@@ -198,8 +199,8 @@ jobs:
             yum install -y openssl-devel &&
             rm -rf /var/cache/yum
           
-          # CIBW_BEFORE_BUILD_WINDOWS è ora solo per logging, l'ambiente MSVC è gestito dallo step precedente.
-          CIBW_BEFORE_BUILD_WINDOWS: "echo INFO: In CIBW_BEFORE_BUILD_WINDOWS. Current PATH is %PATH%"
+          # CIBW_BEFORE_BUILD_WINDOWS è ora solo per logging/diagnostica.
+          CIBW_BEFORE_BUILD_WINDOWS: "echo In CIBW_BEFORE_BUILD_WINDOWS. CIBW_BUILD_ARCHITECTURE is %CIBW_BUILD_ARCHITECTURE%. Current PATH is %PATH%. Current INCLUDE is %INCLUDE%. Current LIB is %LIB%."
 
           CIBW_BUILD_VERBOSITY: 3
 

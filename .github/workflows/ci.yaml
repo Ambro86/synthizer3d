@@ -130,15 +130,12 @@ jobs:
               wheel_file_path_str = sys.argv[1]
               dest_dir_str = sys.argv[2]
 
-              # Queste variabili d'ambiente sono impostate dagli step precedenti del workflow
-              # e dovrebbero essere ereditate nell'ambiente di esecuzione di cibuildwheel (e quindi di questo script)
               vcpkg_installed_raw = os.environ.get('VCPKG_INSTALLED_DIR_PATH_FOR_CIBW') 
 
               if not vcpkg_installed_raw:
                   print(f"::error::Variabile d'ambiente VCPKG_INSTALLED_DIR_PATH_FOR_CIBW non impostata per lo script di riparazione.")
                   sys.exit(1)
 
-              # Converti in percorso Windows nativo (con backslashes) per delvewheel
               vcpkg_installed_path = str(pathlib.Path(vcpkg_installed_raw).resolve())
               add_path_arg = f"{vcpkg_installed_path}\\bin;{vcpkg_installed_path}\\lib"
               
@@ -176,11 +173,9 @@ jobs:
       - name: Build wheels with cibuildwheel
         uses: pypa/cibuildwheel@v2.19.1
         env:
-          # Passa le variabili necessarie agli script CIBW_BEFORE_BUILD_* e CIBW_REPAIR_WHEEL_COMMAND_*
           VCPKG_INSTALLED_DIR_PATH_FOR_CIBW: ${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}
           PRIMARY_VCPKG_TRIPLET: ${{ env.PRIMARY_VCPKG_TRIPLET }}
 
-          # Per Windows, CMAKE_PREFIX_PATH è passato, PATH è gestito da CIBW_BEFORE_BUILD_WINDOWS
           CIBW_ENVIRONMENT_WINDOWS: "CMAKE_PREFIX_PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}"
           
           CIBW_ENVIRONMENT_LINUX: >-
@@ -204,8 +199,23 @@ jobs:
             rm -rf /var/cache/yum
           
           CIBW_BEFORE_BUILD_WINDOWS: |
-            python -c "import os, pathlib; vcpkg_installed_dir = os.environ['VCPKG_INSTALLED_DIR_PATH_FOR_CIBW'].replace('/', '\\'); primary_triplet = os.environ['PRIMARY_VCPKG_TRIPLET']; print(f'::add-path::{vcpkg_installed_dir}\\bin'); print(f'::add-path::{vcpkg_installed_dir}\\tools\\{primary_triplet}\\bin'); print('Updated PATH for build process.')"
-            echo current PATH is %PATH%
+            set VCVARS_PATH="C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
+            set VCVARS_ARCH=
+            if "%CIBW_BUILD_ARCHITECTURE%"=="x86" ( set VCVARS_ARCH=x86 )
+            if "%CIBW_BUILD_ARCHITECTURE%"=="AMD64" ( set VCVARS_ARCH=amd64 )
+            if "%CIBW_BUILD_ARCHITECTURE%"=="ARM64" ( set VCVARS_ARCH=arm64 )
+            if defined VCVARS_ARCH (
+              echo Calling %VCVARS_PATH% %VCVARS_ARCH%
+              call %VCVARS_PATH% %VCVARS_ARCH%
+            ) else (
+              echo Warning: CIBW_BUILD_ARCHITECTURE ('%CIBW_BUILD_ARCHITECTURE%') not recognized for vcvarsall.bat. MSVC environment might not be set up.
+            )
+            echo Adding VCPKG paths to PATH
+            set VCPKG_INSTALLED_DIR_WIN_TEMP=%VCPKG_INSTALLED_DIR_PATH_FOR_CIBW%
+            set VCPKG_INSTALLED_DIR_WIN=%VCPKG_INSTALLED_DIR_WIN_TEMP:/=\%
+            set VCPKG_TOOLS_DIR_WIN_TEMP=%VCPKG_INSTALLED_DIR_WIN%\tools\%PRIMARY_VCPKG_TRIPLET%
+            set PATH=%VCPKG_INSTALLED_DIR_WIN%\bin;%VCPKG_TOOLS_DIR_WIN_TEMP%\bin;%PATH%
+            echo Updated PATH is %PATH%
 
           CIBW_BUILD_VERBOSITY: 3
 

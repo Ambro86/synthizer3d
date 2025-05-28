@@ -1,313 +1,168 @@
-# Trigger del workflow: si attiva ad ogni push e pull request
 on:
-  push: {} # Si attiva su push a qualsiasi branch
-  pull_request: {} # Si attiva su pull request verso qualsiasi branch
+  push: {}
+  pull_request: {}
 
 jobs:
-  # Job per costruire le wheel su Windows
-  windows-build:
-    name: Build Windows (${{ matrix.CI_ARCH }}) Python ${{ matrix.PYVERSION }}
-    runs-on: windows-latest # Semplificato, dato che arm64 è stato rimosso
-    env:
-      PYVERSION: ${{ matrix.PYVERSION }}
-      # Semplificata la logica dato che arm64 è stato rimosso
-      CI_ARCH_LOWER: ${{ (matrix.CI_ARCH == 'x86' && 'x86' || 'x64') }} 
-      CI_WINDOWS: "1"
-      CI_ARCH_ENV: ${{ matrix.CI_ARCH }} 
-    strategy:
-      fail-fast: false
-      matrix:
-        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-        # Rimosso "arm64" dalla lista delle architetture
-        CI_ARCH: ["x64", "x86"] 
-        # Il blocco exclude per arm64 non è più necessario
+  ubuntu:
+    runs-on: ${{matrix.os}}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: "Build CI"
+        run: |
+          cd $GITHUB_WORKSPACE
+          ./ci/build_linux.sh
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-20.04
+          - os: ubuntu-18.04
 
-      - name: Set up Python ${{ matrix.PYVERSION }} (${{ env.CI_ARCH_LOWER }})
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.PYVERSION }}
-          architecture: ${{ env.CI_ARCH_LOWER }}
-
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
-
-      - name: Run C/C++ code vendoring script
-        run: python synthizer-c/vendor.py synthizer-vendored
-
-      - name: Cache Pip (Windows ${{ matrix.CI_ARCH }})
-        uses: actions/cache@v4
-        with:
-          path: ~\AppData\Local\pip\Cache
-          key: ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ matrix.CI_ARCH }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ matrix.CI_ARCH }}-
-
-      - name: Configure MSVC Environment Variables (${{ matrix.CI_ARCH }})
+  windows:
+    runs-on: "${{ matrix.OS }}"
+    env:
+      VCVARS_PATH: ${{matrix.VCVARS_PATH}}
+      BUILDING_SYNTHIZER: "1"
+      CI_WINDOWS: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Init submodules
         shell: cmd
         run: |
-          echo "Configuring MSVC for target architecture: ${{ env.CI_ARCH_ENV }}"
-          set VCVARS_ARG=amd64
-          if "${{ env.CI_ARCH_ENV }}" == "x86" (
-            set VCVARS_ARG=x86
-          )
-          # La condizione per arm64 è stata rimossa dalla logica di VCVARS_ARG
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" %VCVARS_ARG%
-          echo "MSVC configured for %VCVARS_ARG%"
-          set PATH >> %GITHUB_ENV%
-          set INCLUDE >> %GITHUB_ENV%
-          set LIB >> %GITHUB_ENV%
-
-      - name: Install build dependencies (Windows)
+          git submodule update --init --recursive
+      - name: Configure MSVC Environment Variables
+        shell: cmd
         run: |
-          python -m pip install --upgrade pip 
-          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
-
-      - name: Build Python Wheels (Windows ${{ matrix.CI_ARCH }})
+          call "%VCVARS_PATH%"
+          set > %GITHUB_ENV%
+      - name: install ninja
         shell: powershell
         run: |
-          Set-Location $Env:GITHUB_WORKSPACE
-          # La logica condizionale per $cmake_configure_args per arm64 è stata rimossa
-          # dato che la build arm64 non è più presente.
-          python setup.py bdist_wheel
-
-      - name: Upload Python Wheel Artifact (Windows ${{ matrix.CI_ARCH }})
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-wheels-win-${{ matrix.CI_ARCH }}-${{ matrix.PYVERSION }}
-          path: dist/*.whl
-
-  # Job per costruire le wheel su Linux
-  linux-build:
-    name: Build Linux (x64) Python ${{ matrix.PYVERSION }}
-    runs-on: ubuntu-latest 
-    env:
-      PYVERSION: ${{ matrix.PYVERSION }}
-      CI_ARCH: "x64" 
+          choco install ninja
+      - name: Build C Libraries
+        shell: powershell
+        run: |
+          set-location $Env:GITHUB_WORKSPACE
+          ./ci/build_c.ps1
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        include:
+          - VCVARS_PATH: C:\Program Files (x86)\Microsoft Visual Studio\2019\enterprise\VC\Auxiliary\Build\vcvars32.bat
+            OS: windows-2019
+          - VCVARS_PATH: C:\Program Files (x86)\Microsoft Visual Studio\2019\enterprise\VC\Auxiliary\Build\vcvars64.bat
+            OS: windows-2019
+          - VCVARS_PATH: C:\Program Files\Microsoft Visual Studio\2022\enterprise\VC\Auxiliary\Build\vcvars64.bat
+            OS: windows-2022
+
+  osx:
+    runs-on: ${{matrix.os}}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Set up Python ${{ matrix.PYVERSION }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.PYVERSION }}
-
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
-
-      - name: Run C/C++ code vendoring script
-        run: python synthizer-c/vendor.py synthizer-vendored
-
-      - name: Cache Pip (Linux)
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ env.PYVERSION }}-
-
-      - name: Install system build dependencies (Linux)
+      - name: Checkout
+        uses: actions/checkout@v2
+      - shell: bash
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential 
-
-      - name: Install Python build dependencies (Linux)
-        run: |
-          python -m pip install --upgrade pip 
-          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
-
-      - name: Build Python Wheels (Linux)
-        run: |
-          python setup.py bdist_wheel
-
-      - name: Upload Python Wheel Artifact (Linux)
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-wheels-linux-x64-${{ matrix.PYVERSION }}
-          path: dist/*.whl
-          
-  # Job per costruire le wheel su macOS (x64 - Intel Runner)
-  macos-x64-build:
-    name: Build macOS (x64) Python ${{ matrix.PYVERSION }} 
-    runs-on: macos-13 
-    env:
-      PYVERSION: ${{ matrix.PYVERSION }}
-      TARGET_ARCH: "x64" 
+          set -ex
+          brew install ninja
+          cd $GITHUB_WORKSPACE
+          git submodule update --init --recursive
+          mkdir build
+          cd build
+          cmake -G Ninja ..
+          ninja
+          ninja test
     strategy:
-      fail-fast: false
       matrix:
-        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        include:
+          - os: macos-12
+          - os: macos-11
+
+  build_docs:
+    runs-on: ubuntu-20.04
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Cache mdbook
+        id: cache_mdbook
+        uses: actions/cache@v2
         with:
-          submodules: recursive
-
-      - name: Set up Python ${{ matrix.PYVERSION }} (x64)
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.PYVERSION }}
-          architecture: 'x64' 
-
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
-
-      - name: Run C/C++ code vendoring script
-        run: python synthizer-c/vendor.py synthizer-vendored
-
-      - name: Cache Pip (macOS x64)
-        uses: actions/cache@v4
-        with:
-          path: ~/Library/Caches/pip
-          key: ${{ runner.os }}-x64-pip-${{ env.PYVERSION }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }} 
-          restore-keys: |
-            ${{ runner.os }}-x64-pip-${{ env.PYVERSION }}-
-
-      - name: Install Python build dependencies (macOS)
+          key: ${{ runner.os }}-mdbook
+          path: |
+            ~/mdbook
+      - name: Install mdbook
+        if: steps.cache_mdbook.outputs.cache-hit != 'true'
         run: |
-          python -m pip install --upgrade pip 
-          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
-          
-      - name: Build Python Wheels (macOS x64)
+          mkdir -p ~/mdbook
+          curl -H "Accept-Encoding: gzip" https://files.ahicks.io/synthizer_ci/mdbook/mdbook | gunzip - > ~/mdbook/mdbook
+          curl -H "Accept-Encoding: gzip" https://files.ahicks.io/synthizer_ci/mdbook/mdbook-linkcheck | gunzip - > ~/mdbook/mdbook-linkcheck
+          chmod +x ~/mdbook/*
+      - name: Build Manual
         run: |
-          python setup.py bdist_wheel
-
-      - name: Upload Python Wheel Artifact (macOS x64)
-        uses: actions/upload-artifact@v4
+          cd $GITHUB_WORKSPACE/manual
+          export PATH=~/mdbook:$PATH
+          mdbook build
+      - uses: actions/upload-artifact@v2
         with:
-          name: python-wheels-macos-x64-${{ matrix.PYVERSION }} 
-          path: dist/*.whl
-          
-  # Job per costruire le wheel su macOS (ARM64 - ARM Runner)
-  macos-arm64-build:
-    name: Build macOS (arm64) Python ${{ matrix.PYVERSION }} 
-    runs-on: macos-latest 
+          name: manual
+          path: manual/book/html/**
+
+  deploy_docs:
+    if: startsWith(github.ref, 'refs/tags') && !github.event_type != 'pull_request'
+    runs-on: ubuntu-20.04
+    needs: ["build_docs", "windows", "ubuntu", "osx"]
     env:
-      PYVERSION: ${{ matrix.PYVERSION }}
-      TARGET_ARCH: "arm64" 
-    strategy:
-      fail-fast: false
-      matrix:
-        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+      DOCS_DEPLOY_KEY: ${{secrets.docs_deploy_key}}
+      DOCS_DEPLOY_KEY_PUB: ${{secrets.docs_deploy_key_pub}}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Set up Python ${{ matrix.PYVERSION }} (arm64)
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.PYVERSION }}
-          architecture: 'arm64' 
-
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
-
-      - name: Run C/C++ code vendoring script
-        run: python synthizer-c/vendor.py synthizer-vendored
-
-      - name: Cache Pip (macOS arm64)
-        uses: actions/cache@v4
-        with:
-          path: ~/Library/Caches/pip
-          key: ${{ runner.os }}-arm64-pip-${{ env.PYVERSION }}-${{ hashFiles('**/requirements.txt', '**/setup.py') }} 
-          restore-keys: |
-            ${{ runner.os }}-arm64-pip-${{ env.PYVERSION }}-
-
-      - name: Install Python build dependencies (macOS)
+      - name: Install SSH Deploy Key
         run: |
-          python -m pip install --upgrade pip 
-          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
-          
-      - name: Build Python Wheels (macOS arm64)
+          mkdir -p ~/.ssh
+          echo "$DOCS_DEPLOY_KEY" > ~/.ssh/id_rsa
+          echo "$DOCS_DEPLOY_KEY_PUB" > ~/.ssh/id_rsa.pub
+          chmod 400 ~/.ssh/id_rsa
+      - name: Clone Repository
         run: |
-          python setup.py bdist_wheel
-
-      - name: Upload Python Wheel Artifact (macOS arm64)
-        uses: actions/upload-artifact@v4
+          cd $GITHUB_WORKSPACE
+          git clone --recursive git@github.com:synthizer/synthizer.github.io .
+          rm -rf *
+      - name: Download Docs
+        uses: actions/download-artifact@v2
         with:
-          name: python-wheels-macos-arm64-${{ matrix.PYVERSION }} 
-          path: dist/*.whl
+          name: manual
+      - name: Commit and Push Docs
+        run: |
+          git config --global user.name "Synthizer CI"
+          git config --global user.email "ahicks@ahicks.io"
+          git add -A
+          git commit --allow-empty -m "Docs deployed at $(date)"
+          git push
 
-  # Job per creare la sdist (source distribution)
-  sdist-build:
-    name: Build Python sdist
-    runs-on: ubuntu-latest
+  github_release:
+    needs: ["build_docs", "windows", "ubuntu", "osx"]
+    if: startsWith(github.ref, 'refs/tags') && !github.event_type != 'pull_request'
+    runs-on: ubuntu-20.04
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Download Docs
+        uses: actions/download-artifact@v2
         with:
-          submodules: recursive
-
-      - name: Set up Python (for sdist)
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.9' 
-      
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
-
-      - name: Run C/C++ code vendoring script
-        run: python synthizer-c/vendor.py synthizer-vendored
-
-      - name: Install Python build dependencies (sdist)
+          name: manual
+          path: ~/artifacts/manual
+      - name: Zip Docs
         run: |
-          python -m pip install --upgrade pip 
-          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
-
-      - name: Build Python sdist
-        run: python setup.py sdist
-
-      - name: Upload Python sdist Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-sdist
-          path: dist/*.tar.gz 
-
-  # Job per il deployment su PyPI
-  deploy_pypi:
-    name: Deploy to PyPI
-    if: startsWith(github.ref, 'refs/tags') 
-    needs: [windows-build, linux-build, macos-x64-build, macos-arm64-build, sdist-build] 
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write 
-    steps:
-      - name: Download all build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ~/artifacts 
-
-      - name: Set up Python for Twine
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x' 
-      
-      - name: Upgrade pip for Twine step 
-        run: python -m pip install --upgrade pip
-
-      - name: Install Twine
-        run: python -m pip install --upgrade twine
-
-      - name: Display downloaded artifacts structure
-        run: ls -R ~/artifacts
-
-      - name: Upload to PyPI
+          zip -r ~/artifacts/manual.zip ~/artifacts/manual
+          # get it out of the way so that the uploads don't freak out.
+          rm -rf ~/artifacts/manual
+          ls ~/artifacts
+      - name: Create Release
+        uses: actions/create-release@v1
         env:
-          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }} 
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }} 
-        run: |
-          python -m twine upload --skip-existing ~/artifacts/*/*
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          tag_name: ${{github.ref}}
+      - name: Upload Artifacts
+        uses: alexellis/upload-assets@0.2.2
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          asset_paths: '[ "/home/runner/artifacts/*" ]'

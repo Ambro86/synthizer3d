@@ -59,13 +59,17 @@ jobs:
         run: |
           TRIPLET=""
           if [ "${{ matrix.is_windows }}" == "true" ]; then
-            TRIPLET="${{ matrix.vcpkg_triplet_map_amd64 }}" 
+            TRIPLET="${{ matrix.vcpkg_triplet_map_amd64 }}" # Host/default for Windows job is x64
           elif [ "${{ matrix.is_linux }}" == "true" ]; then
-            TRIPLET="${{ matrix.vcpkg_triplet_map_x86_64 }}"
-          elif [ "${{ matrix.is_macos }}" == "true" ]; then
-            if [[ "${{ matrix.cibw_archs }}" == "x86_64"* ]]; then
+            if [[ "${{ matrix.cibw_archs }}" == *"x86_64"* ]]; then
               TRIPLET="${{ matrix.vcpkg_triplet_map_x86_64 }}"
-            elif [[ "${{ matrix.cibw_archs }}" == "arm64"* ]]; then
+            elif [[ "${{ matrix.cibw_archs }}" == *"aarch64"* ]]; then
+              TRIPLET="${{ matrix.vcpkg_triplet_map_aarch64 }}"
+            fi
+          elif [ "${{ matrix.is_macos }}" == "true" ]; then
+            if [[ "${{ matrix.cibw_archs }}" == "x86_64" ]]; then
+              TRIPLET="${{ matrix.vcpkg_triplet_map_x86_64 }}"
+            elif [[ "${{ matrix.cibw_archs }}" == "arm64" ]]; then
               TRIPLET="${{ matrix.vcpkg_triplet_map_arm64 }}"
             fi
           fi
@@ -74,7 +78,7 @@ jobs:
             exit 1
           fi
           echo "PRIMARY_VCPKG_TRIPLET=$TRIPLET" >> $GITHUB_ENV
-          echo "Determinato PRIMARY_VCPKG_TRIPLET per il job: $TRIPLET"
+          echo "Determinato PRIMARY_VCPKG_TRIPLET per il job (default/host): $TRIPLET"
 
       # Per Windows, configura l'ambiente MSVC PRIMA di vcpkg e cibuildwheel
       - name: Setup MSVC Developer Command Prompt (Windows only)
@@ -87,38 +91,54 @@ jobs:
       - name: Set up vcpkg (bootstrap only)
         uses: lukka/run-vcpkg@v11.5
         env:
-          VCPKG_DEFAULT_TRIPLET: ${{ env.PRIMARY_VCPKG_TRIPLET }}
+          VCPKG_DEFAULT_TRIPLET: ${{ env.PRIMARY_VCPKG_TRIPLET }} # Triplet di default per bootstrap
         with:
-          runVcpkgInstall: false
+          runVcpkgInstall: false # Installeremo i pacchetti manualmente
 
-      - name: Install vcpkg packages and set paths
+      - name: Install vcpkg packages and set default paths
         shell: bash
         run: |
           echo "VCPKG_ROOT (from lukka/run-vcpkg) is $VCPKG_ROOT"
-          echo "PRIMARY_VCPKG_TRIPLET is ${{ env.PRIMARY_VCPKG_TRIPLET }}"
-          "$VCPKG_ROOT/vcpkg" install --triplet "${{ env.PRIMARY_VCPKG_TRIPLET }}"
-          
-          VCPKG_INSTALLED_DIR_FOR_JOB="$VCPKG_ROOT/installed/${{ env.PRIMARY_VCPKG_TRIPLET }}"
-          VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE=$(echo "$VCPKG_INSTALLED_DIR_FOR_JOB" | sed 's_\\_/_g')
-          
-          echo "VCPKG_INSTALLED_DIR_PATH_FOR_CIBW=$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE" >> $GITHUB_ENV
-          echo "Set VCPKG_INSTALLED_DIR_PATH_FOR_CIBW to $VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE"
+          EFFECTIVE_TRIPLET_FOR_DEFAULT_PATHS="${{ env.PRIMARY_VCPKG_TRIPLET }}"
 
-          # Aggiungi i percorsi vcpkg al GITHUB_PATH per renderli disponibili agli step successivi (incluso cibuildwheel)
-          VCPKG_BIN_DIR_UNIX_STYLE="$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE/bin"
-          VCPKG_TOOLS_TRIPLET_DIR_UNIX_STYLE="$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE/tools/${{ env.PRIMARY_VCPKG_TRIPLET }}/bin"
+          if [ "${{ matrix.is_windows }}" == "true" ]; then
+            echo "Installando vcpkg packages per ${{ matrix.vcpkg_triplet_map_x86 }}"
+            "$VCPKG_ROOT/vcpkg" install --triplet "${{ matrix.vcpkg_triplet_map_x86 }}"
+            echo "Installando vcpkg packages per ${{ matrix.vcpkg_triplet_map_amd64 }}"
+            "$VCPKG_ROOT/vcpkg" install --triplet "${{ matrix.vcpkg_triplet_map_amd64 }}"
+            # Per GITHUB_ENV e GITHUB_PATH, usiamo il triplet primario (AMD64) come default.
+            # CIBW_ENVIRONMENT_WINDOWS sovrascriverà dinamicamente per ogni architettura.
+          elif [ "${{ matrix.is_linux }}" == "true" ] || [ "${{ matrix.is_macos }}" == "true" ]; then
+            echo "Installando vcpkg packages per ${{ env.PRIMARY_VCPKG_TRIPLET }}"
+            "$VCPKG_ROOT/vcpkg" install --triplet "${{ env.PRIMARY_VCPKG_TRIPLET }}"
+          else
+            echo "::error::OS non supportato per lo script di installazione vcpkg."
+            exit 1
+          fi
           
-          echo "Adding to GITHUB_PATH: $VCPKG_BIN_DIR_UNIX_STYLE"
-          echo "$VCPKG_BIN_DIR_UNIX_STYLE" >> $GITHUB_PATH
-          echo "Adding to GITHUB_PATH: $VCPKG_TOOLS_TRIPLET_DIR_UNIX_STYLE"
-          echo "$VCPKG_TOOLS_TRIPLET_DIR_UNIX_STYLE" >> $GITHUB_PATH
+          # Imposta un VCPKG_INSTALLED_DIR_PATH_FOR_CIBW di default (basato sul triplet primario)
+          # Questo sarà usato da Linux/macOS e come fallback se non sovrascritto.
+          VCPKG_INSTALLED_DIR_FOR_JOB_DEFAULT="$VCPKG_ROOT/installed/$EFFECTIVE_TRIPLET_FOR_DEFAULT_PATHS"
+          VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE_DEFAULT=$(echo "$VCPKG_INSTALLED_DIR_FOR_JOB_DEFAULT" | sed 's_\\_/_g')
+          
+          echo "VCPKG_INSTALLED_DIR_PATH_FOR_CIBW=$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE_DEFAULT" >> $GITHUB_ENV
+          echo "Set VCPKG_INSTALLED_DIR_PATH_FOR_CIBW (default) to $VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE_DEFAULT"
+
+          # Aggiungi i percorsi vcpkg (del triplet primario) a GITHUB_PATH per disponibilità generale degli strumenti
+          VCPKG_BIN_DIR_UNIX_STYLE_DEFAULT="$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE_DEFAULT/bin"
+          VCPKG_TOOLS_TRIPLET_DIR_UNIX_STYLE_DEFAULT="$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE_DEFAULT/tools/$EFFECTIVE_TRIPLET_FOR_DEFAULT_PATHS/bin"
+          
+          echo "Adding to GITHUB_PATH (default): $VCPKG_BIN_DIR_UNIX_STYLE_DEFAULT"
+          echo "$VCPKG_BIN_DIR_UNIX_STYLE_DEFAULT" >> $GITHUB_PATH
+          echo "Adding to GITHUB_PATH (default): $VCPKG_TOOLS_TRIPLET_DIR_UNIX_STYLE_DEFAULT"
+          echo "$VCPKG_TOOLS_TRIPLET_DIR_UNIX_STYLE_DEFAULT" >> $GITHUB_PATH
           
           if [ "${{ matrix.is_windows }}" == "true" ]; then
-            echo "LD_LIBRARY_PATH_FOR_CIBW=" >> $GITHUB_ENV 
+            echo "LD_LIBRARY_PATH_FOR_CIBW=" >> $GITHUB_ENV # Non usato su Windows, PATH è preferito
           else
-            echo "LD_LIBRARY_PATH_FOR_CIBW=$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE/lib" >> $GITHUB_ENV
+            echo "LD_LIBRARY_PATH_FOR_CIBW=$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE_DEFAULT/lib" >> $GITHUB_ENV
           fi
-          echo "Paths set for subsequent steps. Current GITHUB_PATH:"
+          echo "Paths set for subsequent steps (default GITHUB_ENV values). Current GITHUB_PATH:"
           cat $GITHUB_PATH
 
       - name: Create Windows repair script
@@ -135,11 +155,16 @@ jobs:
           if __name__ == "__main__":
               wheel_file_path_str = sys.argv[1]
               dest_dir_str = sys.argv[2]
+              # Questa variabile sarà impostata dinamicamente da CIBW_ENVIRONMENT_WINDOWS
               vcpkg_installed_raw = os.environ.get('VCPKG_INSTALLED_DIR_PATH_FOR_CIBW') 
               if not vcpkg_installed_raw:
                   print(f"::error::Variabile d'ambiente VCPKG_INSTALLED_DIR_PATH_FOR_CIBW non impostata per lo script di riparazione.")
                   sys.exit(1)
+              
+              # pathlib gestirà correttamente sia path Windows che Unix-style emulati
               vcpkg_installed_path = str(pathlib.Path(vcpkg_installed_raw).resolve())
+              print(f"Repair script: Using VCPKG_INSTALLED_DIR_PATH_FOR_CIBW resolved to: {vcpkg_installed_path}")
+
               add_path_arg = f"{vcpkg_installed_path}\\bin;{vcpkg_installed_path}\\lib"
               pathlib.Path(dest_dir_str).mkdir(parents=True, exist_ok=True)
               delvewheel_cmd_module = [
@@ -170,15 +195,35 @@ jobs:
       - name: Build wheels with cibuildwheel
         uses: pypa/cibuildwheel@v2.19.1
         env:
-          # Le variabili d'ambiente necessarie (VCPKG_INSTALLED_DIR_PATH_FOR_CIBW, PRIMARY_VCPKG_TRIPLET)
-          # sono impostate tramite GITHUB_ENV negli step precedenti e dovrebbero essere ereditate.
-          # Per Windows, l'ambiente MSVC (INCLUDE, LIB, PATH per cl.exe) è impostato dallo step 'ilammy/msvc-dev-cmd'.
-          # Anche i percorsi bin/tools di VCPKG sono stati aggiunti a GITHUB_PATH.
+          # VCPKG_ROOT è impostato da lukka/run-vcpkg.
+          # PRIMARY_VCPKG_TRIPLET è impostato da "Determine vcpkg triplet...".
+          # VCPKG_INSTALLED_DIR_PATH_FOR_CIBW (default) e LD_LIBRARY_PATH_FOR_CIBW (default) sono impostati da "Install vcpkg packages...".
+          # Queste variabili sono disponibili in env e possono essere usate sotto.
+
+          # Passa le mappature dei triplet specifici per Windows
+          TRIPLET_MAP_X86_WIN: ${{ matrix.vcpkg_triplet_map_x86 }}
+          TRIPLET_MAP_AMD64_WIN: ${{ matrix.vcpkg_triplet_map_amd64 }}
           
-          # CIBW_ENVIRONMENT_WINDOWS imposta solo CMAKE_PREFIX_PATH.
-          # Ci si aspetta che PATH, INCLUDE, LIB siano ereditati correttamente.
-          CIBW_ENVIRONMENT_WINDOWS: "CMAKE_PREFIX_PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}"
-          
+          CIBW_ENVIRONMENT_WINDOWS: |
+            set "VCPKG_TRIPLET_CURRENT_ARCH="
+            if /I "%CIBW_BUILD_ARCHITECTURE%" == "x86" (
+              set "VCPKG_TRIPLET_CURRENT_ARCH=%TRIPLET_MAP_X86_WIN%"
+            )
+            if /I "%CIBW_BUILD_ARCHITECTURE%" == "AMD64" (
+              set "VCPKG_TRIPLET_CURRENT_ARCH=%TRIPLET_MAP_AMD64_WIN%"
+            )
+            if "%VCPKG_TRIPLET_CURRENT_ARCH%" == "" (
+              echo "::error::[CIBW_ENVIRONMENT_WINDOWS] Impossibile determinare VCPKG_TRIPLET_CURRENT_ARCH per CIBW_BUILD_ARCHITECTURE: %CIBW_BUILD_ARCHITECTURE%"
+              exit /B 1
+            )
+            set "VCPKG_INSTALLED_DIR_ARCH_SPECIFIC=%VCPKG_ROOT%\installed\%VCPKG_TRIPLET_CURRENT_ARCH%"
+            set "CMAKE_PREFIX_PATH=%VCPKG_INSTALLED_DIR_ARCH_SPECIFIC%"
+            set "PATH=%VCPKG_INSTALLED_DIR_ARCH_SPECIFIC%\bin;%VCPKG_INSTALLED_DIR_ARCH_SPECIFIC%\tools\%VCPKG_TRIPLET_CURRENT_ARCH%\bin;%PATH%"
+            set "VCPKG_INSTALLED_DIR_PATH_FOR_CIBW=%VCPKG_INSTALLED_DIR_ARCH_SPECIFIC%"
+            echo [CIBW_ENVIRONMENT_WINDOWS] CIBW_BUILD_ARCHITECTURE: %CIBW_BUILD_ARCHITECTURE%
+            echo [CIBW_ENVIRONMENT_WINDOWS] VCPKG_TRIPLET_CURRENT_ARCH: %VCPKG_TRIPLET_CURRENT_ARCH%
+            echo [CIBW_ENVIRONMENT_WINDOWS] VCPKG_INSTALLED_DIR_PATH_FOR_CIBW (per repair script) impostato a: %VCPKG_INSTALLED_DIR_PATH_FOR_CIBW%
+            echo [CIBW_ENVIRONMENT_WINDOWS] CMAKE_PREFIX_PATH (per build) impostato a: %CMAKE_PREFIX_PATH%
           CIBW_ENVIRONMENT_LINUX: >-
             CMAKE_PREFIX_PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}
             LD_LIBRARY_PATH=${{ env.LD_LIBRARY_PATH_FOR_CIBW }}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
@@ -199,8 +244,7 @@ jobs:
             yum install -y openssl-devel &&
             rm -rf /var/cache/yum
           
-          # CIBW_BEFORE_BUILD_WINDOWS è ora solo per logging/diagnostica.
-          CIBW_BEFORE_BUILD_WINDOWS: "echo In CIBW_BEFORE_BUILD_WINDOWS. CIBW_BUILD_ARCHITECTURE is %CIBW_BUILD_ARCHITECTURE%. Current PATH is %PATH%. Current INCLUDE is %INCLUDE%. Current LIB is %LIB%."
+          CIBW_BEFORE_BUILD_WINDOWS: "echo In CIBW_BEFORE_BUILD_WINDOWS. CIBW_BUILD_ARCHITECTURE is %CIBW_BUILD_ARCHITECTURE%. Current PATH is %PATH%. Current INCLUDE is %INCLUDE%. Current LIB is %LIB%. VCPKG_INSTALLED_DIR_PATH_FOR_CIBW (from CIBW_ENVIRONMENT) is %VCPKG_INSTALLED_DIR_PATH_FOR_CIBW%."
 
           CIBW_BUILD_VERBOSITY: 3
 
@@ -252,12 +296,12 @@ jobs:
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
-      id-token: write
+      id-token: write # Necessario per il trusted publishing di PyPI
     steps:
       - name: Download all build artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ~/artifacts
+          path: ~/artifacts # Scarica tutti gli artefatti in questa directory
 
       - name: Set up Python for Twine
         uses: actions/setup-python@v5

@@ -17,9 +17,9 @@ jobs:
       CI_WINDOWS: "1"
       CI_ARCH_ENV: ${{ matrix.CI_ARCH }}
       VCPKG_DEFAULT_TRIPLET: ${{ (matrix.CI_ARCH == 'x86' && 'x86-windows' || 'x64-windows') }}
-      # Definiamo il percorso presunto per le librerie vcpkg basato sul log del linker
-      # GITHUB_WORKSPACE qui è D:\a\synthizer3d\synthizer3d o simile
-      EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: ${{ github.workspace }}\vcpkg_installed
+      # Definiamo il percorso base INIZIALE per vcpkg_installed.
+      # Questo verrà SOVRASCRITTO nello script pwsh per puntare alla VERA installazione di vcpkg.
+      EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: ${{ github.workspace }}\vcpkg_installed_placeholder 
     strategy:
       fail-fast: false
       matrix:
@@ -58,7 +58,7 @@ jobs:
 
       - name: Setup vcpkg (standard instance)
         uses: lukka/run-vcpkg@v11
-        # Questo configura vcpkg in $GITHUB_WORKSPACE/vcpkg (o il percorso predefinito dell'azione)
+        # Questo configura vcpkg in $env:VCPKG_ROOT (es. $GITHUB_WORKSPACE/vcpkg)
 
       - name: Install dependencies and set CMAKE_PREFIX_PATH (Windows)
         shell: pwsh
@@ -66,21 +66,28 @@ jobs:
           Write-Host "Standard VCPKG_ROOT (from lukka/run-vcpkg) is $env:VCPKG_ROOT"
           Write-Host "VCPKG_DEFAULT_TRIPLET is $env:VCPKG_DEFAULT_TRIPLET"
           
-          # Esegui vcpkg install se necessario per la standard instance (potrebbe essere usato per tools/headers)
-          # Se vendor.py gestisce tutto in vcpkg_installed, questa installazione potrebbe non fornire le librerie usate nel link finale.
-          if ($env:VCPKG_ROOT) {
-            & "$env:VCPKG_ROOT\vcpkg.exe" install --triplet $env:VCPKG_DEFAULT_TRIPLET
-          } else {
-            Write-Warning "VCPKG_ROOT not set, skipping vcpkg install for standard instance."
+          if (-not $env:VCPKG_ROOT) {
+            Write-Error "VCPKG_ROOT not set. This should be set by the lukka/run-vcpkg action."
+            exit 1
           }
+
+          & "$env:VCPKG_ROOT\vcpkg.exe" install --triplet $env:VCPKG_DEFAULT_TRIPLET
           
-          # Impostiamo CMAKE_PREFIX_PATH puntando alla directory che sembra essere usata dal linker (`vcpkg_installed`)
-          $effectiveVcpkgTripletPath = Join-Path $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE $env:VCPKG_DEFAULT_TRIPLET
-          if (-not (Test-Path $effectiveVcpkgTripletPath -PathType Container)) {
-            Write-Warning "The directory $effectiveVcpkgTripletPath (expected for CMAKE_PREFIX_PATH) does not exist. The build might fail if dependencies are not found."
+          # $env:VCPKG_ROOT è impostato da lukka/run-vcpkg (es. D:\a\synthizer3d\synthizer3d\vcpkg)
+          # Le librerie sono installate in $env:VCPKG_ROOT\installed\$env:VCPKG_DEFAULT_TRIPLET
+          $actualVcpkgInstalledBaseDir = Join-Path $env:VCPKG_ROOT "installed" # Questa è la directory base corretta
+          $cmakePrefixPathValue = Join-Path $actualVcpkgInstalledBaseDir $env:VCPKG_DEFAULT_TRIPLET
+          
+          if (-not (Test-Path $cmakePrefixPathValue -PathType Container)) {
+            Write-Warning "La directory $cmakePrefixPathValue (attesa per CMAKE_PREFIX_PATH) non esiste. Questo significa che 'vcpkg install' probabilmente è fallito o ha installato in una posizione inaspettata."
+            # Potresti voler terminare con un errore qui se le dipendenze sono critiche.
           }
-          echo "CMAKE_PREFIX_PATH=$effectiveVcpkgTripletPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          Write-Host "CMAKE_PREFIX_PATH set to $effectiveVcpkgTripletPath (based on linker log assumption)"
+          echo "CMAKE_PREFIX_PATH=$cmakePrefixPathValue" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          Write-Host "CMAKE_PREFIX_PATH impostato a $cmakePrefixPathValue"
+          
+          # Questo assicura che i passaggi successivi usino il percorso base corretto derivato dall'effettiva installazione di vcpkg
+          echo "EFFECTIVE_VCPKG_INSTALLED_DIR_BASE=$actualVcpkgInstalledBaseDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          Write-Host "EFFECTIVE_VCPKG_INSTALLED_DIR_BASE è stato aggiornato in GITHUB_ENV a $actualVcpkgInstalledBaseDir per i passaggi successivi."
 
       - name: Install Python build dependencies (Windows)
         run: |
@@ -91,16 +98,19 @@ jobs:
         shell: powershell
         env:
           # CMAKE_PREFIX_PATH è impostato tramite GITHUB_ENV
+          # SYNTHIZER_EXPECTED_VCPKG_PATH_FOR_DEBUG ora userà il valore aggiornato di EFFECTIVE_VCPKG_INSTALLED_DIR_BASE
           SYNTHIZER_EXPECTED_VCPKG_PATH_FOR_DEBUG: ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}\${{ env.VCPKG_DEFAULT_TRIPLET }}
         run: |
           Set-Location $Env:GITHUB_WORKSPACE
           Write-Host "Current CMAKE_PREFIX_PATH for build is: $env:CMAKE_PREFIX_PATH"
           Write-Host "Synthizer expects vcpkg path (for debug/verification): $env:SYNTHIZER_EXPECTED_VCPKG_PATH_FOR_DEBUG"
+          Write-Host "EFFECTIVE_VCPKG_INSTALLED_DIR_BASE for build is: $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE"
           python -m build --wheel --no-isolation
 
       - name: List vcpkg installed files for debugging
         shell: powershell
         run: |
+          # EFFECTIVE_VCPKG_INSTALLED_DIR_BASE ora punta alla directory 'installed' dentro VCPKG_ROOT
           $vcpkgInstalledTripletDir = Join-Path $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE $env:VCPKG_DEFAULT_TRIPLET
           Write-Host "Listing contents of effective vcpkg directory: $vcpkgInstalledTripletDir ..."
           if (Test-Path $vcpkgInstalledTripletDir -PathType Container) {
@@ -141,10 +151,11 @@ jobs:
           Write-Host "Copying $originalWheelPath to $tempZipPathForExtraction for extraction."
           Copy-Item -Path $originalWheelPath -Destination $tempZipPathForExtraction -Force
           
+          # EFFECTIVE_VCPKG_INSTALLED_DIR_BASE ora punta alla directory 'installed' dentro VCPKG_ROOT
           $vcpkgInstalledTripletDir = Join-Path $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE $env:VCPKG_DEFAULT_TRIPLET
           
           $vcpkgDllSourceDirInBin = Join-Path $vcpkgInstalledTripletDir "bin"
-          $vcpkgDllSourceDirInLib = Join-Path $vcpkgInstalledTripletDir "lib" 
+          $vcpkgDllSourceDirInLib = Join-Path $vcpkgInstalledTripletDir "lib"  # Per alcune librerie i DLL potrebbero essere in lib/
           $vcpkgDllSourceDir = $null
 
           Write-Host "Looking for DLLs in $vcpkgDllSourceDirInBin and then $vcpkgDllSourceDirInLib"
@@ -160,7 +171,7 @@ jobs:
               Write-Warning "$vcpkgDllSourceDirInBin not found."
           }
 
-          if ($null -eq $vcpkgDllSourceDir) { 
+          if ($null -eq $vcpkgDllSourceDir) {  # Se non trovati in bin, prova in lib
               Write-Warning "DLLs not found in BIN directory. Checking LIB directory for DLLs as fallback..."
               if (Test-Path $vcpkgDllSourceDirInLib -PathType Container) {
                   if ((Get-ChildItem -Path $vcpkgDllSourceDirInLib -Filter *.dll -File -ErrorAction SilentlyContinue).Count -gt 0) {
@@ -218,7 +229,7 @@ jobs:
           name: python-wheels-win-${{ matrix.CI_ARCH }}-${{ matrix.PYVERSION }}
           path: dist/*.whl
 
-  # Job per costruire le wheel su Linux
+  # Job per costruire le wheel su Linux (invariato)
   linux-build:
     name: Build Linux (x64) Python ${{ matrix.PYVERSION }} for Ubuntu
     runs-on: ubuntu-latest # Utilizza l'ultima versione di Ubuntu disponibile sui runner
@@ -299,7 +310,7 @@ jobs:
           name: python-wheels-linux-x64-${{ matrix.PYVERSION }}
           path: dist/*.whl 
           if-no-files-found: error  
-  # Job per costruire le wheel su macOS (x64 - Intel Runner)
+  # Job per costruire le wheel su macOS (x64 - Intel Runner) (invariato)
   macos-x64-build:
     name: Build macOS (x64) Python ${{ matrix.PYVERSION }}
     runs-on: macos-13 # Intel runner
@@ -376,7 +387,7 @@ jobs:
           name: python-wheels-macos-x64-${{ matrix.PYVERSION }}
           path: dist/*.whl # Upload all wheels, delocate might overwrite
 
-  # Job per costruire le wheel su macOS (ARM64 - ARM Runner)
+  # Job per costruire le wheel su macOS (ARM64 - ARM Runner) (invariato)
   macos-arm64-build:
     name: Build macOS (arm64) Python ${{ matrix.PYVERSION }}
     runs-on: macos-latest # Should pick an ARM runner like macos-14
@@ -452,7 +463,7 @@ jobs:
           name: python-wheels-macos-arm64-${{ matrix.PYVERSION }}
           path: dist/*.whl
 
-  # Job per creare la sdist (source distribution)
+  # Job per creare la sdist (source distribution) (invariato)
   sdist-build:
     name: Build Python sdist
     runs-on: ubuntu-latest
@@ -489,7 +500,7 @@ jobs:
           name: python-sdist
           path: dist/*.tar.gz
 
-  # Job per il deployment su PyPI
+  # Job per il deployment su PyPI (invariato)
   deploy_pypi:
     name: Deploy to PyPI
     if: startsWith(github.ref, 'refs/tags')

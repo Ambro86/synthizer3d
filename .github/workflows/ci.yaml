@@ -24,16 +24,16 @@ jobs:
             is_linux: true
           - os: windows-latest
             arch_label: x86_amd64
-            cibw_archs: "x86 AMD64"
+            cibw_archs: "x86 AMD64" 
             vcpkg_triplet_map_x86: "x86-windows"
             vcpkg_triplet_map_amd64: "x64-windows"
             is_windows: true
-          - os: macos-13
+          - os: macos-13 
             arch_label: x64
             cibw_archs: "x86_64"
             vcpkg_triplet_map_x86_64: "x64-osx"
             is_macos: true
-          - os: macos-14
+          - os: macos-14 
             arch_label: arm64
             cibw_archs: "arm64"
             vcpkg_triplet_map_arm64: "arm64-osx"
@@ -58,17 +58,19 @@ jobs:
         run: |
           TRIPLET=""
           if [ "${{ matrix.is_windows }}" == "true" ]; then
+            # Per Windows, cibuildwheel eseguirà build separate per x86 e AMD64 se specificato in cibw_archs.
+            # Lo step vcpkg install viene eseguito una volta per il job, quindi scegliamo un triplet primario.
+            # CIBW_BUILD_ARCHITECTURE sarà disponibile all'interno di CIBW_BEFORE_BUILD_WINDOWS.
             if [[ "${{ matrix.cibw_archs }}" == *"AMD64"* ]]; then
               TRIPLET="${{ matrix.vcpkg_triplet_map_amd64 }}"
             elif [[ "${{ matrix.cibw_archs }}" == "x86"* ]]; then
               TRIPLET="${{ matrix.vcpkg_triplet_map_x86 }}"
-            else
-              TRIPLET="${{ matrix.vcpkg_triplet_map_amd64 }}" 
             fi
           elif [ "${{ matrix.is_linux }}" == "true" ]; then
+            # Per Linux, stessa logica, scegliamo un triplet primario per l'installazione vcpkg.
             if [[ "${{ matrix.cibw_archs }}" == *"x86_64"* ]]; then
               TRIPLET="${{ matrix.vcpkg_triplet_map_x86_64 }}"
-            elif [[ "${{ matrix.cibw_archs }}" == *"aarch64"* ]]; then
+            elif [[ "${{ matrix.cibw_archs }}" == *"aarch64"* ]]; then # Se si costruisce solo per aarch64
               TRIPLET="${{ matrix.vcpkg_triplet_map_aarch64 }}"
             fi
           elif [ "${{ matrix.is_macos }}" == "true" ]; then
@@ -199,23 +201,45 @@ jobs:
             rm -rf /var/cache/yum
           
           CIBW_BEFORE_BUILD_WINDOWS: |
-            set VCVARS_PATH="C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
+            rem CIBW_BUILD_ARCHITECTURE è impostata da cibuildwheel a 'x86', 'AMD64', o 'ARM64'
             set VCVARS_ARCH=
-            if "%CIBW_BUILD_ARCHITECTURE%"=="x86" ( set VCVARS_ARCH=x86 )
-            if "%CIBW_BUILD_ARCHITECTURE%"=="AMD64" ( set VCVARS_ARCH=amd64 )
-            if "%CIBW_BUILD_ARCHITECTURE%"=="ARM64" ( set VCVARS_ARCH=arm64 )
-            if defined VCVARS_ARCH (
-              echo Calling %VCVARS_PATH% %VCVARS_ARCH%
-              call %VCVARS_PATH% %VCVARS_ARCH%
+            if "%CIBW_BUILD_ARCHITECTURE%"=="x86" set VCVARS_ARCH=x86
+            if "%CIBW_BUILD_ARCHITECTURE%"=="AMD64" set VCVARS_ARCH=amd64
+            if "%CIBW_BUILD_ARCHITECTURE%"=="ARM64" set VCVARS_ARCH=arm64
+
+            rem Cerca vcvarsall.bat nei percorsi comuni dei runner GitHub
+            set VCVARS_PATH_ENT="C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
+            set VCVARS_PATH_PRO="C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Auxiliary\Build\vcvarsall.bat"
+            set VCVARS_PATH_COMM="C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat"
+            set VCVARS_PATH_BUILDTOOLS="C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvarsall.bat"
+
+            set VCVARS_TO_CALL=
+            if exist %VCVARS_PATH_ENT% (set VCVARS_TO_CALL=%VCVARS_PATH_ENT%)
+            if exist %VCVARS_PATH_PRO% (if not defined VCVARS_TO_CALL set VCVARS_TO_CALL=%VCVARS_PATH_PRO%)
+            if exist %VCVARS_PATH_COMM% (if not defined VCVARS_TO_CALL set VCVARS_TO_CALL=%VCVARS_PATH_COMM%)
+            if exist %VCVARS_PATH_BUILDTOOLS% (if not defined VCVARS_TO_CALL set VCVARS_TO_CALL=%VCVARS_PATH_BUILDTOOLS%)
+            
+            if defined VCVARS_TO_CALL (
+              if defined VCVARS_ARCH (
+                echo Calling %VCVARS_TO_CALL% %VCVARS_ARCH%
+                call %VCVARS_TO_CALL% %VCVARS_ARCH%
+                echo Successfully called vcvarsall.bat for %VCVARS_ARCH%
+              ) else (
+                echo ::warning::CIBW_BUILD_ARCHITECTURE ('%CIBW_BUILD_ARCHITECTURE%') non riconosciuta per vcvarsall.bat. L'ambiente MSVC potrebbe non essere impostato.
+              )
             ) else (
-              echo Warning: CIBW_BUILD_ARCHITECTURE ('%CIBW_BUILD_ARCHITECTURE%') not recognized for vcvarsall.bat. MSVC environment might not be set up.
+              echo ::error::vcvarsall.bat not found in common locations. MSVC environment cannot be set up.
+              exit /B 1
             )
-            echo Adding VCPKG paths to PATH
+            
+            echo Adding VCPKG paths to PATH for build process
+            rem Converti VCPKG_INSTALLED_DIR_PATH_FOR_CIBW in backslashes per Windows PATH
             set VCPKG_INSTALLED_DIR_WIN_TEMP=%VCPKG_INSTALLED_DIR_PATH_FOR_CIBW%
-            set VCPKG_INSTALLED_DIR_WIN=%VCPKG_INSTALLED_DIR_WIN_TEMP:/=\%
-            set VCPKG_TOOLS_DIR_WIN_TEMP=%VCPKG_INSTALLED_DIR_WIN%\tools\%PRIMARY_VCPKG_TRIPLET%
-            set PATH=%VCPKG_INSTALLED_DIR_WIN%\bin;%VCPKG_TOOLS_DIR_WIN_TEMP%\bin;%PATH%
-            echo Updated PATH is %PATH%
+            set VCPKG_INSTALLED_WIN_PATH=%VCPKG_INSTALLED_DIR_WIN_TEMP:/=\%
+            set VCPKG_TOOLS_DIR_WIN_TEMP=%VCPKG_INSTALLED_WIN_PATH%\tools\%PRIMARY_VCPKG_TRIPLET%
+            
+            set PATH=%VCPKG_INSTALLED_WIN_PATH%\bin;%VCPKG_TOOLS_DIR_WIN_TEMP%\bin;%PATH%
+            echo Updated PATH in CIBW_BEFORE_BUILD_WINDOWS is %PATH%
 
           CIBW_BUILD_VERBOSITY: 3
 

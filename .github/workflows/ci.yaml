@@ -1,265 +1,458 @@
 # Workflow for Synthizer3d
-# by Ambro86, adapted for cibuildwheel
-name: Build Synthizer3d Wheels and Sdist
-
+# by Ambro86
+# Trigger del workflow: si attiva ad ogni push e pull request
 on:
-  push: {}
-  pull_request: {}
+  push: {} # Si attiva su push a qualsiasi branch
+  pull_request: {} # Si attiva su pull request verso qualsiasi branch
 
 jobs:
-  build_wheels:
-    name: Build Wheels on ${{ matrix.os }} (${{ matrix.arch_label }})
-    runs-on: ${{ matrix.os }}
-    permissions:
-      id-token: write
+  # Job per costruire le wheel su Windows
+  windows-build:
+    name: Build Windows (${{ matrix.CI_ARCH }}) Python ${{ matrix.PYVERSION }}
+    runs-on: windows-latest
+    env:
+      PYVERSION: ${{ matrix.PYVERSION }}
+      CI_ARCH_LOWER: ${{ (matrix.CI_ARCH == 'x86' && 'x86' || 'x64') }}
+      CI_WINDOWS: "1"
+      CI_ARCH_ENV: ${{ matrix.CI_ARCH }}
+      VCPKG_DEFAULT_TRIPLET: ${{ (matrix.CI_ARCH == 'x86' && 'x86-windows' || 'x64-windows') }}
+      # Definiamo il percorso presunto per le librerie vcpkg basato sul log del linker
+      # GITHUB_WORKSPACE qui è D:\a\synthizer3d\synthizer3d o simile
+      EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: ${{ github.workspace }}\vcpkg_installed
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            arch_label: x64_aarch64
-            cibw_archs: "x86_64 aarch64"
-            vcpkg_triplet_map_x86_64: "x64-linux"
-            vcpkg_triplet_map_aarch64: "aarch64-linux"
-            is_linux: true
-          - os: windows-latest
-            arch_label: x86_amd64
-            cibw_archs: "x86 AMD64" 
-            vcpkg_triplet_map_x86: "x86-windows"
-            vcpkg_triplet_map_amd64: "x64-windows"
-            msvc_dev_cmd_arch: "x64" # Architettura host per msvc-dev-cmd
-            is_windows: true
-          - os: macos-13 
-            arch_label: x64
-            cibw_archs: "x86_64"
-            vcpkg_triplet_map_x86_64: "x64-osx"
-            is_macos: true
-          - os: macos-14 
-            arch_label: arm64
-            cibw_archs: "arm64"
-            vcpkg_triplet_map_arm64: "arm64-osx"
-            is_macos: true
-
+        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        CI_ARCH: ["x64", "x86"]
     steps:
-      - name: Ensure /usr/bin is in PATH for macOS
-        if: matrix.is_macos == true
-        run: echo "/usr/bin" >> $GITHUB_PATH
-
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
+      - name: Set up Python ${{ matrix.PYVERSION }} (${{ env.CI_ARCH_LOWER }})
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.PYVERSION }}
+          architecture: ${{ env.CI_ARCH_LOWER }}
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
       - name: Run C/C++ code vendoring script
         run: python synthizer-c/vendor.py synthizer-vendored
 
-      - name: Determine vcpkg triplet for primary architecture of the job
-        id: vcpkg_triplet_primary
-        shell: bash
-        run: |
-          TRIPLET=""
-          if [ "${{ matrix.is_windows }}" == "true" ]; then
-            TRIPLET="${{ matrix.vcpkg_triplet_map_amd64 }}" # Host/default for Windows job is x64
-          elif [ "${{ matrix.is_linux }}" == "true" ]; then
-            if [[ "${{ matrix.cibw_archs }}" == *"x86_64"* ]]; then
-              TRIPLET="${{ matrix.vcpkg_triplet_map_x86_64 }}"
-            elif [[ "${{ matrix.cibw_archs }}" == *"aarch64"* ]]; then
-              TRIPLET="${{ matrix.vcpkg_triplet_map_aarch64 }}"
-            fi
-          elif [ "${{ matrix.is_macos }}" == "true" ]; then
-            if [[ "${{ matrix.cibw_archs }}" == "x86_64" ]]; then
-              TRIPLET="${{ matrix.vcpkg_triplet_map_x86_64 }}"
-            elif [[ "${{ matrix.cibw_archs }}" == "arm64" ]]; then
-              TRIPLET="${{ matrix.vcpkg_triplet_map_arm64 }}"
-            fi
-          fi
-          if [ -z "$TRIPLET" ]; then
-            echo "::error::Impossibile determinare PRIMARY_VCPKG_TRIPLET per os=${{ matrix.os }}, cibw_archs='${{ matrix.cibw_archs }}'"
-            exit 1
-          fi
-          echo "PRIMARY_VCPKG_TRIPLET=$TRIPLET" >> $GITHUB_ENV
-          echo "Determinato PRIMARY_VCPKG_TRIPLET per il job (default/host): $TRIPLET"
+      - name: Cache Pip (Windows ${{ matrix.CI_ARCH }})
+        uses: actions/cache@v4
+        with:
+          path: ~\AppData\Local\pip\Cache
+          key: ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ matrix.CI_ARCH }}-${{ hashFiles('**/requirements.txt', '**/setup.py', 'vcpkg.json', 'synthizer-c/vendor.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ matrix.CI_ARCH }}-
 
-      # Per Windows, configura l'ambiente MSVC PRIMA di vcpkg e cibuildwheel
-      - name: Setup MSVC Developer Command Prompt (Windows only)
-        if: matrix.is_windows == true
+      - name: Setup MSVC Developer Command Prompt
         uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: ${{ matrix.msvc_dev_cmd_arch }}
-          # Questa azione aggiorna l'ambiente dello step, inclusi INCLUDE, LIB, PATH
+          arch: ${{ env.CI_ARCH_LOWER }}
 
-      - name: Set up vcpkg (bootstrap only)
-        uses: lukka/run-vcpkg@v11.5
-        env:
-          VCPKG_DEFAULT_TRIPLET: ${{ env.PRIMARY_VCPKG_TRIPLET }} # Triplet di default per bootstrap
-        with:
-          runVcpkgInstall: false # Installeremo i pacchetti manualmente
+      - name: Setup vcpkg (standard instance)
+        uses: lukka/run-vcpkg@v11
+        # Questo configura vcpkg in $GITHUB_WORKSPACE/vcpkg (o il percorso predefinito dell'azione)
 
-      - name: Install vcpkg packages and set default paths
-        shell: bash
+      - name: Install dependencies and set CMAKE_PREFIX_PATH (Windows)
+        shell: pwsh
         run: |
-          echo "VCPKG_ROOT (from lukka/run-vcpkg) is $VCPKG_ROOT"
-          EFFECTIVE_TRIPLET_FOR_DEFAULT_PATHS="${{ env.PRIMARY_VCPKG_TRIPLET }}"
+          Write-Host "Standard VCPKG_ROOT (from lukka/run-vcpkg) is $env:VCPKG_ROOT"
+          Write-Host "VCPKG_DEFAULT_TRIPLET is $env:VCPKG_DEFAULT_TRIPLET"
+          
+          # Esegui vcpkg install se necessario per la standard instance (potrebbe essere usato per tools/headers)
+          # Se vendor.py gestisce tutto in vcpkg_installed, questa installazione potrebbe non fornire le librerie usate nel link finale.
+          if ($env:VCPKG_ROOT) {
+            & "$env:VCPKG_ROOT\vcpkg.exe" install --triplet $env:VCPKG_DEFAULT_TRIPLET
+          } else {
+            Write-Warning "VCPKG_ROOT not set, skipping vcpkg install for standard instance."
+          }
+          
+          # Impostiamo CMAKE_PREFIX_PATH puntando alla directory che sembra essere usata dal linker (`vcpkg_installed`)
+          $effectiveVcpkgTripletPath = Join-Path $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE $env:VCPKG_DEFAULT_TRIPLET
+          if (-not (Test-Path $effectiveVcpkgTripletPath -PathType Container)) {
+            Write-Warning "The directory $effectiveVcpkgTripletPath (expected for CMAKE_PREFIX_PATH) does not exist. The build might fail if dependencies are not found."
+          }
+          echo "CMAKE_PREFIX_PATH=$effectiveVcpkgTripletPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          Write-Host "CMAKE_PREFIX_PATH set to $effectiveVcpkgTripletPath (based on linker log assumption)"
 
-          if [ "${{ matrix.is_windows }}" == "true" ]; then
-            echo "Installando vcpkg packages per ${{ matrix.vcpkg_triplet_map_x86 }}"
-            "$VCPKG_ROOT/vcpkg" install --triplet "${{ matrix.vcpkg_triplet_map_x86 }}"
-            echo "Installando vcpkg packages per ${{ matrix.vcpkg_triplet_map_amd64 }}"
-            "$VCPKG_ROOT/vcpkg" install --triplet "${{ matrix.vcpkg_triplet_map_amd64 }}"
-            # Per GITHUB_ENV e GITHUB_PATH, usiamo il triplet primario (AMD64) come default.
-            # CIBW_ENVIRONMENT_WINDOWS sovrascriverà dinamicamente per ogni architettura.
-          elif [ "${{ matrix.is_linux }}" == "true" ] || [ "${{ matrix.is_macos }}" == "true" ]; then
-            echo "Installando vcpkg packages per ${{ env.PRIMARY_VCPKG_TRIPLET }}"
-            "$VCPKG_ROOT/vcpkg" install --triplet "${{ env.PRIMARY_VCPKG_TRIPLET }}"
-          else
-            echo "::error::OS non supportato per lo script di installazione vcpkg."
+      - name: Install Python build dependencies (Windows)
+        run: |
+          python -m pip install --upgrade pip
+          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build
+
+      - name: Build Python Wheels (Windows ${{ matrix.CI_ARCH }})
+        shell: powershell
+        env:
+          # CMAKE_PREFIX_PATH è impostato tramite GITHUB_ENV
+          SYNTHIZER_EXPECTED_VCPKG_PATH_FOR_DEBUG: ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}\${{ env.VCPKG_DEFAULT_TRIPLET }}
+        run: |
+          Set-Location $Env:GITHUB_WORKSPACE
+          Write-Host "Current CMAKE_PREFIX_PATH for build is: $env:CMAKE_PREFIX_PATH"
+          Write-Host "Synthizer expects vcpkg path (for debug/verification): $env:SYNTHIZER_EXPECTED_VCPKG_PATH_FOR_DEBUG"
+          python -m build --wheel --no-isolation
+
+      - name: List vcpkg installed files for debugging
+        shell: powershell
+        run: |
+          $vcpkgInstalledTripletDir = Join-Path $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE $env:VCPKG_DEFAULT_TRIPLET
+          Write-Host "Listing contents of effective vcpkg directory: $vcpkgInstalledTripletDir ..."
+          if (Test-Path $vcpkgInstalledTripletDir -PathType Container) {
+            Get-ChildItem -Path $vcpkgInstalledTripletDir -Recurse | Select-Object FullName, Length, Mode | Format-Table -AutoSize -Wrap
+          } else {
+            Write-Warning "$vcpkgInstalledTripletDir does not exist."
+          }
+
+          $vcpkgInstalledBinDir = Join-Path $vcpkgInstalledTripletDir "bin"
+          if (Test-Path $vcpkgInstalledBinDir -PathType Container) {
+            Write-Host "Listing contents of $vcpkgInstalledBinDir ..."
+            Get-ChildItem -Path $vcpkgInstalledBinDir -Recurse | Select-Object FullName, Length, Mode | Format-Table -AutoSize -Wrap
+          } else {
+            Write-Warning "$vcpkgInstalledBinDir does not exist or is not a directory."
+          }
+
+          $vcpkgInstalledLibDir = Join-Path $vcpkgInstalledTripletDir "lib"
+          if (Test-Path $vcpkgInstalledLibDir -PathType Container) {
+            Write-Host "Listing contents of $vcpkgInstalledLibDir ..."
+            Get-ChildItem -Path $vcpkgInstalledLibDir -Recurse | Select-Object FullName, Length, Mode | Format-Table -AutoSize -Wrap
+          } else {
+            Write-Warning "$vcpkgInstalledLibDir does not exist or is not a directory."
+          }
+        continue-on-error: true
+
+      - name: Add vcpkg libraries to Wheel (Windows ${{ matrix.CI_ARCH }})
+        shell: powershell
+        run: |
+          $wheelFile = Get-ChildItem -Path dist/*.whl | Select-Object -First 1
+          if (-not $wheelFile) {
+            Write-Error "No wheel file found in dist/"
             exit 1
-          fi
+          }
+          $originalWheelPath = $wheelFile.FullName
+          Write-Host "Modifying wheel: $originalWheelPath"
+
+          $tempZipPathForExtraction = Join-Path $wheelFile.DirectoryName ($wheelFile.BaseName + "_temp_for_extraction.zip")
+          Write-Host "Copying $originalWheelPath to $tempZipPathForExtraction for extraction."
+          Copy-Item -Path $originalWheelPath -Destination $tempZipPathForExtraction -Force
           
-          # Imposta un VCPKG_INSTALLED_DIR_PATH_FOR_CIBW di default (basato sul triplet primario)
-          # Questo sarà usato da Linux/macOS e come fallback se non sovrascritto.
-          VCPKG_INSTALLED_DIR_FOR_JOB_DEFAULT="$VCPKG_ROOT/installed/$EFFECTIVE_TRIPLET_FOR_DEFAULT_PATHS"
-          VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE_DEFAULT=$(echo "$VCPKG_INSTALLED_DIR_FOR_JOB_DEFAULT" | sed 's_\\_/_g')
+          $vcpkgInstalledTripletDir = Join-Path $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE $env:VCPKG_DEFAULT_TRIPLET
           
-          echo "VCPKG_INSTALLED_DIR_PATH_FOR_CIBW=$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE_DEFAULT" >> $GITHUB_ENV
-          echo "Set VCPKG_INSTALLED_DIR_PATH_FOR_CIBW (default) to $VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE_DEFAULT"
+          $vcpkgDllSourceDirInBin = Join-Path $vcpkgInstalledTripletDir "bin"
+          $vcpkgDllSourceDirInLib = Join-Path $vcpkgInstalledTripletDir "lib" 
+          $vcpkgDllSourceDir = $null
 
-          # Aggiungi i percorsi vcpkg (del triplet primario) a GITHUB_PATH per disponibilità generale degli strumenti
-          VCPKG_BIN_DIR_UNIX_STYLE_DEFAULT="$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE_DEFAULT/bin"
-          VCPKG_TOOLS_TRIPLET_DIR_UNIX_STYLE_DEFAULT="$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE_DEFAULT/tools/$EFFECTIVE_TRIPLET_FOR_DEFAULT_PATHS/bin"
+          Write-Host "Looking for DLLs in $vcpkgDllSourceDirInBin and then $vcpkgDllSourceDirInLib"
+
+          if (Test-Path $vcpkgDllSourceDirInBin -PathType Container) {
+              if ((Get-ChildItem -Path $vcpkgDllSourceDirInBin -Filter *.dll -File -ErrorAction SilentlyContinue).Count -gt 0) {
+                  $vcpkgDllSourceDir = $vcpkgDllSourceDirInBin
+                  Write-Host "Using DLLs from BIN directory: $vcpkgDllSourceDir"
+              } else {
+                  Write-Warning "$vcpkgDllSourceDirInBin found but is empty of DLLs or DLLs not accessible."
+              }
+          } else {
+              Write-Warning "$vcpkgDllSourceDirInBin not found."
+          }
+
+          if ($null -eq $vcpkgDllSourceDir) { 
+              Write-Warning "DLLs not found in BIN directory. Checking LIB directory for DLLs as fallback..."
+              if (Test-Path $vcpkgDllSourceDirInLib -PathType Container) {
+                  if ((Get-ChildItem -Path $vcpkgDllSourceDirInLib -Filter *.dll -File -ErrorAction SilentlyContinue).Count -gt 0) {
+                      $vcpkgDllSourceDir = $vcpkgDllSourceDirInLib
+                      Write-Host "Using DLLs from LIB directory: $vcpkgDllSourceDir"
+                  } else {
+                      Write-Warning "$vcpkgDllSourceDirInLib found but is empty of DLLs or DLLs not accessible."
+                  }
+              } else {
+                  Write-Warning "$vcpkgDllSourceDirInLib not found."
+              }
+          }
           
-          echo "Adding to GITHUB_PATH (default): $VCPKG_BIN_DIR_UNIX_STYLE_DEFAULT"
-          echo "$VCPKG_BIN_DIR_UNIX_STYLE_DEFAULT" >> $GITHUB_PATH
-          echo "Adding to GITHUB_PATH (default): $VCPKG_TOOLS_TRIPLET_DIR_UNIX_STYLE_DEFAULT"
-          echo "$VCPKG_TOOLS_TRIPLET_DIR_UNIX_STYLE_DEFAULT" >> $GITHUB_PATH
+          if ($null -eq $vcpkgDllSourceDir) {
+            Write-Warning "No suitable vcpkg DLL source directory found. No DLLs will be copied into the wheel."
+          }
+
+          $tempExtractDir = ".\temp_wheel_extracted"
+          Remove-Item -Path $tempExtractDir -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path $tempExtractDir
+
+          Write-Host "Extracting $tempZipPathForExtraction to $tempExtractDir"
+          Expand-Archive -LiteralPath $tempZipPathForExtraction -DestinationPath $tempExtractDir -Force
+
+          $targetDirInWheel = Join-Path $tempExtractDir "synthizer" # Il nome del tuo package Python
+          if (-not (Test-Path $targetDirInWheel -PathType Container)) {
+            Write-Host "Target package directory $targetDirInWheel does not exist in wheel, creating it."
+            New-Item -ItemType Directory -Path $targetDirInWheel -Force
+          }
+
+          if ($null -ne $vcpkgDllSourceDir) {
+            Write-Host "Copying DLLs from $vcpkgDllSourceDir to $targetDirInWheel"
+            Get-ChildItem -Path $vcpkgDllSourceDir -Filter *.dll -File | ForEach-Object {
+                Copy-Item -Path $_.FullName -Destination $targetDirInWheel -Force
+                Write-Host "Copied $($_.Name) to $targetDirInWheel"
+            }
+          }
+
+          $repackagedZipPath = Join-Path $wheelFile.DirectoryName ($wheelFile.BaseName + "_repackaged.zip")
+          If (Test-Path $repackagedZipPath) { Remove-Item $repackagedZipPath -Force }
+
+          Write-Host "Re-packaging wheel contents from $tempExtractDir to $repackagedZipPath"
+          Compress-Archive -Path "$tempExtractDir\*" -DestinationPath $repackagedZipPath -Force
           
-          if [ "${{ matrix.is_windows }}" == "true" ]; then
-            echo "LD_LIBRARY_PATH_FOR_CIBW=" >> $GITHUB_ENV # Non usato su Windows, PATH è preferito
-          else
-            echo "LD_LIBRARY_PATH_FOR_CIBW=$VCPKG_INSTALLED_DIR_PATH_FOR_CIBW_UNIX_STYLE_DEFAULT/lib" >> $GITHUB_ENV
-          fi
-          echo "Paths set for subsequent steps (default GITHUB_ENV values). Current GITHUB_PATH:"
-          cat $GITHUB_PATH
+          Write-Host "Moving $repackagedZipPath to $originalWheelPath"
+          Move-Item -Path $repackagedZipPath -Destination $originalWheelPath -Force
 
-      - name: Create Windows repair script
-        if: matrix.is_windows == true
-        shell: bash 
-        run: |
-          mkdir -p .github/workflows
-          cat << 'EOF' > .github/workflows/repair_wheel_windows.py
-          import os
-          import sys
-          import subprocess
-          import pathlib
+          Remove-Item -Path $tempExtractDir -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path $tempZipPathForExtraction -Force -ErrorAction SilentlyContinue
+          Write-Host "Windows wheel modification complete for $originalWheelPath"
 
-          if __name__ == "__main__":
-              wheel_file_path_str = sys.argv[1]
-              dest_dir_str = sys.argv[2]
-              # Questa variabile sarà impostata dinamicamente da CIBW_ENVIRONMENT_WINDOWS
-              vcpkg_installed_raw = os.environ.get('VCPKG_INSTALLED_DIR_PATH_FOR_CIBW') 
-              if not vcpkg_installed_raw:
-                  print(f"::error::Variabile d'ambiente VCPKG_INSTALLED_DIR_PATH_FOR_CIBW non impostata per lo script di riparazione.")
-                  sys.exit(1)
-              
-              # pathlib gestirà correttamente sia path Windows che Unix-style emulati
-              vcpkg_installed_path = str(pathlib.Path(vcpkg_installed_raw).resolve())
-              print(f"Repair script: Using VCPKG_INSTALLED_DIR_PATH_FOR_CIBW resolved to: {vcpkg_installed_path}")
-
-              add_path_arg = f"{vcpkg_installed_path}\\bin;{vcpkg_installed_path}\\lib"
-              pathlib.Path(dest_dir_str).mkdir(parents=True, exist_ok=True)
-              delvewheel_cmd_module = [
-                  sys.executable, "-m", "delvewheel", "repair",
-                  "--add-path", add_path_arg,
-                  "-w", dest_dir_str,
-                  wheel_file_path_str
-              ]
-              print(f"Tentativo di riparazione delvewheel con comando: {' '.join(delvewheel_cmd_module)}")
-              try:
-                  process = subprocess.run(delvewheel_cmd_module, check=True, capture_output=True, text=True, encoding='utf-8')
-                  print("Output Delvewheel (python -m):")
-                  print(process.stdout)
-                  if process.stderr:
-                      print("Errori Delvewheel (python -m):")
-                      print(process.stderr)
-              except subprocess.CalledProcessError as e_retry:
-                  print(f"::error::Delvewheel (tramite python -m) fallito con codice {e_retry.returncode}")
-                  print(f"Stdout Delvewheel (python -m): {e_retry.stdout}")
-                  print(f"Stderr Delvewheel (python -m): {e_retry.stderr}")
-                  sys.exit(e_retry.returncode)
-              except FileNotFoundError as e_fnf_retry:
-                  print(f"::error::Delvewheel (tramite python -m) fallito, eseguibile python non trovato o modulo delvewheel mancante: {e_fnf_retry}")
-                  sys.exit(1)
-              print(f"Riparazione Delvewheel presumibilmente completata con successo per {wheel_file_path_str}")
-          EOF
-
-      - name: Build wheels with cibuildwheel
-        uses: pypa/cibuildwheel@v2.19.1
-        env:
-          # VCPKG_ROOT è impostato da lukka/run-vcpkg.
-          # PRIMARY_VCPKG_TRIPLET è impostato da "Determine vcpkg triplet...".
-          # VCPKG_INSTALLED_DIR_PATH_FOR_CIBW (default) e LD_LIBRARY_PATH_FOR_CIBW (default) sono impostati da "Install vcpkg packages...".
-          # Queste variabili sono disponibili in env e possono essere usate sotto.
-
-          # Passa le mappature dei triplet specifici per Windows
-          TRIPLET_MAP_X86_WIN: ${{ matrix.vcpkg_triplet_map_x86 }}
-          TRIPLET_MAP_AMD64_WIN: ${{ matrix.vcpkg_triplet_map_amd64 }}
-          
-          CIBW_ENVIRONMENT_WINDOWS: |
-            set "VCPKG_TRIPLET_CURRENT_ARCH="
-            if /I "%CIBW_BUILD_ARCHITECTURE%" == "x86" (
-              set "VCPKG_TRIPLET_CURRENT_ARCH=%TRIPLET_MAP_X86_WIN%"
-            )
-            if /I "%CIBW_BUILD_ARCHITECTURE%" == "AMD64" (
-              set "VCPKG_TRIPLET_CURRENT_ARCH=%TRIPLET_MAP_AMD64_WIN%"
-            )
-            if "%VCPKG_TRIPLET_CURRENT_ARCH%" == "" (
-              echo "::error::[CIBW_ENVIRONMENT_WINDOWS] Impossibile determinare VCPKG_TRIPLET_CURRENT_ARCH per CIBW_BUILD_ARCHITECTURE: %CIBW_BUILD_ARCHITECTURE%"
-              exit /B 1
-            )
-            set "VCPKG_INSTALLED_DIR_ARCH_SPECIFIC=%VCPKG_ROOT%\installed\%VCPKG_TRIPLET_CURRENT_ARCH%"
-            set "CMAKE_PREFIX_PATH=%VCPKG_INSTALLED_DIR_ARCH_SPECIFIC%"
-            set "PATH=%VCPKG_INSTALLED_DIR_ARCH_SPECIFIC%\bin;%VCPKG_INSTALLED_DIR_ARCH_SPECIFIC%\tools\%VCPKG_TRIPLET_CURRENT_ARCH%\bin;%PATH%"
-            set "VCPKG_INSTALLED_DIR_PATH_FOR_CIBW=%VCPKG_INSTALLED_DIR_ARCH_SPECIFIC%"
-            echo [CIBW_ENVIRONMENT_WINDOWS] CIBW_BUILD_ARCHITECTURE: %CIBW_BUILD_ARCHITECTURE%
-            echo [CIBW_ENVIRONMENT_WINDOWS] VCPKG_TRIPLET_CURRENT_ARCH: %VCPKG_TRIPLET_CURRENT_ARCH%
-            echo [CIBW_ENVIRONMENT_WINDOWS] VCPKG_INSTALLED_DIR_PATH_FOR_CIBW (per repair script) impostato a: %VCPKG_INSTALLED_DIR_PATH_FOR_CIBW%
-            echo [CIBW_ENVIRONMENT_WINDOWS] CMAKE_PREFIX_PATH (per build) impostato a: %CMAKE_PREFIX_PATH%
-          CIBW_ENVIRONMENT_LINUX: >-
-            CMAKE_PREFIX_PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}
-            LD_LIBRARY_PATH=${{ env.LD_LIBRARY_PATH_FOR_CIBW }}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
-            PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/bin:${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/tools/${{ env.PRIMARY_VCPKG_TRIPLET }}/bin:$PATH
-          CIBW_ENVIRONMENT_MACOS: >-
-            CMAKE_PREFIX_PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}
-            DYLD_LIBRARY_PATH=${{ env.LD_LIBRARY_PATH_FOR_CIBW }}${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}
-            PATH=${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/bin:${{ env.VCPKG_INSTALLED_DIR_PATH_FOR_CIBW }}/tools/${{ env.PRIMARY_VCPKG_TRIPLET }}/bin:$PATH
-
-          CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*"
-          CIBW_ARCHS_WINDOWS: ${{ matrix.cibw_archs }}
-          CIBW_ARCHS_LINUX: ${{ matrix.cibw_archs }}
-          CIBW_ARCHS_MACOS: ${{ matrix.cibw_archs }}
-
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
-          CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_28
-          CIBW_BEFORE_ALL_LINUX: >-
-            yum install -y openssl-devel &&
-            rm -rf /var/cache/yum
-          
-          CIBW_BEFORE_BUILD_WINDOWS: "echo In CIBW_BEFORE_BUILD_WINDOWS. CIBW_BUILD_ARCHITECTURE is %CIBW_BUILD_ARCHITECTURE%. Current PATH is %PATH%. Current INCLUDE is %INCLUDE%. Current LIB is %LIB%. VCPKG_INSTALLED_DIR_PATH_FOR_CIBW (from CIBW_ENVIRONMENT) is %VCPKG_INSTALLED_DIR_PATH_FOR_CIBW%."
-
-          CIBW_BUILD_VERBOSITY: 3
-
-          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "python .github/workflows/repair_wheel_windows.py {wheel} {dest_dir}"
-          CIBW_PIP_PACKAGES_WINDOWS: delvewheel
-
-          CIBW_PIP_PACKAGES_MACOS: delocate
-
-      - name: Upload Python Wheel Artifacts
+      - name: Upload Python Wheel Artifact (Windows ${{ matrix.CI_ARCH }})
         uses: actions/upload-artifact@v4
         with:
-          name: python-wheels-${{ matrix.os }}-${{ matrix.arch_label }}
-          path: ./wheelhouse/*.whl
+          name: python-wheels-win-${{ matrix.CI_ARCH }}-${{ matrix.PYVERSION }}
+          path: dist/*.whl
 
-  build_sdist:
+  # Job per costruire le wheel su Linux
+  linux-build:
+    name: Build Linux (x64) Python ${{ matrix.PYVERSION }} for Ubuntu
+    runs-on: ubuntu-latest # Utilizza l'ultima versione di Ubuntu disponibile sui runner
+    env:
+      PYVERSION: ${{ matrix.PYVERSION }}
+      CI_ARCH: "x64" 
+      VCPKG_DEFAULT_TRIPLET: "x64-linux"
+    strategy:
+      fail-fast: false
+      matrix:
+        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python ${{ matrix.PYVERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.PYVERSION }}
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Run C/C++ code vendoring script
+        run: python synthizer-c/vendor.py synthizer-vendored
+
+      - name: Cache Pip (Linux)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ env.PYVERSION }}-${{ hashFiles('**/requirements.txt', '**/setup.py', 'vcpkg.json', 'synthizer-c/vendor.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ env.PYVERSION }}-
+
+      - name: Install system build dependencies (Linux)
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y build-essential patchelf curl unzip tar ca-certificates
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+
+      - name: Install dependencies using vcpkg (Linux)
+        run: |
+          echo "VCPKG_ROOT is $VCPKG_ROOT"
+          echo "VCPKG_DEFAULT_TRIPLET is $VCPKG_DEFAULT_TRIPLET"
+          if [ -z "$VCPKG_ROOT" ]; then
+            echo "Error: VCPKG_ROOT is not set. This should be set by the lukka/run-vcpkg action."
+            exit 1
+          fi
+          "$VCPKG_ROOT/vcpkg" install --triplet "$VCPKG_DEFAULT_TRIPLET"
+          
+          VCPKG_INSTALLED_PATH="$VCPKG_ROOT/installed/$VCPKG_DEFAULT_TRIPLET"
+          echo "CMAKE_PREFIX_PATH=$VCPKG_INSTALLED_PATH" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$VCPKG_INSTALLED_PATH/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+          echo "CMAKE_PREFIX_PATH set to $VCPKG_INSTALLED_PATH"
+          echo "LD_LIBRARY_PATH will be extended with $VCPKG_INSTALLED_PATH/lib"
+
+      - name: Install Python build dependencies (Linux)
+        run: |
+          python -m pip install --upgrade pip
+          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build
+
+      - name: Build Python Wheels (Linux)
+        run: |
+          echo "Building with CMAKE_PREFIX_PATH = $CMAKE_PREFIX_PATH"
+          echo "Current LD_LIBRARY_PATH for build = $LD_LIBRARY_PATH"
+          python -m build --wheel --no-isolation
+
+      - name: List generated wheels
+        run: ls -l dist/
+
+      - name: Upload Python Wheel Artifact (Linux)
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-wheels-linux-x64-${{ matrix.PYVERSION }}
+          path: dist/*.whl 
+          if-no-files-found: error  
+  # Job per costruire le wheel su macOS (x64 - Intel Runner)
+  macos-x64-build:
+    name: Build macOS (x64) Python ${{ matrix.PYVERSION }}
+    runs-on: macos-13 # Intel runner
+    env:
+      PYVERSION: ${{ matrix.PYVERSION }}
+      TARGET_ARCH: "x64"
+      VCPKG_DEFAULT_TRIPLET: "x64-osx"
+    strategy:
+      fail-fast: false
+      matrix:
+        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python ${{ matrix.PYVERSION }} (x64)
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.PYVERSION }}
+          architecture: 'x64'
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Run C/C++ code vendoring script
+        run: python synthizer-c/vendor.py synthizer-vendored
+
+      - name: Cache Pip (macOS x64)
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/pip
+          key: ${{ runner.os }}-${{ env.TARGET_ARCH }}-pip-${{ env.PYVERSION }}-${{ hashFiles('**/requirements.txt', '**/setup.py', 'vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.TARGET_ARCH }}-pip-${{ env.PYVERSION }}-
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgTriplet: ${{ env.VCPKG_DEFAULT_TRIPLET }}
+
+      - name: Install dependencies using vcpkg (macOS x64)
+        run: |
+          echo "VCPKG_ROOT is $VCPKG_ROOT"
+          $VCPKG_ROOT/vcpkg install --triplet $VCPKG_DEFAULT_TRIPLET
+          VCPKG_INSTALLED_PATH="$VCPKG_ROOT/installed/$VCPKG_DEFAULT_TRIPLET"
+          echo "CMAKE_PREFIX_PATH=$VCPKG_INSTALLED_PATH" >> $GITHUB_ENV
+          echo "DYLD_LIBRARY_PATH=$VCPKG_INSTALLED_PATH/lib:\$DYLD_LIBRARY_PATH" >> $GITHUB_ENV # For delocate to find libs
+          echo "CMAKE_PREFIX_PATH set to $VCPKG_INSTALLED_PATH"
+          echo "DYLD_LIBRARY_PATH extended with $VCPKG_INSTALLED_PATH/lib"
+
+
+      - name: Install Python build dependencies (macOS)
+        run: |
+          python -m pip install --upgrade pip
+          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build delocate
+
+      - name: Build Python Wheels (macOS x64)
+        run: |
+          echo "Building with CMAKE_PREFIX_PATH = $CMAKE_PREFIX_PATH"
+          python -m build --wheel --no-isolation
+
+      - name: Repair Wheel with Delocate (macOS x64)
+        run: |
+          for wheel in dist/*.whl; do
+            delocate-wheel -w dist/ "$wheel" # delocate will place repaired wheel in dist/
+          done
+          # ls dist/
+
+      - name: Upload Python Wheel Artifact (macOS x64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-wheels-macos-x64-${{ matrix.PYVERSION }}
+          path: dist/*.whl # Upload all wheels, delocate might overwrite
+
+  # Job per costruire le wheel su macOS (ARM64 - ARM Runner)
+  macos-arm64-build:
+    name: Build macOS (arm64) Python ${{ matrix.PYVERSION }}
+    runs-on: macos-latest # Should pick an ARM runner like macos-14
+    env:
+      PYVERSION: ${{ matrix.PYVERSION }}
+      TARGET_ARCH: "arm64"
+      VCPKG_DEFAULT_TRIPLET: "arm64-osx"
+    strategy:
+      fail-fast: false
+      matrix:
+        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python ${{ matrix.PYVERSION }} (arm64)
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.PYVERSION }}
+          architecture: 'arm64'
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Run C/C++ code vendoring script
+        run: python synthizer-c/vendor.py synthizer-vendored
+
+      - name: Cache Pip (macOS arm64)
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/pip
+          key: ${{ runner.os }}-${{ env.TARGET_ARCH }}-pip-${{ env.PYVERSION }}-${{ hashFiles('**/requirements.txt', '**/setup.py', 'vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.TARGET_ARCH }}-pip-${{ env.PYVERSION }}-
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgTriplet: ${{ env.VCPKG_DEFAULT_TRIPLET }}
+
+      - name: Install dependencies using vcpkg (macOS arm64)
+        run: |
+          echo "VCPKG_ROOT is $VCPKG_ROOT"
+          $VCPKG_ROOT/vcpkg install --triplet $VCPKG_DEFAULT_TRIPLET
+          VCPKG_INSTALLED_PATH="$VCPKG_ROOT/installed/$VCPKG_DEFAULT_TRIPLET"
+          echo "CMAKE_PREFIX_PATH=$VCPKG_INSTALLED_PATH" >> $GITHUB_ENV
+          echo "DYLD_LIBRARY_PATH=$VCPKG_INSTALLED_PATH/lib:\$DYLD_LIBRARY_PATH" >> $GITHUB_ENV # For delocate to find libs
+          echo "CMAKE_PREFIX_PATH set to $VCPKG_INSTALLED_PATH"
+          echo "DYLD_LIBRARY_PATH extended with $VCPKG_INSTALLED_PATH/lib"
+
+      - name: Install Python build dependencies (macOS)
+        run: |
+          python -m pip install --upgrade pip
+          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build delocate
+
+      - name: Build Python Wheels (macOS arm64)
+        run: |
+          echo "Building with CMAKE_PREFIX_PATH = $CMAKE_PREFIX_PATH"
+          python -m build --wheel --no-isolation
+
+      - name: Repair Wheel with Delocate (macOS arm64)
+        run: |
+          for wheel in dist/*.whl; do
+            delocate-wheel -w dist/ "$wheel"
+          done
+          # ls dist/
+
+      - name: Upload Python Wheel Artifact (macOS arm64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-wheels-macos-arm64-${{ matrix.PYVERSION }}
+          path: dist/*.whl
+
+  # Job per creare la sdist (source distribution)
+  sdist-build:
     name: Build Python sdist
     runs-on: ubuntu-latest
     steps:
@@ -273,12 +466,18 @@ jobs:
         with:
           python-version: '3.9'
 
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
       - name: Run C/C++ code vendoring script
         run: python synthizer-c/vendor.py synthizer-vendored
 
       - name: Install Python build dependencies (sdist)
         run: |
-          python -m pip install --upgrade pip build
+          python -m pip install --upgrade pip
+          # For sdist, cmake/ninja might not be strictly needed if setup.py/pyproject.toml handles it,
+          # but build tools like 'build' are.
+          pip install wheel tomli setuptools packaging distro scikit-build cython build
 
       - name: Build Python sdist
         run: python -m build --sdist
@@ -289,34 +488,50 @@ jobs:
           name: python-sdist
           path: dist/*.tar.gz
 
+  # Job per il deployment su PyPI
   deploy_pypi:
     name: Deploy to PyPI
     if: startsWith(github.ref, 'refs/tags')
-    needs: [build_wheels, build_sdist]
+    needs: [windows-build, linux-build, macos-x64-build, macos-arm64-build, sdist-build]
     runs-on: ubuntu-latest
-    environment: pypi
     permissions:
-      id-token: write # Necessario per il trusted publishing di PyPI
+      contents: read
+      id-token: write # Required for trusted publishing
     steps:
       - name: Download all build artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ~/artifacts # Scarica tutti gli artefatti in questa directory
+          path: ~/artifacts
+          # pattern: python-wheels-* # Optional: if you need to be specific, otherwise downloads all
+          # merge-multiple: true # If artifacts have same names from different jobs (not the case here)
 
       - name: Set up Python for Twine
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
+      - name: Upgrade pip for Twine step
+        run: python -m pip install --upgrade pip
+
       - name: Install Twine
-        run: python -m pip install --upgrade pip twine
+        run: python -m pip install --upgrade twine
 
       - name: Display downloaded artifacts structure
         run: ls -R ~/artifacts
-      
-      - name: Upload to PyPI
+
+      - name: Remove Linux x64 wheels from artifacts
         run: |
-          echo "Listing all wheel and sdist files to be uploaded:"
-          find ~/artifacts -name '*.whl' -print -exec echo \;
-          find ~/artifacts -name '*.tar.gz' -print -exec echo \;
-          python -m twine upload --skip-existing --verbose $(find ~/artifacts -name '*.whl' -o -name '*.tar.gz')
+          find ~/artifacts -type f -name '*linux_x86_64.whl' -delete
+          echo "Removed Linux x64 wheels (linux_x86_64):"
+          find ~/artifacts -type f -name '*linux_x86_64.whl' || echo "None left"
+
+      - name: Upload to PyPI
+        env:
+          # For trusted publishing, TWINE_USERNAME and TWINE_PASSWORD are not set directly.
+          # PyPI should be configured as a trusted publisher in your GitHub Actions settings.
+          # If not using trusted publishing, uncomment and use secrets:
+          # TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+          # TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+          TWINE_REPOSITORY_URL: https://upload.pypi.org/legacy/ # Or your TestPyPI URL
+        run: |
+          python -m twine upload --skip-existing ~/artifacts/*/*

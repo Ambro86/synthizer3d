@@ -52,18 +52,12 @@ jobs:
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
-        # L'input 'vcpkgTriplet' è stato rimosso perché non valido per questa action.
-        # L'action utilizza VCPKG_DEFAULT_TRIPLET dall'ambiente se necessario,
-        # e imposta VCPKG_ROOT e aggiunge vcpkg al PATH.
 
       - name: Install dependencies using vcpkg (Windows)
         shell: pwsh
         run: |
           Write-Host "VCPKG_ROOT is $env:VCPKG_ROOT"
           Write-Host "VCPKG_DEFAULT_TRIPLET is $env:VCPKG_DEFAULT_TRIPLET"
-          # vcpkg.exe è nel PATH grazie allo step precedente 'Setup vcpkg'
-          # VCPKG_DEFAULT_TRIPLET è una variabile d'ambiente che vcpkg.exe rispetta.
-          # Specificare --triplet esplicitamente è più sicuro.
           vcpkg.exe install --triplet $env:VCPKG_DEFAULT_TRIPLET
           $vcpkgInstalledPath = "$env:VCPKG_ROOT/installed/$env:VCPKG_DEFAULT_TRIPLET"
           echo "CMAKE_PREFIX_PATH=$vcpkgInstalledPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
@@ -76,6 +70,8 @@ jobs:
 
       - name: Build Python Wheels (Windows ${{ matrix.CI_ARCH }})
         shell: powershell
+        env: # Assicura che CMAKE_PREFIX_PATH sia disponibile qui se python -m build lo necessita
+          CMAKE_PREFIX_PATH: ${{ env.CMAKE_PREFIX_PATH }}
         run: |
           Set-Location $Env:GITHUB_WORKSPACE
           Write-Host "Building with CMAKE_PREFIX_PATH = $env:CMAKE_PREFIX_PATH"
@@ -89,21 +85,27 @@ jobs:
             Write-Error "No wheel file found in dist/"
             exit 1
           }
-          $wheelPath = $wheelFile.FullName
-          Write-Host "Modifying wheel: $wheelPath"
+          $originalWheelPath = $wheelFile.FullName
+          Write-Host "Modifying wheel: $originalWheelPath"
 
-          # Assumendo che VCPKG_ROOT sia impostato correttamente dallo step precedente
+          # Crea un percorso temporaneo per il file .zip
+          $tempZipPath = Join-Path $wheelFile.DirectoryName ($wheelFile.BaseName + ".zip")
+
+          # Copia .whl in .zip per Expand-Archive
+          Write-Host "Copying $originalWheelPath to $tempZipPath for extraction."
+          Copy-Item -Path $originalWheelPath -Destination $tempZipPath -Force
+          
           $vcpkgTripletBinDir = "$env:VCPKG_ROOT/installed/$env:VCPKG_DEFAULT_TRIPLET/bin"
           Write-Host "Source directory for DLLs: $vcpkgTripletBinDir"
 
-          $tempDir = ".\temp_wheel_extracted"
-          Remove-Item -Path $tempDir -Recurse -Force -ErrorAction SilentlyContinue
-          New-Item -ItemType Directory -Path $tempDir
+          $tempExtractDir = ".\temp_wheel_extracted"
+          Remove-Item -Path $tempExtractDir -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path $tempExtractDir
 
-          Write-Host "Extracting $wheelPath to $tempDir"
-          Expand-Archive -LiteralPath $wheelPath -DestinationPath $tempDir -Force
+          Write-Host "Extracting $tempZipPath to $tempExtractDir"
+          Expand-Archive -LiteralPath $tempZipPath -DestinationPath $tempExtractDir -Force
 
-          $targetDirInWheel = Join-Path $tempDir "synthizer"
+          $targetDirInWheel = Join-Path $tempExtractDir "synthizer" # Il nome del tuo package
           if (-not (Test-Path $targetDirInWheel)) {
             Write-Host "Target package directory $targetDirInWheel does not exist in wheel, creating it."
             New-Item -ItemType Directory -Path $targetDirInWheel -Force
@@ -119,11 +121,14 @@ jobs:
             Write-Warning "$vcpkgTripletBinDir not found. No DLLs will be copied."
           }
 
-          Write-Host "Re-packaging wheel from $tempDir to $wheelPath"
-          Compress-Archive -Path "$tempDir\*" -DestinationPath $wheelPath -Force
+          Write-Host "Re-packaging wheel from $tempExtractDir to $originalWheelPath"
+          # Comprimi il contenuto della directory estratta e sovrascrivi il file .whl originale
+          Compress-Archive -Path "$tempExtractDir\*" -DestinationPath $originalWheelPath -Force
 
-          Remove-Item -Path $tempDir -Recurse -Force
-          Write-Host "Windows wheel modification complete for $wheelPath"
+          # Pulisci i file temporanei
+          Remove-Item -Path $tempExtractDir -Recurse -Force
+          Remove-Item -Path $tempZipPath -Force
+          Write-Host "Windows wheel modification complete for $originalWheelPath"
 
       - name: Upload Python Wheel Artifact (Windows ${{ matrix.CI_ARCH }})
         uses: actions/upload-artifact@v4

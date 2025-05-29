@@ -1,6 +1,5 @@
 // File: aac.cpp
 
-// 1. Header di Synthizer (C++)
 #include "synthizer/decoders/aac.hpp"
 #include "synthizer/byte_stream.hpp"
 #include "synthizer/config.hpp"
@@ -8,14 +7,12 @@
 #include "synthizer/error.hpp"
 #include "synthizer/logging.hpp"
 
-// 2. Header Standard C++
 #include <vector>
 #include <string>
 #include <cstring>
 #include <algorithm>
 #include <memory>
 
-// 3. Header C (FAAD2)
 extern "C" {
 #include <neaacdec.h>
 }
@@ -32,7 +29,6 @@ namespace synthizer {
 namespace aac_detail {
 
 static constexpr unsigned int INTERNAL_DECODER_CHANNELS_REQUEST_MAX = 32;
-// --- CORREZIONE: buffer più grande
 static constexpr unsigned int AAC_INPUT_BUFFER_CAPACITY = 32768;
 
 class AacDecoder : public AudioDecoder {
@@ -131,11 +127,11 @@ public:
         unsigned long long frames_written_total = 0;
         NeAACDecFrameInfo frame_info;
 
-        // --- CORREZIONE: inizializza a zero l'output prima di scrivere
+        // Inizializza a zero l'output
         std::fill(output_samples, output_samples + num_frames_to_write * ch_out, 0.0f);
 
         while (frames_written_total < num_frames_to_write) {
-            // --- CORREZIONE: decodifica solo se hai abbastanza dati (eccetto a fine stream)
+            // Decodifica solo se hai abbastanza dati (eccetto a fine stream)
             const unsigned long MIN_DECODE_CHUNK = 2048;
             if (current_valid_bytes_in_buffer < MIN_DECODE_CHUNK && !stream_at_eos) {
                 unsigned long bytes_to_read_target = AAC_INPUT_BUFFER_CAPACITY - current_valid_bytes_in_buffer;
@@ -151,7 +147,6 @@ public:
                 }
             }
 
-            // --- CORREZIONE: non decodificare se non hai almeno MIN_DECODE_CHUNK, eccetto a fine stream
             if (current_valid_bytes_in_buffer < MIN_DECODE_CHUNK && !stream_at_eos) {
                 break;
             }
@@ -162,28 +157,37 @@ public:
 
             current_frame_data = NeAACDecDecode(decoder_handle, &frame_info, internal_input_buffer.data(), current_valid_bytes_in_buffer);
 
-            // --- DEBUG: log dettagliato
             logDebug("FAAD2: decoded frame: samples=%lu, bytesconsumed=%lu, error=%d, eos=%d",
                      frame_info.samples, frame_info.bytesconsumed, frame_info.error, stream_at_eos);
 
             bool processed_consumed_bytes_this_iteration = false;
+
+            // 1. Gestione errori: non fare break ma continua
             if (frame_info.error > 0) {
                 logDebug("Errore decodifica FAAD2: %s (consumati: %lu, campioni: %lu)",
                          NeAACDecGetErrorMessage(frame_info.error), frame_info.bytesconsumed, frame_info.samples);
+                // Gestione buffer come prima
                 if (frame_info.bytesconsumed > 0 && frame_info.bytesconsumed <= current_valid_bytes_in_buffer) {
                     std::memmove(internal_input_buffer.data(),
                                  internal_input_buffer.data() + frame_info.bytesconsumed,
                                  current_valid_bytes_in_buffer - frame_info.bytesconsumed);
                     current_valid_bytes_in_buffer -= frame_info.bytesconsumed;
-                } else if (frame_info.bytesconsumed > current_valid_bytes_in_buffer) {
-                    current_valid_bytes_in_buffer = 0;
                 } else {
                     current_valid_bytes_in_buffer = 0;
                 }
                 processed_consumed_bytes_this_iteration = true;
-                break;
+
+                // Scrivi un frame di zeri nell'output (o più se vuoi gestire meglio la discontinuità)
+                if (frames_written_total < num_frames_to_write) {
+                    for (unsigned int c = 0; c < ch_out; ++c) {
+                        output_samples[frames_written_total * ch_out + c] = 0.0f;
+                    }
+                    frames_written_total += 1;
+                }
+                continue; // NON break, vai avanti!
             }
 
+            // 2. Frame vuoto/null: avanza l'output di un frame di zeri
             if (current_frame_data == nullptr || frame_info.samples == 0) {
                 if (frame_info.bytesconsumed > 0 && frame_info.bytesconsumed <= current_valid_bytes_in_buffer) {
                     std::memmove(internal_input_buffer.data(),
@@ -201,10 +205,20 @@ public:
                     }
                 }
                 processed_consumed_bytes_this_iteration = true;
+
+                // Scrivi un frame di zeri nell'output
+                if (frames_written_total < num_frames_to_write) {
+                    for (unsigned int c = 0; c < ch_out; ++c) {
+                        output_samples[frames_written_total * ch_out + c] = 0.0f;
+                    }
+                    frames_written_total += 1;
+                }
+
                 if (stream_at_eos && current_valid_bytes_in_buffer == 0) break;
-                if (frame_info.samples == 0) continue;
+                continue;
             }
 
+            // 3. Scrivi i campioni decodificati
             if (frame_info.samples > 0 && current_frame_data != nullptr) {
                 unsigned long long frames_in_this_faad_output = frame_info.samples / frame_info.channels;
                 unsigned int channels_in_faad_output = frame_info.channels;
@@ -219,7 +233,7 @@ public:
                         }
                         input_ptr++;
                     }
-                    // --- CORREZIONE: azzera eventuali canali extra
+                    // azzera eventuali canali extra
                     for (unsigned int c_fill = channels_in_faad_output; c_fill < ch_out; ++c_fill) {
                         output_samples[(frames_written_total + f) * ch_out + c_fill] = 0.0f;
                     }
@@ -243,8 +257,6 @@ public:
                 }
             }
         }
-
-        // --- CORREZIONE: (non serve più fare zero-fill qui, già fatto all'inizio)
         return frames_written_total;
     }
 

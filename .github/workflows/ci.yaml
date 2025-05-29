@@ -5,7 +5,6 @@
 on:
   push: {} # Si attiva su push a qualsiasi branch
   pull_request: {} # Si attiva su pull request verso qualsiasi branch
-
 jobs:
   # Job per costruire le wheel su Windows
   windows-build:

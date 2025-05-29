@@ -1,3 +1,0 @@
-C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/pdqsort-subbuild/CMakeFiles/pdqsort-populate.dir
-C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/pdqsort-subbuild/CMakeFiles/edit_cache.dir
-C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/pdqsort-subbuild/CMakeFiles/rebuild_cache.dir

@@ -38,9 +38,9 @@ pip install synthizer3d
 
 **Or, to install directly from this repository for development/testing:**
 
-1. Clone the repository with submodules:
+1. Clone the repository:
     ```sh
-    git clone --recursive https://github.com/Ambro86/synthizer3d
+    git clone https://github.com/Ambro86/synthizer3d
     ```
 
 2. From the project root, run:
@@ -48,13 +48,29 @@ pip install synthizer3d
     python synthizer-c/vendor.py synthizer-vendored
     ```
 
-3. Then install with:
+3. Install the additional libraries needed to compile the project:
+    ```sh
+    python.exe -m pip install --upgrade pip
+    pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython
+    ```
+
+4. After that, make sure you have installed additional packages with VCPKG:
+    ```sh
+    vcpkg install
+    ```
+
+5. Make sure that the CMAKE_PREFIX_PATH variable is set correctly, for example for Windows 64bit Writing:
+    ```sh
+    set CMAKE_PREFIX_PATH=%CD%\vcpkg_installed\x64-windows
+    ```
+
+6. Then install with:
     ```sh
     python setup.py install
     ```
     Or build a wheel:
     ```sh
-    python setup.py bdist_wheel
+    python -m build --wheel
     ```
 
 ---

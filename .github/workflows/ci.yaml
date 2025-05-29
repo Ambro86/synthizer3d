@@ -112,7 +112,7 @@ jobs:
       - name: Install Python build dependencies (Windows)
         run: |
           python -m pip install --upgrade pip
-          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build
+          pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build delvewheel
 
       - name: Build Python Wheels (Windows ${{ matrix.CI_ARCH }})
         shell: powershell
@@ -156,91 +156,25 @@ jobs:
           }
         continue-on-error: true
 
-      - name: Add vcpkg libraries to Wheel (Windows ${{ matrix.CI_ARCH }})
+      - name: Repair Wheel with Delvewheel (Windows ${{ matrix.CI_ARCH }})
         shell: powershell
         run: |
-          $wheelFile = Get-ChildItem -Path dist/*.whl | Select-Object -First 1
-          if (-not $wheelFile) {
-            Write-Error "No wheel file found in dist/"
-            exit 1
-          }
-          $originalWheelPath = $wheelFile.FullName
-          Write-Host "Modifying wheel: $originalWheelPath"
-
-          $tempZipPathForExtraction = Join-Path $wheelFile.DirectoryName ($wheelFile.BaseName + "_temp_for_extraction.zip")
-          Write-Host "Copying $originalWheelPath to $tempZipPathForExtraction for extraction."
-          Copy-Item -Path $originalWheelPath -Destination $tempZipPathForExtraction -Force
+          $vcpkgInstalledBinDir = Join-Path $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE $env:VCPKG_DEFAULT_TRIPLET "bin"
+          $vcpkgInstalledLibDir = Join-Path $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE $env:VCPKG_DEFAULT_TRIPLET "lib"
           
-          $vcpkgInstalledTripletDir = Join-Path $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE $env:VCPKG_DEFAULT_TRIPLET
-          
-          $vcpkgDllSourceDirInBin = Join-Path $vcpkgInstalledTripletDir "bin"
-          $vcpkgDllSourceDirInLib = Join-Path $vcpkgInstalledTripletDir "lib"  
-          $vcpkgDllSourceDir = $null
+          Write-Host "Path vcpkg (bin) che sarà aggiunto a delvewheel: $vcpkgInstalledBinDir"
+          Write-Host "Path vcpkg (lib) che sarà aggiunto a delvewheel: $vcpkgInstalledLibDir"
 
-          Write-Host "Looking for DLLs in $vcpkgDllSourceDirInBin and then $vcpkgDllSourceDirInLib"
-
-          if (Test-Path $vcpkgDllSourceDirInBin -PathType Container) {
-              if ((Get-ChildItem -Path $vcpkgDllSourceDirInBin -Filter *.dll -File -ErrorAction SilentlyContinue).Count -gt 0) {
-                  $vcpkgDllSourceDir = $vcpkgDllSourceDirInBin
-                  Write-Host "Using DLLs from BIN directory: $vcpkgDllSourceDir"
-              } else {
-                  Write-Warning "$vcpkgDllSourceDirInBin found but is empty of DLLs or DLLs not accessible."
-              }
-          } else {
-              Write-Warning "$vcpkgDllSourceDirInBin not found."
+          foreach ($wheel in (Get-ChildItem -Path dist/*.whl)) {
+            Write-Host "Repairing wheel: $($wheel.FullName)"
+            # Aggiungi i percorsi delle DLL di vcpkg a delvewheel.
+            # Delvewheel cercherà le dipendenze in queste directory.
+            # Potrebbe essere necessario solo -add-path per la directory bin, o entrambe.
+            # Il flag -w sovrascrive la wheel originale con quella riparata nella stessa directory (dist/)
+            delvewheel repair --add-path "$vcpkgInstalledBinDir;$vcpkgInstalledLibDir" -w "$($wheel.DirectoryName)" "$($wheel.FullName)"
           }
-
-          if ($null -eq $vcpkgDllSourceDir) { 
-              Write-Warning "DLLs not found in BIN directory. Checking LIB directory for DLLs as fallback..."
-              if (Test-Path $vcpkgDllSourceDirInLib -PathType Container) {
-                  if ((Get-ChildItem -Path $vcpkgDllSourceDirInLib -Filter *.dll -File -ErrorAction SilentlyContinue).Count -gt 0) {
-                      $vcpkgDllSourceDir = $vcpkgDllSourceDirInLib
-                      Write-Host "Using DLLs from LIB directory: $vcpkgDllSourceDir"
-                  } else {
-                      Write-Warning "$vcpkgDllSourceDirInLib found but is empty of DLLs or DLLs not accessible."
-                  }
-              } else {
-                  Write-Warning "$vcpkgDllSourceDirInLib not found."
-              }
-          }
-          
-          if ($null -eq $vcpkgDllSourceDir) {
-            Write-Warning "No suitable vcpkg DLL source directory found. No DLLs will be copied into the wheel."
-          }
-
-          $tempExtractDir = ".\temp_wheel_extracted"
-          Remove-Item -Path $tempExtractDir -Recurse -Force -ErrorAction SilentlyContinue
-          New-Item -ItemType Directory -Path $tempExtractDir
-
-          Write-Host "Extracting $tempZipPathForExtraction to $tempExtractDir"
-          Expand-Archive -LiteralPath $tempZipPathForExtraction -DestinationPath $tempExtractDir -Force
-
-          $targetDirInWheel = Join-Path $tempExtractDir "synthizer" 
-          if (-not (Test-Path $targetDirInWheel -PathType Container)) {
-            Write-Host "Target package directory $targetDirInWheel does not exist in wheel, creating it."
-            New-Item -ItemType Directory -Path $targetDirInWheel -Force
-          }
-
-          if ($null -ne $vcpkgDllSourceDir) {
-            Write-Host "Copying DLLs from $vcpkgDllSourceDir to $targetDirInWheel"
-            Get-ChildItem -Path $vcpkgDllSourceDir -Filter *.dll -File | ForEach-Object {
-                Copy-Item -Path $_.FullName -Destination $targetDirInWheel -Force
-                Write-Host "Copied $($_.Name) to $targetDirInWheel"
-            }
-          }
-
-          $repackagedZipPath = Join-Path $wheelFile.DirectoryName ($wheelFile.BaseName + "_repackaged.zip")
-          If (Test-Path $repackagedZipPath) { Remove-Item $repackagedZipPath -Force }
-
-          Write-Host "Re-packaging wheel contents from $tempExtractDir to $repackagedZipPath"
-          Compress-Archive -Path "$tempExtractDir\*" -DestinationPath $repackagedZipPath -Force
-          
-          Write-Host "Moving $repackagedZipPath to $originalWheelPath"
-          Move-Item -Path $repackagedZipPath -Destination $originalWheelPath -Force
-
-          Remove-Item -Path $tempExtractDir -Recurse -Force -ErrorAction SilentlyContinue
-          Remove-Item -Path $tempZipPathForExtraction -Force -ErrorAction SilentlyContinue
-          Write-Host "Windows wheel modification complete for $originalWheelPath"
+          Write-Host "Listing repaired wheels in dist/:"
+          Get-ChildItem -Path dist/*.whl | ForEach-Object { Write-Host $_.Name }
 
       - name: Upload Python Wheel Artifact (Windows ${{ matrix.CI_ARCH }})
         uses: actions/upload-artifact@v4

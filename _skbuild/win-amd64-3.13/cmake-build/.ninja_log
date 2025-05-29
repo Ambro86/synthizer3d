@@ -1,0 +1,27 @@
+# ninja log v5
+50	761	7702533148031822	CMakeFiles/synthizer.dir/src/error.cpp.obj	2d6b687e45f8fc60
+74	773	7702533148206563	CMakeFiles/synthizer.dir/src/logging.cpp.obj	e9f8b54f90f87efd
+89	1336	7702533153072325	CMakeFiles/synthizer.dir/src/property_internals.cpp.obj	de433eb60cd5d1c2
+765	1345	7702533153092261	CMakeFiles/synthizer.dir/src/data/arrays.cpp.obj	10c87a7d7a5405c4
+108	1355	7702533153157352	CMakeFiles/synthizer.dir/src/shared_object.cpp.obj	e6df3986a8263c45
+43	1445	7702533154216456	CMakeFiles/synthizer.dir/src/decoding.cpp.obj	b9b8126f193b5acd
+779	1531	7702533154780578	CMakeFiles/synthizer.dir/src/data/hrtf.cpp.obj	46764c8d0e89ab49
+68	1612	7702533155909601	CMakeFiles/synthizer.dir/src/generator.cpp.obj	8dabd98ac9ef561d
+79	1625	7702533156259329	CMakeFiles/synthizer.dir/src/memory.cpp.obj	a1c06a11a6055f15
+84	2080	7702533161235409	CMakeFiles/synthizer.dir/src/pausable.cpp.obj	d8fdd3a2189dc1bf
+22	2159	7702533162049681	CMakeFiles/synthizer.dir/src/byte_stream.cpp.obj	aab5eef9454626b2
+62	2368	7702533161674786	CMakeFiles/synthizer.dir/src/events.cpp.obj	85addd456db91a7a
+10	2373	7702533163952611	CMakeFiles/synthizer.dir/src/audio_output.cpp.obj	5cf10f7e2de3ab07
+16	2511	7702533165251317	CMakeFiles/synthizer.dir/src/base_object.cpp.obj	b718a06f9b1aa0a2
+97	2560	7702533165805803	CMakeFiles/synthizer.dir/src/routable.cpp.obj	86e75db0f847d8bf
+1627	2572	7702533166185759	_deps/wdl-build/CMakeFiles/wdl_objlib.dir/WDL/resample.cpp.obj	de3ea6c8920f112
+1360	2602	7702533166420485	CMakeFiles/synthizer.dir/src/streams/memory_stream.cpp.obj	67a720dff27d4e02
+54	2627	7702533166690106	CMakeFiles/synthizer.dir/src/event_timeline.cpp.obj	6ae24e2930e3aa84
+1539	2756	7702533168005730	CMakeFiles/synthizer.dir/include/synthizer/decoders/opus.cpp.obj	43b9b673a52ebeb8
+1447	2810	7702533168600049	CMakeFiles/synthizer.dir/include/synthizer/decoders/ogg.cpp.obj	200a41e1db864192
+1339	2945	7702533169919298	CMakeFiles/synthizer.dir/src/streams/custom_stream.cpp.obj	805456ad134afdbe
+1348	3244	7702533172939494	CMakeFiles/synthizer.dir/src/streams/file.cpp.obj	420fd68732a2ea47
+5	4226	7702533182689895	CMakeFiles/synthizer_single_file_libs.dir/src/single_file_libs.c.obj	f56d5ea503f2d146
+103	4451	7702533184991437	CMakeFiles/synthizer.dir/src/router.cpp.obj	b85c24b2e3292698
+36	5371	7702533194195139	CMakeFiles/synthizer.dir/src/context.cpp.obj	4547f23ba05e830
+27	8060	7702533221049501	CMakeFiles/synthizer.dir/src/c_api/unity.cpp.obj	6a80508bf460a1fe

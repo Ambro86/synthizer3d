@@ -112,6 +112,8 @@ add_library(synthizer ${SYNTHIZER_LIB_TYPE}
   src/streams/memory_stream.cpp
   include/synthizer/decoders/ogg.cpp
   include/synthizer/decoders/opus.cpp
+  include/synthizer/decoders/aac.cpp
+  
   $<TARGET_OBJECTS:wdl_objlib>
   $<TARGET_OBJECTS:synthizer_single_file_libs>
 )

@@ -1,0 +1,14 @@
+# Target labels
+ miniaudio-populate
+# Source files and their labels
+C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/CMakeFiles/miniaudio-populate
+C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/CMakeFiles/miniaudio-populate.rule
+C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/CMakeFiles/miniaudio-populate-complete.rule
+C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-build.rule
+C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-configure.rule
+C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-download.rule
+C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-install.rule
+C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-mkdir.rule
+C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-patch.rule
+C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-test.rule
+C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-update.rule

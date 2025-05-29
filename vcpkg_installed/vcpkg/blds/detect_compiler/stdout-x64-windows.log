@@ -12,8 +12,8 @@
 #COMPILER_CXX_VERSION#19.44.35207.1
 #COMPILER_CXX_ID#MSVC
 #COMPILER_CXX_PATH#C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe
--- Configuring done (0.8s)
--- Generating done (0.0s)
+-- Configuring done (3.7s)
+-- Generating done (0.1s)
 CMake Warning:
   Manually-specified variables were not used by the project:
 

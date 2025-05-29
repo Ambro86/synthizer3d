@@ -131,7 +131,7 @@ set(SYZ_LIBRARIES
   Ogg::ogg
   Opus::opus
   OpusFile::opusfile
-  faad2
+  faad
 )
 if(WIN32)
   list(APPEND SYZ_LIBRARIES
@@ -140,10 +140,9 @@ if(WIN32)
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/vorbisfile.lib"
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/opus.lib"
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/opusfile.lib"
-    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/vorbisenc.lib"
-    
-  "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/faad.lib"
-  "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/faad_drm.lib"
+    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/vorbisenc.lib"    
+    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/faad.lib"
+
   
   )  
 endif()

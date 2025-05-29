@@ -1,46 +1,60 @@
-#include "synthizer/decoders/aac.hpp" // Assuming this will be the path
+// File: aac.cpp - Riscritto manualmente
 
-#include "synthizer/channel_mixing.hpp" // For potential future use with channel mapping
-#include "synthizer/config.hpp"         // For potential config values
+#include "synthizer/decoders/aac.hpp" 
+#include "synthizer/byte_stream.hpp"
+#include "synthizer/config.hpp"
+#include "synthizer/decoding.hpp"
+#include "synthizer/error.hpp"
 #include "synthizer/logging.hpp"
 
+#include <vector>       // Standard C++
+#include <string>       // Standard C++
+#include <cstring>      // Standard C++
+#include <algorithm>    // Standard C++
+
 extern "C" {
-#include <neaacdec.h>
+#include <neaacdec.h>   // FAAD2 Header
 }
 
-#include <vector>
-#include <cstring>   // For std::memcpy and std::memcmp
-#include <algorithm> // For std::min
-
-// Define a default buffer size for NeAACDecInit if not available in synthizer::config
-// This should be large enough for FAAD2 to parse initial headers.
-// FAAD2_MIN_STREAMSIZE for AAC-LC is 768 bytes. A few KB is safer.
 #ifndef SYNTHIZER_CONFIG_AAC_INIT_BUFFER_SIZE
 #define SYNTHIZER_CONFIG_AAC_INIT_BUFFER_SIZE 4096
 #endif
 
-// Minimum bytes we expect to successfully initialize FAAD2.
-// This is a heuristic; ADTS headers are small, but NeAACDecInit might need more context.
+// Byte minimi che ci aspettiamo di leggere per tentare un'inizializzazione valida di FAAD2.
+// È un'euristica; gli header ADTS sono piccoli, ma NeAACDecInit potrebbe aver bisogno di più contesto.
+#ifndef MIN_BYTES_FOR_AAC_INIT
 #define MIN_BYTES_FOR_AAC_INIT 64
+#endif
+
+// Se CHANNELS_MAX non è in config.hpp o constants.hpp, dovrai trovarlo o definirlo.
+// Per ora, se non è definito, usiamo un placeholder.
+#ifndef CHANNELS_MAX
+#define CHANNELS_MAX 8 // Placeholder ragionevole, ma usa quello di Synthizer se possibile!
+#endif
+
 
 namespace synthizer {
 
 namespace aac_detail {
 
-// Callback for FAAD2 to read data from the ByteStream
-long faad_read_callback(void *user_data, void *buffer, unsigned long bytes) {
+// Callback per FAAD2 per leggere dati dal ByteStream
+long faad_read_callback(void *user_data, void *buffer, unsigned long bytes_to_read) {
     ByteStream *stream = static_cast<ByteStream *>(user_data);
     if (!stream) {
-        return -1; // Error condition
+        return -1; // Condizione di errore
     }
-    return static_cast<long>(stream->read(bytes, static_cast<char *>(buffer)));
+    // stream->read restituisce unsigned long long, la callback si aspetta long.
+    // Assicurati che la conversione sia sicura per i tuoi casi d'uso.
+    // Se bytes_to_read è molto grande, questo cast potrebbe troncare su sistemi a 32 bit per 'long'.
+    // Tuttavia, 'bytes_to_read' è unsigned long, quindi dovrebbe andare bene.
+    return static_cast<long>(stream->read(bytes_to_read, static_cast<char *>(buffer)));
 }
 
-// Callback for FAAD2 to seek within the ByteStream
+// Callback per FAAD2 per posizionarsi nel ByteStream
 long faad_seek_callback(void *user_data, unsigned long long offset, int whence) {
     ByteStream *stream = static_cast<ByteStream *>(user_data);
     if (!stream || !stream->supportsSeek()) {
-        return -1; // Error or not supported
+        return -1; // Errore o non supportato
     }
 
     long long stream_len = static_cast<long long>(stream->getLength());
@@ -54,25 +68,26 @@ long faad_seek_callback(void *user_data, unsigned long long offset, int whence) 
         target_pos = static_cast<long long>(stream->getPosition()) + static_cast<long long>(offset);
         break;
     case SEEK_END:
-        if (stream_len <= 0) return -1; // Cannot seek from end if length is unknown
-        target_pos = stream_len + static_cast<long long>(offset);
+        if (stream_len <= 0 && offset > 0) { // Non si può cercare relativo alla fine se la lunghezza è sconosciuta e l'offset è positivo
+             // se offset è 0 o negativo potrebbe avere senso in alcuni contesti, ma FAAD2 probabilmente non lo usa così
+            return -1;
+        }
+        target_pos = stream_len + static_cast<long long>(offset); // offset può essere negativo
         break;
     default:
-        return -1; // Invalid whence
+        return -1; // whence non valido
     }
-
+    
+    // Controlla se target_pos è valido.
+    // Se la lunghezza dello stream è nota, target_pos non deve superarla.
+    // target_pos non deve essere negativo.
     if (target_pos < 0 || (stream_len > 0 && target_pos > stream_len) ) {
-        // logDebug("AAC Seek: Target position %lld out of bounds (length %lld)", target_pos, stream_len);
-        // FAAD2 expects 0 on success, non-zero on error.
-        // Depending on how strict FAAD2 is, seeking past EOF might be an error or clamped.
-        // For safety, let's call it an error if target is clearly out of bounds.
-        // If length is unknown, we can only check for negative offset.
-        if (target_pos < 0) return -1;
-        if (stream_len > 0 && target_pos > stream_len) return -1;
+         // FAAD2 si aspetta 0 per successo, non-zero per errore.
+        return -1;
     }
     
     stream->seek(static_cast<unsigned long long>(target_pos));
-    return 0; // Success
+    return 0; // Successo
 }
 
 class AacDecoder : public AudioDecoder {
@@ -82,66 +97,73 @@ public:
         decoder_handle(nullptr),
         channels(0),
         sample_rate(0),
-        frame_count(0), // Raw AAC streams often don't have a total frame count in headers
+        frame_count(0), // I flussi AAC raw spesso non hanno un conteggio totale di frame negli header
         current_frame_data(nullptr) {
 
         decoder_handle = NeAACDecOpen();
         if (!decoder_handle) {
-            throw Error("Unable to open FAAD2 decoder: NeAACDecOpen() failed.");
+            throw Error("Impossibile aprire il decoder FAAD2: NeAACDecOpen() fallito.");
         }
 
-        // Configure FAAD2 to output float samples
+        // Configura FAAD2 per restituire campioni float
         NeAACDecConfigurationPtr config = NeAACDecGetCurrentConfiguration(decoder_handle);
         if (!config) {
             NeAACDecClose(decoder_handle);
             decoder_handle = nullptr;
-            throw Error("Failed to get FAAD2 configuration.");
+            throw Error("Fallimento nel recuperare la configurazione FAAD2.");
         }
         config->outputFormat = FAAD_FMT_FLOAT;
-        // Potentially set other configurations, e.g., defSampleRate if needed, though
-        // it should be determined from the stream.
-        // config->defSampleRate = 44100; // Example, not typically needed if stream has info
-        // config->dontUpSampleImplicitSBR = 1; // Example SBR handling
-        if (NeAACDecSetConfiguration(decoder_handle, config) == 0) {
+        // NB: NeAACDecSetConfiguration restituisce 1 per successo, 0 per fallimento.
+        if (NeAACDecSetConfiguration(decoder_handle, config) == 0) { // 0 indica fallimento
              NeAACDecClose(decoder_handle);
              decoder_handle = nullptr;
-             throw Error("Failed to set FAAD2 configuration (output format to float).");
+             throw Error("Fallimento nell'impostare la configurazione FAAD2 (formato output a float).");
         }
         
-        // Set up FAAD2 callbacks
-        NeAACDecCallbacks faad_callbacks;
-        std::memset(&faad_callbacks, 0, sizeof(faad_callbacks));
-        faad_callbacks.read_callback = faad_read_callback;
-        faad_callbacks.seek_callback = faad_seek_callback;
-        faad_callbacks.user_data = stream.get();
-        NeAACDecSetCallbacks(decoder_handle, &faad_callbacks);
+        // --- Logica di Inizializzazione Adattata per LookaheadByteStream ---
+        std::vector<unsigned char> init_buf_vector(SYNTHIZER_CONFIG_AAC_INIT_BUFFER_SIZE);
+        unsigned long long actual_bytes_read_for_init = 0;
 
-        // Initialize the decoder with the first chunk of data from the stream.
-        // NeAACDecInit requires a buffer with some stream data to parse headers.
-        unsigned char *init_buffer_ptr = nullptr;
-        long init_buffer_len = stream->lookahead(SYNTHIZER_CONFIG_AAC_INIT_BUFFER_SIZE, &init_buffer_ptr);
+        actual_bytes_read_for_init = stream->read(SYNTHIZER_CONFIG_AAC_INIT_BUFFER_SIZE, reinterpret_cast<char*>(init_buf_vector.data()));
 
-        if (init_buffer_len < MIN_BYTES_FOR_AAC_INIT) {
+        if (actual_bytes_read_for_init < MIN_BYTES_FOR_AAC_INIT) {
+            stream->reset(); 
             NeAACDecClose(decoder_handle);
             decoder_handle = nullptr;
-            // stream->reset(); // Not strictly needed if lookahead doesn't consume on failure to get enough bytes
-            throw Error("AAC stream too short to initialize decoder: got " + std::to_string(init_buffer_len) + " bytes.");
+            throw Error("Stream AAC troppo corto per inizializzare: letti solo " + std::to_string(actual_bytes_read_for_init) + " bytes.");
         }
 
-        unsigned long sr_long;
-        unsigned char ch_uchar;
-        // NeAACDecInit will read from init_buffer_ptr and return bytes consumed.
-        long bytes_consumed = NeAACDecInit(decoder_handle, init_buffer_ptr, init_buffer_len, &sr_long, &ch_uchar);
+        unsigned long sr_long = 0;
+        unsigned char ch_uchar = 0;
+        long bytes_consumed_by_init = NeAACDecInit(decoder_handle, init_buf_vector.data(), static_cast<unsigned long>(actual_bytes_read_for_init), &sr_long, &ch_uchar);
 
-        if (bytes_consumed < 0) { // Error during init
+        if (bytes_consumed_by_init < 0) {
+            stream->reset();
             NeAACDecClose(decoder_handle);
             decoder_handle = nullptr;
-            // stream->reset(); // Lookahead bytes not consumed yet.
-            throw Error("Failed to initialize AAC decoder: FAAD2 error code " + std::to_string(bytes_consumed));
+            throw Error("Fallimento inizializzazione decoder AAC (NeAACDecInit): FAAD2 error code " + std::to_string(bytes_consumed_by_init));
         }
-        
-        // Consume the bytes that NeAACDecInit used from the lookahead buffer.
-        stream->consumeLookedBytes(bytes_consumed);
+
+        stream->reset(); // Torna all'inizio dello stream
+
+        if (bytes_consumed_by_init > 0) {
+            std::vector<char> dummy_skip_buffer(bytes_consumed_by_init); // Deve essere grande quanto bytes_consumed_by_init
+            if (static_cast<unsigned long>(bytes_consumed_by_init) > dummy_skip_buffer.capacity()) {
+                 // Questo non dovrebbe succedere se il vector è creato con la dimensione corretta.
+                 // Ma per sicurezza, gestiamo il caso in cui bytes_consumed_by_init fosse enorme.
+                NeAACDecClose(decoder_handle);
+                decoder_handle = nullptr;
+                throw Error("Errore interno: bytes_consumed_by_init troppo grande per il buffer di skip.");
+            }
+            unsigned long long skipped_count = stream->read(static_cast<unsigned long long>(bytes_consumed_by_init), dummy_skip_buffer.data());
+            
+            if (skipped_count != static_cast<unsigned long long>(bytes_consumed_by_init)) {
+                NeAACDecClose(decoder_handle);
+                decoder_handle = nullptr;
+                throw Error("Errore stream AAC: fallito il salto dei byte dell'header consumati. Attesi " +
+                            std::to_string(bytes_consumed_by_init) + ", saltati " + std::to_string(skipped_count));
+            }
+        }
 
         this->sample_rate = static_cast<int>(sr_long);
         this->channels = static_cast<int>(ch_uchar);
@@ -149,17 +171,23 @@ public:
         if (this->sample_rate == 0 || this->channels == 0) {
             NeAACDecClose(decoder_handle);
             decoder_handle = nullptr;
-            throw Error("AAC stream parameters (sample rate/channels) invalid after init.");
+            throw Error("Parametri stream AAC (sample rate/channels) non validi dopo init.");
         }
 
-        // Try to estimate frame_count if stream length is known. This is a rough estimate.
-        // AAC frame size is typically 1024 samples (can vary with SBR, LD, etc.)
-        // This is very approximate for raw AAC.
-        if (stream->getLength() > 0 && this->sample_rate > 0 && this->channels > 0) {
-            // A very rough estimate assuming an average bitrate leading to ~1024 samples/frame
-            // This part is highly speculative for raw ADTS/ADIF without more info.
-            // For now, let's keep frame_count as 0, indicating unknown length.
-            this->frame_count = 0; 
+        // Imposta le callback di FAAD2 dopo che lo stream è posizionato correttamente
+        NeAACDecCallbacks faad_callbacks_struct;
+        std::memset(&faad_callbacks_struct, 0, sizeof(faad_callbacks_struct));
+        faad_callbacks_struct.read_callback = faad_read_callback;
+        faad_callbacks_struct.seek_callback = faad_seek_callback;
+        faad_callbacks_struct.user_data = stream.get(); // Passa il puntatore al ByteStream
+        NeAACDecSetCallbacks(decoder_handle, &faad_callbacks_struct);
+        // --- Fine Logica di Inizializzazione Adattata ---
+
+        // Stima di frame_count (opzionale, spesso 0 per AAC raw)
+        if (stream->supportsSeek() && stream->getLength() > 0 && this->sample_rate > 0 && this->channels > 0) {
+            // Potresti provare una stima MOLTO approssimativa qui se necessario,
+            // ma per AAC raw è difficile senza analizzare l'intero stream o avere metadati.
+            // Lasciamo this->frame_count = 0 (sconosciuto) per ora.
         }
     }
 
@@ -171,36 +199,36 @@ public:
     }
 
     unsigned long long writeSamplesInterleaved(unsigned long long num_frames_to_write, float *output_samples, unsigned int channels_req = 0) override {
-        if (!decoder_handle) return 0;
+        if (!decoder_handle || num_frames_to_write == 0) return 0;
 
         unsigned int ch_out = (channels_req < 1 || channels_req > CHANNELS_MAX) ? this->channels : channels_req;
+        if (this->channels == 0) return 0; // Non dovremmo arrivare qui se l'init è andato a buon fine
+
         unsigned long long frames_written_total = 0;
-        NeAACDecFrameInfo frame_info;
+        NeAACDecFrameInfo frame_info; // Spostato fuori dal loop per riutilizzo
 
         while (frames_written_total < num_frames_to_write) {
-            // Decode one frame.
-            // If callbacks are set, buffer and buffer_size for NeAACDecDecode can be NULL and 0.
-            // FAAD2 will use the read_callback internally.
+            // Decodifica un frame. FAAD2 userà la read_callback internamente.
             current_frame_data = NeAACDecDecode(decoder_handle, &frame_info, nullptr, 0);
 
             if (frame_info.error > 0) {
-                logDebug("FAAD2 decoding error: %s\n", NeAACDecGetErrorMessage(frame_info.error));
-                // Consider if this is a fatal error or if we can continue.
-                // For now, stop decoding on error.
+                // Usa logDebug o un logging più appropriato per Synthizer
+                logDebug("Errore decodifica FAAD2: %s (bytes consumati: %lu, campioni: %lu)\n", 
+                         NeAACDecGetErrorMessage(frame_info.error), frame_info.bytesconsumed, frame_info.samples);
+                // Considera se questo è un errore fatale. Per ora, interrompi la decodifica su errore.
                 break;
             }
 
             if (current_frame_data == nullptr || frame_info.samples == 0) {
-                // End of stream or no samples produced
+                // Fine dello stream o nessun campione prodotto (potrebbe essere un errore non segnalato da frame_info.error)
                 break;
             }
             
-            // frame_info.samples contains samples per channel for the current frame.
-            // frame_info.channels contains the actual number of channels in decoded_frame_data.
-            // The decoded_frame_data is interleaved: L, R, L, R ... for stereo float.
-            
             unsigned long long frames_in_this_faad_frame = frame_info.samples;
-            unsigned int channels_in_faad_frame = frame_info.channels;
+            // frame_info.channels dovrebbe corrispondere a this->channels se tutto è coerente
+            unsigned int channels_in_faad_frame = frame_info.channels; 
+            if (channels_in_faad_frame == 0) break; // Frame vuoto o errore
+
             float* input_ptr = static_cast<float*>(current_frame_data);
 
             unsigned long long frames_to_copy_this_iteration = std::min(frames_in_this_faad_frame, num_frames_to_write - frames_written_total);
@@ -208,12 +236,10 @@ public:
             for (unsigned long long f = 0; f < frames_to_copy_this_iteration; ++f) {
                 for (unsigned int c_in = 0; c_in < channels_in_faad_frame; ++c_in) {
                     if (c_in < ch_out) {
-                        // output_samples is the user's buffer, expecting ch_out channels
                         output_samples[(frames_written_total + f) * ch_out + c_in] = *input_ptr;
                     }
-                    input_ptr++; // Advance in the FAAD2 output buffer (already interleaved)
+                    input_ptr++; 
                 }
-                // Zero-fill extra channels if upmixing (ch_out > channels_in_faad_frame)
                 for (unsigned int c_fill = channels_in_faad_frame; c_fill < ch_out; ++c_fill) {
                     output_samples[(frames_written_total + f) * ch_out + c_fill] = 0.0f;
                 }
@@ -225,46 +251,32 @@ public:
 
     int getSr() override { return sample_rate; }
     int getChannels() override { return channels; }
-    AudioFormat getFormat() override { return AudioFormat::Float32; } // Configured FAAD2 for float
+    AudioFormat getFormat() override { 
+        // Assicurati che AudioFormat::Float32 esista nel tuo enum AudioFormat
+        // Se non esiste, dovrai usare il membro corretto o AudioFormat::Unknown
+        return AudioFormat::Unknown; 
+    }
 
-    void seekPcm(unsigned long long pos) override {
+    void seekPcm(unsigned long long pcm_frame_pos) override {
         if (!decoder_handle || !stream->supportsSeek()) {
-            throw Error("AAC seeking not supported or stream not seekable.");
+            throw Error("Seek PCM AAC non supportato o stream non seekable.");
         }
-        // Seeking in raw AAC to an exact PCM sample is non-trivial with FAAD2.
-        // FAAD2's seek callback operates on the byte stream.
-        // A precise PCM seek would require:
-        // 1. Estimating byte offset for PCM sample `pos`.
-        // 2. Calling stream->seek() (via faad_seek_callback indirectly if FAAD2 uses it for this,
-        //    or directly if we manage seeking state).
-        // 3. Re-syncing/flushing the decoder.
-        // 4. Decoding and discarding samples until `pos` is reached.
-        // This is complex. For now, this function could be a no-op or throw.
-        // The `faad_seek_callback` allows FAAD2 to seek its input. If FAAD2 itself
-        // had a PCM seek function that used this, it would work. But it doesn't.
-        // Let's throw, as per Ogg example if ov_pcm_seek fails.
-        logDebug("AacDecoder::seekPcm is not fully implemented for sample-accurate seeking.");
-        throw Error("Sample-accurate PCM seeking is not implemented for this AAC decoder.");
-        // If we wanted a byte-level seek, we could do:
-        // stream->seek(pos_in_bytes);
-        // And then potentially re-init or flush FAAD2, but NeAACDecInit is for the start.
-        // There isn't a clear "flush and resync at new position" in FAAD2 API easily.
+        // Il seek PCM accurato per AAC raw è complesso. FAAD2 non lo supporta direttamente.
+        logDebug("AacDecoder::seekPcm chiamato, ma il seek PCM accurato non è implementato per AAC raw.");
+        throw Error("Seek PCM accurato non implementato per questo decoder AAC.");
     }
 
     bool supportsSeek() override { return stream->supportsSeek(); }
-    // Sample-accurate seek is hard for raw AAC without an index.
     bool supportsSampleAccurateSeek() override { return false; } 
-    unsigned long long getLength() override { return frame_count; } // Often unknown for raw AAC
+    unsigned long long getLength() override { return frame_count; } // Spesso sconosciuto (0) per AAC raw
 
 private:
     std::shared_ptr<LookaheadByteStream> stream;
     NeAACDecHandle decoder_handle;
     int channels;
     int sample_rate;
-    unsigned long long frame_count; // In PCM samples per channel
+    unsigned long long frame_count;
 
-    // FAAD2's NeAACDecDecode returns a pointer to an internal buffer.
-    // We don't need to manage this buffer's memory directly, other than not using it after next decode call.
     void* current_frame_data; 
 };
 
@@ -275,39 +287,42 @@ std::shared_ptr<AudioDecoder> decodeAac(std::shared_ptr<LookaheadByteStream> str
         return nullptr;
     }
 
-    // Try to identify AAC stream.
-    // ADTS syncword: 12 bits of 1 (0xFFF). Check first 2 bytes: buffer[0] == 0xFF, (buffer[1] & 0xF0) == 0xF0.
-    // ADIF format starts with "ADIF".
-    unsigned char header[4] = {0}; // Read up to 4 bytes for ADIF check
-    long actual_read = stream->read(4, reinterpret_cast<char*>(header));
+    unsigned char header_check_buffer[4] = {0}; // Leggi fino a 4 byte per ADIF
+    // Leggiamo i byte per l'identificazione. stream->read avanza la posizione.
+    long long actual_read = stream->read(4, reinterpret_cast<char*>(header_check_buffer));
 
     bool looks_like_aac = false;
-    if (actual_read >= 2) {
-        if (header[0] == 0xFF && (header[1] & 0xF0) == 0xF0) {
-            looks_like_aac = true; // Likely ADTS
+    if (actual_read >= 2) { // Minimo per ADTS
+        // Controllo ADTS: syncword 0xFFF (primi 12 bit a 1)
+        // header_check_buffer[0] == 0xFF
+        // (header_check_buffer[1] & 0xF0) == 0xF0
+        // Alcuni controlli più specifici (es. (header_check_buffer[1] & 0xF6) == 0xF0 per MPEG-4)
+        // ma per ora un controllo generico ADTS è sufficiente.
+        if (header_check_buffer[0] == 0xFF && (header_check_buffer[1] & 0xF0) == (unsigned char)0xF0) {
+            looks_like_aac = true;
         }
     }
-    if (!looks_like_aac && actual_read == 4) {
-        if (std::memcmp(header, "ADIF", 4) == 0) {
-            looks_like_aac = true; // Likely ADIF
+    if (!looks_like_aac && actual_read == 4) { // Controllo ADIF se non è ADTS e abbiamo letto 4 byte
+        if (std::memcmp(header_check_buffer, "ADIF", 4) == 0) {
+            looks_like_aac = true;
         }
     }
 
-    // IMPORTANT: Reset the stream so the AacDecoder starts reading from the beginning.
+    // IMPORTANTE: Resetta lo stream INDIPENDENTEMENTE dal risultato del controllo,
+    // in modo che il decoder (o il prossimo tentativo di decodifica) inizi dall'inizio.
     stream->reset();
 
     if (!looks_like_aac) {
-        return nullptr; // Not recognized as AAC
+        return nullptr; // Non riconosciuto come AAC
     }
 
     try {
         return std::make_shared<aac_detail::AacDecoder>(stream);
     } catch (const std::exception &e) {
-        logDebug("AAC decoder: Failed to create AacDecoder: %s", e.what());
-        // Stream is already reset. If AacDecoder constructor threw, its internal state is managed by its destructor.
+        logDebug("Decoder AAC: Fallimento creazione AacDecoder: %s", e.what());
         return nullptr;
     } catch (...) {
-        logDebug("AAC decoder: Unknown error creating AacDecoder.");
+        logDebug("Decoder AAC: Errore sconosciuto durante creazione AacDecoder.");
         return nullptr;
     }
 }

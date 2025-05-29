@@ -156,12 +156,13 @@ jobs:
           }
         continue-on-error: true
 
-      - name: Repair Wheel with Delvewheel (Windows ${{ matrix.CI_ARCH }})
+- name: Repair Wheel with Delvewheel (Windows ${{ matrix.CI_ARCH }})
         shell: powershell
         run: |
-          $vcpkgInstalledBinDir = Join-Path $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE $env:VCPKG_DEFAULT_TRIPLET "bin"
-          $vcpkgInstalledLibDir = Join-Path $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE $env:VCPKG_DEFAULT_TRIPLET "lib"
-          
+          $vcpkgInstalledTripletDir = Join-Path $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE $env:VCPKG_DEFAULT_TRIPLET
+          $vcpkgInstalledBinDir = Join-Path $vcpkgInstalledTripletDir "bin"
+          $vcpkgInstalledLibDir = Join-Path $vcpkgInstalledTripletDir "lib"
+
           Write-Host "Path vcpkg (bin) che sarà aggiunto a delvewheel: $vcpkgInstalledBinDir"
           Write-Host "Path vcpkg (lib) che sarà aggiunto a delvewheel: $vcpkgInstalledLibDir"
 

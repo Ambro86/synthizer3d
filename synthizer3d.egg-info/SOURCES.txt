@@ -1350,6 +1350,7 @@ synthizer-vendored/include/synthizer/xoshiro.hpp
 synthizer-vendored/include/synthizer/data/arrays.hpp
 synthizer-vendored/include/synthizer/data/hrtf.hpp
 synthizer-vendored/include/synthizer/decoders/aac.cpp
+synthizer-vendored/include/synthizer/decoders/aac.cpp.bac
 synthizer-vendored/include/synthizer/decoders/aac.hpp
 synthizer-vendored/include/synthizer/decoders/flac.hpp
 synthizer-vendored/include/synthizer/decoders/libsndfile.hpp

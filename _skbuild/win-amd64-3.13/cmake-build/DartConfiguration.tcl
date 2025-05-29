@@ -27,8 +27,8 @@ SubmitInactivityTimeout:
 NightlyStartTime: 00:00:00 EDT
 
 # Commands for the build/test/submit cycle
-ConfigureCommand: "C:/Users/ambro/AppData/Local/Temp/build-env-ww4pwrxp/Lib/site-packages/cmake/data/bin/cmake.exe" "C:/fork/synthizer3d/synthizer-vendored"
-MakeCommand: C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe --build . --config "${CTEST_CONFIGURATION_TYPE}"
+ConfigureCommand: "C:/Users/ambro/AppData/Local/Temp/build-env-my4u256k/Lib/site-packages/cmake/data/bin/cmake.exe" "C:/fork/synthizer3d/synthizer-vendored"
+MakeCommand: C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe --build . --config "${CTEST_CONFIGURATION_TYPE}"
 DefaultCTestConfigurationType: Release
 
 # version control

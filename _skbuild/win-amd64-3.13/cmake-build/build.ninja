@@ -523,7 +523,7 @@ build data: phony CMakeFiles\data
 # Utility command for test
 
 build CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe "
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -535,7 +535,7 @@ build test: phony CMakeFiles\test.util
 # Utility command for edit_cache
 
 build CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -547,7 +547,7 @@ build edit_cache: phony CMakeFiles\edit_cache.util
 # Utility command for rebuild_cache
 
 build CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -565,7 +565,7 @@ build list_install_components: phony
 # Utility command for install
 
 build CMakeFiles\install.util: CUSTOM_COMMAND all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -577,7 +577,7 @@ build install: phony CMakeFiles\install.util
 # Utility command for install/local
 
 build CMakeFiles\install\local.util: CUSTOM_COMMAND all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
@@ -589,7 +589,7 @@ build install\local: phony CMakeFiles\install\local.util
 # Custom command for CMakeFiles\Experimental
 
 build CMakeFiles\Experimental | ${cmake_ninja_workdir}CMakeFiles\Experimental: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D Experimental"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D Experimental"
   pool = console
 
 
@@ -597,7 +597,7 @@ build CMakeFiles\Experimental | ${cmake_ninja_workdir}CMakeFiles\Experimental: C
 # Custom command for CMakeFiles\Nightly
 
 build CMakeFiles\Nightly | ${cmake_ninja_workdir}CMakeFiles\Nightly: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D Nightly"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D Nightly"
   pool = console
 
 
@@ -605,7 +605,7 @@ build CMakeFiles\Nightly | ${cmake_ninja_workdir}CMakeFiles\Nightly: CUSTOM_COMM
 # Custom command for CMakeFiles\Continuous
 
 build CMakeFiles\Continuous | ${cmake_ninja_workdir}CMakeFiles\Continuous: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D Continuous"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D Continuous"
   pool = console
 
 
@@ -613,7 +613,7 @@ build CMakeFiles\Continuous | ${cmake_ninja_workdir}CMakeFiles\Continuous: CUSTO
 # Custom command for CMakeFiles\NightlyMemoryCheck
 
 build CMakeFiles\NightlyMemoryCheck | ${cmake_ninja_workdir}CMakeFiles\NightlyMemoryCheck: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlyMemoryCheck"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlyMemoryCheck"
   pool = console
 
 
@@ -621,7 +621,7 @@ build CMakeFiles\NightlyMemoryCheck | ${cmake_ninja_workdir}CMakeFiles\NightlyMe
 # Custom command for CMakeFiles\NightlyStart
 
 build CMakeFiles\NightlyStart | ${cmake_ninja_workdir}CMakeFiles\NightlyStart: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlyStart"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlyStart"
   pool = console
 
 
@@ -629,7 +629,7 @@ build CMakeFiles\NightlyStart | ${cmake_ninja_workdir}CMakeFiles\NightlyStart: C
 # Custom command for CMakeFiles\NightlyUpdate
 
 build CMakeFiles\NightlyUpdate | ${cmake_ninja_workdir}CMakeFiles\NightlyUpdate: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlyUpdate"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlyUpdate"
   pool = console
 
 
@@ -637,7 +637,7 @@ build CMakeFiles\NightlyUpdate | ${cmake_ninja_workdir}CMakeFiles\NightlyUpdate:
 # Custom command for CMakeFiles\NightlyConfigure
 
 build CMakeFiles\NightlyConfigure | ${cmake_ninja_workdir}CMakeFiles\NightlyConfigure: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlyConfigure"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlyConfigure"
   pool = console
 
 
@@ -645,7 +645,7 @@ build CMakeFiles\NightlyConfigure | ${cmake_ninja_workdir}CMakeFiles\NightlyConf
 # Custom command for CMakeFiles\NightlyBuild
 
 build CMakeFiles\NightlyBuild | ${cmake_ninja_workdir}CMakeFiles\NightlyBuild: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlyBuild"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlyBuild"
   pool = console
 
 
@@ -653,7 +653,7 @@ build CMakeFiles\NightlyBuild | ${cmake_ninja_workdir}CMakeFiles\NightlyBuild: C
 # Custom command for CMakeFiles\NightlyTest
 
 build CMakeFiles\NightlyTest | ${cmake_ninja_workdir}CMakeFiles\NightlyTest: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlyTest"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlyTest"
   pool = console
 
 
@@ -661,7 +661,7 @@ build CMakeFiles\NightlyTest | ${cmake_ninja_workdir}CMakeFiles\NightlyTest: CUS
 # Custom command for CMakeFiles\NightlyCoverage
 
 build CMakeFiles\NightlyCoverage | ${cmake_ninja_workdir}CMakeFiles\NightlyCoverage: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlyCoverage"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlyCoverage"
   pool = console
 
 
@@ -669,7 +669,7 @@ build CMakeFiles\NightlyCoverage | ${cmake_ninja_workdir}CMakeFiles\NightlyCover
 # Custom command for CMakeFiles\NightlyMemCheck
 
 build CMakeFiles\NightlyMemCheck | ${cmake_ninja_workdir}CMakeFiles\NightlyMemCheck: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlyMemCheck"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlyMemCheck"
   pool = console
 
 
@@ -677,7 +677,7 @@ build CMakeFiles\NightlyMemCheck | ${cmake_ninja_workdir}CMakeFiles\NightlyMemCh
 # Custom command for CMakeFiles\NightlySubmit
 
 build CMakeFiles\NightlySubmit | ${cmake_ninja_workdir}CMakeFiles\NightlySubmit: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlySubmit"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D NightlySubmit"
   pool = console
 
 
@@ -685,7 +685,7 @@ build CMakeFiles\NightlySubmit | ${cmake_ninja_workdir}CMakeFiles\NightlySubmit:
 # Custom command for CMakeFiles\ExperimentalStart
 
 build CMakeFiles\ExperimentalStart | ${cmake_ninja_workdir}CMakeFiles\ExperimentalStart: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D ExperimentalStart"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D ExperimentalStart"
   pool = console
 
 
@@ -693,7 +693,7 @@ build CMakeFiles\ExperimentalStart | ${cmake_ninja_workdir}CMakeFiles\Experiment
 # Custom command for CMakeFiles\ExperimentalUpdate
 
 build CMakeFiles\ExperimentalUpdate | ${cmake_ninja_workdir}CMakeFiles\ExperimentalUpdate: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D ExperimentalUpdate"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D ExperimentalUpdate"
   pool = console
 
 
@@ -701,7 +701,7 @@ build CMakeFiles\ExperimentalUpdate | ${cmake_ninja_workdir}CMakeFiles\Experimen
 # Custom command for CMakeFiles\ExperimentalConfigure
 
 build CMakeFiles\ExperimentalConfigure | ${cmake_ninja_workdir}CMakeFiles\ExperimentalConfigure: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D ExperimentalConfigure"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D ExperimentalConfigure"
   pool = console
 
 
@@ -709,7 +709,7 @@ build CMakeFiles\ExperimentalConfigure | ${cmake_ninja_workdir}CMakeFiles\Experi
 # Custom command for CMakeFiles\ExperimentalBuild
 
 build CMakeFiles\ExperimentalBuild | ${cmake_ninja_workdir}CMakeFiles\ExperimentalBuild: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D ExperimentalBuild"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D ExperimentalBuild"
   pool = console
 
 
@@ -717,7 +717,7 @@ build CMakeFiles\ExperimentalBuild | ${cmake_ninja_workdir}CMakeFiles\Experiment
 # Custom command for CMakeFiles\ExperimentalTest
 
 build CMakeFiles\ExperimentalTest | ${cmake_ninja_workdir}CMakeFiles\ExperimentalTest: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D ExperimentalTest"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D ExperimentalTest"
   pool = console
 
 
@@ -725,7 +725,7 @@ build CMakeFiles\ExperimentalTest | ${cmake_ninja_workdir}CMakeFiles\Experimenta
 # Custom command for CMakeFiles\ExperimentalCoverage
 
 build CMakeFiles\ExperimentalCoverage | ${cmake_ninja_workdir}CMakeFiles\ExperimentalCoverage: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D ExperimentalCoverage"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D ExperimentalCoverage"
   pool = console
 
 
@@ -733,7 +733,7 @@ build CMakeFiles\ExperimentalCoverage | ${cmake_ninja_workdir}CMakeFiles\Experim
 # Custom command for CMakeFiles\ExperimentalMemCheck
 
 build CMakeFiles\ExperimentalMemCheck | ${cmake_ninja_workdir}CMakeFiles\ExperimentalMemCheck: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D ExperimentalMemCheck"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D ExperimentalMemCheck"
   pool = console
 
 
@@ -741,7 +741,7 @@ build CMakeFiles\ExperimentalMemCheck | ${cmake_ninja_workdir}CMakeFiles\Experim
 # Custom command for CMakeFiles\ExperimentalSubmit
 
 build CMakeFiles\ExperimentalSubmit | ${cmake_ninja_workdir}CMakeFiles\ExperimentalSubmit: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D ExperimentalSubmit"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D ExperimentalSubmit"
   pool = console
 
 
@@ -749,7 +749,7 @@ build CMakeFiles\ExperimentalSubmit | ${cmake_ninja_workdir}CMakeFiles\Experimen
 # Custom command for CMakeFiles\ContinuousStart
 
 build CMakeFiles\ContinuousStart | ${cmake_ninja_workdir}CMakeFiles\ContinuousStart: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D ContinuousStart"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D ContinuousStart"
   pool = console
 
 
@@ -757,7 +757,7 @@ build CMakeFiles\ContinuousStart | ${cmake_ninja_workdir}CMakeFiles\ContinuousSt
 # Custom command for CMakeFiles\ContinuousUpdate
 
 build CMakeFiles\ContinuousUpdate | ${cmake_ninja_workdir}CMakeFiles\ContinuousUpdate: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D ContinuousUpdate"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D ContinuousUpdate"
   pool = console
 
 
@@ -765,7 +765,7 @@ build CMakeFiles\ContinuousUpdate | ${cmake_ninja_workdir}CMakeFiles\ContinuousU
 # Custom command for CMakeFiles\ContinuousConfigure
 
 build CMakeFiles\ContinuousConfigure | ${cmake_ninja_workdir}CMakeFiles\ContinuousConfigure: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D ContinuousConfigure"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D ContinuousConfigure"
   pool = console
 
 
@@ -773,7 +773,7 @@ build CMakeFiles\ContinuousConfigure | ${cmake_ninja_workdir}CMakeFiles\Continuo
 # Custom command for CMakeFiles\ContinuousBuild
 
 build CMakeFiles\ContinuousBuild | ${cmake_ninja_workdir}CMakeFiles\ContinuousBuild: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D ContinuousBuild"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D ContinuousBuild"
   pool = console
 
 
@@ -781,7 +781,7 @@ build CMakeFiles\ContinuousBuild | ${cmake_ninja_workdir}CMakeFiles\ContinuousBu
 # Custom command for CMakeFiles\ContinuousTest
 
 build CMakeFiles\ContinuousTest | ${cmake_ninja_workdir}CMakeFiles\ContinuousTest: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D ContinuousTest"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D ContinuousTest"
   pool = console
 
 
@@ -789,7 +789,7 @@ build CMakeFiles\ContinuousTest | ${cmake_ninja_workdir}CMakeFiles\ContinuousTes
 # Custom command for CMakeFiles\ContinuousCoverage
 
 build CMakeFiles\ContinuousCoverage | ${cmake_ninja_workdir}CMakeFiles\ContinuousCoverage: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D ContinuousCoverage"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D ContinuousCoverage"
   pool = console
 
 
@@ -797,7 +797,7 @@ build CMakeFiles\ContinuousCoverage | ${cmake_ninja_workdir}CMakeFiles\Continuou
 # Custom command for CMakeFiles\ContinuousMemCheck
 
 build CMakeFiles\ContinuousMemCheck | ${cmake_ninja_workdir}CMakeFiles\ContinuousMemCheck: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D ContinuousMemCheck"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D ContinuousMemCheck"
   pool = console
 
 
@@ -805,7 +805,7 @@ build CMakeFiles\ContinuousMemCheck | ${cmake_ninja_workdir}CMakeFiles\Continuou
 # Custom command for CMakeFiles\ContinuousSubmit
 
 build CMakeFiles\ContinuousSubmit | ${cmake_ninja_workdir}CMakeFiles\ContinuousSubmit: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe -D ContinuousSubmit"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe -D ContinuousSubmit"
   pool = console
 
 
@@ -825,7 +825,7 @@ build CMakeFiles\data | ${cmake_ninja_workdir}CMakeFiles\data: CUSTOM_COMMAND
 # Utility command for test
 
 build deps\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\deps && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe "
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\deps && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -837,7 +837,7 @@ build deps\test: phony deps\CMakeFiles\test.util
 # Utility command for edit_cache
 
 build deps\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\deps && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\deps && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -849,7 +849,7 @@ build deps\edit_cache: phony deps\CMakeFiles\edit_cache.util
 # Utility command for rebuild_cache
 
 build deps\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\deps && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\deps && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -867,7 +867,7 @@ build deps\list_install_components: phony
 # Utility command for install
 
 build deps\CMakeFiles\install.util: CUSTOM_COMMAND deps\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\deps && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\deps && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -879,7 +879,7 @@ build deps\install: phony deps\CMakeFiles\install.util
 # Utility command for install/local
 
 build deps\CMakeFiles\install\local.util: CUSTOM_COMMAND deps\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\deps && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\deps && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
@@ -896,7 +896,7 @@ build deps\install\local: phony deps\CMakeFiles\install\local.util
 # Utility command for test
 
 build _deps\boost_partial-build\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\boost_partial-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe "
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\boost_partial-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -908,7 +908,7 @@ build _deps\boost_partial-build\test: phony _deps\boost_partial-build\CMakeFiles
 # Utility command for edit_cache
 
 build _deps\boost_partial-build\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\boost_partial-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\boost_partial-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -920,7 +920,7 @@ build _deps\boost_partial-build\edit_cache: phony _deps\boost_partial-build\CMak
 # Utility command for rebuild_cache
 
 build _deps\boost_partial-build\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\boost_partial-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\boost_partial-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -938,7 +938,7 @@ build _deps\boost_partial-build\list_install_components: phony
 # Utility command for install
 
 build _deps\boost_partial-build\CMakeFiles\install.util: CUSTOM_COMMAND _deps\boost_partial-build\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\boost_partial-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\boost_partial-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -950,7 +950,7 @@ build _deps\boost_partial-build\install: phony _deps\boost_partial-build\CMakeFi
 # Utility command for install/local
 
 build _deps\boost_partial-build\CMakeFiles\install\local.util: CUSTOM_COMMAND _deps\boost_partial-build\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\boost_partial-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\boost_partial-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
@@ -967,7 +967,7 @@ build _deps\boost_partial-build\install\local: phony _deps\boost_partial-build\C
 # Utility command for test
 
 build _deps\concurrentqueue-build\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\concurrentqueue-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe "
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\concurrentqueue-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -979,7 +979,7 @@ build _deps\concurrentqueue-build\test: phony _deps\concurrentqueue-build\CMakeF
 # Utility command for edit_cache
 
 build _deps\concurrentqueue-build\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\concurrentqueue-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\concurrentqueue-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -991,7 +991,7 @@ build _deps\concurrentqueue-build\edit_cache: phony _deps\concurrentqueue-build\
 # Utility command for rebuild_cache
 
 build _deps\concurrentqueue-build\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\concurrentqueue-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\concurrentqueue-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -1009,7 +1009,7 @@ build _deps\concurrentqueue-build\list_install_components: phony
 # Utility command for install
 
 build _deps\concurrentqueue-build\CMakeFiles\install.util: CUSTOM_COMMAND _deps\concurrentqueue-build\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\concurrentqueue-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\concurrentqueue-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -1021,7 +1021,7 @@ build _deps\concurrentqueue-build\install: phony _deps\concurrentqueue-build\CMa
 # Utility command for install/local
 
 build _deps\concurrentqueue-build\CMakeFiles\install\local.util: CUSTOM_COMMAND _deps\concurrentqueue-build\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\concurrentqueue-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\concurrentqueue-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
@@ -1038,7 +1038,7 @@ build _deps\concurrentqueue-build\install\local: phony _deps\concurrentqueue-bui
 # Utility command for test
 
 build _deps\cpp11-on-multicore-build\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\cpp11-on-multicore-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe "
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\cpp11-on-multicore-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -1050,7 +1050,7 @@ build _deps\cpp11-on-multicore-build\test: phony _deps\cpp11-on-multicore-build\
 # Utility command for edit_cache
 
 build _deps\cpp11-on-multicore-build\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\cpp11-on-multicore-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\cpp11-on-multicore-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -1062,7 +1062,7 @@ build _deps\cpp11-on-multicore-build\edit_cache: phony _deps\cpp11-on-multicore-
 # Utility command for rebuild_cache
 
 build _deps\cpp11-on-multicore-build\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\cpp11-on-multicore-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\cpp11-on-multicore-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -1080,7 +1080,7 @@ build _deps\cpp11-on-multicore-build\list_install_components: phony
 # Utility command for install
 
 build _deps\cpp11-on-multicore-build\CMakeFiles\install.util: CUSTOM_COMMAND _deps\cpp11-on-multicore-build\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\cpp11-on-multicore-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\cpp11-on-multicore-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -1092,7 +1092,7 @@ build _deps\cpp11-on-multicore-build\install: phony _deps\cpp11-on-multicore-bui
 # Utility command for install/local
 
 build _deps\cpp11-on-multicore-build\CMakeFiles\install\local.util: CUSTOM_COMMAND _deps\cpp11-on-multicore-build\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\cpp11-on-multicore-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\cpp11-on-multicore-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
@@ -1109,7 +1109,7 @@ build _deps\cpp11-on-multicore-build\install\local: phony _deps\cpp11-on-multico
 # Utility command for test
 
 build _deps\dr_libs-build\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\dr_libs-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe "
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\dr_libs-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -1121,7 +1121,7 @@ build _deps\dr_libs-build\test: phony _deps\dr_libs-build\CMakeFiles\test.util
 # Utility command for edit_cache
 
 build _deps\dr_libs-build\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\dr_libs-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\dr_libs-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -1133,7 +1133,7 @@ build _deps\dr_libs-build\edit_cache: phony _deps\dr_libs-build\CMakeFiles\edit_
 # Utility command for rebuild_cache
 
 build _deps\dr_libs-build\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\dr_libs-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\dr_libs-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -1151,7 +1151,7 @@ build _deps\dr_libs-build\list_install_components: phony
 # Utility command for install
 
 build _deps\dr_libs-build\CMakeFiles\install.util: CUSTOM_COMMAND _deps\dr_libs-build\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\dr_libs-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\dr_libs-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -1163,7 +1163,7 @@ build _deps\dr_libs-build\install: phony _deps\dr_libs-build\CMakeFiles\install.
 # Utility command for install/local
 
 build _deps\dr_libs-build\CMakeFiles\install\local.util: CUSTOM_COMMAND _deps\dr_libs-build\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\dr_libs-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\dr_libs-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
@@ -1180,7 +1180,7 @@ build _deps\dr_libs-build\install\local: phony _deps\dr_libs-build\CMakeFiles\in
 # Utility command for test
 
 build _deps\hedley-build\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\hedley-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe "
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\hedley-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -1192,7 +1192,7 @@ build _deps\hedley-build\test: phony _deps\hedley-build\CMakeFiles\test.util
 # Utility command for edit_cache
 
 build _deps\hedley-build\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\hedley-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\hedley-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -1204,7 +1204,7 @@ build _deps\hedley-build\edit_cache: phony _deps\hedley-build\CMakeFiles\edit_ca
 # Utility command for rebuild_cache
 
 build _deps\hedley-build\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\hedley-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\hedley-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -1222,7 +1222,7 @@ build _deps\hedley-build\list_install_components: phony
 # Utility command for install
 
 build _deps\hedley-build\CMakeFiles\install.util: CUSTOM_COMMAND _deps\hedley-build\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\hedley-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\hedley-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -1234,7 +1234,7 @@ build _deps\hedley-build\install: phony _deps\hedley-build\CMakeFiles\install.ut
 # Utility command for install/local
 
 build _deps\hedley-build\CMakeFiles\install\local.util: CUSTOM_COMMAND _deps\hedley-build\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\hedley-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\hedley-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
@@ -1251,7 +1251,7 @@ build _deps\hedley-build\install\local: phony _deps\hedley-build\CMakeFiles\inst
 # Utility command for test
 
 build _deps\miniaudio-build\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\miniaudio-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe "
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\miniaudio-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -1263,7 +1263,7 @@ build _deps\miniaudio-build\test: phony _deps\miniaudio-build\CMakeFiles\test.ut
 # Utility command for edit_cache
 
 build _deps\miniaudio-build\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\miniaudio-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\miniaudio-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -1275,7 +1275,7 @@ build _deps\miniaudio-build\edit_cache: phony _deps\miniaudio-build\CMakeFiles\e
 # Utility command for rebuild_cache
 
 build _deps\miniaudio-build\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\miniaudio-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\miniaudio-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -1293,7 +1293,7 @@ build _deps\miniaudio-build\list_install_components: phony
 # Utility command for install
 
 build _deps\miniaudio-build\CMakeFiles\install.util: CUSTOM_COMMAND _deps\miniaudio-build\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\miniaudio-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\miniaudio-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -1305,7 +1305,7 @@ build _deps\miniaudio-build\install: phony _deps\miniaudio-build\CMakeFiles\inst
 # Utility command for install/local
 
 build _deps\miniaudio-build\CMakeFiles\install\local.util: CUSTOM_COMMAND _deps\miniaudio-build\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\miniaudio-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\miniaudio-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
@@ -1322,7 +1322,7 @@ build _deps\miniaudio-build\install\local: phony _deps\miniaudio-build\CMakeFile
 # Utility command for test
 
 build _deps\pdqsort-build\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\pdqsort-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe "
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\pdqsort-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -1334,7 +1334,7 @@ build _deps\pdqsort-build\test: phony _deps\pdqsort-build\CMakeFiles\test.util
 # Utility command for edit_cache
 
 build _deps\pdqsort-build\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\pdqsort-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\pdqsort-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -1346,7 +1346,7 @@ build _deps\pdqsort-build\edit_cache: phony _deps\pdqsort-build\CMakeFiles\edit_
 # Utility command for rebuild_cache
 
 build _deps\pdqsort-build\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\pdqsort-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\pdqsort-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -1364,7 +1364,7 @@ build _deps\pdqsort-build\list_install_components: phony
 # Utility command for install
 
 build _deps\pdqsort-build\CMakeFiles\install.util: CUSTOM_COMMAND _deps\pdqsort-build\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\pdqsort-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\pdqsort-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -1376,7 +1376,7 @@ build _deps\pdqsort-build\install: phony _deps\pdqsort-build\CMakeFiles\install.
 # Utility command for install/local
 
 build _deps\pdqsort-build\CMakeFiles\install\local.util: CUSTOM_COMMAND _deps\pdqsort-build\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\pdqsort-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\pdqsort-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
@@ -1418,7 +1418,7 @@ build _deps\wdl-build\wdl_objlib: phony _deps\wdl-build\CMakeFiles\wdl_objlib.di
 # Utility command for test
 
 build _deps\wdl-build\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\wdl-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\ctest.exe "
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\wdl-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\ctest.exe "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -1430,7 +1430,7 @@ build _deps\wdl-build\test: phony _deps\wdl-build\CMakeFiles\test.util
 # Utility command for edit_cache
 
 build _deps\wdl-build\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\wdl-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\wdl-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake-gui.exe -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -1442,7 +1442,7 @@ build _deps\wdl-build\edit_cache: phony _deps\wdl-build\CMakeFiles\edit_cache.ut
 # Utility command for rebuild_cache
 
 build _deps\wdl-build\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\wdl-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\wdl-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe --regenerate-during-build -SC:\fork\synthizer3d\synthizer-vendored -BC:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -1460,7 +1460,7 @@ build _deps\wdl-build\list_install_components: phony
 # Utility command for install
 
 build _deps\wdl-build\CMakeFiles\install.util: CUSTOM_COMMAND _deps\wdl-build\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\wdl-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\wdl-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -1472,7 +1472,7 @@ build _deps\wdl-build\install: phony _deps\wdl-build\CMakeFiles\install.util
 # Utility command for install/local
 
 build _deps\wdl-build\CMakeFiles\install\local.util: CUSTOM_COMMAND _deps\wdl-build\all
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\wdl-build && C:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\wdl-build && C:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\bin\cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
@@ -1566,14 +1566,14 @@ build deps\all: phony
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\deps\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\boost_partial-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\concurrentqueue-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\cpp11-on-multicore-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\dr_libs-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\hedley-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\miniaudio-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\pdqsort-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\wdl-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\CTestTestfile.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\boost_partial-build\CTestTestfile.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\concurrentqueue-build\CTestTestfile.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\cpp11-on-multicore-build\CTestTestfile.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\dr_libs-build\CTestTestfile.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\hedley-build\CTestTestfile.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\miniaudio-build\CTestTestfile.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\pdqsort-build\CTestTestfile.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\wdl-build\CTestTestfile.cmake: RERUN_CMAKE | C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeCInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeCXXInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeCommonLanguageInclude.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeFindDependencyMacro.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeGenericSystem.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeInitializeConfigs.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeLanguageInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeRCInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeSystemSpecificInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeSystemSpecificInitialize.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CTest.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CTestTargets.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CTestUseLaunchers.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CheckCSourceCompiles.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CheckCXXSourceRuns.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CheckIncludeFile.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CheckLibraryExists.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Compiler\MSVC-C.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Compiler\MSVC-CXX.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Compiler\MSVC.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\DartConfiguration.tcl.in C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\ExternalProject\shared_internal_commands.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FetchContent.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FetchContent\CMakeLists.cmake.in C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FindPackageHandleStandardArgs.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FindPackageMessage.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FindThreads.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CMakeCLinkerInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CMakeCXXLinkerInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CMakeCommonLinkerInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CheckSourceCompiles.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CheckSourceRuns.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Linker\MSVC-C.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Linker\MSVC-CXX.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Linker\MSVC.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-C.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-CXX.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows-Initialize.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows-MSVC-C.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows-MSVC.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\WindowsPaths.cmake C$:\fork\synthizer3d\synthizer-vendored\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\boost_partial\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\concurrentqueue\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\cpp11-on-multicore\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\dr_libs\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\hedley\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\miniaudio\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\pdqsort\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\wdl\CMakeLists.txt C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisConfig.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisConfigVersion.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisTargets-debug.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisTargets-release.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisTargets.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggConfig.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggConfigVersion.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggTargets-debug.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggTargets-release.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggTargets.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusConfig.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusConfigVersion.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusTargets-debug.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusTargets-release.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusTargets.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileConfig.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileConfigVersion.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileTargets-debug.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileTargets-release.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileTargets.cmake CMakeCache.txt CMakeFiles\4.0.2\CMakeCCompiler.cmake CMakeFiles\4.0.2\CMakeCXXCompiler.cmake CMakeFiles\4.0.2\CMakeRCCompiler.cmake CMakeFiles\4.0.2\CMakeSystem.cmake
+build build.ninja C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\deps\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\boost_partial-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\concurrentqueue-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\cpp11-on-multicore-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\dr_libs-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\hedley-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\miniaudio-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\pdqsort-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\wdl-build\cmake_install.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\CTestTestfile.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\boost_partial-build\CTestTestfile.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\concurrentqueue-build\CTestTestfile.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\cpp11-on-multicore-build\CTestTestfile.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\dr_libs-build\CTestTestfile.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\hedley-build\CTestTestfile.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\miniaudio-build\CTestTestfile.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\pdqsort-build\CTestTestfile.cmake C$:\fork\synthizer3d\_skbuild\win-amd64-3.13\cmake-build\_deps\wdl-build\CTestTestfile.cmake: RERUN_CMAKE | C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeCInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeCXXInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeCommonLanguageInclude.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeFindDependencyMacro.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeGenericSystem.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeInitializeConfigs.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeLanguageInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeRCInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeSystemSpecificInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeSystemSpecificInitialize.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CTest.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CTestTargets.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CTestUseLaunchers.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CheckCSourceCompiles.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CheckCXXSourceRuns.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CheckIncludeFile.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CheckLibraryExists.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Compiler\MSVC-C.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Compiler\MSVC-CXX.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Compiler\MSVC.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\DartConfiguration.tcl.in C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\ExternalProject\shared_internal_commands.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FetchContent.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FetchContent\CMakeLists.cmake.in C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FindPackageHandleStandardArgs.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FindPackageMessage.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FindThreads.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CMakeCLinkerInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CMakeCXXLinkerInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CMakeCommonLinkerInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CheckSourceCompiles.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CheckSourceRuns.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Linker\MSVC-C.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Linker\MSVC-CXX.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Linker\MSVC.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-C.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-CXX.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows-Initialize.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows-MSVC-C.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows-MSVC.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\WindowsPaths.cmake C$:\fork\synthizer3d\synthizer-vendored\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\boost_partial\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\concurrentqueue\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\cpp11-on-multicore\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\dr_libs\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\hedley\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\miniaudio\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\pdqsort\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\wdl\CMakeLists.txt C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisConfig.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisConfigVersion.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisTargets-debug.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisTargets-release.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisTargets.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggConfig.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggConfigVersion.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggTargets-debug.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggTargets-release.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggTargets.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusConfig.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusConfigVersion.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusTargets-debug.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusTargets-release.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusTargets.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileConfig.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileConfigVersion.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileTargets-debug.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileTargets-release.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileTargets.cmake CMakeCache.txt CMakeFiles\4.0.2\CMakeCCompiler.cmake CMakeFiles\4.0.2\CMakeCXXCompiler.cmake CMakeFiles\4.0.2\CMakeRCCompiler.cmake CMakeFiles\4.0.2\CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeCInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeCXXInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeCommonLanguageInclude.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeFindDependencyMacro.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeGenericSystem.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeInitializeConfigs.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeLanguageInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeRCInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeSystemSpecificInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeSystemSpecificInitialize.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CTest.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CTestTargets.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CTestUseLaunchers.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CheckCSourceCompiles.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CheckCXXSourceRuns.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CheckIncludeFile.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CheckLibraryExists.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Compiler\MSVC-C.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Compiler\MSVC-CXX.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Compiler\MSVC.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\DartConfiguration.tcl.in C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\ExternalProject\shared_internal_commands.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FetchContent.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FetchContent\CMakeLists.cmake.in C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FindPackageHandleStandardArgs.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FindPackageMessage.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FindThreads.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CMakeCLinkerInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CMakeCXXLinkerInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CMakeCommonLinkerInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CheckSourceCompiles.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CheckSourceRuns.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Linker\MSVC-C.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Linker\MSVC-CXX.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Linker\MSVC.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-C.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-CXX.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows-Initialize.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows-MSVC-C.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows-MSVC.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-ww4pwrxp\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\WindowsPaths.cmake C$:\fork\synthizer3d\synthizer-vendored\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\boost_partial\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\concurrentqueue\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\cpp11-on-multicore\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\dr_libs\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\hedley\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\miniaudio\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\pdqsort\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\wdl\CMakeLists.txt C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisConfig.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisConfigVersion.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisTargets-debug.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisTargets-release.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisTargets.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggConfig.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggConfigVersion.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggTargets-debug.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggTargets-release.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggTargets.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusConfig.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusConfigVersion.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusTargets-debug.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusTargets-release.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusTargets.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileConfig.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileConfigVersion.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileTargets-debug.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileTargets-release.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileTargets.cmake CMakeCache.txt CMakeFiles\4.0.2\CMakeCCompiler.cmake CMakeFiles\4.0.2\CMakeCXXCompiler.cmake CMakeFiles\4.0.2\CMakeRCCompiler.cmake CMakeFiles\4.0.2\CMakeSystem.cmake: phony
+build C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeCInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeCXXInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeCommonLanguageInclude.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeFindDependencyMacro.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeGenericSystem.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeInitializeConfigs.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeLanguageInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeRCInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeSystemSpecificInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CMakeSystemSpecificInitialize.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CTest.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CTestTargets.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CTestUseLaunchers.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CheckCSourceCompiles.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CheckCXXSourceRuns.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CheckIncludeFile.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\CheckLibraryExists.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Compiler\MSVC-C.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Compiler\MSVC-CXX.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Compiler\MSVC.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\DartConfiguration.tcl.in C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\ExternalProject\shared_internal_commands.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FetchContent.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FetchContent\CMakeLists.cmake.in C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FindPackageHandleStandardArgs.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FindPackageMessage.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\FindThreads.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CMakeCLinkerInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CMakeCXXLinkerInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CMakeCommonLinkerInformation.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CheckSourceCompiles.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Internal\CheckSourceRuns.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Linker\MSVC-C.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Linker\MSVC-CXX.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Linker\MSVC.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-C.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-CXX.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows-Initialize.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows-MSVC-C.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows-MSVC.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\Windows.cmake C$:\Users\ambro\AppData\Local\Temp\build-env-my4u256k\Lib\site-packages\cmake\data\share\cmake-4.0\Modules\Platform\WindowsPaths.cmake C$:\fork\synthizer3d\synthizer-vendored\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\boost_partial\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\concurrentqueue\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\cpp11-on-multicore\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\dr_libs\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\hedley\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\miniaudio\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\pdqsort\CMakeLists.txt C$:\fork\synthizer3d\synthizer-vendored\deps\deps\third_party\wdl\CMakeLists.txt C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisConfig.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisConfigVersion.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisTargets-debug.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisTargets-release.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\Vorbis\VorbisTargets.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggConfig.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggConfigVersion.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggTargets-debug.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggTargets-release.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\ogg\OggTargets.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusConfig.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusConfigVersion.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusTargets-debug.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusTargets-release.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opus\OpusTargets.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileConfig.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileConfigVersion.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileTargets-debug.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileTargets-release.cmake C$:\fork\synthizer3d\vcpkg_installed\x64-windows\share\opusfile\OpusFileTargets.cmake CMakeCache.txt CMakeFiles\4.0.2\CMakeCCompiler.cmake CMakeFiles\4.0.2\CMakeCXXCompiler.cmake CMakeFiles\4.0.2\CMakeRCCompiler.cmake CMakeFiles\4.0.2\CMakeSystem.cmake: phony
 
 
 #############################################

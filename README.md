@@ -15,6 +15,24 @@ This fork keeps the library up to date for modern Python, improves compatibility
 
 ---
 
+## 🚀 **Audio Format Support**
+
+> **Synthizer3D now supports:**
+>
+> - **WAV**
+> - **MP3**
+> - **FLAC**
+> - **OGG**  🆕
+> - **OPUS** 🆕
+>
+> <br>
+>
+> **OGG and OPUS support are new!**  
+> You can now load, spatialize, and play audio from these formats in your 3D environments.  
+> This makes Synthizer3D even more versatile for interactive, gaming, and streaming audio applications.
+
+---
+
 ## Supported Python Versions and Platforms
 
 Synthizer3D provides pre-built wheels for **Python 3.8 to 3.13** on all major platforms:

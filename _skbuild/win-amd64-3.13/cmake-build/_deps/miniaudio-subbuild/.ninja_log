@@ -1,0 +1,21 @@
+# ninja log v5
+1	47	7702533108570437	miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-mkdir	ebc9ee86a81048ac
+1	47	7702533108570437	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-mkdir	ebc9ee86a81048ac
+47	90	7702533108990746	miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-download	ac9cbb3285976c32
+47	90	7702533108990746	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-download	ac9cbb3285976c32
+91	131	7702533109406678	miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-update	2bca47ebe2998367
+91	131	7702533109406678	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-update	2bca47ebe2998367
+131	178	7702533109883000	miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-patch	1aa9eaf462ccef0d
+131	178	7702533109883000	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-patch	1aa9eaf462ccef0d
+179	221	7702533110300239	miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-configure	a941cd2c36bc597e
+179	221	7702533110300239	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-configure	a941cd2c36bc597e
+221	269	7702533110785408	miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-build	5bf61060bfead1de
+221	269	7702533110785408	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-build	5bf61060bfead1de
+269	311	7702533111206573	miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-install	c14463e2c5f77529
+269	311	7702533111206573	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-install	c14463e2c5f77529
+311	352	7702533111609670	miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-test	9961470bb8134d09
+311	352	7702533111609670	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-test	9961470bb8134d09
+352	406	7702533112160349	CMakeFiles/miniaudio-populate-complete	9094694a4efd8710
+352	406	7702533112160349	miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-done	9094694a4efd8710
+352	406	7702533112160349	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/CMakeFiles/miniaudio-populate-complete	9094694a4efd8710
+352	406	7702533112160349	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/miniaudio-subbuild/miniaudio-populate-prefix/src/miniaudio-populate-stamp/miniaudio-populate-done	9094694a4efd8710

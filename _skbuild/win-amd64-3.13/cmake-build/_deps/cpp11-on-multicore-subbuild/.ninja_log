@@ -1,0 +1,21 @@
+# ninja log v5
+1	51	7702533087810407	cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-mkdir	ff52bc47f1349eb6
+1	51	7702533087810407	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/cpp11-on-multicore-subbuild/cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-mkdir	ff52bc47f1349eb6
+51	94	7702533088243969	cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-download	cac4e0d03c42d490
+51	94	7702533088243969	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/cpp11-on-multicore-subbuild/cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-download	cac4e0d03c42d490
+96	141	7702533088692792	cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-update	3e426d742ae33236
+96	141	7702533088692792	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/cpp11-on-multicore-subbuild/cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-update	3e426d742ae33236
+141	182	7702533089110498	cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-patch	df0bb2fa3e1a8b0e
+141	182	7702533089110498	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/cpp11-on-multicore-subbuild/cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-patch	df0bb2fa3e1a8b0e
+182	229	7702533089585054	cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-configure	17e3c2c70534faf6
+182	229	7702533089585054	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/cpp11-on-multicore-subbuild/cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-configure	17e3c2c70534faf6
+229	276	7702533090065719	cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-build	a8f9cb4de6403fa2
+229	276	7702533090065719	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/cpp11-on-multicore-subbuild/cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-build	a8f9cb4de6403fa2
+276	315	7702533090443830	cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-install	5024c1ef5bf53762
+276	315	7702533090443830	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/cpp11-on-multicore-subbuild/cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-install	5024c1ef5bf53762
+315	357	7702533090868643	cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-test	f391af57a1eb8e51
+315	357	7702533090868643	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/cpp11-on-multicore-subbuild/cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-test	f391af57a1eb8e51
+357	416	7702533091449392	CMakeFiles/cpp11-on-multicore-populate-complete	eebae9478a118849
+357	416	7702533091449392	cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-done	eebae9478a118849
+357	416	7702533091449392	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/cpp11-on-multicore-subbuild/CMakeFiles/cpp11-on-multicore-populate-complete	eebae9478a118849
+357	416	7702533091449392	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/cpp11-on-multicore-subbuild/cpp11-on-multicore-populate-prefix/src/cpp11-on-multicore-populate-stamp/cpp11-on-multicore-populate-done	eebae9478a118849

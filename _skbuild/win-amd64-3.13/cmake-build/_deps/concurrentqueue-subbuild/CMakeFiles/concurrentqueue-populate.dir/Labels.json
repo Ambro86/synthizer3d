@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/concurrentqueue-subbuild/CMakeFiles/concurrentqueue-populate"
+		},
+		{
+			"file" : "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/concurrentqueue-subbuild/CMakeFiles/concurrentqueue-populate.rule"
+		},
+		{
+			"file" : "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/concurrentqueue-subbuild/CMakeFiles/concurrentqueue-populate-complete.rule"
+		},
+		{
+			"file" : "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/concurrentqueue-subbuild/concurrentqueue-populate-prefix/src/concurrentqueue-populate-stamp/concurrentqueue-populate-build.rule"
+		},
+		{
+			"file" : "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/concurrentqueue-subbuild/concurrentqueue-populate-prefix/src/concurrentqueue-populate-stamp/concurrentqueue-populate-configure.rule"
+		},
+		{
+			"file" : "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/concurrentqueue-subbuild/concurrentqueue-populate-prefix/src/concurrentqueue-populate-stamp/concurrentqueue-populate-download.rule"
+		},
+		{
+			"file" : "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/concurrentqueue-subbuild/concurrentqueue-populate-prefix/src/concurrentqueue-populate-stamp/concurrentqueue-populate-install.rule"
+		},
+		{
+			"file" : "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/concurrentqueue-subbuild/concurrentqueue-populate-prefix/src/concurrentqueue-populate-stamp/concurrentqueue-populate-mkdir.rule"
+		},
+		{
+			"file" : "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/concurrentqueue-subbuild/concurrentqueue-populate-prefix/src/concurrentqueue-populate-stamp/concurrentqueue-populate-patch.rule"
+		},
+		{
+			"file" : "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/concurrentqueue-subbuild/concurrentqueue-populate-prefix/src/concurrentqueue-populate-stamp/concurrentqueue-populate-test.rule"
+		},
+		{
+			"file" : "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/concurrentqueue-subbuild/concurrentqueue-populate-prefix/src/concurrentqueue-populate-stamp/concurrentqueue-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"concurrentqueue-populate"
+		],
+		"name" : "concurrentqueue-populate"
+	}
+}

@@ -494,19 +494,11 @@ jobs:
       - name: Display downloaded artifacts structure
         run: ls -R ~/artifacts
 
-      - name: Remove Linux x64 wheels from artifacts
+      - name: Unzip wheels
         run: |
-          find ~/artifacts -type f -name '*linux_x86_64.whl' -delete
-          echo "Removed Linux x64 wheels (linux_x86_64):"
-          find ~/artifacts -type f -name '*linux_x86_64.whl' || echo "None left"
+          mkdir -p ~/artifacts/extracted
+          find ~/artifacts -name '*.zip' -exec unzip -o {} -d ~/artifacts/extracted \;
 
       - name: Upload to PyPI
-        env:
-          # For trusted publishing, TWINE_USERNAME and TWINE_PASSWORD are not set directly.
-          # PyPI should be configured as a trusted publisher in your GitHub Actions settings.
-          # If not using trusted publishing, uncomment and use secrets:
-          # TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
-          # TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-          TWINE_REPOSITORY_URL: https://upload.pypi.org/legacy/ # Or your TestPyPI URL
         run: |
-          python -m twine upload --skip-existing ~/artifacts/*/*
+          python -m twine upload --skip-existing ~/artifacts/extracted/*.whl

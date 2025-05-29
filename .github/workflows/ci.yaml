@@ -473,7 +473,7 @@ jobs:
       contents: read
       id-token: write # Required for trusted publishing
     steps:
-      - name: Download all build artifacts
+- name: Download all build artifacts
         uses: actions/download-artifact@v4
         with:
           path: ~/artifacts
@@ -491,14 +491,20 @@ jobs:
       - name: Install Twine
         run: python -m pip install --upgrade twine
 
-      - name: Display downloaded artifacts structure
+      - name: Display downloaded artifacts structure # Utile per il debug
         run: ls -R ~/artifacts
 
-      - name: Unzip wheels
-        run: |
-          mkdir -p ~/artifacts/extracted
-          find ~/artifacts -name '*.zip' -exec unzip -o {} -d ~/artifacts/extracted \;
+      # --- PASSAGGIO "Unzip wheels" RIMOSSO ---
+      # L'azione download-artifact@v4 estrae già gli artefatti.
+      # - name: Unzip wheels
+      #   run: |
+      #     mkdir -p ~/artifacts/extracted
+      #     find ~/artifacts -name '*.zip' -exec unzip -o {} -d ~/artifacts/extracted \;
 
       - name: Upload to PyPI
+        env: # Assicurati che queste variabili d'ambiente siano configurate per l'autenticazione con PyPI
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }} # Verifica che il nome del tuo secret sia corretto
         run: |
-          python -m twine upload --skip-existing ~/artifacts/extracted/*.whl
+          # Il comando ora cerca i file .whl direttamente nelle sottocartelle create da download-artifact
+          python -m twine upload --skip-existing ~/artifacts/*/*.whl

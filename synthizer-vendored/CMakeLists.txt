@@ -117,6 +117,7 @@ add_library(synthizer ${SYNTHIZER_LIB_TYPE}
 )
 
 if(MSVC)
+  target_compile_definitions(synthizer PRIVATE _USE_MATH_DEFINES)
   set_source_files_properties(src/decoding.cpp PROPERTIES COMPILE_FLAGS "/W4 /wd4245 /wd4456 /wd4457 /wd4701 /wd4245 /WX-")
 endif()
 target_compile_features(synthizer PUBLIC cxx_std_17)

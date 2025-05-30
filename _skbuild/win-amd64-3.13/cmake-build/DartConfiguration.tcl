@@ -27,7 +27,7 @@ SubmitInactivityTimeout:
 NightlyStartTime: 00:00:00 EDT
 
 # Commands for the build/test/submit cycle
-ConfigureCommand: "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/bin/cmake.exe" "C:/fork/synthizer3d/synthizer-vendored"
+ConfigureCommand: "C:/Users/ambro/AppData/Local/Temp/build-env-6zgmxky2/Lib/site-packages/cmake/data/bin/cmake.exe" "C:/fork/synthizer3d/synthizer-vendored"
 MakeCommand: C:\Users\ambro\AppData\Local\Temp\build-env-z97wxa7w\Lib\site-packages\cmake\data\bin\cmake.exe --build . --config "${CTEST_CONFIGURATION_TYPE}"
 DefaultCTestConfigurationType: Release
 

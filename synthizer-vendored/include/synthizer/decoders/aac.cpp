@@ -130,8 +130,10 @@ public:
         // Inizializza a zero l'output
         std::fill(output_samples, output_samples + num_frames_to_write * ch_out, 0.0f);
 
+        int consecutive_decode_errors = 0;
+
         while (frames_written_total < num_frames_to_write) {
-            // Decodifica solo se hai abbastanza dati (eccetto a fine stream)
+            // Riempi il buffer se serve
             const unsigned long MIN_DECODE_CHUNK = 2048;
             if (current_valid_bytes_in_buffer < MIN_DECODE_CHUNK && !stream_at_eos) {
                 unsigned long bytes_to_read_target = AAC_INPUT_BUFFER_CAPACITY - current_valid_bytes_in_buffer;
@@ -147,26 +149,30 @@ public:
                 }
             }
 
-            if (current_valid_bytes_in_buffer < MIN_DECODE_CHUNK && !stream_at_eos) {
-                break;
-            }
-
-            if (current_valid_bytes_in_buffer == 0) {
-                break;
-            }
+            // Se il buffer è vuoto e lo stream è finito, fine.
+            if (current_valid_bytes_in_buffer == 0 && stream_at_eos) break;
+            if (current_valid_bytes_in_buffer == 0) break;
 
             current_frame_data = NeAACDecDecode(decoder_handle, &frame_info, internal_input_buffer.data(), current_valid_bytes_in_buffer);
 
             logDebug("FAAD2: decoded frame: samples=%lu, bytesconsumed=%lu, error=%d, eos=%d",
                      frame_info.samples, frame_info.bytesconsumed, frame_info.error, stream_at_eos);
 
-            bool processed_consumed_bytes_this_iteration = false;
-
-            // 1. Gestione errori: non fare break ma continua
+            // Migliorata: SOLO su errore GRAVE si scrivono zeri nell'output
             if (frame_info.error > 0) {
                 logDebug("Errore decodifica FAAD2: %s (consumati: %lu, campioni: %lu)",
                          NeAACDecGetErrorMessage(frame_info.error), frame_info.bytesconsumed, frame_info.samples);
-                // Gestione buffer come prima
+
+                ++consecutive_decode_errors;
+                // Se sono molti errori consecutivi, inserisci uno o due frame di zeri come padding per evitare pop prolungati.
+                if (consecutive_decode_errors <= 2 && frames_written_total < num_frames_to_write) {
+                    for (unsigned int c = 0; c < ch_out; ++c) {
+                        output_samples[frames_written_total * ch_out + c] = 0.0f;
+                    }
+                    frames_written_total += 1;
+                }
+
+                // Gestione buffer dopo errore
                 if (frame_info.bytesconsumed > 0 && frame_info.bytesconsumed <= current_valid_bytes_in_buffer) {
                     std::memmove(internal_input_buffer.data(),
                                  internal_input_buffer.data() + frame_info.bytesconsumed,
@@ -175,19 +181,12 @@ public:
                 } else {
                     current_valid_bytes_in_buffer = 0;
                 }
-                processed_consumed_bytes_this_iteration = true;
-
-                // Scrivi un frame di zeri nell'output (o più se vuoi gestire meglio la discontinuità)
-                if (frames_written_total < num_frames_to_write) {
-                    for (unsigned int c = 0; c < ch_out; ++c) {
-                        output_samples[frames_written_total * ch_out + c] = 0.0f;
-                    }
-                    frames_written_total += 1;
-                }
-                continue; // NON break, vai avanti!
+                continue;
+            } else {
+                consecutive_decode_errors = 0;
             }
 
-            // 2. Frame vuoto/null: avanza l'output di un frame di zeri
+            // Se il frame non produce campioni, ma non è errore: accumula più dati
             if (current_frame_data == nullptr || frame_info.samples == 0) {
                 if (frame_info.bytesconsumed > 0 && frame_info.bytesconsumed <= current_valid_bytes_in_buffer) {
                     std::memmove(internal_input_buffer.data(),
@@ -199,26 +198,15 @@ public:
                 } else if (frame_info.bytesconsumed == 0) {
                     if (stream_at_eos && current_valid_bytes_in_buffer > 0) {
                         current_valid_bytes_in_buffer = 0;
-                    } else if (!stream_at_eos && current_valid_bytes_in_buffer > 0) {
-                        logDebug("FAAD2: Nessun campione, nessun byte consumato, dati nel buffer. Svuoto buffer.");
-                        current_valid_bytes_in_buffer = 0;
                     }
                 }
-                processed_consumed_bytes_this_iteration = true;
 
-                // Scrivi un frame di zeri nell'output
-                if (frames_written_total < num_frames_to_write) {
-                    for (unsigned int c = 0; c < ch_out; ++c) {
-                        output_samples[frames_written_total * ch_out + c] = 0.0f;
-                    }
-                    frames_written_total += 1;
-                }
-
-                if (stream_at_eos && current_valid_bytes_in_buffer == 0) break;
+                // NON scrivere frame di zeri se non sei sicuro che il decoder abbia bisogno di tempo.
+                // Se vuoi evitare buchi, puoi scrivere frame di zeri SOLO se ti accorgi di salto brusco (conta i frame non scritti).
                 continue;
             }
 
-            // 3. Scrivi i campioni decodificati
+            // Scrivi i campioni decodificati
             if (frame_info.samples > 0 && current_frame_data != nullptr) {
                 unsigned long long frames_in_this_faad_output = frame_info.samples / frame_info.channels;
                 unsigned int channels_in_faad_output = frame_info.channels;
@@ -241,20 +229,18 @@ public:
                 frames_written_total += frames_to_copy_this_iteration;
             }
 
-            if (!processed_consumed_bytes_this_iteration) {
-                if (frame_info.bytesconsumed > 0 && frame_info.bytesconsumed <= current_valid_bytes_in_buffer) {
-                    std::memmove(internal_input_buffer.data(),
-                                 internal_input_buffer.data() + frame_info.bytesconsumed,
-                                 current_valid_bytes_in_buffer - frame_info.bytesconsumed);
-                    current_valid_bytes_in_buffer -= frame_info.bytesconsumed;
-                } else if (frame_info.bytesconsumed > current_valid_bytes_in_buffer) {
-                    logDebug("FAAD2 ha consumato più byte di quelli disponibili (successo).");
-                    current_valid_bytes_in_buffer = 0;
-                    break;
-                } else if (frame_info.bytesconsumed == 0 && frame_info.samples > 0) {
-                    logDebug("FAAD2 ha prodotto campioni ma 0 byte consumati (successo). Invalido buffer.");
-                    current_valid_bytes_in_buffer = 0;
-                }
+            // Gestione buffer dopo decodifica
+            if (frame_info.bytesconsumed > 0 && frame_info.bytesconsumed <= current_valid_bytes_in_buffer) {
+                std::memmove(internal_input_buffer.data(),
+                             internal_input_buffer.data() + frame_info.bytesconsumed,
+                             current_valid_bytes_in_buffer - frame_info.bytesconsumed);
+                current_valid_bytes_in_buffer -= frame_info.bytesconsumed;
+            } else if (frame_info.bytesconsumed > current_valid_bytes_in_buffer) {
+                logDebug("FAAD2 ha consumato più byte di quelli disponibili (successo).");
+                current_valid_bytes_in_buffer = 0;
+                break;
+            } else if (frame_info.bytesconsumed == 0 && frame_info.samples > 0) {
+                // NON svuotare il buffer: caso raro, lasciamo come fallback
             }
         }
         return frames_written_total;

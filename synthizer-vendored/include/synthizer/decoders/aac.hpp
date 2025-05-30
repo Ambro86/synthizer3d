@@ -1,21 +1,22 @@
 #pragma once
 
-#include <memory> // Per std::shared_ptr
+#include "synthizer/byte_stream.hpp"
+#include "synthizer/decoding.hpp"
+#include "synthizer/error.hpp"
 
-// Includi gli header di Synthizer necessari per le dichiarazioni sottostanti
-#include "synthizer/decoding.hpp"     // Per AudioDecoder
-#include "synthizer/byte_stream.hpp"  // Per LookaheadByteStream
+#include <memory>
 
 namespace synthizer {
 
 /**
- * @brief Crea un decodificatore audio per stream AAC.
- * * Questa funzione tenta di creare un decodificatore per il formato AAC.
- * L'implementazione interna ora utilizza FFmpeg.
- * * @param stream_ptr Un puntatore condiviso a un LookaheadByteStream che fornisce i dati AAC.
- * @return Un puntatore condiviso a un AudioDecoder se la decodifica può essere gestita,
- * altrimenti nullptr.
+ * @brief Creates an AudioDecoder for AAC streams.
+ *
+ * This function attempts to detect an AAC stream (ADTS or ADIF format) from the provided ByteStream.
+ * If successful, it returns a shared_ptr to an AacDecoder. Otherwise, it returns nullptr.
+ *
+ * @param stream A shared_ptr to a LookaheadByteStream representing the input AAC audio data.
+ * @return std::shared_ptr<AudioDecoder> A decoder instance if successful, otherwise nullptr.
  */
-std::shared_ptr<AudioDecoder> decodeAac(std::shared_ptr<LookaheadByteStream> stream_ptr);
+std::shared_ptr<AudioDecoder> decodeAac(std::shared_ptr<LookaheadByteStream> stream);
 
 } // namespace synthizer

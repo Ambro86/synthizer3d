@@ -13,7 +13,6 @@
 #include <algorithm>
 #include <memory>
 #include <cmath>
-
 extern "C" {
 #include <neaacdec.h>
 }
@@ -59,6 +58,15 @@ private:
     // Filtro passa-alto per rimuovere DC offset
     std::vector<float> dc_filter_x1, dc_filter_y1;
     static constexpr float DC_FILTER_ALPHA = 0.995f;
+    
+    // Filtri anti-distorsione avanzati
+    std::vector<std::vector<float>> smoothing_buffer; // Buffer per smoothing multi-tap
+    std::vector<float> peak_limiter_env; // Envelope per peak limiting
+    std::vector<float> notch_filter_x1, notch_filter_x2, notch_filter_y1, notch_filter_y2; // Filtro notch per fischi
+    unsigned int smoothing_buffer_pos;
+    static constexpr unsigned int SMOOTHING_TAPS = 5;
+    static constexpr float PEAK_LIMIT_THRESHOLD = 0.95f;
+    static constexpr float PEAK_LIMIT_RATIO = 0.3f;
 
 public:
     AacDecoder(std::shared_ptr<LookaheadByteStream> stream_ptr) :
@@ -88,11 +96,13 @@ public:
             throw Error("Fallimento nel recuperare la configurazione FAAD2.");
         }
         
-        // Configurazione ottimizzata per ridurre i pop
+        // Configurazione ottimizzata per ridurre i pop e distorsioni
         config_ptr->outputFormat = FAAD_FMT_FLOAT;
         config_ptr->downMatrix = 0; // Non fare downmix automatico
         config_ptr->useOldADTSFormat = 0;
-        config_ptr->dontUpSampleImplicitSBR = 1; // Evita upsampling che può causare pop
+        config_ptr->dontUpSampleImplicitSBR = 1; // Evita upsampling che può causare distorsioni
+        //config_ptr->defSampleRate = 0; // Usa sample rate originale
+        //config_ptr->defObjectType = 0; // Rilevamento automatico
         
         if (NeAACDecSetConfiguration(decoder_handle, config_ptr) == 0) {
             NeAACDecClose(decoder_handle);
@@ -143,6 +153,15 @@ public:
         fade_buffer.resize(FADE_SAMPLES * this->channels, 0.0f);
         dc_filter_x1.resize(this->channels, 0.0f);
         dc_filter_y1.resize(this->channels, 0.0f);
+        
+        // Inizializza filtri anti-distorsione
+        smoothing_buffer.resize(SMOOTHING_TAPS, std::vector<float>(this->channels, 0.0f));
+        smoothing_buffer_pos = 0;
+        peak_limiter_env.resize(this->channels, 0.0f);
+        notch_filter_x1.resize(this->channels, 0.0f);
+        notch_filter_x2.resize(this->channels, 0.0f);
+        notch_filter_y1.resize(this->channels, 0.0f);
+        notch_filter_y2.resize(this->channels, 0.0f);
     }
 
     ~AacDecoder() override {
@@ -211,6 +230,120 @@ private:
                 dc_filter_x1[c] = input;
                 dc_filter_y1[c] = output;
                 samples[f * channels_count + c] = output;
+            }
+        }
+    }
+    
+    // Filtro smoothing multi-tap per ridurre distorsioni acute
+    void applySmoothingFilter(float* samples, unsigned long long num_frames, unsigned int channels_count) {
+        for (unsigned long long f = 0; f < num_frames; ++f) {
+            for (unsigned int c = 0; c < channels_count && c < smoothing_buffer[0].size(); ++c) {
+                // Salva il campione corrente nel buffer circolare
+                smoothing_buffer[smoothing_buffer_pos][c] = samples[f * channels_count + c];
+                
+                // Calcola la media pesata dei tap
+                float smoothed = 0.0f;
+                float weight_sum = 0.0f;
+                for (unsigned int tap = 0; tap < SMOOTHING_TAPS; ++tap) {
+                    unsigned int buf_idx = (smoothing_buffer_pos + SMOOTHING_TAPS - tap) % SMOOTHING_TAPS;
+                    float weight = 1.0f / (1.0f + tap * 0.3f); // Peso decrescente
+                    smoothed += smoothing_buffer[buf_idx][c] * weight;
+                    weight_sum += weight;
+                }
+                
+                samples[f * channels_count + c] = smoothed / weight_sum;
+            }
+            smoothing_buffer_pos = (smoothing_buffer_pos + 1) % SMOOTHING_TAPS;
+        }
+    }
+    
+    // Peak limiter per evitare saturazione e distorsione
+    void applyPeakLimiter(float* samples, unsigned long long num_frames, unsigned int channels_count) {
+        const float attack = 0.1f;
+        const float release = 0.01f;
+        
+        for (unsigned long long f = 0; f < num_frames; ++f) {
+            for (unsigned int c = 0; c < channels_count && c < peak_limiter_env.size(); ++c) {
+                float input = samples[f * channels_count + c];
+                float abs_input = std::abs(input);
+                
+                // Calcola l'envelope
+                if (abs_input > peak_limiter_env[c]) {
+                    peak_limiter_env[c] = abs_input * attack + peak_limiter_env[c] * (1.0f - attack);
+                } else {
+                    peak_limiter_env[c] = abs_input * release + peak_limiter_env[c] * (1.0f - release);
+                }
+                
+                // Applica limiting se necessario
+                if (peak_limiter_env[c] > PEAK_LIMIT_THRESHOLD) {
+                    float reduction = PEAK_LIMIT_THRESHOLD / peak_limiter_env[c];
+                    reduction = std::pow(reduction, PEAK_LIMIT_RATIO); // Soft knee
+                    samples[f * channels_count + c] = input * reduction;
+                }
+            }
+        }
+    }
+    
+    // Filtro notch per attenuare fischi specifici (intorno ai 8-12kHz)
+    void applyNotchFilter(float* samples, unsigned long long num_frames, unsigned int channels_count) {
+        if (sample_rate <= 0) return;
+        
+        // Parametri del filtro notch per frequenze acute problematiche
+        const float freq_hz = 10000.0f; // Frequency to notch out
+        const float q_factor = 5.0f;
+        
+        float omega = 2.0f * M_PI * freq_hz / static_cast<float>(sample_rate);
+        float alpha = std::sin(omega) / (2.0f * q_factor);
+        float cos_omega = std::cos(omega);
+        
+        // Coefficienti del filtro notch
+        float b0 = 1.0f;
+        float b1 = -2.0f * cos_omega;
+        float b2 = 1.0f;
+        float a0 = 1.0f + alpha;
+        float a1 = -2.0f * cos_omega;
+        float a2 = 1.0f - alpha;
+        
+        // Normalizza
+        b0 /= a0;
+        b1 /= a0;
+        b2 /= a0;
+        a1 /= a0;
+        a2 /= a0;
+        
+        for (unsigned long long f = 0; f < num_frames; ++f) {
+            for (unsigned int c = 0; c < channels_count && c < notch_filter_x1.size(); ++c) {
+                float input = samples[f * channels_count + c];
+                
+                float output = b0 * input + b1 * notch_filter_x1[c] + b2 * notch_filter_x2[c]
+                              - a1 * notch_filter_y1[c] - a2 * notch_filter_y2[c];
+                
+                // Aggiorna le linee di ritardo
+                notch_filter_x2[c] = notch_filter_x1[c];
+                notch_filter_x1[c] = input;
+                notch_filter_y2[c] = notch_filter_y1[c];
+                notch_filter_y1[c] = output;
+                
+                samples[f * channels_count + c] = output;
+            }
+        }
+    }
+    
+    // Soft clipping per evitare distorsioni dure
+    void applySoftClipping(float* samples, unsigned long long num_frames, unsigned int channels_count) {
+        const float threshold = 0.8f;
+        const float knee = 0.1f;
+        
+        for (unsigned long long f = 0; f < num_frames; ++f) {
+            for (unsigned int c = 0; c < channels_count; ++c) {
+                float input = samples[f * channels_count + c];
+                float abs_input = std::abs(input);
+                
+                if (abs_input > threshold) {
+                    float excess = abs_input - threshold;
+                    float compressed = threshold + excess / (1.0f + excess / knee);
+                    samples[f * channels_count + c] = (input > 0 ? 1.0f : -1.0f) * compressed;
+                }
             }
         }
     }
@@ -369,8 +502,12 @@ public:
                     }
                 }
                 
-                // Applica i filtri per eliminare i pop
-                applyDCFilter(temp_buffer.data(), frames_to_copy_this_iteration, ch_out);
+                // Applica i filtri per eliminare i pop e distorsioni
+                //applyDCFilter(temp_buffer.data(), frames_to_copy_this_iteration, ch_out);
+                //applySmoothingFilter(temp_buffer.data(), frames_to_copy_this_iteration, ch_out);
+                //applyNotchFilter(temp_buffer.data(), frames_to_copy_this_iteration, ch_out);
+                //applyPeakLimiter(temp_buffer.data(), frames_to_copy_this_iteration, ch_out);
+                //applySoftClipping(temp_buffer.data(), frames_to_copy_this_iteration, ch_out);
                 
                 // Applica smooth transition se necessario
                 if (total_frames_decoded > 0) {
@@ -466,3 +603,5 @@ std::shared_ptr<AudioDecoder> decodeAac(std::shared_ptr<LookaheadByteStream> str
 }
 
 } // namespace synthizer
+ 
+ 

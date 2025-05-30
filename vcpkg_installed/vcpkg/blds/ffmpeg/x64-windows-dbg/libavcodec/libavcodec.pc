@@ -1,0 +1,14 @@
+prefix=C:/fork/synthizer3d/vcpkg_installed/vcpkg/pkgs/ffmpeg_x64-windows/debug
+exec_prefix=${prefix}
+libdir=C:/fork/synthizer3d/vcpkg_installed/vcpkg/pkgs/ffmpeg_x64-windows/debug/lib
+includedir=C:/fork/synthizer3d/vcpkg_installed/vcpkg/pkgs/ffmpeg_x64-windows/debug/include
+
+Name: libavcodec
+Description: FFmpeg codec library
+Version: 61.19.101
+Requires: 
+Requires.private: libswresample >= 5.3.100, libavutil >= 59.39.100
+Conflicts:
+Libs: -L${libdir}  -lavcodec 
+Libs.private: mfuuid.lib ole32.lib strmiids.lib ole32.lib user32.lib
+Cflags: -I${includedir}

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "dep247888418864766769083207740115982302501",
+    "type": "internal",
+    "version": "2.4.3",
+    "compile_args": [],
+    "link_args": [],
+    "include_directories": [
+      "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\.",
+      "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\x64-windows-rel\\."
+    ],
+    "sources": [],
+    "extra_files": [],
+    "dependencies": [],
+    "depends": [
+      "pkgconf@sha"
+    ],
+    "meson_variables": [
+      "dep_libpkgconf"
+    ]
+  }
+]

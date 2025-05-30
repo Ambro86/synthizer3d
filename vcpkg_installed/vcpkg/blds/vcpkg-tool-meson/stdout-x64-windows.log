@@ -1,0 +1,18 @@
+-- Installing: C:/fork/synthizer3d/vcpkg_installed/vcpkg/pkgs/vcpkg-tool-meson_x64-windows/share/vcpkg-tool-meson/copyright
+Downloading https://github.com/mesonbuild/meson/archive/1.7.2.tar.gz -> meson-1.7.2.tar.gz
+Successfully downloaded meson-1.7.2.tar.gz
+cmake -E tar: warning: skipping symbolic link "meson-1.7.2/test cases/frameworks/35 boost symlinks/boost/lib/boost_python-vc142-mt-gd-x32-0_3.lib" -> "../Cellar/boost-python/0.3.0/lib/boost_python-vc142-mt-gd-x32-0_3.lib".
+cmake -E tar: warning: skipping symbolic link "meson-1.7.2/test cases/frameworks/35 boost symlinks/boost/lib/boost_python-vc142-mt-gd-x64-0_3.lib" -> "../Cellar/boost-python/0.3.0/lib/boost_python-vc142-mt-gd-x64-0_3.lib".
+cmake -E tar: warning: skipping symbolic link "meson-1.7.2/test cases/frameworks/35 boost symlinks/boost/lib/boost_regex-vc142-mt-gd-x32-0_3.lib" -> "../Cellar/boost/0.3.0/lib/boost_regex-vc142-mt-gd-x32-0_3.lib".
+cmake -E tar: warning: skipping symbolic link "meson-1.7.2/test cases/frameworks/35 boost symlinks/boost/lib/boost_regex-vc142-mt-gd-x64-0_3.lib" -> "../Cellar/boost/0.3.0/lib/boost_regex-vc142-mt-gd-x64-0_3.lib".
+cmake -E tar: warning: skipping symbolic link "meson-1.7.2/test cases/frameworks/35 boost symlinks/boost/lib/libboost_python.so.0.3.0" -> "../Cellar/boost-python/0.3.0/lib/libboost_python.so.0.3.0".
+cmake -E tar: warning: skipping symbolic link "meson-1.7.2/test cases/frameworks/35 boost symlinks/boost/lib/libboost_regex.so.0.3.0" -> "../Cellar/boost/0.3.0/lib/libboost_regex.so.0.3.0".
+-- Applying patch C:/fork/synthizer3d/vcpkg_installed/vcpkg/pkgs/vcpkg-tool-meson_x64-windows/share/vcpkg-tool-meson/meson-intl.patch
+-- Applying patch C:/fork/synthizer3d/vcpkg_installed/vcpkg/pkgs/vcpkg-tool-meson_x64-windows/share/vcpkg-tool-meson/adjust-python-dep.patch
+-- Applying patch C:/fork/synthizer3d/vcpkg_installed/vcpkg/pkgs/vcpkg-tool-meson_x64-windows/share/vcpkg-tool-meson/adjust-args.patch
+-- Applying patch C:/fork/synthizer3d/vcpkg_installed/vcpkg/pkgs/vcpkg-tool-meson_x64-windows/share/vcpkg-tool-meson/remove-freebsd-pcfile-specialization.patch
+Downloading https://www.python.org/ftp/python/3.12.7/python-3.12.7-embed-amd64.zip -> python-3.12.7-embed-amd64.zip
+Successfully downloaded python-3.12.7-embed-amd64.zip
+-- Found Python version '3.12.7 at C:/Users/ambro/AppData/Local/vcpkg/downloads/tools/python/python-3.12.7-x64-1/python.exe'
+-- Using meson: C:/Users/ambro/AppData/Local/vcpkg/downloads/tools/meson-1.7.2-549ef7/meson.py
+-- Performing post-build validation

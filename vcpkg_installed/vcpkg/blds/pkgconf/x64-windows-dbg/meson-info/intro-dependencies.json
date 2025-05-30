@@ -1,0 +1,22 @@
+[
+  {
+    "name": "dep265714003114907507769072284131423957548",
+    "type": "internal",
+    "version": "2.4.3",
+    "compile_args": [],
+    "link_args": [],
+    "include_directories": [
+      "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\.",
+      "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\x64-windows-dbg\\."
+    ],
+    "sources": [],
+    "extra_files": [],
+    "dependencies": [],
+    "depends": [
+      "pkgconf@sha"
+    ],
+    "meson_variables": [
+      "dep_libpkgconf"
+    ]
+  }
+]

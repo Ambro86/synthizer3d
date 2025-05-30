@@ -1,0 +1,3 @@
+Checking patch usr/share/automake-1.16/compile...
+warning: usr/share/automake-1.16/compile has type 100644, expected 100755
+Applied patch usr/share/automake-1.16/compile cleanly.

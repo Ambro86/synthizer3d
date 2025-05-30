@@ -1,0 +1,7 @@
+Package: vcpkg-tool-meson
+Version: 1.7.2
+Depends: vcpkg-cmake-get-vars
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 0954d7266a0bde2a233c5f6d51c47f6452258531fa9826f7d266a7ac84a20bb3
+Description: Meson build system

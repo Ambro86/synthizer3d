@@ -1,0 +1,105 @@
+{
+  "targets": {
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\x64-windows-dbg\\pkgconf-6.dll": {
+      "destination": "{libdir_shared}\\pkgconf-6.dll",
+      "tag": "runtime",
+      "subproject": null,
+      "install_rpath": null
+    },
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\x64-windows-dbg\\pkgconf.lib": {
+      "destination": "{libdir_shared}\\pkgconf.lib",
+      "tag": "devel",
+      "subproject": null,
+      "install_rpath": null
+    },
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\x64-windows-dbg\\pkgconf-6.pdb": {
+      "destination": "{libdir_shared}\\pkgconf-6.pdb",
+      "tag": "devel",
+      "subproject": null,
+      "install_rpath": null
+    },
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\x64-windows-dbg\\pkgconf.exe": {
+      "destination": "{bindir}\\pkgconf.exe",
+      "tag": "runtime",
+      "subproject": null,
+      "install_rpath": null
+    },
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\x64-windows-dbg\\pkgconf.pdb": {
+      "destination": "{bindir}\\pkgconf.pdb",
+      "tag": "devel",
+      "subproject": null,
+      "install_rpath": null
+    }
+  },
+  "data": {
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\x64-windows-dbg\\meson-private\\libpkgconf.pc": {
+      "destination": "{libdir}\\pkgconfig\\libpkgconf.pc",
+      "tag": "devel",
+      "subproject": null
+    },
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\pkg.m4": {
+      "destination": "share/aclocal\\pkg.m4",
+      "tag": null,
+      "subproject": null
+    },
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\AUTHORS": {
+      "destination": "share/doc/pkgconf\\AUTHORS",
+      "tag": null,
+      "subproject": null
+    },
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\README.md": {
+      "destination": "share/doc/pkgconf\\README.md",
+      "tag": null,
+      "subproject": null
+    }
+  },
+  "man": {
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\man/pkgconf.1": {
+      "destination": "{mandir}\\man1\\pkgconf.1",
+      "tag": "man",
+      "subproject": null
+    },
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\man/pkg.m4.7": {
+      "destination": "{mandir}\\man7\\pkg.m4.7",
+      "tag": "man",
+      "subproject": null
+    },
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\man/pc.5": {
+      "destination": "{mandir}\\man5\\pc.5",
+      "tag": "man",
+      "subproject": null
+    },
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\man/pkgconf-personality.5": {
+      "destination": "{mandir}\\man5\\pkgconf-personality.5",
+      "tag": "man",
+      "subproject": null
+    }
+  },
+  "headers": {
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf\\libpkgconf.h": {
+      "destination": "{includedir}\\pkgconf/libpkgconf\\libpkgconf.h",
+      "tag": "devel",
+      "subproject": null
+    },
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf\\stdinc.h": {
+      "destination": "{includedir}\\pkgconf/libpkgconf\\stdinc.h",
+      "tag": "devel",
+      "subproject": null
+    },
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf\\iter.h": {
+      "destination": "{includedir}\\pkgconf/libpkgconf\\iter.h",
+      "tag": "devel",
+      "subproject": null
+    },
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf\\bsdstubs.h": {
+      "destination": "{includedir}\\pkgconf/libpkgconf\\bsdstubs.h",
+      "tag": "devel",
+      "subproject": null
+    },
+    "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf\\libpkgconf-api.h": {
+      "destination": "{includedir}\\pkgconf/libpkgconf\\libpkgconf-api.h",
+      "tag": "devel",
+      "subproject": null
+    }
+  }
+}

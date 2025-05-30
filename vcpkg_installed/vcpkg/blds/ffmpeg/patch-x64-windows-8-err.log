@@ -1,0 +1,4 @@
+Checking patch configure...
+warning: configure has type 100644, expected 100755
+Hunk #1 succeeded at 5651 (offset 44 lines).
+Applied patch configure cleanly.

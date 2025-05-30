@@ -1,1 +1,0 @@
-  -nologo -DWIN32 -D_WINDOWS -utf-8 -MP  -MD -O2 -Oi -Gy -DNDEBUG -Z7    -I "C:/fork/synthizer3d/vcpkg_installed/x64-windows/include"

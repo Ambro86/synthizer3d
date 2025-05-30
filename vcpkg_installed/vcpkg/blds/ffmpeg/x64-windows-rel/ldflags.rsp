@@ -1,1 +1,0 @@
- -machine:x64 -nologo -DEBUG -INCREMENTAL:NO -OPT:REF -OPT:ICF    

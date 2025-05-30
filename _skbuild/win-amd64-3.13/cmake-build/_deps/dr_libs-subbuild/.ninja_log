@@ -1,0 +1,21 @@
+# ninja log v5
+1	49	7703171178977284	dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-mkdir	1ff3125ca896ff5b
+1	49	7703171178977284	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/dr_libs-subbuild/dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-mkdir	1ff3125ca896ff5b
+93	132	7703171179812931	dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-update	a6035686f3732f40
+349	403	7703171182522023	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/dr_libs-subbuild/CMakeFiles/dr_libs-populate-complete	6c60e7e77ec178d8
+271	309	7703171181574311	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/dr_libs-subbuild/dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-install	7ba8c818bf7c4f66
+132	173	7703171180224212	dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-patch	5502687379b8c0ac
+49	88	7703171179367790	dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-download	8264f9482dca7360
+49	88	7703171179367790	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/dr_libs-subbuild/dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-download	8264f9482dca7360
+93	132	7703171179812931	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/dr_libs-subbuild/dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-update	a6035686f3732f40
+132	173	7703171180224212	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/dr_libs-subbuild/dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-patch	5502687379b8c0ac
+173	231	7703171180794394	dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-configure	944cdf6d1a00e8ae
+173	231	7703171180794394	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/dr_libs-subbuild/dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-configure	944cdf6d1a00e8ae
+231	270	7703171181190755	dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-build	6ed3cf02f18da8e4
+231	270	7703171181190755	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/dr_libs-subbuild/dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-build	6ed3cf02f18da8e4
+271	309	7703171181574311	dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-install	7ba8c818bf7c4f66
+309	348	7703171181972861	dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-test	7c54b3073d5bec50
+309	348	7703171181972861	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/dr_libs-subbuild/dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-test	7c54b3073d5bec50
+349	403	7703171182522023	CMakeFiles/dr_libs-populate-complete	6c60e7e77ec178d8
+349	403	7703171182522023	dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-done	6c60e7e77ec178d8
+349	403	7703171182522023	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/dr_libs-subbuild/dr_libs-populate-prefix/src/dr_libs-populate-stamp/dr_libs-populate-done	6c60e7e77ec178d8

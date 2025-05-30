@@ -1,4 +1,4 @@
-// File: aac.cpp
+// File: aac.cpp - Versione con fix per eliminare i pop audio
 
 #include "synthizer/decoders/aac.hpp"
 #include "synthizer/byte_stream.hpp"
@@ -12,6 +12,7 @@
 #include <cstring>
 #include <algorithm>
 #include <memory>
+#include <cmath>
 
 extern "C" {
 #include <neaacdec.h>
@@ -30,6 +31,9 @@ namespace aac_detail {
 
 static constexpr unsigned int INTERNAL_DECODER_CHANNELS_REQUEST_MAX = 32;
 static constexpr unsigned int AAC_INPUT_BUFFER_CAPACITY = 32768;
+static constexpr unsigned int FADE_SAMPLES = 64; // Campioni per fade in/out
+static constexpr unsigned int MAX_CONSECUTIVE_ERRORS = 3;
+static constexpr float SILENCE_THRESHOLD = 1e-6f;
 
 class AacDecoder : public AudioDecoder {
 private:
@@ -43,6 +47,19 @@ private:
     std::vector<unsigned char> internal_input_buffer;
     unsigned long current_valid_bytes_in_buffer;
     bool stream_at_eos;
+    
+    // Variabili per la gestione dei pop audio
+    std::vector<float> last_frame_samples; // Ultimi campioni per continuità
+    std::vector<float> fade_buffer; // Buffer per fade in/out
+    bool need_fade_in;
+    bool decoder_recovering;
+    int consecutive_decode_errors;
+    unsigned long long total_frames_decoded;
+    
+    // Filtro passa-alto per rimuovere DC offset
+    std::vector<float> dc_filter_x1, dc_filter_y1;
+    static constexpr float DC_FILTER_ALPHA = 0.995f;
+
 public:
     AacDecoder(std::shared_ptr<LookaheadByteStream> stream_ptr) :
         stream(stream_ptr),
@@ -52,7 +69,11 @@ public:
         frame_count(0),
         current_frame_data(nullptr),
         current_valid_bytes_in_buffer(0),
-        stream_at_eos(false) {
+        stream_at_eos(false),
+        need_fade_in(true),
+        decoder_recovering(false),
+        consecutive_decode_errors(0),
+        total_frames_decoded(0) {
 
         internal_input_buffer.resize(AAC_INPUT_BUFFER_CAPACITY);
 
@@ -66,7 +87,13 @@ public:
             NeAACDecClose(decoder_handle);
             throw Error("Fallimento nel recuperare la configurazione FAAD2.");
         }
+        
+        // Configurazione ottimizzata per ridurre i pop
         config_ptr->outputFormat = FAAD_FMT_FLOAT;
+        config_ptr->downMatrix = 0; // Non fare downmix automatico
+        config_ptr->useOldADTSFormat = 0;
+        config_ptr->dontUpSampleImplicitSBR = 1; // Evita upsampling che può causare pop
+        
         if (NeAACDecSetConfiguration(decoder_handle, config_ptr) == 0) {
             NeAACDecClose(decoder_handle);
             throw Error("Fallimento nell'impostare la configurazione FAAD2 (output a float).");
@@ -110,6 +137,12 @@ public:
             NeAACDecClose(decoder_handle);
             throw Error("Parametri stream AAC (sample rate/channels) non validi dopo init.");
         }
+        
+        // Inizializza i buffer per la gestione dei pop
+        last_frame_samples.resize(this->channels, 0.0f);
+        fade_buffer.resize(FADE_SAMPLES * this->channels, 0.0f);
+        dc_filter_x1.resize(this->channels, 0.0f);
+        dc_filter_y1.resize(this->channels, 0.0f);
     }
 
     ~AacDecoder() override {
@@ -118,6 +151,98 @@ public:
         }
     }
 
+private:
+    // Applica fade in per evitare pop all'inizio
+    void applyFadeIn(float* samples, unsigned long long num_frames, unsigned int channels_count) {
+        unsigned long long fade_frames = std::min(static_cast<unsigned long long>(FADE_SAMPLES), num_frames);
+        for (unsigned long long f = 0; f < fade_frames; ++f) {
+            float fade_factor = static_cast<float>(f) / static_cast<float>(FADE_SAMPLES);
+            for (unsigned int c = 0; c < channels_count; ++c) {
+                samples[f * channels_count + c] *= fade_factor;
+            }
+        }
+    }
+    
+    // Applica fade out per evitare pop alla fine
+    void applyFadeOut(float* samples, unsigned long long num_frames, unsigned int channels_count) {
+        unsigned long long fade_frames = std::min(static_cast<unsigned long long>(FADE_SAMPLES), num_frames);
+        unsigned long long start_frame = num_frames - fade_frames;
+        for (unsigned long long f = start_frame; f < num_frames; ++f) {
+            float fade_factor = static_cast<float>(num_frames - f) / static_cast<float>(FADE_SAMPLES);
+            for (unsigned int c = 0; c < channels_count; ++c) {
+                samples[f * channels_count + c] *= fade_factor;
+            }
+        }
+    }
+    
+    // Smooth transition tra frame per evitare discontinuità
+    void applySmoothTransition(float* samples, unsigned long long num_frames, unsigned int channels_count) {
+        if (num_frames == 0 || last_frame_samples.size() != channels_count) return;
+        
+        // Controlla se c'è una discontinuità significativa
+        bool needs_smoothing = false;
+        for (unsigned int c = 0; c < channels_count; ++c) {
+            float diff = std::abs(samples[c] - last_frame_samples[c]);
+            if (diff > SILENCE_THRESHOLD * 10.0f) { // Soglia per rilevare discontinuità
+                needs_smoothing = true;
+                break;
+            }
+        }
+        
+        if (needs_smoothing) {
+            unsigned long long smooth_frames = std::min(static_cast<unsigned long long>(16), num_frames);
+            for (unsigned long long f = 0; f < smooth_frames; ++f) {
+                float blend_factor = static_cast<float>(f) / static_cast<float>(smooth_frames);
+                for (unsigned int c = 0; c < channels_count; ++c) {
+                    float current_sample = samples[f * channels_count + c];
+                    float smooth_sample = last_frame_samples[c] * (1.0f - blend_factor) + current_sample * blend_factor;
+                    samples[f * channels_count + c] = smooth_sample;
+                }
+            }
+        }
+    }
+    
+    // Filtro passa-alto per rimuovere DC offset che può causare pop
+    void applyDCFilter(float* samples, unsigned long long num_frames, unsigned int channels_count) {
+        for (unsigned long long f = 0; f < num_frames; ++f) {
+            for (unsigned int c = 0; c < channels_count && c < dc_filter_x1.size(); ++c) {
+                float input = samples[f * channels_count + c];
+                float output = input - dc_filter_x1[c] + DC_FILTER_ALPHA * dc_filter_y1[c];
+                dc_filter_x1[c] = input;
+                dc_filter_y1[c] = output;
+                samples[f * channels_count + c] = output;
+            }
+        }
+    }
+    
+    // Salva gli ultimi campioni per la continuità
+    void saveLastSamples(float* samples, unsigned long long num_frames, unsigned int channels_count) {
+        if (num_frames > 0 && channels_count == last_frame_samples.size()) {
+            unsigned long long last_frame_index = (num_frames - 1) * channels_count;
+            for (unsigned int c = 0; c < channels_count; ++c) {
+                last_frame_samples[c] = samples[last_frame_index + c];
+            }
+        }
+    }
+    
+    // Genera silenzio con fade per coprire errori
+    void generateSilenceWithFade(float* output, unsigned long long num_frames, unsigned int channels_count) {
+        // Riempi con silenzio
+        std::fill(output, output + num_frames * channels_count, 0.0f);
+        
+        // Applica fade in dal last_frame_samples se disponibile
+        if (!last_frame_samples.empty() && num_frames > 0) {
+            unsigned long long fade_frames = std::min(static_cast<unsigned long long>(FADE_SAMPLES/2), num_frames);
+            for (unsigned long long f = 0; f < fade_frames; ++f) {
+                float fade_factor = 1.0f - (static_cast<float>(f) / static_cast<float>(fade_frames));
+                for (unsigned int c = 0; c < channels_count && c < last_frame_samples.size(); ++c) {
+                    output[f * channels_count + c] = last_frame_samples[c] * fade_factor;
+                }
+            }
+        }
+    }
+
+public:
     unsigned long long writeSamplesInterleaved(unsigned long long num_frames_to_write, float *output_samples, unsigned int channels_req = 0) override {
         if (!decoder_handle || num_frames_to_write == 0) return 0;
 
@@ -129,8 +254,6 @@ public:
 
         // Inizializza a zero l'output
         std::fill(output_samples, output_samples + num_frames_to_write * ch_out, 0.0f);
-
-        int consecutive_decode_errors = 0;
 
         while (frames_written_total < num_frames_to_write) {
             // Riempi il buffer se serve
@@ -149,8 +272,13 @@ public:
                 }
             }
 
-            // Se il buffer è vuoto e lo stream è finito, fine.
-            if (current_valid_bytes_in_buffer == 0 && stream_at_eos) break;
+            // Se il buffer è vuoto e lo stream è finito, applica fade out e termina
+            if (current_valid_bytes_in_buffer == 0 && stream_at_eos) {
+                if (frames_written_total > 0) {
+                    applyFadeOut(output_samples, frames_written_total, ch_out);
+                }
+                break;
+            }
             if (current_valid_bytes_in_buffer == 0) break;
 
             current_frame_data = NeAACDecDecode(decoder_handle, &frame_info, internal_input_buffer.data(), current_valid_bytes_in_buffer);
@@ -158,35 +286,49 @@ public:
             logDebug("FAAD2: decoded frame: samples=%lu, bytesconsumed=%lu, error=%d, eos=%d",
                      frame_info.samples, frame_info.bytesconsumed, frame_info.error, stream_at_eos);
 
-            // Migliorata: SOLO su errore GRAVE si scrivono zeri nell'output
+            // Gestione errori migliorata
             if (frame_info.error > 0) {
                 logDebug("Errore decodifica FAAD2: %s (consumati: %lu, campioni: %lu)",
                          NeAACDecGetErrorMessage(frame_info.error), frame_info.bytesconsumed, frame_info.samples);
 
-                ++consecutive_decode_errors;
-                // Se sono molti errori consecutivi, inserisci uno o due frame di zeri come padding per evitare pop prolungati.
-                if (consecutive_decode_errors <= 2 && frames_written_total < num_frames_to_write) {
-                    for (unsigned int c = 0; c < ch_out; ++c) {
-                        output_samples[frames_written_total * ch_out + c] = 0.0f;
-                    }
-                    frames_written_total += 1;
+                consecutive_decode_errors++;
+                decoder_recovering = true;
+                
+                // Per errori minori, inserisci silenzio con fade
+                if (consecutive_decode_errors <= MAX_CONSECUTIVE_ERRORS && frames_written_total < num_frames_to_write) {
+                    unsigned long long frames_to_fill = std::min(static_cast<unsigned long long>(1024), num_frames_to_write - frames_written_total);
+                    generateSilenceWithFade(output_samples + frames_written_total * ch_out, frames_to_fill, ch_out);
+                    frames_written_total += frames_to_fill;
                 }
 
-                // Gestione buffer dopo errore
+                // Gestione buffer dopo errore - più conservativa
                 if (frame_info.bytesconsumed > 0 && frame_info.bytesconsumed <= current_valid_bytes_in_buffer) {
                     std::memmove(internal_input_buffer.data(),
                                  internal_input_buffer.data() + frame_info.bytesconsumed,
                                  current_valid_bytes_in_buffer - frame_info.bytesconsumed);
                     current_valid_bytes_in_buffer -= frame_info.bytesconsumed;
                 } else {
-                    current_valid_bytes_in_buffer = 0;
+                    // Su errore grave, salta una piccola quantità di byte
+                    unsigned long bytes_to_skip = std::min(static_cast<unsigned long>(256), current_valid_bytes_in_buffer);
+                    if (bytes_to_skip > 0) {
+                        std::memmove(internal_input_buffer.data(),
+                                     internal_input_buffer.data() + bytes_to_skip,
+                                     current_valid_bytes_in_buffer - bytes_to_skip);
+                        current_valid_bytes_in_buffer -= bytes_to_skip;
+                    } else {
+                        current_valid_bytes_in_buffer = 0;
+                    }
                 }
                 continue;
             } else {
-                consecutive_decode_errors = 0;
+                // Reset contatore errori su successo
+                if (consecutive_decode_errors > 0) {
+                    consecutive_decode_errors = 0;
+                    decoder_recovering = true; // Mantieni il flag per il prossimo frame valido
+                }
             }
 
-            // Se il frame non produce campioni, ma non è errore: accumula più dati
+            // Se il frame non produce campioni, ma non è errore
             if (current_frame_data == nullptr || frame_info.samples == 0) {
                 if (frame_info.bytesconsumed > 0 && frame_info.bytesconsumed <= current_valid_bytes_in_buffer) {
                     std::memmove(internal_input_buffer.data(),
@@ -200,9 +342,6 @@ public:
                         current_valid_bytes_in_buffer = 0;
                     }
                 }
-
-                // NON scrivere frame di zeri se non sei sicuro che il decoder abbia bisogno di tempo.
-                // Se vuoi evitare buchi, puoi scrivere frame di zeri SOLO se ti accorgi di salto brusco (conta i frame non scritti).
                 continue;
             }
 
@@ -214,19 +353,46 @@ public:
                 float* input_ptr = static_cast<float*>(current_frame_data);
                 unsigned long long frames_to_copy_this_iteration = std::min(frames_in_this_faad_output, num_frames_to_write - frames_written_total);
 
+                // Copia i campioni nel buffer temporaneo per l'elaborazione
+                std::vector<float> temp_buffer(frames_to_copy_this_iteration * ch_out, 0.0f);
+                
                 for (unsigned long long f = 0; f < frames_to_copy_this_iteration; ++f) {
                     for (unsigned int c_in = 0; c_in < channels_in_faad_output; ++c_in) {
                         if (c_in < ch_out) {
-                            output_samples[(frames_written_total + f) * ch_out + c_in] = *input_ptr;
+                            temp_buffer[f * ch_out + c_in] = *input_ptr;
                         }
                         input_ptr++;
                     }
-                    // azzera eventuali canali extra
+                    // Azzera eventuali canali extra
                     for (unsigned int c_fill = channels_in_faad_output; c_fill < ch_out; ++c_fill) {
-                        output_samples[(frames_written_total + f) * ch_out + c_fill] = 0.0f;
+                        temp_buffer[f * ch_out + c_fill] = 0.0f;
                     }
                 }
+                
+                // Applica i filtri per eliminare i pop
+                applyDCFilter(temp_buffer.data(), frames_to_copy_this_iteration, ch_out);
+                
+                // Applica smooth transition se necessario
+                if (total_frames_decoded > 0) {
+                    applySmoothTransition(temp_buffer.data(), frames_to_copy_this_iteration, ch_out);
+                }
+                
+                // Applica fade in se è il primo frame o se stiamo recuperando da errore
+                if (need_fade_in || decoder_recovering) {
+                    applyFadeIn(temp_buffer.data(), frames_to_copy_this_iteration, ch_out);
+                    need_fade_in = false;
+                    decoder_recovering = false;
+                }
+                
+                // Copia nel buffer di output
+                std::copy(temp_buffer.begin(), temp_buffer.end(), 
+                         output_samples + frames_written_total * ch_out);
+                
+                // Salva gli ultimi campioni per la continuità
+                saveLastSamples(temp_buffer.data(), frames_to_copy_this_iteration, ch_out);
+                
                 frames_written_total += frames_to_copy_this_iteration;
+                total_frames_decoded += frames_to_copy_this_iteration;
             }
 
             // Gestione buffer dopo decodifica
@@ -236,13 +402,12 @@ public:
                              current_valid_bytes_in_buffer - frame_info.bytesconsumed);
                 current_valid_bytes_in_buffer -= frame_info.bytesconsumed;
             } else if (frame_info.bytesconsumed > current_valid_bytes_in_buffer) {
-                logDebug("FAAD2 ha consumato più byte di quelli disponibili (successo).");
+                logDebug("FAAD2 ha consumato più byte di quelli disponibili.");
                 current_valid_bytes_in_buffer = 0;
                 break;
-            } else if (frame_info.bytesconsumed == 0 && frame_info.samples > 0) {
-                // NON svuotare il buffer: caso raro, lasciamo come fallback
             }
         }
+        
         return frames_written_total;
     }
 

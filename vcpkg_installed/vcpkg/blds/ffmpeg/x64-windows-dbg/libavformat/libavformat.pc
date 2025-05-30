@@ -1,0 +1,14 @@
+prefix=C:/fork/synthizer3d/vcpkg_installed/vcpkg/pkgs/ffmpeg_x64-windows/debug
+exec_prefix=${prefix}
+libdir=C:/fork/synthizer3d/vcpkg_installed/vcpkg/pkgs/ffmpeg_x64-windows/debug/lib
+includedir=C:/fork/synthizer3d/vcpkg_installed/vcpkg/pkgs/ffmpeg_x64-windows/debug/include
+
+Name: libavformat
+Description: FFmpeg container format library
+Version: 61.7.100
+Requires: 
+Requires.private: libavcodec >= 61.19.101, libswresample >= 5.3.100, libavutil >= 59.39.100
+Conflicts:
+Libs: -L${libdir}  -lavformat 
+Libs.private: secur32.lib ws2_32.lib
+Cflags: -I${includedir}

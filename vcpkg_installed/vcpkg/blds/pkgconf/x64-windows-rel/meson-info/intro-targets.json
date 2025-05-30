@@ -1,0 +1,212 @@
+[
+  {
+    "name": "pkgconf",
+    "id": "pkgconf@sha",
+    "type": "shared library",
+    "defined_in": "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\meson.build",
+    "filename": [
+      "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\x64-windows-rel\\pkgconf-6.dll"
+    ],
+    "build_by_default": true,
+    "target_sources": [
+      {
+        "language": "c",
+        "machine": "host",
+        "compiler": [
+          "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe",
+          "-DWIN32",
+          "-D_WINDOWS",
+          "-utf-8",
+          "-MP",
+          "-MD",
+          "-O2",
+          "-Oi",
+          "-Gy",
+          "-DNDEBUG",
+          "-Z7"
+        ],
+        "parameters": [
+          "-IC:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\x64-windows-rel\\pkgconf-6.dll.p",
+          "-IC:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\x64-windows-rel",
+          "-IC:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean",
+          "-IC:\\fork\\synthizer3d\\vcpkg_installed\\x64-windows\\include",
+          "/MD",
+          "/nologo",
+          "/showIncludes",
+          "/utf-8",
+          "/W2",
+          "-D_BSD_SOURCE",
+          "-D_DEFAULT_SOURCE",
+          "-D_POSIX_C_SOURCE=200809L",
+          "-nologo",
+          "-DWIN32",
+          "-D_WINDOWS",
+          "-utf-8",
+          "-MP",
+          "-MD",
+          "-O2",
+          "-Oi",
+          "-Gy",
+          "-DNDEBUG",
+          "-Z7",
+          "-DLIBPKGCONF_EXPORT",
+          "-DPKGCONFIG_IS_NOT_STATIC"
+        ],
+        "sources": [
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf/argvsplit.c",
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf/audit.c",
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf/buffer.c",
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf/bsdstubs.c",
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf/cache.c",
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf/client.c",
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf/dependency.c",
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf/fileio.c",
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf/fragment.c",
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf/parser.c",
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf/path.c",
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf/personality.c",
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf/pkg.c",
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf/queue.c",
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\libpkgconf/tuple.c"
+        ],
+        "generated_sources": [],
+        "unity_sources": []
+      },
+      {
+        "linker": [
+          "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/link.exe"
+        ],
+        "parameters": [
+          "-INCREMENTAL:NO",
+          "/release",
+          "/nologo",
+          "/DLL",
+          "/IMPLIB:pkgconf.lib",
+          "-machine:x64",
+          "-nologo",
+          "-DEBUG",
+          "-OPT:REF",
+          "-OPT:ICF",
+          "/LIBPATH:C:/fork/synthizer3d/vcpkg_installed/x64-windows/lib",
+          "kernel32.lib",
+          "user32.lib",
+          "gdi32.lib",
+          "winspool.lib",
+          "shell32.lib",
+          "ole32.lib",
+          "oleaut32.lib",
+          "uuid.lib",
+          "comdlg32.lib",
+          "advapi32.lib"
+        ]
+      }
+    ],
+    "extra_files": [],
+    "subproject": null,
+    "dependencies": [],
+    "depends": [],
+    "installed": true,
+    "install_filename": [
+      "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\pkgs\\pkgconf_x64-windows\\bin\\pkgconf-6.dll"
+    ]
+  },
+  {
+    "name": "pkgconf",
+    "id": "pkgconf@exe",
+    "type": "executable",
+    "defined_in": "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\meson.build",
+    "filename": [
+      "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\x64-windows-rel\\pkgconf.exe"
+    ],
+    "build_by_default": true,
+    "target_sources": [
+      {
+        "language": "c",
+        "machine": "host",
+        "compiler": [
+          "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe",
+          "-DWIN32",
+          "-D_WINDOWS",
+          "-utf-8",
+          "-MP",
+          "-MD",
+          "-O2",
+          "-Oi",
+          "-Gy",
+          "-DNDEBUG",
+          "-Z7"
+        ],
+        "parameters": [
+          "-IC:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\x64-windows-rel\\pkgconf.exe.p",
+          "-IC:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\x64-windows-rel",
+          "-IC:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean",
+          "-IC:\\fork\\synthizer3d\\vcpkg_installed\\x64-windows\\include",
+          "/MD",
+          "/nologo",
+          "/showIncludes",
+          "/utf-8",
+          "/W2",
+          "-D_BSD_SOURCE",
+          "-D_DEFAULT_SOURCE",
+          "-D_POSIX_C_SOURCE=200809L",
+          "-nologo",
+          "-DWIN32",
+          "-D_WINDOWS",
+          "-utf-8",
+          "-MP",
+          "-MD",
+          "-O2",
+          "-Oi",
+          "-Gy",
+          "-DNDEBUG",
+          "-Z7",
+          "-DPKGCONFIG_IS_NOT_STATIC"
+        ],
+        "sources": [
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\cli/main.c",
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\cli/getopt_long.c",
+          "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\src\\conf-2.4.3-d5be0b9b2c.clean\\cli/renderer-msvc.c"
+        ],
+        "generated_sources": [],
+        "unity_sources": []
+      },
+      {
+        "linker": [
+          "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/link.exe"
+        ],
+        "parameters": [
+          "-INCREMENTAL:NO",
+          "/release",
+          "/nologo",
+          "-machine:x64",
+          "-nologo",
+          "-DEBUG",
+          "-OPT:REF",
+          "-OPT:ICF",
+          "/LIBPATH:C:/fork/synthizer3d/vcpkg_installed/x64-windows/lib",
+          "pkgconf.lib",
+          "/SUBSYSTEM:CONSOLE",
+          "kernel32.lib",
+          "user32.lib",
+          "gdi32.lib",
+          "winspool.lib",
+          "shell32.lib",
+          "ole32.lib",
+          "oleaut32.lib",
+          "uuid.lib",
+          "comdlg32.lib",
+          "advapi32.lib"
+        ]
+      }
+    ],
+    "extra_files": [],
+    "subproject": null,
+    "dependencies": [],
+    "depends": [],
+    "win_subsystem": "console",
+    "installed": true,
+    "install_filename": [
+      "C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\pkgs\\pkgconf_x64-windows\\bin\\pkgconf.exe"
+    ]
+  }
+]

@@ -1,0 +1,21 @@
+[
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/meson.build",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/meson_options.txt",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/libpkgconf/meson.build",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/libpkgconf/config.h.meson",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/Kyuafile.in",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/tests/meson.build",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/tests/Kyuafile.in",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/tests/test_env.sh.in",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/tests/basic.sh",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/tests/builtins.sh",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/tests/conflicts.sh",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/tests/framework.sh",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/tests/parser.sh",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/tests/provides.sh",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/tests/regress.sh",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/tests/requires.sh",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/tests/symlink.sh",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/tests/sysroot.sh",
+  "C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/src/conf-2.4.3-d5be0b9b2c.clean/tests/version.sh"
+]

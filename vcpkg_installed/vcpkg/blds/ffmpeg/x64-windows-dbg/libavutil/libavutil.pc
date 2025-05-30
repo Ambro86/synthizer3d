@@ -1,0 +1,14 @@
+prefix=C:/fork/synthizer3d/vcpkg_installed/vcpkg/pkgs/ffmpeg_x64-windows/debug
+exec_prefix=${prefix}
+libdir=C:/fork/synthizer3d/vcpkg_installed/vcpkg/pkgs/ffmpeg_x64-windows/debug/lib
+includedir=C:/fork/synthizer3d/vcpkg_installed/vcpkg/pkgs/ffmpeg_x64-windows/debug/include
+
+Name: libavutil
+Description: FFmpeg utility library
+Version: 59.39.100
+Requires: 
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lavutil 
+Libs.private: user32.lib bcrypt.lib
+Cflags: -I${includedir}

@@ -1,0 +1,130 @@
+{
+  "$schema": "https://raw.githubusercontent.com/spdx/spdx-spec/v2.2.1/schemas/spdx-schema.json",
+  "spdxVersion": "SPDX-2.2",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "documentNamespace": "https://spdx.org/spdxdocs/pkgconf-x64-windows-2.4.3#1-e7857b90-cf3b-4315-8800-371bbfb6a074",
+  "name": "pkgconf:x64-windows@2.4.3#1 b785e775e8c7529f27b8278e397017f4b34ac1fa8de8d0825671b091fb83434c",
+  "creationInfo": {
+    "creators": [
+      "Tool: vcpkg-2025-04-01-9c604254140797833b6f76908435c9fcbf09920e"
+    ],
+    "created": "2025-05-30T07:46:58Z"
+  },
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "GENERATES",
+      "relatedSpdxElement": "SPDXRef-binary"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-0"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-1"
+    },
+    {
+      "spdxElementId": "SPDXRef-binary",
+      "relationshipType": "GENERATED_FROM",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-0",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-1",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-1",
+      "relationshipType": "DEPENDENCY_MANIFEST_OF",
+      "relatedSpdxElement": "SPDXRef-port"
+    }
+  ],
+  "packages": [
+    {
+      "name": "pkgconf",
+      "SPDXID": "SPDXRef-port",
+      "versionInfo": "2.4.3#1",
+      "downloadLocation": "git+https://github.com/microsoft/vcpkg@ee86667e248e39cfb0ac994ac4e0bd00ce5b0836",
+      "homepage": "https://github.com/pkgconf/pkgconf",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "description": "pkgconf is a program which helps to configure compiler and linker flags for development libraries. It is similar to pkg-config from freedesktop.org.",
+      "comment": "This is the port (recipe) consumed by vcpkg."
+    },
+    {
+      "name": "pkgconf:x64-windows",
+      "SPDXID": "SPDXRef-binary",
+      "versionInfo": "b785e775e8c7529f27b8278e397017f4b34ac1fa8de8d0825671b091fb83434c",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "comment": "This is a binary package built by vcpkg."
+    },
+    {
+      "SPDXID": "SPDXRef-resource-0",
+      "name": "pkgconf/pkgconf",
+      "downloadLocation": "git+https://github.com/pkgconf/pkgconf@pkgconf-2.4.3",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "8c73b8f9c3dd3c72e6b0acf139a68054d631484af4618f46c30c3c13947294986d809bbac0648af9e974739fd42e1730a4e22323884d7cf72f0843a972991a99"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-resource-1",
+      "name": "pkgconf-add-missing-define-664b53d5c4920e66e4a57c7515ccfd1bd1477bac.patch",
+      "packageFileName": "pkgconf-add-missing-define-664b53d5c4920e66e4a57c7515ccfd1bd1477bac.patch",
+      "downloadLocation": "https://github.com/pkgconf/pkgconf/commit/664b53d5c4920e66e4a57c7515ccfd1bd1477bac.patch?full_index=1",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "1e5dc8b6ac9547157694c1674660c0f207876ed2916a053217c9299eb352c05d1f03a1ba8afddaf994b7c22474590407c627846cd68000bf53bd7229d9009895"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "fileName": "./portfile.cmake",
+      "SPDXID": "SPDXRef-file-0",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "c2bb1673e75ee1298dd799d494df4a785da317e55ccdebc7e20c7c9ceda5b0cb"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./vcpkg.json",
+      "SPDXID": "SPDXRef-file-1",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "aa84d5e2df85970a062637c16b1c2bbc2913d76c9b5ae6df7a805268252079fd"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    }
+  ]
+}

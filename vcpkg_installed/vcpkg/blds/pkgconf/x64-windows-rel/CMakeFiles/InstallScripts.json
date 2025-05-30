@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/fork/synthizer3d/vcpkg_installed/vcpkg/blds/pkgconf/x64-windows-rel/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

@@ -1,0 +1,12 @@
+prefix=
+exec_prefix=
+libdir=${pcfiledir}/../../../libavutil
+includedir=/c/fork/synthizer3d/vcpkg_installed/vcpkg/blds/ffmpeg/src/n7.1.1-07cb3aa68a.clean
+
+Name: libavutil
+Description: FFmpeg utility library
+Version: 59.39.100
+Requires: 
+Conflicts:
+Libs: -L${libdir} -Wl,-rpath,${libdir} -lavutil 
+Cflags: -I${includedir}

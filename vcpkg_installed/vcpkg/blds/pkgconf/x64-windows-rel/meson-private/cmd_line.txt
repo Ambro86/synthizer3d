@@ -1,0 +1,15 @@
+[options]
+tests = disabled
+optimization = plain
+debug = false
+cmake_prefix_path = ['C:/fork/synthizer3d/vcpkg_installed/x64-windows','C:/fork/synthizer3d/vcpkg_installed/x64-windows/debug','C:/fork/synthizer3d/vcpkg_installed/x64-windows/share']
+prefix = C:/fork/synthizer3d/vcpkg_installed/vcpkg/pkgs/pkgconf_x64-windows
+libdir = lib
+backend = ninja
+wrap_mode = nodownload
+pkgconfig.relocatable = True
+pkg_config_path = ['C:/fork/synthizer3d/vcpkg_installed/x64-windows/lib/pkgconfig','C:/fork/synthizer3d/vcpkg_installed/x64-windows/share/pkgconfig']
+
+[properties]
+native_file = ['C:\\fork\\synthizer3d\\vcpkg_installed\\vcpkg\\blds\\pkgconf\\meson-x64-windows-rel.log']
+

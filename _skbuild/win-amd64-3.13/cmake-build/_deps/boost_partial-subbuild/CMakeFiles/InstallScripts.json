@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/boost_partial-subbuild/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

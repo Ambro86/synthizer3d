@@ -1,0 +1,21 @@
+# ninja log v5
+2	50	7702806933206572	wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-mkdir	8f722d511b47998d
+2	50	7702806933206572	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/wdl-subbuild/wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-mkdir	8f722d511b47998d
+50	97	7702806933675785	wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-download	18fa1d7100626515
+97	140	7702806934100559	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/wdl-subbuild/wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-update	d9f1f9aa6ab02dd9
+50	97	7702806933675785	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/wdl-subbuild/wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-download	18fa1d7100626515
+97	140	7702806934100559	wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-update	d9f1f9aa6ab02dd9
+146	186	7702806934560418	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/wdl-subbuild/wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-patch	174e65cb3d622ded
+146	186	7702806934560418	wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-patch	174e65cb3d622ded
+186	235	7702806935055726	wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-configure	cef345e67db285b5
+186	235	7702806935055726	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/wdl-subbuild/wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-configure	cef345e67db285b5
+280	319	7702806935895427	wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-install	aebd9f5285b9291f
+236	280	7702806935511377	wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-build	8bff76fbac00c8fa
+236	280	7702806935511377	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/wdl-subbuild/wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-build	8bff76fbac00c8fa
+280	319	7702806935895427	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/wdl-subbuild/wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-install	aebd9f5285b9291f
+319	361	7702806936324229	wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-test	e9251252205d2811
+319	361	7702806936324229	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/wdl-subbuild/wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-test	e9251252205d2811
+362	425	7702806936956063	CMakeFiles/wdl-populate-complete	83cd2a8b5c9f419b
+362	425	7702806936956063	wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-done	83cd2a8b5c9f419b
+362	425	7702806936956063	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/wdl-subbuild/CMakeFiles/wdl-populate-complete	83cd2a8b5c9f419b
+362	425	7702806936956063	C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/_deps/wdl-subbuild/wdl-populate-prefix/src/wdl-populate-stamp/wdl-populate-done	83cd2a8b5c9f419b

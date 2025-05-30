@@ -1,0 +1,363 @@
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineSystem.cmake:205 (message)"
+      - "CMakeLists.txt:10 (project)"
+    message: |
+      The system is: Windows - 10.0.26100 - AMD64
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:10 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+      Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx86/x64/cl.exe 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      Microsoft (R) C/C++ Optimizing Compiler versione 19.44.35207.1 per x64
+      Copyright (C) Microsoft Corporation. Tutti i diritti  sono riservati.
+      
+      CMakeCCompilerId.c
+      Microsoft (R) Incremental Linker Version 14.44.35207.1
+      Copyright (C) Microsoft Corporation.  All rights reserved.
+      
+      /out:CMakeCCompilerId.exe 
+      CMakeCCompilerId.obj 
+      
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CMakeCCompilerId.exe"
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CMakeCCompilerId.obj"
+      
+      The C compiler identification is MSVC, found in:
+        C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/4.0.2/CompilerIdC/CMakeCCompilerId.exe
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:1322 (message)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:250 (CMAKE_DETERMINE_MSVC_SHOWINCLUDES_PREFIX)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:10 (project)"
+    message: |
+      Detecting C compiler /showIncludes prefix:
+        main.c
+        Nota: file incluso  C:\\fork\\synthizer3d\\_skbuild\\win-amd64-3.13\\cmake-build\\CMakeFiles\\ShowIncludes\\foo.h
+        
+      Found prefix "Nota: file incluso  "
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCXXCompiler.cmake:126 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:10 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+      Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx86/x64/cl.exe 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      Microsoft (R) C/C++ Optimizing Compiler versione 19.44.35207.1 per x64
+      Copyright (C) Microsoft Corporation. Tutti i diritti  sono riservati.
+      
+      CMakeCXXCompilerId.cpp
+      Microsoft (R) Incremental Linker Version 14.44.35207.1
+      Copyright (C) Microsoft Corporation.  All rights reserved.
+      
+      /out:CMakeCXXCompilerId.exe 
+      CMakeCXXCompilerId.obj 
+      
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CMakeCXXCompilerId.exe"
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CMakeCXXCompilerId.obj"
+      
+      The CXX compiler identification is MSVC, found in:
+        C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/4.0.2/CompilerIdCXX/CMakeCXXCompilerId.exe
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:1322 (message)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:250 (CMAKE_DETERMINE_MSVC_SHOWINCLUDES_PREFIX)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCXXCompiler.cmake:126 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:10 (project)"
+    message: |
+      Detecting CXX compiler /showIncludes prefix:
+        main.c
+        Nota: file incluso  C:\\fork\\synthizer3d\\_skbuild\\win-amd64-3.13\\cmake-build\\CMakeFiles\\ShowIncludes\\foo.h
+        
+      Found prefix "Nota: file incluso  "
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCompilerABI.cmake:83 (try_compile)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:10 (project)"
+    checks:
+      - "Detecting C compiler ABI info"
+    directories:
+      source: "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-q1o4ju"
+      binary: "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-q1o4ju"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/skbuild/resources/cmake"
+      CMAKE_MSVC_RUNTIME_LIBRARY: "MultiThreadedDLL"
+      CMAKE_POSITION_INDEPENDENT_CODE: "TRUE"
+    buildResult:
+      variable: "CMAKE_C_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-q1o4ju'
+        
+        Run Build Command(s): C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Scripts/ninja -v cmTC_941f6
+        [1/2] C:\\PROGRA~2\\MICROS~4\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx86\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MD /showIncludes /FoCMakeFiles\\cmTC_941f6.dir\\CMakeCCompilerABI.c.obj /FdCMakeFiles\\cmTC_941f6.dir\\ /FS -c C:\\Users\\ambro\\AppData\\Local\\Temp\\build-env-z97wxa7w\\Lib\\site-packages\\cmake\\data\\share\\cmake-4.0\\Modules\\CMakeCCompilerABI.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Users\\ambro\\AppData\\Local\\Temp\\build-env-z97wxa7w\\Lib\\site-packages\\cmake\\data\\bin\\cmake.exe -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_941f6.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x86\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x86\\mt.exe --manifests  -- C:\\PROGRA~2\\MICROS~4\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx86\\x64\\link.exe /nologo CMakeFiles\\cmTC_941f6.dir\\CMakeCCompilerABI.c.obj  /out:cmTC_941f6.exe /implib:cmTC_941f6.lib /pdb:cmTC_941f6.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCompilerABI.cmake:227 (message)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:10 (project)"
+    message: |
+      Parsed C implicit link information:
+        link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
+        linker tool for 'C': C:/PROGRA~2/MICROS~4/2022/BUILDT~1/VC/Tools/MSVC/1444~1.352/bin/Hostx86/x64/link.exe
+        implicit libs: []
+        implicit objs: []
+        implicit dirs: []
+        implicit fwks: []
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/Internal/CMakeDetermineLinkerId.cmake:36 (message)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCompilerABI.cmake:270 (cmake_determine_linker_id)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:10 (project)"
+    message: |
+      Running the C compiler's linker: "C:/PROGRA~2/MICROS~4/2022/BUILDT~1/VC/Tools/MSVC/1444~1.352/bin/Hostx86/x64/link.exe" "-v"
+      Microsoft (R) Incremental Linker Version 14.44.35207.1
+      Copyright (C) Microsoft Corporation.  All rights reserved.
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCompilerABI.cmake:83 (try_compile)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:10 (project)"
+    checks:
+      - "Detecting CXX compiler ABI info"
+    directories:
+      source: "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-03ix06"
+      binary: "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-03ix06"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /GR /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_CXX_SCAN_FOR_MODULES: "OFF"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/skbuild/resources/cmake"
+      CMAKE_MSVC_RUNTIME_LIBRARY: "MultiThreadedDLL"
+      CMAKE_POSITION_INDEPENDENT_CODE: "TRUE"
+    buildResult:
+      variable: "CMAKE_CXX_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-03ix06'
+        
+        Run Build Command(s): C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Scripts/ninja -v cmTC_fa98a
+        [1/2] C:\\PROGRA~2\\MICROS~4\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx86\\x64\\cl.exe  /nologo /TP   /DWIN32 /D_WINDOWS /GR /EHsc  /Zi /Ob0 /Od /RTC1 -MD /showIncludes /FoCMakeFiles\\cmTC_fa98a.dir\\CMakeCXXCompilerABI.cpp.obj /FdCMakeFiles\\cmTC_fa98a.dir\\ /FS -c C:\\Users\\ambro\\AppData\\Local\\Temp\\build-env-z97wxa7w\\Lib\\site-packages\\cmake\\data\\share\\cmake-4.0\\Modules\\CMakeCXXCompilerABI.cpp
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Users\\ambro\\AppData\\Local\\Temp\\build-env-z97wxa7w\\Lib\\site-packages\\cmake\\data\\bin\\cmake.exe -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_fa98a.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x86\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x86\\mt.exe --manifests  -- C:\\PROGRA~2\\MICROS~4\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx86\\x64\\link.exe /nologo CMakeFiles\\cmTC_fa98a.dir\\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_fa98a.exe /implib:cmTC_fa98a.lib /pdb:cmTC_fa98a.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCompilerABI.cmake:227 (message)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:10 (project)"
+    message: |
+      Parsed CXX implicit link information:
+        link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
+        linker tool for 'CXX': C:/PROGRA~2/MICROS~4/2022/BUILDT~1/VC/Tools/MSVC/1444~1.352/bin/Hostx86/x64/link.exe
+        implicit libs: []
+        implicit objs: []
+        implicit dirs: []
+        implicit fwks: []
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/Internal/CMakeDetermineLinkerId.cmake:36 (message)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeDetermineCompilerABI.cmake:270 (cmake_determine_linker_id)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:10 (project)"
+    message: |
+      Running the CXX compiler's linker: "C:/PROGRA~2/MICROS~4/2022/BUILDT~1/VC/Tools/MSVC/1444~1.352/bin/Hostx86/x64/link.exe" "-v"
+      Microsoft (R) Incremental Linker Version 14.44.35207.1
+      Copyright (C) Microsoft Corporation.  All rights reserved.
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CheckCSourceCompiles.cmake:58 (cmake_check_source_compiles)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/FindThreads.cmake:97 (check_c_source_compiles)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/FindThreads.cmake:163 (_threads_check_libc)"
+      - "CMakeLists.txt:23 (find_package)"
+    checks:
+      - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
+    directories:
+      source: "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-d5z8be"
+      binary: "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-d5z8be"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/skbuild/resources/cmake"
+      CMAKE_MSVC_RUNTIME_LIBRARY: "MultiThreadedDLL"
+      CMAKE_POSITION_INDEPENDENT_CODE: "TRUE"
+    buildResult:
+      variable: "CMAKE_HAVE_LIBC_PTHREAD"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-d5z8be'
+        
+        Run Build Command(s): C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Scripts/ninja -v cmTC_72924
+        [1/2] C:\\PROGRA~2\\MICROS~4\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx86\\x64\\cl.exe  /nologo -DCMAKE_HAVE_LIBC_PTHREAD  /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MD /showIncludes /FoCMakeFiles\\cmTC_72924.dir\\src.c.obj /FdCMakeFiles\\cmTC_72924.dir\\ /FS -c C:\\fork\\synthizer3d\\_skbuild\\win-amd64-3.13\\cmake-build\\CMakeFiles\\CMakeScratch\\TryCompile-d5z8be\\src.c
+        FAILED: CMakeFiles/cmTC_72924.dir/src.c.obj 
+        C:\\PROGRA~2\\MICROS~4\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx86\\x64\\cl.exe  /nologo -DCMAKE_HAVE_LIBC_PTHREAD  /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MD /showIncludes /FoCMakeFiles\\cmTC_72924.dir\\src.c.obj /FdCMakeFiles\\cmTC_72924.dir\\ /FS -c C:\\fork\\synthizer3d\\_skbuild\\win-amd64-3.13\\cmake-build\\CMakeFiles\\CMakeScratch\\TryCompile-d5z8be\\src.c
+        C:\\fork\\synthizer3d\\_skbuild\\win-amd64-3.13\\cmake-build\\CMakeFiles\\CMakeScratch\\TryCompile-d5z8be\\src.c(1): fatal error C1083: Non è possibile aprire il file inclusione: 'pthread.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CheckLibraryExists.cmake:112 (try_compile)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/FindThreads.cmake:112 (check_library_exists)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/FindThreads.cmake:175 (_threads_check_lib)"
+      - "CMakeLists.txt:23 (find_package)"
+    checks:
+      - "Looking for pthread_create in pthreads"
+    directories:
+      source: "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-yfxa23"
+      binary: "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-yfxa23"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/skbuild/resources/cmake"
+      CMAKE_MSVC_RUNTIME_LIBRARY: "MultiThreadedDLL"
+      CMAKE_POSITION_INDEPENDENT_CODE: "TRUE"
+    buildResult:
+      variable: "CMAKE_HAVE_PTHREADS_CREATE"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-yfxa23'
+        
+        Run Build Command(s): C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Scripts/ninja -v cmTC_41a44
+        [1/2] C:\\PROGRA~2\\MICROS~4\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx86\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS -DCHECK_FUNCTION_EXISTS=pthread_create /Zi /Ob0 /Od /RTC1 -MD /showIncludes /FoCMakeFiles\\cmTC_41a44.dir\\CheckFunctionExists.c.obj /FdCMakeFiles\\cmTC_41a44.dir\\ /FS -c C:\\fork\\synthizer3d\\_skbuild\\win-amd64-3.13\\cmake-build\\CMakeFiles\\CMakeScratch\\TryCompile-yfxa23\\CheckFunctionExists.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Users\\ambro\\AppData\\Local\\Temp\\build-env-z97wxa7w\\Lib\\site-packages\\cmake\\data\\bin\\cmake.exe -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_41a44.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x86\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x86\\mt.exe --manifests  -- C:\\PROGRA~2\\MICROS~4\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx86\\x64\\link.exe /nologo CMakeFiles\\cmTC_41a44.dir\\CheckFunctionExists.c.obj  /out:cmTC_41a44.exe /implib:cmTC_41a44.lib /pdb:cmTC_41a44.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthreads.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        FAILED: cmTC_41a44.exe 
+        C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Users\\ambro\\AppData\\Local\\Temp\\build-env-z97wxa7w\\Lib\\site-packages\\cmake\\data\\bin\\cmake.exe -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_41a44.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x86\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x86\\mt.exe --manifests  -- C:\\PROGRA~2\\MICROS~4\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx86\\x64\\link.exe /nologo CMakeFiles\\cmTC_41a44.dir\\CheckFunctionExists.c.obj  /out:cmTC_41a44.exe /implib:cmTC_41a44.lib /pdb:cmTC_41a44.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthreads.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        LINK Pass 1: command "C:\\PROGRA~2\\MICROS~4\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx86\\x64\\link.exe /nologo CMakeFiles\\cmTC_41a44.dir\\CheckFunctionExists.c.obj /out:cmTC_41a44.exe /implib:cmTC_41a44.lib /pdb:cmTC_41a44.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_41a44.dir/intermediate.manifest CMakeFiles\\cmTC_41a44.dir/manifest.res" failed (exit code 1104) with the following output:
+        LINK : fatal error LNK1104: impossibile aprire il file 'pthreads.lib'\x0d
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CheckLibraryExists.cmake:112 (try_compile)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/FindThreads.cmake:112 (check_library_exists)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/FindThreads.cmake:176 (_threads_check_lib)"
+      - "CMakeLists.txt:23 (find_package)"
+    checks:
+      - "Looking for pthread_create in pthread"
+    directories:
+      source: "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-x6iq5d"
+      binary: "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-x6iq5d"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/skbuild/resources/cmake"
+      CMAKE_MSVC_RUNTIME_LIBRARY: "MultiThreadedDLL"
+      CMAKE_POSITION_INDEPENDENT_CODE: "TRUE"
+    buildResult:
+      variable: "CMAKE_HAVE_PTHREAD_CREATE"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-x6iq5d'
+        
+        Run Build Command(s): C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Scripts/ninja -v cmTC_db27d
+        [1/2] C:\\PROGRA~2\\MICROS~4\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx86\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS -DCHECK_FUNCTION_EXISTS=pthread_create /Zi /Ob0 /Od /RTC1 -MD /showIncludes /FoCMakeFiles\\cmTC_db27d.dir\\CheckFunctionExists.c.obj /FdCMakeFiles\\cmTC_db27d.dir\\ /FS -c C:\\fork\\synthizer3d\\_skbuild\\win-amd64-3.13\\cmake-build\\CMakeFiles\\CMakeScratch\\TryCompile-x6iq5d\\CheckFunctionExists.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Users\\ambro\\AppData\\Local\\Temp\\build-env-z97wxa7w\\Lib\\site-packages\\cmake\\data\\bin\\cmake.exe -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_db27d.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x86\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x86\\mt.exe --manifests  -- C:\\PROGRA~2\\MICROS~4\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx86\\x64\\link.exe /nologo CMakeFiles\\cmTC_db27d.dir\\CheckFunctionExists.c.obj  /out:cmTC_db27d.exe /implib:cmTC_db27d.lib /pdb:cmTC_db27d.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthread.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        FAILED: cmTC_db27d.exe 
+        C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Users\\ambro\\AppData\\Local\\Temp\\build-env-z97wxa7w\\Lib\\site-packages\\cmake\\data\\bin\\cmake.exe -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_db27d.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x86\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x86\\mt.exe --manifests  -- C:\\PROGRA~2\\MICROS~4\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx86\\x64\\link.exe /nologo CMakeFiles\\cmTC_db27d.dir\\CheckFunctionExists.c.obj  /out:cmTC_db27d.exe /implib:cmTC_db27d.lib /pdb:cmTC_db27d.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthread.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        LINK Pass 1: command "C:\\PROGRA~2\\MICROS~4\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx86\\x64\\link.exe /nologo CMakeFiles\\cmTC_db27d.dir\\CheckFunctionExists.c.obj /out:cmTC_db27d.exe /implib:cmTC_db27d.lib /pdb:cmTC_db27d.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_db27d.dir/intermediate.manifest CMakeFiles\\cmTC_db27d.dir/manifest.res" failed (exit code 1104) with the following output:
+        LINK : fatal error LNK1104: impossibile aprire il file 'pthread.lib'\x0d
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/Internal/CheckSourceRuns.cmake:95 (try_run)"
+      - "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/cmake/data/share/cmake-4.0/Modules/CheckCXXSourceRuns.cmake:52 (cmake_check_source_runs)"
+      - "CMakeLists.txt:65 (check_cxx_source_runs)"
+    checks:
+      - "Performing Test FILESYSTEM_OK"
+    directories:
+      source: "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-2rhdk4"
+      binary: "C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-2rhdk4"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /GR /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Lib/site-packages/skbuild/resources/cmake"
+      CMAKE_MSVC_RUNTIME_LIBRARY: "MultiThreadedDLL"
+      CMAKE_POSITION_INDEPENDENT_CODE: "TRUE"
+    buildResult:
+      variable: "FILESYSTEM_OK_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/fork/synthizer3d/_skbuild/win-amd64-3.13/cmake-build/CMakeFiles/CMakeScratch/TryCompile-2rhdk4'
+        
+        Run Build Command(s): C:/Users/ambro/AppData/Local/Temp/build-env-z97wxa7w/Scripts/ninja -v cmTC_40f92
+        [1/2] C:\\PROGRA~2\\MICROS~4\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx86\\x64\\cl.exe  /nologo /TP -DFILESYSTEM_OK  /DWIN32 /D_WINDOWS /GR /EHsc  /Zi /Ob0 /Od /RTC1 -std:c++17 -MD /showIncludes /FoCMakeFiles\\cmTC_40f92.dir\\src.cxx.obj /FdCMakeFiles\\cmTC_40f92.dir\\ /FS -c C:\\fork\\synthizer3d\\_skbuild\\win-amd64-3.13\\cmake-build\\CMakeFiles\\CMakeScratch\\TryCompile-2rhdk4\\src.cxx
+        C:\\fork\\synthizer3d\\_skbuild\\win-amd64-3.13\\cmake-build\\CMakeFiles\\CMakeScratch\\TryCompile-2rhdk4\\src.cxx(6): warning C4477: 'printf': con la stringa di formato '%s' è necessario un argomento di tipo 'char *', ma il tipo dell'argomento variadic 1 è 'const std::filesystem::path::value_type *'
+        C:\\fork\\synthizer3d\\_skbuild\\win-amd64-3.13\\cmake-build\\CMakeFiles\\CMakeScratch\\TryCompile-2rhdk4\\src.cxx(6): note: provare a usare '%ls' nella stringa di formato
+        C:\\fork\\synthizer3d\\_skbuild\\win-amd64-3.13\\cmake-build\\CMakeFiles\\CMakeScratch\\TryCompile-2rhdk4\\src.cxx(6): note: provare a usare '%lls' nella stringa di formato
+        C:\\fork\\synthizer3d\\_skbuild\\win-amd64-3.13\\cmake-build\\CMakeFiles\\CMakeScratch\\TryCompile-2rhdk4\\src.cxx(6): note: provare a usare '%Ls' nella stringa di formato
+        C:\\fork\\synthizer3d\\_skbuild\\win-amd64-3.13\\cmake-build\\CMakeFiles\\CMakeScratch\\TryCompile-2rhdk4\\src.cxx(6): note: provare a usare '%ws' nella stringa di formato
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && C:\\Users\\ambro\\AppData\\Local\\Temp\\build-env-z97wxa7w\\Lib\\site-packages\\cmake\\data\\bin\\cmake.exe -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\cmTC_40f92.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x86\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x86\\mt.exe --manifests  -- C:\\PROGRA~2\\MICROS~4\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx86\\x64\\link.exe /nologo CMakeFiles\\cmTC_40f92.dir\\src.cxx.obj  /out:cmTC_40f92.exe /implib:cmTC_40f92.lib /pdb:cmTC_40f92.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+    runResult:
+      variable: "FILESYSTEM_OK_EXITCODE"
+      cached: true
+      stdout: |
+        C
+      stderr: |
+      exitCode: 0
+...

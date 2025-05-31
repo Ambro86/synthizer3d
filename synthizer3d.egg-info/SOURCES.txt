@@ -1349,6 +1349,7 @@ synthizer-vendored/include/synthizer/vorbis.hpp
 synthizer-vendored/include/synthizer/xoshiro.hpp
 synthizer-vendored/include/synthizer/data/arrays.hpp
 synthizer-vendored/include/synthizer/data/hrtf.hpp
+synthizer-vendored/include/synthizer/decoders/aif.hpp
 synthizer-vendored/include/synthizer/decoders/flac.hpp
 synthizer-vendored/include/synthizer/decoders/libsndfile.hpp
 synthizer-vendored/include/synthizer/decoders/mp3.hpp
@@ -1391,7 +1392,6 @@ synthizer-vendored/src/routable.cpp
 synthizer-vendored/src/router.cpp
 synthizer-vendored/src/shared_object.cpp
 synthizer-vendored/src/single_file_libs.c
-synthizer-vendored/src/stb_vorbis.c
 synthizer-vendored/src/c_api/buffer.cpp
 synthizer-vendored/src/c_api/core.cpp
 synthizer-vendored/src/c_api/effects.cpp

@@ -15,6 +15,8 @@ Synthizer3D builds on the work of the original Synthizer Developers and is now m
 Synthizer3D provides advanced Python bindings for 3D audio, powered by the Synthizer C library.  
 This fork ensures up-to-date support for modern Python versions, enhances compatibility with more platforms, and introduces new features.
 
+Synthizer is a library for game/VR audio applications, designed to handle everything from file decoding and asset caching, down to audio processing with a focus on speed and efficiency.
+
 ---
 
 ## 🚀 **Audio Format Support**
@@ -33,6 +35,16 @@ This fork ensures up-to-date support for modern Python versions, enhances compat
 > **AIF, OGG and OPUS support are newly added!**  
 > You can now load, spatialize, and play audio from these formats in your 3D environments.  
 > This enhancement makes Synthizer3D even more versatile for interactive, gaming, and streaming audio applications.
+
+**Key features from the Synthizer core:**
+- MP3, WAV, and FLAC decoding (now with more formats in Synthizer3D!)
+- Support for Libsndfile
+- HRTF and stereo panning for immersive 3D audio
+- An FDN reverb model for realistic soundscapes
+- Noise generators for ambiance or effects
+- Fast execution with minimal blocking or kernel transitions—optimized for real-time applications
+- No blocking calls on the hot path and efforts to minimize memory allocation/syscalls
+- Cross-platform: Windows, Linux, and macOS
 
 ---
 
@@ -96,6 +108,38 @@ pip install synthizer3d
 
 ---
 
+## Building and Platform Support
+
+Synthizer3D, like the original Synthizer, can be built on:
+
+- **Windows:** Using MSVC 2019 or Clang 9
+- **Linux:** Using Clang 9 or GCC 9
+- **macOS:** Catalina and later
+
+The standard build instructions:
+```sh
+mkdir build
+cd build
+cmake -G Ninja ..
+ninja
+```
+
+To build a shared library:
+```sh
+cmake -G Ninja .. -DCMAKE_BUILD_TYPE=Release -DSYNTHIZER_LIB_TYPE=SHARED
+```
+
+For Windows, you may add:
+```sh
+-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL
+```
+
+For Python bindings:
+- On Windows: use the provided wheels for easiest installation.
+- On Linux/macOS: `pip install synthizer3d` will attempt to build from source if wheels are not available (requires `git`, but not CMake or other external dependencies).
+
+---
+
 ## For Developers
 
 This fork builds on an unmaintained project. Our goals include:
@@ -104,6 +148,18 @@ This fork builds on an unmaintained project. Our goals include:
 - Wheels for all major platforms (Windows x64/x86, Linux x64, macOS x64/arm64)
 - Updated CI/build scripts
 - New features and compatibility improvements
+- Fast and efficient for game and VR usage
+
+---
+
+## Licensing
+
+Synthizer3D is licensed under the Unlicense (public domain).  
+You may use, modify, and redistribute the code freely—credit is appreciated but not required.
+
+Third party dependencies are stored in the `third_party` directory and may require source attribution. The goal is to avoid binary dependencies requiring attribution.
+
+If you want to contribute, see `CONTRIBUTING.md` for details on licensing and contribution process.
 
 ---
 

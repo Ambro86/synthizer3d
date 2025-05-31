@@ -24,10 +24,11 @@ This fork ensures up-to-date support for modern Python versions, enhances compat
 > - **FLAC**
 > - **OGG**  🆕
 > - **OPUS** 🆕
+> - **AIF** 🆕
 >
 > <br>
 >
-> **OGG and OPUS support are newly added!**  
+> **AIF, OGG and OPUS support are newly added!**  
 > You can now load, spatialize, and play audio from these formats in your 3D environments.  
 > This enhancement makes Synthizer3D even more versatile for interactive, gaming, and streaming audio applications.
 

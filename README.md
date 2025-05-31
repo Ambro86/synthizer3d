@@ -2,6 +2,8 @@
 
 ![Forked from Synthizer](https://img.shields.io/badge/forked%20from-synthizer-blue)
 
+This project was born out of the need to compile this library on new Python versions, but later it became something more. Several features have been added directly in the C code.
+
 This repository is a maintained and updated fork of the [Synthizer](https://github.com/synthizer/synthizer) Python bindings, now developed by [Ambro86](https://github.com/Ambro86).
 
 Synthizer3D builds on the work of the original Synthizer Developers and is now maintained and improved by Ambro86.

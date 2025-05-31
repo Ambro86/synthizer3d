@@ -2,3 +2,4 @@ build/
 _skbuild/
 dist/
 synthizer-vendored/
+vcpkg_installed/

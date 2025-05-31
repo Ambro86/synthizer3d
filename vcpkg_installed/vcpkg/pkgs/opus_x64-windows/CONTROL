@@ -1,7 +1,0 @@
-Package: opus
-Version: 1.5.2
-Depends: vcpkg-cmake, vcpkg-cmake-config
-Architecture: x64-windows
-Multi-Arch: same
-Abi: b31b54a779aa62c08c1d0164e99b9c3af7548bc407705b145e5d340d3c6d60b0
-Description: Totally open, royalty-free, highly versatile audio codec

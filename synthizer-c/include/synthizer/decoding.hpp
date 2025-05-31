@@ -24,6 +24,7 @@ public:
 /* The audio formats we support. */
 enum class AudioFormat : int {
   Unknown,
+  Aif,
   Wav,
   Flac,
   Mp3,

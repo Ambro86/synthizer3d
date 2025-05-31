@@ -7,7 +7,6 @@
 #include "synthizer/decoders/mp3.hpp"
 #include "synthizer/decoders/ogg.hpp"
 #include "synthizer/decoders/opus.hpp"
-#include "synthizer/decoders/aac.hpp" // <--- aggiungi questa riga!
 #include "synthizer/decoders/raw_decoder.hpp"
 #include "synthizer/decoders/wav.hpp"
 #include "synthizer/decoding.hpp"
@@ -23,7 +22,7 @@ struct DecoderDef {
 };
 
 static auto decoders = makeStaticArray(DecoderDef{"libsndfile", decodeLibsndfile}, DecoderDef{"dr_wav", decodeWav},
-                                       DecoderDef{"dr_flac", decodeFlac}, DecoderDef{"dr_mp3", decodeMp3}, DecoderDef{"ogg", decodeOgg}, DecoderDef{"opusfile", decodeOpusFile}, DecoderDef{"faad2_aac", decodeAac});
+                                       DecoderDef{"dr_flac", decodeFlac}, DecoderDef{"dr_mp3", decodeMp3}, DecoderDef{"ogg", decodeOgg}, DecoderDef{"opusfile", decodeOpusFile});
 
 std::shared_ptr<AudioDecoder> getDecoderForStream(std::shared_ptr<ByteStream> stream) {
   auto lookahead_stream = getLookaheadByteStream(stream);

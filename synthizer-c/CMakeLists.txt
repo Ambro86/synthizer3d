@@ -27,6 +27,7 @@ find_package(Vorbis REQUIRED)
 find_package(Ogg REQUIRED)
 find_package(Opus REQUIRED)
 find_package(OpusFile REQUIRED)
+
 set(SYZ_DEPS
   boost_partial
   concurrentqueue
@@ -111,7 +112,6 @@ add_library(synthizer ${SYNTHIZER_LIB_TYPE}
   src/streams/memory_stream.cpp
   include/synthizer/decoders/ogg.cpp
   include/synthizer/decoders/opus.cpp
-  include/synthizer/decoders/aac.cpp  
   $<TARGET_OBJECTS:wdl_objlib>
   $<TARGET_OBJECTS:synthizer_single_file_libs>
 )
@@ -131,7 +131,6 @@ set(SYZ_LIBRARIES
   Ogg::ogg
   Opus::opus
   OpusFile::opusfile
-  faad
 )
 if(WIN32)
   list(APPEND SYZ_LIBRARIES
@@ -140,11 +139,8 @@ if(WIN32)
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/vorbisfile.lib"
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/opus.lib"
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/opusfile.lib"
-    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/vorbisenc.lib"    
-    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/faad.lib"
-
-  
-  )  
+    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/vorbisenc.lib"
+  )
 endif()
 target_link_libraries(synthizer PRIVATE ${SYZ_LIBRARIES})
 

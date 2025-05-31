@@ -18,8 +18,7 @@
             "vorbisfile",
             "opus",
             "opusfile",
-            "vorbisenc",
-            "faad"
+            "vorbisenc"
         ],
         "library_dirs": [
             "C:\\fork\\synthizer3d\\_skbuild\\win-amd64-3.13\\cmake-install\\lib",

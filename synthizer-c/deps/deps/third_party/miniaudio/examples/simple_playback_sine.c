@@ -14,8 +14,7 @@ This example works with Emscripten.
 */
 #define MA_NO_DECODING
 #define MA_NO_ENCODING
-#define MINIAUDIO_IMPLEMENTATION
-#include "../miniaudio.h"
+#include "../miniaudio.c"
 
 #include <stdio.h>
 
@@ -33,14 +32,7 @@ void main_loop__em()
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
-    ma_waveform* pSineWave;
-
-    MA_ASSERT(pDevice->playback.channels == DEVICE_CHANNELS);
-
-    pSineWave = (ma_waveform*)pDevice->pUserData;
-    MA_ASSERT(pSineWave != NULL);
-
-    ma_waveform_read_pcm_frames(pSineWave, pOutput, frameCount, NULL);
+    ma_waveform_read_pcm_frames((ma_waveform*)pDevice->pUserData, pOutput, frameCount, NULL);
 
     (void)pInput;   /* Unused. */
 }
@@ -51,9 +43,6 @@ int main(int argc, char** argv)
     ma_device_config deviceConfig;
     ma_device device;
     ma_waveform_config sineWaveConfig;
-
-    sineWaveConfig = ma_waveform_config_init(DEVICE_FORMAT, DEVICE_CHANNELS, DEVICE_SAMPLE_RATE, ma_waveform_type_sine, 0.2, 220);
-    ma_waveform_init(&sineWaveConfig, &sineWave);
 
     deviceConfig = ma_device_config_init(ma_device_type_playback);
     deviceConfig.playback.format   = DEVICE_FORMAT;
@@ -69,6 +58,9 @@ int main(int argc, char** argv)
 
     printf("Device Name: %s\n", device.playback.name);
 
+    sineWaveConfig = ma_waveform_config_init(device.playback.format, device.playback.channels, device.sampleRate, ma_waveform_type_sine, 0.2, 220);
+    ma_waveform_init(&sineWaveConfig, &sineWave);
+
     if (ma_device_start(&device) != MA_SUCCESS) {
         printf("Failed to start playback device.\n");
         ma_device_uninit(&device);
@@ -83,6 +75,7 @@ int main(int argc, char** argv)
 #endif
     
     ma_device_uninit(&device);
+    ma_waveform_uninit(&sineWave);  /* Uninitialize the waveform after the device so we don't pull it from under the device while it's being reference in the data callback. */
     
     (void)argc;
     (void)argv;

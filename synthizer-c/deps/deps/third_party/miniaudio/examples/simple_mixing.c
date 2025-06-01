@@ -4,15 +4,14 @@ Demonstrates one way to load multiple files and play them all back at the same t
 When mixing multiple sounds together, you should not create multiple devices. Instead you should create only a single
 device and then mix your sounds together which you can do by simply summing their samples together. The simplest way to
 do this is to use floating point samples and use miniaudio's built-in clipper to handling clipping for you. (Clipping
-is when sample are clampled to their minimum and maximum range, which for floating point is -1..1.)
+is when sample are clamped to their minimum and maximum range, which for floating point is -1..1.)
 
 ```
 Usage:   simple_mixing [input file 0] [input file 1] ... [input file n]
 Example: simple_mixing file1.wav file2.flac
 ```
 */
-#define MINIAUDIO_IMPLEMENTATION
-#include "../miniaudio.h"
+#include "../miniaudio.c"
 
 #include <stdio.h>
 
@@ -29,7 +28,7 @@ ma_bool32*  g_pDecodersAtEnd;
 
 ma_event g_stopEvent; /* <-- Signaled by the audio thread, waited on by the main thread. */
 
-ma_bool32 are_all_decoders_at_end()
+ma_bool32 are_all_decoders_at_end(void)
 {
     ma_uint32 iDecoder;
     for (iDecoder = 0; iDecoder < g_decoderCount; ++iDecoder) {
@@ -87,8 +86,7 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
     float* pOutputF32 = (float*)pOutput;
     ma_uint32 iDecoder;
 
-    MA_ASSERT(pDevice->playback.format == SAMPLE_FORMAT);   /* <-- Important for this example. */
-
+    /* This example assumes the device was configured to use ma_format_f32. */
     for (iDecoder = 0; iDecoder < g_decoderCount; ++iDecoder) {
         if (!g_pDecodersAtEnd[iDecoder]) {
             ma_uint32 framesRead = read_and_mix_pcm_frames_f32(&g_pDecoders[iDecoder], pOutputF32, frameCount);
@@ -107,6 +105,7 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
     }
 
     (void)pInput;
+    (void)pDevice;
 }
 
 int main(int argc, char** argv)

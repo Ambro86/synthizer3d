@@ -8,18 +8,14 @@ Capturing works in a very similar way to playback. The only difference is the di
 the application sending data to the device, the device will send data to the application. This example just writes the
 data received by the microphone straight to a WAV file.
 */
-#define MINIAUDIO_IMPLEMENTATION
-#include "../miniaudio.h"
+#include "../miniaudio.c"
 
 #include <stdlib.h>
 #include <stdio.h>
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
-    ma_encoder* pEncoder = (ma_encoder*)pDevice->pUserData;
-    MA_ASSERT(pEncoder != NULL);
-
-    ma_encoder_write_pcm_frames(pEncoder, pInput, frameCount, NULL);
+    ma_encoder_write_pcm_frames((ma_encoder*)pDevice->pUserData, pInput, frameCount, NULL);
 
     (void)pOutput;
 }

@@ -10,8 +10,7 @@ glitching which the backend may not be able to recover from. For this reason, mi
 sample rate for both capture and playback. If internally the native sample rates differ, miniaudio will perform the
 sample rate conversion for you automatically.
 */
-#define MINIAUDIO_IMPLEMENTATION
-#include "../miniaudio.h"
+#include "../miniaudio.c"
 
 #include <stdio.h>
 
@@ -23,8 +22,10 @@ void main_loop__em()
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
-    MA_ASSERT(pDevice->capture.format == pDevice->playback.format);
-    MA_ASSERT(pDevice->capture.channels == pDevice->playback.channels);
+    /* This example assumes the playback and capture sides use the same format and channel count. */
+    if (pDevice->capture.format != pDevice->playback.format || pDevice->capture.channels != pDevice->playback.channels) {
+        return;
+    }
 
     /* In this example the format and channel count are the same for both input and output which means we can just memcpy(). */
     MA_COPY_MEMORY(pOutput, pInput, frameCount * ma_get_bytes_per_frame(pDevice->capture.format, pDevice->capture.channels));

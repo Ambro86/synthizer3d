@@ -6,8 +6,7 @@ called `ma_vocoder_node` is used to achieve the effect which can be found in the
 the miniaudio repository. The vocoder node uses https://github.com/blastbay/voclib to achieve the
 effect.
 */
-#define MINIAUDIO_IMPLEMENTATION
-#include "../../../miniaudio.h"
+#include "../../../miniaudio.c"
 #include "ma_vocoder_node.c"
 
 #include <stdio.h>
@@ -24,8 +23,13 @@ static ma_node_graph       g_nodeGraph;
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
-    MA_ASSERT(pDevice->capture.format == pDevice->playback.format);
-    MA_ASSERT(pDevice->capture.channels == pDevice->playback.channels);
+    /*
+    This example assumes the playback and capture sides use the same format and channel count. The
+    format must be f32.
+    */
+    if (pDevice->capture.format != DEVICE_FORMAT || pDevice->playback.format != DEVICE_FORMAT || pDevice->capture.channels != pDevice->playback.channels) {
+        return;
+    }
 
     /*
     The node graph system is a pulling style of API. At the lowest level of the chain will be a 

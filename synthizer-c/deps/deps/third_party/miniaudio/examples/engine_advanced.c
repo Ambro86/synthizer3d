@@ -14,8 +14,7 @@ Using a shared resource manager, as we do in this example, is useful for when yo
 multiple engines so that you can output to multiple playback devices simultaneoulys. An example
 might be a local co-op multiplayer game where each player has their own headphones.
 */
-#define MINIAUDIO_IMPLEMENTATION
-#include "../miniaudio.h"
+#include "../miniaudio.c"
 
 #define MAX_DEVICES 2
 #define MAX_SOUNDS  32
@@ -237,6 +236,9 @@ int main(int argc, char** argv)
         */
         ma_device_uninit(&devices[iEngine]);
     }
+
+    /* The context can only be uninitialized after the devices. */
+    ma_context_uninit(&context);
 
     /*
     Do the resource manager last. This way we can guarantee the data callbacks of each device aren't trying to access

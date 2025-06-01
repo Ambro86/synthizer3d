@@ -51,8 +51,7 @@ pass and echo effects so that one of them becomes more obvious than the other.
 
 When you want to read from the graph, you simply call `ma_node_graph_read_pcm_frames()`.
 */
-#define MINIAUDIO_IMPLEMENTATION
-#include "../miniaudio.h"
+#include "../miniaudio.c"
 
 /* Data Format */
 #define FORMAT              ma_format_f32   /* Must always be f32. */
@@ -81,8 +80,6 @@ static int              g_soundNodeCount;
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
-    MA_ASSERT(pDevice->playback.channels == CHANNELS);
-
     /*
     Hearing the output of the node graph is as easy as reading straight into the output buffer. You just need to
     make sure you use a consistent data format or else you'll need to do your own conversion.
@@ -90,6 +87,7 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
     ma_node_graph_read_pcm_frames(&g_nodeGraph, pOutput, frameCount, NULL);
 
     (void)pInput;   /* Unused. */
+    (void)pDevice;  /* Unused. */
 }
 
 int main(int argc, char** argv)

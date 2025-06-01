@@ -31,9 +31,7 @@ starting the chain from the start again. It is also seeking the head data source
 so that playback starts from the start as expected. You do not need to seek non-head items back to
 the start as miniaudio will do that for you internally.
 */
-#define MA_EXPERIMENTAL__DATA_LOOPING_AND_CHAINING
-#define MINIAUDIO_IMPLEMENTATION
-#include "../miniaudio.h"
+#include "../miniaudio.c"
 
 #include <stdio.h>
 
@@ -49,7 +47,11 @@ ma_decoder* g_pDecoders;
 
 static ma_data_source* next_callback_tail(ma_data_source* pDataSource)
 {
-    MA_ASSERT(g_decoderCount > 0);  /* <-- We check for this in main() so should never happen. */
+    (void)pDataSource;  /* Unused. */
+
+    if (g_decoderCount > 0) {   /* <-- We check for this in main() so should never happen. */
+        return NULL;
+    }
 
     /*
     This will be fired when the last item in the chain has reached the end. In this example we want
@@ -131,15 +133,15 @@ int main(int argc, char** argv)
     deviceConfig.dataCallback      = data_callback;
     deviceConfig.pUserData         = NULL;
 
-    if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS) {
+    result = ma_device_init(NULL, &deviceConfig, &device);
+    if (result != MA_SUCCESS) {
         printf("Failed to open playback device.\n");
-        result = -1;
         goto done_decoders;
     }
 
-    if (ma_device_start(&device) != MA_SUCCESS) {
+    result = ma_device_start(&device);
+    if (result != MA_SUCCESS) {
         printf("Failed to start playback device.\n");
-        result = -1;
         goto done;
     }
 

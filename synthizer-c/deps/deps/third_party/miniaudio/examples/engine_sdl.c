@@ -9,11 +9,10 @@ This example will load the sound specified on the command line and rotate it aro
 head.
 */
 #define MA_NO_DEVICE_IO /* <-- Disables the `ma_device` API. We don't need that in this example since SDL will be doing that part for us. */
-#define MINIAUDIO_IMPLEMENTATION
-#include "../miniaudio.h"
+#include "../miniaudio.c"
 
 #define SDL_MAIN_HANDLED
-#include <SDL.h>    /* Change this to your include location. Might be <SDL2/SDL.h>. */
+#include <SDL2/SDL.h>    /* Change this to your include location. Might be <SDL.h>. */
 
 #define CHANNELS    2               /* Must be stereo for this example. */
 #define SAMPLE_RATE 48000
@@ -23,6 +22,8 @@ static ma_sound g_sound;            /* This example will play only a single soun
 
 void data_callback(void* pUserData, ma_uint8* pBuffer, int bufferSizeInBytes)
 {
+    (void)pUserData;
+
     /* Reading is just a matter of reading straight from the engine. */
     ma_uint32 bufferSizeInFrames = (ma_uint32)bufferSizeInBytes / ma_get_bytes_per_frame(ma_format_f32, ma_engine_get_channels(&g_engine));
     ma_engine_read_pcm_frames(&g_engine, pBuffer, bufferSizeInFrames, NULL);

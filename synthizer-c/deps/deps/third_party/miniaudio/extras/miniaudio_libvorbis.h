@@ -1,3 +1,5 @@
+/* THIS HAS BEEN DEPRECATED! Use the libvorbis decoder in extras/decoders/libvorbis instead. */
+
 /*
 This implements a data source that decodes Vorbis streams via libvorbis + libvorbisfile
 
@@ -99,6 +101,10 @@ static size_t ma_libvorbis_vf_callback__read(void* pBufferOut, size_t size, size
 
     bytesToRead = size * count;
     result = pVorbis->onRead(pVorbis->pReadSeekTellUserData, pBufferOut, bytesToRead, &bytesRead);
+    if (result != MA_SUCCESS) {
+        /* Not entirely sure what to return here. What if an error occurs, but some data was read and bytesRead is > 0? */
+        return 0;
+    }
 
     return bytesRead / size;
 }
@@ -322,7 +328,7 @@ MA_API ma_result ma_libvorbis_read_pcm_frames(ma_libvorbis* pVorbis, void* pFram
                     }
                 }
             } else {
-                libvorbisResult = ov_read(&pVorbis->vf, ma_offset_pcm_frames_ptr(pFramesOut, totalFramesRead, format, channels), framesToRead * ma_get_bytes_per_frame(format, channels), 0, 2, 1, NULL);
+                libvorbisResult = ov_read(&pVorbis->vf, (char*)ma_offset_pcm_frames_ptr(pFramesOut, totalFramesRead, format, channels), framesToRead * ma_get_bytes_per_frame(format, channels), 0, 2, 1, NULL);
                 if (libvorbisResult < 0) {
                     result = MA_ERROR;  /* Error while decoding. */
                     break;

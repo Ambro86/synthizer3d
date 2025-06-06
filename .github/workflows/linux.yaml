@@ -107,13 +107,6 @@ jobs:
           pwd
           which python3 || echo "python3 not found"
 
-      - name: Checkout Synthizer3D source code (without submodules)
-        uses: actions/checkout@v4
-        timeout-minutes: 5
-        with:
-          fetch-depth: 1
-          submodules: false
-          clean: false
       - name: Force and Verify PYVERSION from Matrix
         run: |
           echo "Forcing PYVERSION to be '${{ matrix.PYVERSION }}'"
@@ -125,6 +118,19 @@ jobs:
           echo "Valore ricevuto da 'matrix.PYVERSION': ${{ matrix.PYVERSION }}"
           echo "Valore della variabile d'ambiente 'env.PYVERSION': ${{ env.PYVERSION }}"
           echo "--- Fine Debug ---"
+      - name: Checkout source code (for 64-bit jobs)
+        if: matrix.CI_ARCH == 'x86_64'
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive' # Scarica direttamente anche i sottomoduli
+
+      - name: Checkout source code with git (for 32-bit jobs)
+        if: matrix.CI_ARCH == 'i686'
+        run: |
+          # Usiamo il git a 32-bit presente nel container
+          git clone https://github.com/${{ github.repository }}.git .
+          git checkout ${{ github.sha }}
+          git submodule update --init --recursive
 
       - name: Check if synthizer-c directory exists
         run: |
@@ -136,64 +142,6 @@ jobs:
           else
             echo "❌ synthizer-c directory NOT found - submodules needed"
           fi
-
-      - name: Initialize and update submodules with retry logic
-        timeout-minutes: 15
-        continue-on-error: true
-        run: |
-          echo "🔄 Initializing and updating submodules with retry logic..."
-          
-          # Fix Git safe directory issues in container
-          git config --global --add safe.directory "$(pwd)"
-          git config --global --add safe.directory "*"
-          
-          # Funzione di retry per submoduli
-          retry_submodule_update() {
-            local max_attempts=3
-            local attempt=1
-            
-            while [ $attempt -le $max_attempts ]; do
-              echo "Attempt $attempt of $max_attempts..."
-              
-              # Prima inizializza i submoduli
-              if git submodule init; then
-                echo "✅ Submodules initialized"
-                
-                # Poi aggiorna con timeout e opzioni conservative
-                if timeout 300 git submodule update --recursive --depth=1 --jobs=2 --init; then
-                  echo "✅ Submodules updated successfully!"
-                  return 0
-                else
-                  echo "❌ Submodule update failed on attempt $attempt"
-                fi
-              else
-                echo "❌ Submodule init failed on attempt $attempt"
-              fi
-              
-              if [ $attempt -lt $max_attempts ]; then
-                echo "⏳ Waiting 30 seconds before retry..."
-                sleep 30
-              fi
-              attempt=$((attempt + 1))
-            done
-            
-            echo "❌ All attempts failed. Trying fallback approach..."
-            return 1
-          }
-          
-          # Prova il normale update
-          if ! retry_submodule_update; then
-            echo "🔧 Fallback: Trying to update essential submodules only..."
-            
-            # Se synthizer-c esiste nei submoduli, proviamo solo quello
-            if git submodule status | grep -q synthizer-c; then
-              echo "Updating only synthizer-c submodule..."
-              git submodule update --init --depth=1 synthizer-c || true
-            fi
-          fi
-          
-          echo "📂 Final submodule status:"
-          git submodule status || true
 
       - name: Verify essential files exist
         run: |

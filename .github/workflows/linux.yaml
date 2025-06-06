@@ -10,12 +10,12 @@ on:
       manylinux_version:
         description: 'ManyLinux version to use'
         required: false
-        default: 'manylinux2014'
+        default: 'manylinux_2_28'
         type: choice
         options:
-          - manylinux2014
-          - manylinux_2_24
           - manylinux_2_28
+          - manylinux_2_24
+          - manylinux2014
 
 jobs:
   # Job per costruire le wheel su Linux (manylinux)
@@ -273,3 +273,5 @@ jobs:
       - name: Upload to PyPI
         run: |
           python -m twine upload --skip-existing ~/artifacts/*/*.whl
+ 
+ 

@@ -292,67 +292,67 @@ jobs:
           find synthizer-vendored -name "CMakeLists.txt" -exec sed -i 's/-Werror//g' {} \;
           find synthizer-vendored -name "*.cmake" -exec sed -i 's/-Werror//g' {} \;
       - name: Setup CMake paths for vcpkg libraries
-       run: |
-         echo "🔧 Setting up CMake paths for vcpkg libraries..."
-         
-         echo "🔍 Debug: Environment variables from run-vcpkg action..."
-         echo "VCPKG_ROOT: $VCPKG_ROOT"
-         echo "VCPKG_DEFAULT_TRIPLET: $VCPKG_DEFAULT_TRIPLET"
-         
-         # Find the actual vcpkg installation directory
-         echo "🔍 Searching for vcpkg installation directory..."
-         VCPKG_INSTALLED_PATH=""
-         
-         # Method 1: Look for the actual installation directory
-         if [ -d "$(pwd)/vcpkg_installed" ]; then
-           VCPKG_INSTALLED_PATH="$(pwd)/vcpkg_installed/$VCPKG_DEFAULT_TRIPLET"
-           echo "✅ Found Method 1: $VCPKG_INSTALLED_PATH"
-         fi
-         
-         # Method 2: Search in workspace for any vcpkg_installed directory
-         if [ -z "$VCPKG_INSTALLED_PATH" ] || [ ! -d "$VCPKG_INSTALLED_PATH" ]; then
-           SEARCH_PATH=$(find "$(pwd)" -name "vcpkg_installed" -type d | head -1)
-           if [ -n "$SEARCH_PATH" ]; then
-             VCPKG_INSTALLED_PATH="$SEARCH_PATH/$VCPKG_DEFAULT_TRIPLET"
-             echo "✅ Found Method 2: $VCPKG_INSTALLED_PATH"
-           fi
-         fi
-         
-         # Method 3: Use the RUNVCPKG output (if available)
-         if [ -z "$VCPKG_INSTALLED_PATH" ] || [ ! -d "$VCPKG_INSTALLED_PATH" ]; then
-           # Look for any directory containing the triplet name
-           TRIPLET_DIR=$(find "$(pwd)" -name "$VCPKG_DEFAULT_TRIPLET" -type d | grep vcpkg | head -1)
-           if [ -n "$TRIPLET_DIR" ]; then
-             VCPKG_INSTALLED_PATH="$TRIPLET_DIR"
-             echo "✅ Found Method 3: $VCPKG_INSTALLED_PATH"
-           fi
-         fi
-         
-         # Verify the path exists
-         if [ -z "$VCPKG_INSTALLED_PATH" ] || [ ! -d "$VCPKG_INSTALLED_PATH" ]; then
-           echo "❌ Could not find vcpkg installation directory"
-           echo "📂 Workspace contents:"
-           find "$(pwd)" -name "*vcpkg*" -type d | head -10
-           echo "📂 Looking for any $VCPKG_DEFAULT_TRIPLET directories:"
-           find "$(pwd)" -name "$VCPKG_DEFAULT_TRIPLET" -type d | head -5
-           exit 1
-         fi
-         
-         echo "✅ Using vcpkg path: $VCPKG_INSTALLED_PATH"
-         
-         # Verify libraries are installed
-         echo "📂 Checking installed libraries..."
-         ls -la "$VCPKG_INSTALLED_PATH/lib/" | head -10 || echo "No lib directory found"
-         ls -la "$VCPKG_INSTALLED_PATH/include/" | head -5 || echo "No include directory found"
-         
-         # Set environment variables for the build
-         echo "CMAKE_PREFIX_PATH=${VCPKG_INSTALLED_PATH}" >> $GITHUB_ENV
-         echo "PKG_CONFIG_PATH=${VCPKG_INSTALLED_PATH}/lib/pkgconfig:${PKG_CONFIG_PATH}" >> $GITHUB_ENV
-         echo "LD_LIBRARY_PATH=${VCPKG_INSTALLED_PATH}/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
-         echo "VCPKG_INSTALLED_PATH=${VCPKG_INSTALLED_PATH}" >> $GITHUB_ENV
-         echo "CMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" >> $GITHUB_ENV
-         
-         echo "✅ Environment variables set for CMake build"
+        run: |
+          echo "🔧 Setting up CMake paths for vcpkg libraries..."
+          
+          echo "🔍 Debug: Environment variables from run-vcpkg action..."
+          echo "VCPKG_ROOT: $VCPKG_ROOT"
+          echo "VCPKG_DEFAULT_TRIPLET: $VCPKG_DEFAULT_TRIPLET"
+          
+          # Find the actual vcpkg installation directory
+          echo "🔍 Searching for vcpkg installation directory..."
+          VCPKG_INSTALLED_PATH=""
+          
+          # Method 1: Look for the actual installation directory
+          if [ -d "$(pwd)/vcpkg_installed" ]; then
+            VCPKG_INSTALLED_PATH="$(pwd)/vcpkg_installed/$VCPKG_DEFAULT_TRIPLET"
+            echo "✅ Found Method 1: $VCPKG_INSTALLED_PATH"
+          fi
+          
+          # Method 2: Search in workspace for any vcpkg_installed directory
+          if [ -z "$VCPKG_INSTALLED_PATH" ] || [ ! -d "$VCPKG_INSTALLED_PATH" ]; then
+            SEARCH_PATH=$(find "$(pwd)" -name "vcpkg_installed" -type d | head -1)
+            if [ -n "$SEARCH_PATH" ]; then
+              VCPKG_INSTALLED_PATH="$SEARCH_PATH/$VCPKG_DEFAULT_TRIPLET"
+              echo "✅ Found Method 2: $VCPKG_INSTALLED_PATH"
+            fi
+          fi
+          
+          # Method 3: Use the RUNVCPKG output (if available)
+          if [ -z "$VCPKG_INSTALLED_PATH" ] || [ ! -d "$VCPKG_INSTALLED_PATH" ]; then
+            # Look for any directory containing the triplet name
+            TRIPLET_DIR=$(find "$(pwd)" -name "$VCPKG_DEFAULT_TRIPLET" -type d | grep vcpkg | head -1)
+            if [ -n "$TRIPLET_DIR" ]; then
+              VCPKG_INSTALLED_PATH="$TRIPLET_DIR"
+              echo "✅ Found Method 3: $VCPKG_INSTALLED_PATH"
+            fi
+          fi
+          
+          # Verify the path exists
+          if [ -z "$VCPKG_INSTALLED_PATH" ] || [ ! -d "$VCPKG_INSTALLED_PATH" ]; then
+            echo "❌ Could not find vcpkg installation directory"
+            echo "📂 Workspace contents:"
+            find "$(pwd)" -name "*vcpkg*" -type d | head -10
+            echo "📂 Looking for any $VCPKG_DEFAULT_TRIPLET directories:"
+            find "$(pwd)" -name "$VCPKG_DEFAULT_TRIPLET" -type d | head -5
+            exit 1
+          fi
+          
+          echo "✅ Using vcpkg path: $VCPKG_INSTALLED_PATH"
+          
+          # Verify libraries are installed
+          echo "📂 Checking installed libraries..."
+          ls -la "$VCPKG_INSTALLED_PATH/lib/" | head -10 || echo "No lib directory found"
+          ls -la "$VCPKG_INSTALLED_PATH/include/" | head -5 || echo "No include directory found"
+          
+          # Set environment variables for the build
+          echo "CMAKE_PREFIX_PATH=${VCPKG_INSTALLED_PATH}" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=${VCPKG_INSTALLED_PATH}/lib/pkgconfig:${PKG_CONFIG_PATH}" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=${VCPKG_INSTALLED_PATH}/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
+          echo "VCPKG_INSTALLED_PATH=${VCPKG_INSTALLED_PATH}" >> $GITHUB_ENV
+          echo "CMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" >> $GITHUB_ENV
+          
+          echo "✅ Environment variables set for CMake build"
       - name: Build Python wheel
         timeout-minutes: 20
         env:

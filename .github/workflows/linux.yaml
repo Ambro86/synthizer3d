@@ -433,7 +433,7 @@ jobs:
               # Sintassi corretta: repair prima di --plat-tag
               $PYTHON_PATH/bin/auditwheel repair \
                 "$wheel" \
-                --plat-tag "${MANYLINUX_VERSION}_${CI_ARCH}" \
+                --plat "${MANYLINUX_VERSION}_${CI_ARCH}" \
                 --wheel-dir wheelhouse
             fi
           done

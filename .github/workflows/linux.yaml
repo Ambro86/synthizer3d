@@ -89,12 +89,93 @@ jobs:
       EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: ${{ github.workspace }}/vcpkg_installed
 
     steps:
-      - name: Checkout Synthizer3D source code
+      - name: Checkout Synthizer3D source code (without submodules)
         uses: actions/checkout@v4
-        timeout-minutes: 10
+        timeout-minutes: 5
         with:
-          submodules: 'recursive'
           fetch-depth: 1
+          submodules: false
+
+      - name: Check if synthizer-c directory exists
+        run: |
+          echo "📁 Checking project structure..."
+          ls -la
+          if [ -d "synthizer-c" ]; then
+            echo "✅ synthizer-c directory found"
+            ls -la synthizer-c/
+          else
+            echo "❌ synthizer-c directory NOT found - submodules needed"
+          fi
+
+      - name: Initialize submodules (lightweight)
+        timeout-minutes: 10
+        run: |
+          echo "🔄 Initializing submodules with minimal depth..."
+          git submodule init
+          
+      - name: Update submodules with retry logic
+        timeout-minutes: 20
+        continue-on-error: true
+        run: |
+          echo "📥 Updating submodules with retry logic..."
+          
+          # Funzione di retry per submoduli
+          retry_submodule_update() {
+            local max_attempts=3
+            local attempt=1
+            
+            while [ $attempt -le $max_attempts ]; do
+              echo "Attempt $attempt of $max_attempts..."
+              
+              if timeout 300 git submodule update --recursive --depth=1 --jobs=2; then
+                echo "✅ Submodules updated successfully!"
+                return 0
+              else
+                echo "❌ Attempt $attempt failed"
+                if [ $attempt -lt $max_attempts ]; then
+                  echo "⏳ Waiting 30 seconds before retry..."
+                  sleep 30
+                fi
+                attempt=$((attempt + 1))
+              fi
+            done
+            
+            echo "❌ All attempts failed. Trying fallback approach..."
+            return 1
+          }
+          
+          # Prova il normale update
+          if ! retry_submodule_update; then
+            echo "🔧 Fallback: Trying to update essential submodules only..."
+            
+            # Se synthizer-c esiste nei submoduli, proviamo solo quello
+            if git submodule status | grep -q synthizer-c; then
+              echo "Updating only synthizer-c submodule..."
+              git submodule update --init --depth=1 synthizer-c || true
+            fi
+          fi
+          
+          echo "📂 Final submodule status:"
+          git submodule status || true
+
+      - name: Verify essential files exist
+        run: |
+          echo "🔍 Verifying essential files for build..."
+          
+          # Controlla se abbiamo i file necessari
+          if [ -f "setup.py" ] || [ -f "pyproject.toml" ]; then
+            echo "✅ Python build files found"
+          else
+            echo "❌ No Python build files found"
+            exit 1
+          fi
+          
+          if [ -d "synthizer-c" ]; then
+            echo "✅ synthizer-c directory found"
+            ls -la synthizer-c/
+          else
+            echo "❌ synthizer-c directory missing - this may cause build issues"
+          fi
 
       - name: Set environment variables for Python path
         run: |
@@ -393,5 +474,3 @@ jobs:
           else
             echo "❌ **Build Status**: FAILED" >> $GITHUB_STEP_SUMMARY
           fi
- 
- 

@@ -125,22 +125,22 @@ jobs:
         run: |
           echo "📦 Installing system dependencies..."
           if command -v dnf >/dev/null 2>&1; then
-            dnf install -y curl zip unzip tar cmake make gcc-c++
+            dnf install -y curl zip unzip tar cmake make gcc-c++ openssl-devel
           elif command -v yum >/dev/null 2>&1; then
-            yum install -y curl zip unzip tar cmake make gcc-c++
+            yum install -y curl zip unzip tar cmake make gcc-c++ openssl-devel
           fi
           
+          # Solo per le build i686, installiamo il compilatore Rust a 32-bit
           if [ "${{ matrix.CI_ARCH }}" = "i686" ]; then
             echo "Installing 32-bit Rust toolchain for i686 build..."
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable --default-host i686-unknown-linux-gnu -y
-            
-            # CORREZIONE FINALE: Attiva l'ambiente Rust nella shell corrente
             source "$HOME/.cargo/env"
           fi
           
           echo "📦 Installing Python build tools (including ninja)..."
           $PYTHON_PATH/bin/python -m pip install --upgrade pip
           $PYTHON_PATH/bin/pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build auditwheel twine
+
       - name: Set vcpkg Cache Path
         run: echo "VCPKG_DEFAULT_BINARY_CACHE=${{ github.workspace }}/vcpkg_cache" >> $GITHUB_ENV
 

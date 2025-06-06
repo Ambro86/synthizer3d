@@ -288,15 +288,39 @@ jobs:
           CFLAGS: "-Wno-error"
         run: |
           $PYTHON_PATH/bin/python -m build --wheel --no-isolation
-
       - name: Debug vcpkg libraries and dependencies
         run: |
+          echo "🔍 Environment variables:"
+          echo "VCPKG_ROOT: $VCPKG_ROOT"
+          echo "EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}"
+          echo "VCPKG_DEFAULT_TRIPLET: $VCPKG_DEFAULT_TRIPLET"
+          
+          echo "🔍 Checking if vcpkg installed directory exists..."
+          ls -la ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/ || echo "Directory not found!"
+          
           echo "🔍 Checking vcpkg installed libraries..."
-          find ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/$VCPKG_DEFAULT_TRIPLET -name "*.so*" | head -20
-          echo "🔍 Checking wheel dependencies before repair..."
-          $PYTHON_PATH/bin/python -m auditwheel show dist/*.whl
-          echo "🔍 Checking ldd on synthizer module..."
-          find dist -name "*.so" -exec ldd {} \;
+          if [ -d "${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/$VCPKG_DEFAULT_TRIPLET" ]; then
+            find ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/$VCPKG_DEFAULT_TRIPLET -name "*.so*" | head -20
+            echo "🔍 Looking for audio libraries specifically..."
+            find ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/$VCPKG_DEFAULT_TRIPLET -name "*ogg*" -o -name "*vorbis*" -o -name "*opus*"
+          else
+            echo "❌ vcpkg installed directory not found!"
+            echo "Looking for vcpkg directories..."
+            find /home/runner/work -name "vcpkg_installed" -type d 2>/dev/null || echo "No vcpkg_installed found"
+          fi
+          
+          echo "🔍 Checking built wheel content..."
+          if ls dist/*.whl 1> /dev/null 2>&1; then
+            echo "Found wheels:"
+            ls -la dist/*.whl
+            echo "🔍 Checking wheel dependencies before repair..."
+            $PYTHON_PATH/bin/python -m auditwheel show dist/*.whl
+          else
+            echo "❌ No wheels found in dist/"
+          fi
+          
+          echo "🔍 Checking synthizer module dependencies..."
+          find . -name "*.so" -type f -exec echo "Checking: {}" \; -exec ldd {} \; 2>/dev/null || echo "No .so files found"
       - name: Repair wheels with auditwheel
         timeout-minutes: 10
         run: |

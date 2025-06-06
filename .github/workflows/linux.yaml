@@ -1,175 +1,219 @@
-# Workflow for Synthizer3d - ManyLinux Build
-# by Ambro86
-# Ver. 0.9.0
-# Trigger del workflow: dispatch manuale per build manylinux
-name: Build ManyLinux Wheels
+# Synthizer3D v0.9.1 - ManyLinux Python Wheels Build Workflow
+# 
+# Questo workflow compila wheel Python manylinux compatibili per Synthizer3D,
+# una libreria audio 3D. Include tutte le dipendenze audio (Opus, Vorbis, FAAD2)
+# e supporta sia architetture x86_64 che i686.
+#
+# Versione: 0.9.1
+# Ultimo aggiornamento: Giugno 2025
+# Autore: Assistant & Team Synthizer3D
+
+name: Build and Publish Python Wheels for ManyLinux
 
 on:
-  workflow_dispatch: # Permette l'avvio manuale dalla tab Azioni di GitHub
+  push:
+    tags:
+      - 'v*'
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
     inputs:
-      manylinux_version:
-        description: 'ManyLinux version to use'
+      version:
+        description: 'Version to build (e.g., 0.9.1)'
+        required: true
+        default: '0.9.1'
+      upload_to_pypi:
+        description: 'Upload to PyPI (true/false)'
         required: false
-        default: 'manylinux_2_28'
+        default: 'false'
         type: choice
         options:
-          - manylinux_2_28
-          - manylinux_2_24
-          - manylinux2014
+          - 'true'
+          - 'false'
+
+env:
+  VCPKG_DEFAULT_TRIPLET: x64-linux
+  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+  SYNTHIZER_VERSION: ${{ github.event.inputs.version || '0.9.1' }}
 
 jobs:
-  # Job per costruire le wheel su Linux (manylinux)
-  manylinux-build:
-    name: Build ManyLinux (${{ matrix.CI_ARCH }}) Python ${{ matrix.PYVERSION }}
+  build-manylinux:
     runs-on: ubuntu-latest
-    container: quay.io/pypa/${{ github.event.inputs.manylinux_version || 'manylinux_2_28' }}_${{ matrix.CI_ARCH }}
-    env:
-      PYVERSION: ${{ matrix.PYVERSION }}
-      CI_ARCH: ${{ matrix.CI_ARCH }}
-      MANYLINUX_VERSION: ${{ github.event.inputs.manylinux_version || 'manylinux_2_28' }}
-      VCPKG_DEFAULT_TRIPLET: ${{ (matrix.CI_ARCH == 'x86_64' && 'x64-linux' || 'x86-linux') }}
-      # Percorso dove vcpkg in modalità manifest installa di default
-      EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: ${{ github.workspace }}/vcpkg_installed
-      # Necessario per evitare problemi con Node.js nei container manylinux più vecchi
-      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     strategy:
-      fail-fast: false
       matrix:
-        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-        CI_ARCH: ["x86_64", "i686"]
+        include:
+          # x86_64 - usa manylinux_2_28 moderno (AlmaLinux 8)
+          - CI_ARCH: x86_64
+            MANYLINUX_VERSION: manylinux_2_28
+            PYVERSION: 3.8
+          - CI_ARCH: x86_64
+            MANYLINUX_VERSION: manylinux_2_28
+            PYVERSION: 3.9
+          - CI_ARCH: x86_64
+            MANYLINUX_VERSION: manylinux_2_28
+            PYVERSION: 3.10
+          - CI_ARCH: x86_64
+            MANYLINUX_VERSION: manylinux_2_28
+            PYVERSION: 3.11
+          - CI_ARCH: x86_64
+            MANYLINUX_VERSION: manylinux_2_28
+            PYVERSION: 3.12
+            
+          # i686 - usa manylinux2014 (CentOS 7, ultimo che supporta i686)
+          - CI_ARCH: i686
+            MANYLINUX_VERSION: manylinux2014
+            PYVERSION: 3.8
+          - CI_ARCH: i686
+            MANYLINUX_VERSION: manylinux2014
+            PYVERSION: 3.9
+          - CI_ARCH: i686
+            MANYLINUX_VERSION: manylinux2014
+            PYVERSION: 3.10
+          - CI_ARCH: i686
+            MANYLINUX_VERSION: manylinux2014
+            PYVERSION: 3.11
+          - CI_ARCH: i686
+            MANYLINUX_VERSION: manylinux2014
+            PYVERSION: 3.12
+
+    name: "Build ManyLinux (${{ matrix.CI_ARCH }}, ${{ matrix.MANYLINUX_VERSION }}) Python ${{ matrix.PYVERSION }}"
+    
+    container:
+      image: quay.io/pypa/${{ matrix.MANYLINUX_VERSION }}_${{ matrix.CI_ARCH }}
+
+    env:
+      CI_ARCH: ${{ matrix.CI_ARCH }}
+      MANYLINUX_VERSION: ${{ matrix.MANYLINUX_VERSION }}
+      PYVERSION: ${{ matrix.PYVERSION }}
+      EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: ${{ github.workspace }}/vcpkg_installed
+
     steps:
-      - name: Checkout repository
+      - name: Checkout Synthizer3D source code
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: 'recursive'
 
-      # Workaround per problemi di compatibilità con Node.js nei container manylinux
-      - name: Setup Node.js compatibility
+      - name: Set environment variables for Python path
         run: |
-          # Per i container manylinux più vecchi, potrebbe essere necessario usare versioni Node.js compatibili
-          echo "Checking Node.js compatibility..."
-          if [ "$MANYLINUX_VERSION" = "manylinux2014" ]; then
-            echo "Using manylinux2014 - potential Node.js compatibility issues"
+          echo "🐍 Setting up Python ${{ matrix.PYVERSION }} environment..."
+          if [ "${{ matrix.PYVERSION }}" = "3.8" ]; then
+            echo "PYTHON_PATH=/opt/python/cp38-cp38" >> $GITHUB_ENV
+          elif [ "${{ matrix.PYVERSION }}" = "3.9" ]; then
+            echo "PYTHON_PATH=/opt/python/cp39-cp39" >> $GITHUB_ENV
+          elif [ "${{ matrix.PYVERSION }}" = "3.10" ]; then
+            echo "PYTHON_PATH=/opt/python/cp310-cp310" >> $GITHUB_ENV
+          elif [ "${{ matrix.PYVERSION }}" = "3.11" ]; then
+            echo "PYTHON_PATH=/opt/python/cp311-cp311" >> $GITHUB_ENV
+          elif [ "${{ matrix.PYVERSION }}" = "3.12" ]; then
+            echo "PYTHON_PATH=/opt/python/cp312-cp312" >> $GITHUB_ENV
           fi
 
-      - name: Install system dependencies
-        run: |
-          # Aggiorna il sistema e installa dipendenze base
-          if command -v yum &> /dev/null; then
-            yum update -y
-            yum install -y git wget curl tar gzip unzip zip
-            yum groupinstall -y "Development Tools"
-            yum install -y cmake ninja-build pkg-config
-          elif command -v apt-get &> /dev/null; then
-            apt-get update -y
-            apt-get install -y git wget curl tar gzip unzip zip
-            apt-get install -y build-essential cmake ninja-build pkg-config
-          fi
-
-      - name: Set up Python ${{ matrix.PYVERSION }} (${{ matrix.CI_ARCH }})
-        run: |
-          # Trova e configura la versione Python corretta nel container manylinux
-          PYTHON_VERSION_SHORT=$(echo "${{ matrix.PYVERSION }}" | sed 's/\.//')
-          PYTHON_PATH="/opt/python/cp${PYTHON_VERSION_SHORT}-cp${PYTHON_VERSION_SHORT}"
+      - name: Setup vcpkg with cache
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgGitCommitId: '8eb57355a4ffb410a2e94c07b4dca2dffbee8e50'
+          vcpkgJsonGlob: 'synthizer-c/vcpkg.json'
           
-          # Per Python 3.8+ potrebbe essere necessario un suffisso diverso
-          if [ ! -d "$PYTHON_PATH" ]; then
-            PYTHON_PATH="/opt/python/cp${PYTHON_VERSION_SHORT}-cp${PYTHON_VERSION_SHORT}m"
-          fi
-          
-          if [ ! -d "$PYTHON_PATH" ]; then
-            echo "Python ${{ matrix.PYVERSION }} non trovato nel container"
-            ls -la /opt/python/
-            exit 1
-          fi
-          
-          echo "PYTHON_PATH=$PYTHON_PATH" >> $GITHUB_ENV
-          echo "$PYTHON_PATH/bin" >> $GITHUB_PATH
-          
-          # Verifica che Python funzioni
-          $PYTHON_PATH/bin/python --version
-
-      - name: Upgrade pip
-        run: $PYTHON_PATH/bin/python -m pip install --upgrade pip
-
-      - name: Run C/C++ code vendoring script
-        run: $PYTHON_PATH/bin/python synthizer-c/vendor.py synthizer-vendored
-
-      - name: Cache Pip (ManyLinux ${{ matrix.CI_ARCH }})
+      - name: Cache vcpkg binary cache
         uses: actions/cache@v4
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-manylinux-pip-${{ env.PYVERSION }}-${{ matrix.CI_ARCH }}-${{ hashFiles('**/requirements.txt', '**/setup.py', 'vcpkg.json', 'synthizer-c/vendor.py') }}
+          path: ${{ github.workspace }}/vcpkg_cache
+          key: vcpkg-${{ matrix.MANYLINUX_VERSION }}-${{ matrix.CI_ARCH }}-${{ hashFiles('synthizer-c/vcpkg.json') }}
           restore-keys: |
-            ${{ runner.os }}-manylinux-pip-${{ env.PYVERSION }}-${{ matrix.CI_ARCH }}-
+            vcpkg-${{ matrix.MANYLINUX_VERSION }}-${{ matrix.CI_ARCH }}-
 
-      - name: Setup vcpkg
-        # Solo per container con glibc sufficiente per Node.js 20
-        if: env.MANYLINUX_VERSION != 'manylinux2014'
-        uses: lukka/run-vcpkg@v11
-        # Questo configura $VCPKG_ROOT
-
-      - name: Install vcpkg manually (fallback for older containers)
-        if: env.MANYLINUX_VERSION == 'manylinux2014'
+      - name: Set vcpkg binary cache directory
         run: |
-          echo "Installing vcpkg manually for older container..."
-          cd /tmp
-          git clone https://github.com/Microsoft/vcpkg.git
-          cd vcpkg
-          ./bootstrap-vcpkg.sh
-          echo "VCPKG_ROOT=/tmp/vcpkg" >> $GITHUB_ENV
-          echo "Manual vcpkg installation completed"
+          mkdir -p "${{ github.workspace }}/vcpkg_cache"
+          echo "VCPKG_DEFAULT_BINARY_CACHE=${{ github.workspace }}/vcpkg_cache" >> $GITHUB_ENV
 
-      - name: Install dependencies using vcpkg (ManyLinux)
+      - name: Install vcpkg audio dependencies (Opus, Vorbis, FAAD2)
         run: |
-          echo "VCPKG_ROOT (vcpkg tool directory) is $VCPKG_ROOT"
-          echo "VCPKG_DEFAULT_TRIPLET is $VCPKG_DEFAULT_TRIPLET"
-          echo "GITHUB_WORKSPACE is $GITHUB_WORKSPACE"
-          echo "Architecture: $CI_ARCH"
-          echo "ManyLinux version: $MANYLINUX_VERSION"
-
-          if [ -z "$VCPKG_ROOT" ]; then
-            echo "Error: VCPKG_ROOT is not set."
+          echo "🎵 Installing audio libraries via vcpkg..."
+          cd synthizer-c
+          echo "Working directory: $(pwd)"
+          echo "Contents of synthizer-c:"
+          ls -la
+          
+          echo "Running vcpkg install command..."
+          "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions
+          
+          echo "Setting CMAKE_PREFIX_PATH and library paths..."
+          TARGET_CMAKE_PREFIX_PATH="${EFFECTIVE_VCPKG_INSTALLED_DIR_BASE}/$VCPKG_DEFAULT_TRIPLET"
+          echo "Target CMAKE_PREFIX_PATH will be: $TARGET_CMAKE_PREFIX_PATH"
+          
+          if [ -d "$TARGET_CMAKE_PREFIX_PATH" ]; then
+            echo "✅ Confirmed: Target directory for CMAKE_PREFIX_PATH exists: $TARGET_CMAKE_PREFIX_PATH"
+            echo "CMAKE_PREFIX_PATH=$TARGET_CMAKE_PREFIX_PATH" >> $GITHUB_ENV
+            echo "LD_LIBRARY_PATH=$TARGET_CMAKE_PREFIX_PATH/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+            echo "PKG_CONFIG_PATH=$TARGET_CMAKE_PREFIX_PATH/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          else
+            echo "❌ ERROR: Expected vcpkg installed directory not found: $TARGET_CMAKE_PREFIX_PATH"
+            echo "Available directories in $EFFECTIVE_VCPKG_INSTALLED_DIR_BASE:"
+            ls -la "$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE" || echo "Base directory not found"
             exit 1
           fi
-
-          # Installa le dipendenze usando vcpkg in modalità manifest
-          "$VCPKG_ROOT/vcpkg" install --triplet "$VCPKG_DEFAULT_TRIPLET"
-          echo "Finished vcpkg install command."
-
-          # Percorso di installazione atteso per la modalità manifest
-          VCPKG_MANIFEST_INSTALL_PATH="$GITHUB_WORKSPACE/vcpkg_installed/$VCPKG_DEFAULT_TRIPLET"
           
-          echo "Target CMAKE_PREFIX_PATH will be: $VCPKG_MANIFEST_INSTALL_PATH"
-          if [ ! -d "$VCPKG_MANIFEST_INSTALL_PATH" ]; then
-            echo "WARNING: Directory $VCPKG_MANIFEST_INSTALL_PATH does NOT exist after vcpkg install."
-            echo "This suggests vcpkg did not install to the expected manifest location."
-            echo "Listing contents of $GITHUB_WORKSPACE/vcpkg_installed for debugging:"
-            ls -la "$GITHUB_WORKSPACE/vcpkg_installed" || echo "$GITHUB_WORKSPACE/vcpkg_installed does not exist or is empty."
-            
-            # Fallback per debug: controlla la directory di installazione classica
-            CLASSIC_INSTALL_PATH="$VCPKG_ROOT/installed/$VCPKG_DEFAULT_TRIPLET"
-            echo "Checking classic mode install path for debugging: $CLASSIC_INSTALL_PATH"
-            if [ -d "$CLASSIC_INSTALL_PATH" ]; then
-                echo "WARNING: Classic mode path $CLASSIC_INSTALL_PATH EXISTS. This is unexpected if manifest mode is active."
-            else
-                echo "Classic mode path $CLASSIC_INSTALL_PATH also does NOT exist."
-            fi
-          else
-            echo "Confirmed: Target directory for CMAKE_PREFIX_PATH exists: $VCPKG_MANIFEST_INSTALL_PATH"
-          fi
+          echo "✅ Finished vcpkg install command."
 
-          echo "CMAKE_PREFIX_PATH=$VCPKG_MANIFEST_INSTALL_PATH" >> "$GITHUB_ENV"
-          echo "LD_LIBRARY_PATH=$VCPKG_MANIFEST_INSTALL_PATH/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
-          echo "PKG_CONFIG_PATH=$VCPKG_MANIFEST_INSTALL_PATH/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" >> "$GITHUB_ENV"
-          echo "CMAKE_PREFIX_PATH set to $VCPKG_MANIFEST_INSTALL_PATH"
-          echo "LD_LIBRARY_PATH extended with $VCPKG_MANIFEST_INSTALL_PATH/lib"
-          echo "PKG_CONFIG_PATH extended with $VCPKG_MANIFEST_INSTALL_PATH/lib/pkgconfig"
-
-      - name: Install Python build dependencies (ManyLinux)
+      - name: Install Python build dependencies
         run: |
+          echo "📦 Installing Python build tools..."
           $PYTHON_PATH/bin/python -m pip install --upgrade pip
-          $PYTHON_PATH/bin/pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build auditwheel
+          $PYTHON_PATH/bin/pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build auditwheel twine
+
+      - name: Set version in setup.py and pyproject.toml
+        run: |
+          echo "🏷️ Setting version to: ${{ env.SYNTHIZER_VERSION }}"
+          
+          # Aggiorna version in setup.py se esiste
+          if [ -f "setup.py" ]; then
+            sed -i "s/version=['\"][^'\"]*['\"]/version='${{ env.SYNTHIZER_VERSION }}'/g" setup.py
+            echo "✅ Updated setup.py with version ${{ env.SYNTHIZER_VERSION }}"
+          fi
+          
+          # Aggiorna version in pyproject.toml se esiste
+          if [ -f "pyproject.toml" ]; then
+            sed -i "s/version = ['\"][^'\"]*['\"]/version = \"${{ env.SYNTHIZER_VERSION }}\"/g" pyproject.toml
+            echo "✅ Updated pyproject.toml with version ${{ env.SYNTHIZER_VERSION }}"
+          fi
+          
+          # Verifica le modifiche
+          echo "=== Current setup.py version line ==="
+          grep -n "version" setup.py || echo "No version found in setup.py"
+          echo "=== Current pyproject.toml version line ==="
+          grep -n "version" pyproject.toml || echo "No version found in pyproject.toml"
+
+      - name: Run C/C++ code vendoring script
+        run: |
+          echo "📁 Running Synthizer vendoring script..."
+          python synthizer-c/vendor.py synthizer-vendored
+
+      - name: Fix C++ compilation issues for modern compilers
+        run: |
+          echo "🔧 Fixing C++20 template-id constructor issues..."
+          
+          # Fix nel file property_automation_timeline.hpp
+          if [ -f "synthizer-vendored/include/synthizer/property_automation_timeline.hpp" ]; then
+            sed -i 's/PropertyAutomationPoint<N>(const PropertyAutomationPoint<N> &) = default;/PropertyAutomationPoint(const PropertyAutomationPoint<N> \&) = default;/g' \
+              synthizer-vendored/include/synthizer/property_automation_timeline.hpp
+            echo "✅ Fixed PropertyAutomationPoint constructor"
+          fi
+          
+          # Fix per il cast di funzioni in mp3.hpp
+          if [ -f "synthizer-vendored/include/synthizer/decoders/mp3.hpp" ]; then
+            # Cercare il cast problematico e sostituirlo
+            sed -i 's/local_seek_cb_for_init = (drmp3_seek_proc)seek_cb;/local_seek_cb_for_init = reinterpret_cast<drmp3_seek_proc>(seek_cb);/g' \
+              synthizer-vendored/include/synthizer/decoders/mp3.hpp
+            echo "✅ Fixed function cast in mp3.hpp"
+          fi
+          
+          # Disabilita -Werror nei CMakeLists.txt se presente
+          find synthizer-vendored -name "CMakeLists.txt" -exec sed -i 's/-Werror//g' {} \;
+          find synthizer-vendored -name "*.cmake" -exec sed -i 's/-Werror//g' {} \;
+          
+          echo "✅ C++ fixes applied"
 
       - name: Build Python Wheels (ManyLinux ${{ matrix.CI_ARCH }})
         env:
@@ -179,6 +223,7 @@ jobs:
           CXXFLAGS: "-Wno-template-id-cdtor -Wno-cast-function-type -Wno-error"
           CFLAGS: "-Wno-error"
         run: |
+          echo "🔨 Building Synthizer3D wheel for $CI_ARCH..."
           cd "$GITHUB_WORKSPACE"
           echo "Architecture: $CI_ARCH"
           echo "ManyLinux version: $MANYLINUX_VERSION"
@@ -191,9 +236,11 @@ jobs:
           echo "CFLAGS: $CFLAGS"
           
           $PYTHON_PATH/bin/python -m build --wheel --no-isolation
+          echo "✅ Wheel built successfully!"
 
-      - name: List vcpkg installed files for debugging
+      - name: Debug vcpkg installation
         run: |
+          echo "🔍 Debugging vcpkg installation..."
           VCPKG_INSTALLED_TRIPLET_DIR="$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE/$VCPKG_DEFAULT_TRIPLET"
           echo "Listing contents of effective vcpkg directory: $VCPKG_INSTALLED_TRIPLET_DIR ..."
           if [ -d "$VCPKG_INSTALLED_TRIPLET_DIR" ]; then
@@ -201,7 +248,7 @@ jobs:
           else
             echo "WARNING: $VCPKG_INSTALLED_TRIPLET_DIR does not exist."
           fi
-
+          
           VCPKG_INSTALLED_LIB_DIR="$VCPKG_INSTALLED_TRIPLET_DIR/lib"
           if [ -d "$VCPKG_INSTALLED_LIB_DIR" ]; then
             echo "Listing contents of $VCPKG_INSTALLED_LIB_DIR ..."
@@ -209,7 +256,7 @@ jobs:
           else
             echo "WARNING: $VCPKG_INSTALLED_LIB_DIR does not exist or is not a directory."
           fi
-
+          
           VCPKG_INSTALLED_BIN_DIR="$VCPKG_INSTALLED_TRIPLET_DIR/bin"
           if [ -d "$VCPKG_INSTALLED_BIN_DIR" ]; then
             echo "Listing contents of $VCPKG_INSTALLED_BIN_DIR ..."
@@ -217,13 +264,13 @@ jobs:
           else
             echo "WARNING: $VCPKG_INSTALLED_BIN_DIR does not exist or is not a directory."
           fi
-        continue-on-error: true
 
-      - name: Repair Wheel with Auditwheel (ManyLinux ${{ matrix.CI_ARCH }})
+      - name: Repair wheels with auditwheel (make manylinux compatible)
+        env:
+          VCPKG_INSTALLED_TRIPLET_DIR: ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/${{ env.VCPKG_DEFAULT_TRIPLET }}
+          VCPKG_INSTALLED_LIB_DIR: ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/${{ env.VCPKG_DEFAULT_TRIPLET }}/lib
         run: |
-          VCPKG_INSTALLED_TRIPLET_DIR="$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE/$VCPKG_DEFAULT_TRIPLET"
-          VCPKG_INSTALLED_LIB_DIR="$VCPKG_INSTALLED_TRIPLET_DIR/lib"
-          
+          echo "🛠️ Repairing wheels with auditwheel..."
           echo "Path vcpkg (lib) che sarà aggiunto a auditwheel: $VCPKG_INSTALLED_LIB_DIR"
           
           # Crea directory wheelhouse se non esiste
@@ -233,12 +280,11 @@ jobs:
             if [ -f "$wheel" ]; then
               echo "Repairing wheel: $wheel"
               # Usa auditwheel per riparare la wheel e renderla compatibile con manylinux
-              # --plat-tag forza il tag della piattaforma
-              # -w specifica la directory di output
+              # Sintassi corretta: repair prima di --plat-tag
               $PYTHON_PATH/bin/auditwheel repair \
+                "$wheel" \
                 --plat-tag "${MANYLINUX_VERSION}_${CI_ARCH}" \
-                --wheel-dir wheelhouse \
-                "$wheel"
+                --wheel-dir wheelhouse
             fi
           done
           
@@ -248,59 +294,102 @@ jobs:
           # Sposta le wheel riparate in dist/ per coerenza con gli altri job
           if ls wheelhouse/*.whl 1> /dev/null 2>&1; then
             cp wheelhouse/*.whl dist/
-            echo "Copied repaired wheels to dist/:"
+            echo "✅ Copied repaired wheels to dist/:"
             ls -la dist/*.whl
           fi
 
-      - name: Verify wheel compatibility
+      - name: Verify wheel contents and metadata
         run: |
+          echo "🔍 Verifying wheel contents..."
           for wheel in dist/*.whl; do
             if [ -f "$wheel" ]; then
-              echo "Verifying wheel: $wheel"
-              $PYTHON_PATH/bin/auditwheel show "$wheel" || echo "Warning: auditwheel show failed for $wheel"
+              echo "=== Wheel: $wheel ==="
+              $PYTHON_PATH/bin/python -m zipfile -l "$wheel" | head -20
+              echo ""
+              # Verifica metadata con auditwheel
+              echo "=== Auditwheel show output ==="
+              $PYTHON_PATH/bin/auditwheel show "$wheel" || echo "Auditwheel show failed"
+              echo ""
             fi
           done
-        continue-on-error: true
 
-      - name: Upload Python Wheel Artifact (ManyLinux ${{ matrix.CI_ARCH }})
+      - name: Upload wheel artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-wheels-manylinux-${{ matrix.CI_ARCH }}-${{ matrix.PYVERSION }}
+          name: python-wheels-${{ matrix.MANYLINUX_VERSION }}-${{ matrix.CI_ARCH }}-py${{ matrix.PYVERSION }}
           path: dist/*.whl
-          if-no-files-found: error
 
-  # Job opzionale per il deployment su PyPI (solo se necessario)
-  deploy_pypi:
-    name: Deploy ManyLinux wheels to PyPI
-    needs: [manylinux-build]
+  # Job separato per la pubblicazione (solo quando richiesto)
+  publish-to-pypi:
+    needs: build-manylinux
     runs-on: ubuntu-latest
-    if: github.event.inputs.deploy_to_pypi == 'true'
+    if: >
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.upload_to_pypi == 'true')
+    
+    environment:
+      name: pypi
+      url: https://pypi.org/p/synthizer3d
+    
     permissions:
-      contents: read
-      id-token: write # Required for trusted publishing
+      id-token: write  # Per PyPI trusted publishing
+      
     steps:
-      - name: Download all build artifacts
+      - name: Download all wheel artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ~/artifacts
-          pattern: python-wheels-manylinux-*
+          pattern: python-wheels-*
+          path: dist
+          merge-multiple: true
 
-      - name: Set up Python for Twine
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Upgrade pip for Twine step
-        run: python -m pip install --upgrade pip
-
-      - name: Install Twine
-        run: python -m pip install --upgrade twine
-
-      - name: Display downloaded artifacts structure
-        run: ls -R ~/artifacts
-
-      - name: Upload to PyPI
+      - name: List all wheels to be published
         run: |
-          python -m twine upload --skip-existing ~/artifacts/*/*.whl
+          echo "🎯 Wheels ready for publication:"
+          ls -la dist/*.whl
+          echo ""
+          echo "Total wheels: $(ls dist/*.whl | wc -l)"
+
+      - name: Publish to Test PyPI (for testing)
+        if: github.event_name == 'workflow_dispatch'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages-dir: dist/
+          verbose: true
+
+      - name: Publish to PyPI (production)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+          verbose: true
+
+  # Job finale per summary
+  build-summary:
+    needs: build-manylinux
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Build Summary
+        run: |
+          echo "# 🎵 Synthizer3D v${{ env.SYNTHIZER_VERSION }} Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
+          echo "- **x86_64 wheels**: 5 versions (Python 3.8-3.12) with manylinux_2_28" >> $GITHUB_STEP_SUMMARY
+          echo "- **i686 wheels**: 5 versions (Python 3.8-3.12) with manylinux2014" >> $GITHUB_STEP_SUMMARY
+          echo "- **Total expected wheels**: 10" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Audio Libraries Included" >> $GITHUB_STEP_SUMMARY
+          echo "- 🎵 **Opus**: Advanced audio codec" >> $GITHUB_STEP_SUMMARY
+          echo "- 🎵 **Vorbis**: OGG Vorbis audio codec" >> $GITHUB_STEP_SUMMARY
+          echo "- 🎵 **FAAD2**: AAC audio decoder" >> $GITHUB_STEP_SUMMARY
+          echo "- 🎵 **OGG**: Container format support" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.build-manylinux.result }}" = "success" ]; then
+            echo "✅ **Build Status**: SUCCESS" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Build Status**: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
  
  

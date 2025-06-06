@@ -274,14 +274,59 @@ jobs:
           find synthizer-vendored -name "CMakeLists.txt" -exec sed -i 's/-Werror//g' {} \;
           find synthizer-vendored -name "*.cmake" -exec sed -i 's/-Werror//g' {} \;
 
-      - name: Build Python Wheels (Linux x86_64)
-        timeout-minutes: 45
-        env:
-          RUSTFLAGS: "-A warnings"
-          CXXFLAGS: "-Wno-template-id-cdtor -Wno-cast-function-type -Wno-error"
-          CFLAGS: "-Wno-error"
+      - name: Set CMake paths for vcpkg dependencies
         run: |
-          $PYTHON_PATH/bin/python -m build --wheel --no-isolation
+          echo "🔧 Setting up CMake paths for vcpkg libraries..."
+          VCPKG_INSTALLED_PATH="${VCPKG_ROOT}/installed/${VCPKG_DEFAULT_TRIPLET}"
+          
+          echo "📍 VCPKG installed path: $VCPKG_INSTALLED_PATH"
+          ls -la "$VCPKG_INSTALLED_PATH" || echo "Directory not found"
+          ls -la "$VCPKG_INSTALLED_PATH/lib" || echo "Lib directory not found"
+          ls -la "$VCPKG_INSTALLED_PATH/lib/cmake" || echo "CMake directory not found"
+          
+          # Debug: trova tutti i file di configurazione CMake
+          echo "🔍 Finding CMake configuration files..."
+          find "$VCPKG_INSTALLED_PATH" -name "*Config.cmake" -o -name "*-config.cmake" | head -20 || echo "No config files found"
+          find "$VCPKG_INSTALLED_PATH" -name "*vorbis*" -o -name "*Vorbis*" | head -10 || echo "No vorbis files found"
+          
+          # Set environment variables per il build Python
+          echo "CMAKE_PREFIX_PATH=${VCPKG_INSTALLED_PATH}" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=${VCPKG_INSTALLED_PATH}/lib/pkgconfig:${PKG_CONFIG_PATH}" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=${VCPKG_INSTALLED_PATH}/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
+          
+          echo "✅ Environment variables set for CMake"
+      - name: Build Python wheel
+        timeout-minutes: 20
+        env:
+          # Forza CMake a usare il percorso vcpkg
+          CMAKE_PREFIX_PATH: ${{ env.VCPKG_ROOT }}/installed/${{ env.VCPKG_DEFAULT_TRIPLET }}
+          PKG_CONFIG_PATH: ${{ env.VCPKG_ROOT }}/installed/${{ env.VCPKG_DEFAULT_TRIPLET }}/lib/pkgconfig:${{ env.PKG_CONFIG_PATH }}
+          LD_LIBRARY_PATH: ${{ env.VCPKG_ROOT }}/installed/${{ env.VCPKG_DEFAULT_TRIPLET }}/lib:${{ env.LD_LIBRARY_PATH }}
+          # Flags per disabilitare errori di compilazione
+          RUSTFLAGS: "-A warnings"
+          CXXFLAGS: "-Wno-template-id-cdtor -Wno-cast-function-type -Wno-error -I${{ env.VCPKG_ROOT }}/installed/ ${{ env.VCPKG_DEFAULT_TRIPLET }}/include"
+          CFLAGS: "-Wno-error -I${{ env.VCPKG_ROOT }}/installed/${{ env.VCPKG_DEFAULT_TRIPLET }}/include"
+          LDFLAGS: "-L${{ env.VCPKG_ROOT }}/installed/${{ env.VCPKG_DEFAULT_TRIPLET }}/lib"
+        run: |
+          echo "🔨 Building Python wheel with explicit CMake paths..."
+          VCPKG_INSTALLED_PATH="${VCPKG_ROOT}/installed/${VCPKG_DEFAULT_TRIPLET}"
+          
+          echo "📍 Using paths:"
+          echo "  CMAKE_PREFIX_PATH: $CMAKE_PREFIX_PATH"
+          echo "  PKG_CONFIG_PATH: $PKG_CONFIG_PATH"
+          echo "  VCPKG_ROOT: $VCPKG_ROOT"
+          echo "  VCPKG_INSTALLED_PATH: $VCPKG_INSTALLED_PATH"
+          
+          echo "🔍 Final verification of vcpkg installation:"
+          ./vcpkg/vcpkg list | grep -E "(vorbis|opus|ogg|faad)" || echo "No audio libraries found in vcpkg list"
+          
+          echo "🚀 Starting Python wheel build..."
+          $PYTHON_PATH/bin/python -m build --wheel --no-isolation \
+            --config-setting="cmake.args=-DCMAKE_PREFIX_PATH=${VCPKG_INSTALLED_PATH}" \
+            --config-setting="cmake.args=-DCMAKE_FIND_ROOT_PATH=${VCPKG_INSTALLED_PATH}" \
+            --config-setting="cmake.args=-DVCPKG_TARGET_TRIPLET=${VCPKG_DEFAULT_TRIPLET}" \
+            --config-setting="cmake.args=-DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+
       - name: Debug vcpkg libraries and dependencies
         run: |
           echo "🔍 Environment variables:"

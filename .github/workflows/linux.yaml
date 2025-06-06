@@ -1,0 +1,275 @@
+# Workflow for Synthizer3d - ManyLinux Build
+# by Ambro86
+# Ver. 0.9.0
+# Trigger del workflow: dispatch manuale per build manylinux
+name: Build ManyLinux Wheels
+
+on:
+  workflow_dispatch: # Permette l'avvio manuale dalla tab Azioni di GitHub
+    inputs:
+      manylinux_version:
+        description: 'ManyLinux version to use'
+        required: false
+        default: 'manylinux2014'
+        type: choice
+        options:
+          - manylinux2014
+          - manylinux_2_24
+          - manylinux_2_28
+
+jobs:
+  # Job per costruire le wheel su Linux (manylinux)
+  manylinux-build:
+    name: Build ManyLinux (${{ matrix.CI_ARCH }}) Python ${{ matrix.PYVERSION }}
+    runs-on: ubuntu-latest
+    container: quay.io/pypa/${{ github.event.inputs.manylinux_version || 'manylinux2014' }}_${{ matrix.CI_ARCH }}
+    env:
+      PYVERSION: ${{ matrix.PYVERSION }}
+      CI_ARCH: ${{ matrix.CI_ARCH }}
+      MANYLINUX_VERSION: ${{ github.event.inputs.manylinux_version || 'manylinux2014' }}
+      VCPKG_DEFAULT_TRIPLET: ${{ (matrix.CI_ARCH == 'x86_64' && 'x64-linux' || 'x86-linux') }}
+      # Percorso dove vcpkg in modalità manifest installa di default
+      EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: ${{ github.workspace }}/vcpkg_installed
+    strategy:
+      fail-fast: false
+      matrix:
+        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        CI_ARCH: ["x86_64", "i686"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install system dependencies
+        run: |
+          # Aggiorna il sistema e installa dipendenze base
+          if command -v yum &> /dev/null; then
+            yum update -y
+            yum install -y git wget curl tar gzip unzip zip
+            yum groupinstall -y "Development Tools"
+            yum install -y cmake ninja-build pkg-config
+          elif command -v apt-get &> /dev/null; then
+            apt-get update -y
+            apt-get install -y git wget curl tar gzip unzip zip
+            apt-get install -y build-essential cmake ninja-build pkg-config
+          fi
+
+      - name: Set up Python ${{ matrix.PYVERSION }} (${{ matrix.CI_ARCH }})
+        run: |
+          # Trova e configura la versione Python corretta nel container manylinux
+          PYTHON_VERSION_SHORT=$(echo "${{ matrix.PYVERSION }}" | sed 's/\.//')
+          PYTHON_PATH="/opt/python/cp${PYTHON_VERSION_SHORT}-cp${PYTHON_VERSION_SHORT}"
+          
+          # Per Python 3.8+ potrebbe essere necessario un suffisso diverso
+          if [ ! -d "$PYTHON_PATH" ]; then
+            PYTHON_PATH="/opt/python/cp${PYTHON_VERSION_SHORT}-cp${PYTHON_VERSION_SHORT}m"
+          fi
+          
+          if [ ! -d "$PYTHON_PATH" ]; then
+            echo "Python ${{ matrix.PYVERSION }} non trovato nel container"
+            ls -la /opt/python/
+            exit 1
+          fi
+          
+          echo "PYTHON_PATH=$PYTHON_PATH" >> $GITHUB_ENV
+          echo "$PYTHON_PATH/bin" >> $GITHUB_PATH
+          
+          # Verifica che Python funzioni
+          $PYTHON_PATH/bin/python --version
+
+      - name: Upgrade pip
+        run: $PYTHON_PATH/bin/python -m pip install --upgrade pip
+
+      - name: Run C/C++ code vendoring script
+        run: $PYTHON_PATH/bin/python synthizer-c/vendor.py synthizer-vendored
+
+      - name: Cache Pip (ManyLinux ${{ matrix.CI_ARCH }})
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-manylinux-pip-${{ env.PYVERSION }}-${{ matrix.CI_ARCH }}-${{ hashFiles('**/requirements.txt', '**/setup.py', 'vcpkg.json', 'synthizer-c/vendor.py') }}
+          restore-keys: |
+            ${{ runner.os }}-manylinux-pip-${{ env.PYVERSION }}-${{ matrix.CI_ARCH }}-
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        # Questo configura $VCPKG_ROOT
+
+      - name: Install dependencies using vcpkg (ManyLinux)
+        run: |
+          echo "VCPKG_ROOT (vcpkg tool directory) is $VCPKG_ROOT"
+          echo "VCPKG_DEFAULT_TRIPLET is $VCPKG_DEFAULT_TRIPLET"
+          echo "GITHUB_WORKSPACE is $GITHUB_WORKSPACE"
+          echo "Architecture: $CI_ARCH"
+          echo "ManyLinux version: $MANYLINUX_VERSION"
+
+          if [ -z "$VCPKG_ROOT" ]; then
+            echo "Error: VCPKG_ROOT is not set."
+            exit 1
+          fi
+
+          # Installa le dipendenze usando vcpkg in modalità manifest
+          "$VCPKG_ROOT/vcpkg" install --triplet "$VCPKG_DEFAULT_TRIPLET"
+          echo "Finished vcpkg install command."
+
+          # Percorso di installazione atteso per la modalità manifest
+          VCPKG_MANIFEST_INSTALL_PATH="$GITHUB_WORKSPACE/vcpkg_installed/$VCPKG_DEFAULT_TRIPLET"
+          
+          echo "Target CMAKE_PREFIX_PATH will be: $VCPKG_MANIFEST_INSTALL_PATH"
+          if [ ! -d "$VCPKG_MANIFEST_INSTALL_PATH" ]; then
+            echo "WARNING: Directory $VCPKG_MANIFEST_INSTALL_PATH does NOT exist after vcpkg install."
+            echo "This suggests vcpkg did not install to the expected manifest location."
+            echo "Listing contents of $GITHUB_WORKSPACE/vcpkg_installed for debugging:"
+            ls -la "$GITHUB_WORKSPACE/vcpkg_installed" || echo "$GITHUB_WORKSPACE/vcpkg_installed does not exist or is empty."
+            
+            # Fallback per debug: controlla la directory di installazione classica
+            CLASSIC_INSTALL_PATH="$VCPKG_ROOT/installed/$VCPKG_DEFAULT_TRIPLET"
+            echo "Checking classic mode install path for debugging: $CLASSIC_INSTALL_PATH"
+            if [ -d "$CLASSIC_INSTALL_PATH" ]; then
+                echo "WARNING: Classic mode path $CLASSIC_INSTALL_PATH EXISTS. This is unexpected if manifest mode is active."
+            else
+                echo "Classic mode path $CLASSIC_INSTALL_PATH also does NOT exist."
+            fi
+          else
+            echo "Confirmed: Target directory for CMAKE_PREFIX_PATH exists: $VCPKG_MANIFEST_INSTALL_PATH"
+          fi
+
+          echo "CMAKE_PREFIX_PATH=$VCPKG_MANIFEST_INSTALL_PATH" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$VCPKG_MANIFEST_INSTALL_PATH/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+          echo "PKG_CONFIG_PATH=$VCPKG_MANIFEST_INSTALL_PATH/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" >> "$GITHUB_ENV"
+          echo "CMAKE_PREFIX_PATH set to $VCPKG_MANIFEST_INSTALL_PATH"
+          echo "LD_LIBRARY_PATH extended with $VCPKG_MANIFEST_INSTALL_PATH/lib"
+          echo "PKG_CONFIG_PATH extended with $VCPKG_MANIFEST_INSTALL_PATH/lib/pkgconfig"
+
+      - name: Install Python build dependencies (ManyLinux)
+        run: |
+          $PYTHON_PATH/bin/python -m pip install --upgrade pip
+          $PYTHON_PATH/bin/pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build auditwheel
+
+      - name: Build Python Wheels (ManyLinux ${{ matrix.CI_ARCH }})
+        env:
+          # CMAKE_PREFIX_PATH è impostato tramite GITHUB_ENV
+          SYNTHIZER_EXPECTED_VCPKG_PATH_FOR_DEBUG: ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/${{ env.VCPKG_DEFAULT_TRIPLET }}
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          echo "Architecture: $CI_ARCH"
+          echo "ManyLinux version: $MANYLINUX_VERSION"
+          echo "Current CMAKE_PREFIX_PATH for build is: $CMAKE_PREFIX_PATH"
+          echo "EFFECTIVE_VCPKG_INSTALLED_DIR_BASE for build is: $EFFECTIVE_VCPKG_INSTALLED_DIR_BASE"
+          echo "Synthizer expects vcpkg path (for debug/verification): $SYNTHIZER_EXPECTED_VCPKG_PATH_FOR_DEBUG"
+          echo "Current LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
+          echo "Current PKG_CONFIG_PATH: $PKG_CONFIG_PATH"
+          
+          $PYTHON_PATH/bin/python -m build --wheel --no-isolation
+
+      - name: List vcpkg installed files for debugging
+        run: |
+          VCPKG_INSTALLED_TRIPLET_DIR="$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE/$VCPKG_DEFAULT_TRIPLET"
+          echo "Listing contents of effective vcpkg directory: $VCPKG_INSTALLED_TRIPLET_DIR ..."
+          if [ -d "$VCPKG_INSTALLED_TRIPLET_DIR" ]; then
+            find "$VCPKG_INSTALLED_TRIPLET_DIR" -maxdepth 3 -type f -exec ls -la {} \; | head -50
+          else
+            echo "WARNING: $VCPKG_INSTALLED_TRIPLET_DIR does not exist."
+          fi
+
+          VCPKG_INSTALLED_LIB_DIR="$VCPKG_INSTALLED_TRIPLET_DIR/lib"
+          if [ -d "$VCPKG_INSTALLED_LIB_DIR" ]; then
+            echo "Listing contents of $VCPKG_INSTALLED_LIB_DIR ..."
+            ls -la "$VCPKG_INSTALLED_LIB_DIR"
+          else
+            echo "WARNING: $VCPKG_INSTALLED_LIB_DIR does not exist or is not a directory."
+          fi
+
+          VCPKG_INSTALLED_BIN_DIR="$VCPKG_INSTALLED_TRIPLET_DIR/bin"
+          if [ -d "$VCPKG_INSTALLED_BIN_DIR" ]; then
+            echo "Listing contents of $VCPKG_INSTALLED_BIN_DIR ..."
+            ls -la "$VCPKG_INSTALLED_BIN_DIR"
+          else
+            echo "WARNING: $VCPKG_INSTALLED_BIN_DIR does not exist or is not a directory."
+          fi
+        continue-on-error: true
+
+      - name: Repair Wheel with Auditwheel (ManyLinux ${{ matrix.CI_ARCH }})
+        run: |
+          VCPKG_INSTALLED_TRIPLET_DIR="$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE/$VCPKG_DEFAULT_TRIPLET"
+          VCPKG_INSTALLED_LIB_DIR="$VCPKG_INSTALLED_TRIPLET_DIR/lib"
+          
+          echo "Path vcpkg (lib) che sarà aggiunto a auditwheel: $VCPKG_INSTALLED_LIB_DIR"
+          
+          # Crea directory wheelhouse se non esiste
+          mkdir -p wheelhouse
+          
+          for wheel in dist/*.whl; do
+            if [ -f "$wheel" ]; then
+              echo "Repairing wheel: $wheel"
+              # Usa auditwheel per riparare la wheel e renderla compatibile con manylinux
+              # --plat-tag forza il tag della piattaforma
+              # -w specifica la directory di output
+              $PYTHON_PATH/bin/auditwheel repair \
+                --plat-tag "${MANYLINUX_VERSION}_${CI_ARCH}" \
+                --wheel-dir wheelhouse \
+                "$wheel"
+            fi
+          done
+          
+          echo "Listing repaired wheels in wheelhouse/:"
+          ls -la wheelhouse/*.whl || echo "No wheels found in wheelhouse/"
+          
+          # Sposta le wheel riparate in dist/ per coerenza con gli altri job
+          if ls wheelhouse/*.whl 1> /dev/null 2>&1; then
+            cp wheelhouse/*.whl dist/
+            echo "Copied repaired wheels to dist/:"
+            ls -la dist/*.whl
+          fi
+
+      - name: Verify wheel compatibility
+        run: |
+          for wheel in dist/*.whl; do
+            if [ -f "$wheel" ]; then
+              echo "Verifying wheel: $wheel"
+              $PYTHON_PATH/bin/auditwheel show "$wheel" || echo "Warning: auditwheel show failed for $wheel"
+            fi
+          done
+        continue-on-error: true
+
+      - name: Upload Python Wheel Artifact (ManyLinux ${{ matrix.CI_ARCH }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-wheels-manylinux-${{ matrix.CI_ARCH }}-${{ matrix.PYVERSION }}
+          path: dist/*.whl
+          if-no-files-found: error
+
+  # Job opzionale per il deployment su PyPI (solo se necessario)
+  deploy_pypi:
+    name: Deploy ManyLinux wheels to PyPI
+    needs: [manylinux-build]
+    runs-on: ubuntu-latest
+    if: github.event.inputs.deploy_to_pypi == 'true'
+    permissions:
+      contents: read
+      id-token: write # Required for trusted publishing
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ~/artifacts
+          pattern: python-wheels-manylinux-*
+
+      - name: Set up Python for Twine
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Upgrade pip for Twine step
+        run: python -m pip install --upgrade pip
+
+      - name: Install Twine
+        run: python -m pip install --upgrade twine
+
+      - name: Display downloaded artifacts structure
+        run: ls -R ~/artifacts
+
+      - name: Upload to PyPI
+        run: |
+          python -m twine upload --skip-existing ~/artifacts/*/*.whl

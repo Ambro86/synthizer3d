@@ -332,12 +332,11 @@ jobs:
           grep -n "version" setup.py || echo "No version found in setup.py"
           echo "=== Current pyproject.toml version line ==="
           grep -n "version" pyproject.toml || echo "No version found in pyproject.toml"
-
       - name: Run C/C++ code vendoring script
         timeout-minutes: 5
         run: |
           echo "📁 Running Synthizer vendoring script..."
-          python synthizer-c/vendor.py synthizer-vendored
+          $PYTHON_PATH/bin/python synthizer-c/vendor.py synthizer-vendored
 
       - name: Fix C++ compilation issues for modern compilers
         run: |

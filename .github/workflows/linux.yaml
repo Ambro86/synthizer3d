@@ -92,11 +92,13 @@ jobs:
         timeout-minutes: 15
         run: |
           echo "🐳 Ensuring Docker image is fully loaded..."
-          # Il container è già in esecuzione, ma possiamo verificare che tutto sia ok
           echo "Container info:"
           cat /etc/os-release || true
           echo "Python versions available:"
           ls -la /opt/python/ || true
+          
+          # Fix potential Git permission issues in container
+          git config --global --add safe.directory "*"
 
       - name: Checkout Synthizer3D source code (without submodules)
         uses: actions/checkout@v4
@@ -104,6 +106,7 @@ jobs:
         with:
           fetch-depth: 1
           submodules: false
+          clean: false
 
       - name: Check if synthizer-c directory exists
         run: |
@@ -116,17 +119,15 @@ jobs:
             echo "❌ synthizer-c directory NOT found - submodules needed"
           fi
 
-      - name: Initialize submodules (lightweight)
-        timeout-minutes: 10
-        run: |
-          echo "🔄 Initializing submodules with minimal depth..."
-          git submodule init
-          
-      - name: Update submodules with retry logic
-        timeout-minutes: 20
+      - name: Initialize and update submodules with retry logic
+        timeout-minutes: 15
         continue-on-error: true
         run: |
-          echo "📥 Updating submodules with retry logic..."
+          echo "🔄 Initializing and updating submodules with retry logic..."
+          
+          # Fix Git safe directory issues in container
+          git config --global --add safe.directory "$(pwd)"
+          git config --global --add safe.directory "*"
           
           # Funzione di retry per submoduli
           retry_submodule_update() {
@@ -136,17 +137,26 @@ jobs:
             while [ $attempt -le $max_attempts ]; do
               echo "Attempt $attempt of $max_attempts..."
               
-              if timeout 300 git submodule update --recursive --depth=1 --jobs=2; then
-                echo "✅ Submodules updated successfully!"
-                return 0
-              else
-                echo "❌ Attempt $attempt failed"
-                if [ $attempt -lt $max_attempts ]; then
-                  echo "⏳ Waiting 30 seconds before retry..."
-                  sleep 30
+              # Prima inizializza i submoduli
+              if git submodule init; then
+                echo "✅ Submodules initialized"
+                
+                # Poi aggiorna con timeout e opzioni conservative
+                if timeout 300 git submodule update --recursive --depth=1 --jobs=2 --init; then
+                  echo "✅ Submodules updated successfully!"
+                  return 0
+                else
+                  echo "❌ Submodule update failed on attempt $attempt"
                 fi
-                attempt=$((attempt + 1))
+              else
+                echo "❌ Submodule init failed on attempt $attempt"
               fi
+              
+              if [ $attempt -lt $max_attempts ]; then
+                echo "⏳ Waiting 30 seconds before retry..."
+                sleep 30
+              fi
+              attempt=$((attempt + 1))
             done
             
             echo "❌ All attempts failed. Trying fallback approach..."
@@ -491,4 +501,3 @@ jobs:
           else
             echo "❌ **Build Status**: FAILED" >> $GITHUB_STEP_SUMMARY
           fi
- 

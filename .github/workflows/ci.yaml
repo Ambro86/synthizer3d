@@ -245,7 +245,7 @@ jobs:
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgJsonGlob: 'synthizer-c/vcpkg.json'  # ← Specifica il path corretto
+          vcpkgJsonGlob: 'vcpkg.json'  # ← Specifica il path corretto
           runVcpkgInstall: true                     # ← Abilita l'installazione automatica
       - name: Install vcpkg audio dependencies manually (backup)
         timeout-minutes: 25

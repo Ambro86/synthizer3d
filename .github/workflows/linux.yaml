@@ -1,4 +1,4 @@
-# Synthizer3D v0.9.1 - ManyLinux Python Wheels Build Workflow
+# Synthizer3D v0.9.2 - ManyLinux Python Wheels Build Workflow
 # Questo workflow compila wheel Python manylinux compatibili per Synthizer3D,
 # una libreria audio 3D. Include tutte le dipendenze audio (Opus, Vorbis, FAAD2)
 # e supporta sia architetture x86_64 che i686.

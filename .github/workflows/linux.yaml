@@ -1,10 +1,7 @@
-# Synthizer3D v0.9.1 - ManyLinux Python Wheels Build Workflow
-# Questo workflow compila wheel Python manylinux compatibili per Synthizer3D,
-# una libreria audio 3D. Include tutte le dipendenze audio (Opus, Vorbis, FAAD2)
-# e supporta sia architetture x86_64 che i686.
-# Versione: 1.0.0 (Finale)
-# Ultimo aggiornamento: Giugno 2025
+# Synthizer3D v1.0.0 (Finale) - ManyLinux Python Wheels Build Workflow
+# Questo workflow compila wheel Python manylinux compatibili per Synthizer3D.
 # Autore: Assistant & Team Synthizer3D
+# Ultimo aggiornamento: 6 Giugno 2025
 
 name: Build and Publish Python Wheels for ManyLinux
 
@@ -25,7 +22,7 @@ on:
           - 'false'
 
 env:
-  # CORREZIONE: Usiamo il nuovo sistema di cache 'gits'
+  # CORREZIONE: Usa il moderno sistema di cache 'gits' per vcpkg
   VCPKG_BINARY_SOURCES: "clear;gits,readwrite"
   SYNTHIZER_VERSION: ${{ github.event.inputs.version || '0.9.1' }}
 
@@ -98,12 +95,11 @@ jobs:
       CI_ARCH: ${{ matrix.CI_ARCH }}
       MANYLINUX_VERSION: ${{ matrix.MANYLINUX_VERSION }}
       PYVERSION: ${{ matrix.PYVERSION }}
-      # CORREZIONE: Impostiamo il triplet corretto per ogni architettura
       VCPKG_DEFAULT_TRIPLET: ${{ matrix.VCPKG_TRIPLET }}
       EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: ${{ github.workspace }}/vcpkg_installed
 
     steps:
-      # 1. Checkout del codice (condizionale per architettura)
+      # 1. Checkout del codice (con logica separata per 32-bit e 64-bit)
       - name: Checkout source code (for 64-bit jobs)
         if: matrix.CI_ARCH == 'x86_64'
         uses: actions/checkout@v4
@@ -118,7 +114,7 @@ jobs:
           git checkout ${{ github.sha }}
           git submodule update --init --recursive
       
-      # 2. Impostazione del percorso di Python
+      # 2. Impostazione del percorso di Python specifico per la build
       - name: Set environment variables for Python path
         run: |
           echo "🐍 Setting up Python ${{ matrix.PYVERSION }} environment..."
@@ -130,7 +126,7 @@ jobs:
           elif [ "${{ matrix.PYVERSION }}" = "3.13" ]; then echo "PYTHON_PATH=/opt/python/cp313-cp313" >> $GITHUB_ENV
           fi
 
-      # 3. Installazione di tutte le dipendenze (di sistema e di Python)
+      # 3. Installazione delle dipendenze di sistema e di build Python
       - name: Install system and Python build dependencies
         timeout-minutes: 10
         run: |
@@ -152,7 +148,7 @@ jobs:
           vcpkgJsonGlob: 'vcpkg.json'
           runVcpkgInstall: false
       
-      # 5. Installazione delle librerie audio con vcpkg
+      # 5. Installazione delle librerie audio C++ con vcpkg
       - name: Install vcpkg audio dependencies (Opus, Vorbis, FAAD2)
         timeout-minutes: 25
         run: |
@@ -165,193 +161,72 @@ jobs:
           echo "LD_LIBRARY_PATH=$TARGET_CMAKE_PREFIX_PATH/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
           echo "PKG_CONFIG_PATH=$TARGET_CMAKE_PREFIX_PATH/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
 
-      # ... (tutti gli altri step da "Set version in setup.py" in poi rimangono identici)
-      # ... (copia e incolla il resto del tuo file da qui in poi)
-      
-      - name: Set version in setup.py and pyproject.toml
-        # ...
-
-      - name: Run C/C++ code vendoring script
-        # ...
-        
-      - name: Fix C++ compilation issues for modern compilers
-        # ...
-
-      - name: Build Python Wheels (ManyLinux ${{ matrix.CI_ARCH }})
-        # ...
-
-      - name: Repair wheels with auditwheel (make manylinux compatible)
-        # ...
-
-      - name: Upload wheel artifacts
-        # ...
-
-  # Il resto dei job (publish-to-pypi, build-summary) rimane invariato
-  publish-to-pypi:
-    # ...
-  
-  build-summary:
-    # ...
+      # 6. Impostazione della versione del pacchetto
       - name: Set version in setup.py and pyproject.toml
         run: |
           echo "🏷️ Setting version to: ${{ env.SYNTHIZER_VERSION }}"
-          
-          # Aggiorna version in setup.py se esiste
           if [ -f "setup.py" ]; then
             sed -i "s/version=['\"][^'\"]*['\"]/version='${{ env.SYNTHIZER_VERSION }}'/g" setup.py
-            echo "✅ Updated setup.py with version ${{ env.SYNTHIZER_VERSION }}"
           fi
-          
-          # Aggiorna version in pyproject.toml se esiste
           if [ -f "pyproject.toml" ]; then
             sed -i "s/version = ['\"][^'\"]*['\"]/version = \"${{ env.SYNTHIZER_VERSION }}\"/g" pyproject.toml
-            echo "✅ Updated pyproject.toml with version ${{ env.SYNTHIZER_VERSION }}"
           fi
-          
-          # Verifica le modifiche
-          echo "=== Current setup.py version line ==="
-          grep -n "version" setup.py || echo "No version found in setup.py"
-          echo "=== Current pyproject.toml version line ==="
-          grep -n "version" pyproject.toml || echo "No version found in pyproject.toml"
+
+      # 7. Esecuzione dello script di vendoring
       - name: Run C/C++ code vendoring script
         timeout-minutes: 5
         run: |
-          echo "📁 Running Synthizer vendoring script..."
           $PYTHON_PATH/bin/python synthizer-c/vendor.py synthizer-vendored
 
+      # 8. Applicazione di patch al codice C++ se necessario
       - name: Fix C++ compilation issues for modern compilers
         run: |
-          echo "🔧 Fixing C++20 template-id constructor issues..."
-          
-          # Fix nel file property_automation_timeline.hpp
+          echo "🔧 Fixing C++ compilation issues..."
           if [ -f "synthizer-vendored/include/synthizer/property_automation_timeline.hpp" ]; then
             sed -i 's/PropertyAutomationPoint<N>(const PropertyAutomationPoint<N> &) = default;/PropertyAutomationPoint(const PropertyAutomationPoint<N> \&) = default;/g' \
               synthizer-vendored/include/synthizer/property_automation_timeline.hpp
-            echo "✅ Fixed PropertyAutomationPoint constructor"
           fi
-          
-          # Fix per il cast di funzioni in mp3.hpp
           if [ -f "synthizer-vendored/include/synthizer/decoders/mp3.hpp" ]; then
-            # Cercare il cast problematico e sostituirlo
             sed -i 's/local_seek_cb_for_init = (drmp3_seek_proc)seek_cb;/local_seek_cb_for_init = reinterpret_cast<drmp3_seek_proc>(seek_cb);/g' \
               synthizer-vendored/include/synthizer/decoders/mp3.hpp
-            echo "✅ Fixed function cast in mp3.hpp"
           fi
-          
-          # Disabilita -Werror nei CMakeLists.txt se presente
           find synthizer-vendored -name "CMakeLists.txt" -exec sed -i 's/-Werror//g' {} \;
           find synthizer-vendored -name "*.cmake" -exec sed -i 's/-Werror//g' {} \;
-          
-          echo "✅ C++ fixes applied"
 
+      # 9. Compilazione dei wheel Python
       - name: Build Python Wheels (ManyLinux ${{ matrix.CI_ARCH }})
         timeout-minutes: 20
         env:
-          # CMAKE_PREFIX_PATH è impostato tramite GITHUB_ENV
-          SYNTHIZER_EXPECTED_VCPKG_PATH_FOR_DEBUG: ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/${{ env.VCPKG_DEFAULT_TRIPLET }}
-          # Flag per risolvere errori di compilazione C++
           CXXFLAGS: "-Wno-template-id-cdtor -Wno-cast-function-type -Wno-error"
           CFLAGS: "-Wno-error"
         run: |
-          echo "🔨 Building Synthizer3D wheel for $CI_ARCH..."
-          cd "$GITHUB_WORKSPACE"
-          echo "Architecture: $CI_ARCH"
-          echo "ManyLinux version: $MANYLINUX_VERSION"
-          echo "Current CMAKE_PREFIX_PATH for build is: $CMAKE_PREFIX_PATH"
-          echo "EFFECTIVE_VCPKG_INSTALLED_DIR_BASE for build is: $EFFECTIVE_VCPKG_INSTALLED_DIR_BASE"
-          echo "Synthizer expects vcpkg path (for debug/verification): $SYNTHIZER_EXPECTED_VCPKG_PATH_FOR_DEBUG"
-          echo "Current LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
-          echo "Current PKG_CONFIG_PATH: $PKG_CONFIG_PATH"
-          echo "CXXFLAGS: $CXXFLAGS"
-          echo "CFLAGS: $CFLAGS"
-          
           $PYTHON_PATH/bin/python -m build --wheel --no-isolation
-          echo "✅ Wheel built successfully!"
 
-      - name: Debug vcpkg installation
-        run: |
-          echo "🔍 Debugging vcpkg installation..."
-          VCPKG_INSTALLED_TRIPLET_DIR="$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE/$VCPKG_DEFAULT_TRIPLET"
-          echo "Listing contents of effective vcpkg directory: $VCPKG_INSTALLED_TRIPLET_DIR ..."
-          if [ -d "$VCPKG_INSTALLED_TRIPLET_DIR" ]; then
-            find "$VCPKG_INSTALLED_TRIPLET_DIR" -maxdepth 3 -type f -exec ls -la {} \; | head -50
-          else
-            echo "WARNING: $VCPKG_INSTALLED_TRIPLET_DIR does not exist."
-          fi
-          
-          VCPKG_INSTALLED_LIB_DIR="$VCPKG_INSTALLED_TRIPLET_DIR/lib"
-          if [ -d "$VCPKG_INSTALLED_LIB_DIR" ]; then
-            echo "Listing contents of $VCPKG_INSTALLED_LIB_DIR ..."
-            ls -la "$VCPKG_INSTALLED_LIB_DIR"
-          else
-            echo "WARNING: $VCPKG_INSTALLED_LIB_DIR does not exist or is not a directory."
-          fi
-          
-          VCPKG_INSTALLED_BIN_DIR="$VCPKG_INSTALLED_TRIPLET_DIR/bin"
-          if [ -d "$VCPKG_INSTALLED_BIN_DIR" ]; then
-            echo "Listing contents of $VCPKG_INSTALLED_BIN_DIR ..."
-            ls -la "$VCPKG_INSTALLED_BIN_DIR"
-          else
-            echo "WARNING: $VCPKG_INSTALLED_BIN_DIR does not exist or is not a directory."
-          fi
-
-      - name: Repair wheels with auditwheel (make manylinux compatible)
+      # 10. Riparazione dei wheel per la compatibilità ManyLinux
+      - name: Repair wheels with auditwheel
         timeout-minutes: 10
-        env:
-          VCPKG_INSTALLED_TRIPLET_DIR: ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/${{ env.VCPKG_DEFAULT_TRIPLET }}
-          VCPKG_INSTALLED_LIB_DIR: ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/${{ env.VCPKG_DEFAULT_TRIPLET }}/lib
         run: |
           echo "🛠️ Repairing wheels with auditwheel..."
-          echo "Path vcpkg (lib) che sarà aggiunto a auditwheel: $VCPKG_INSTALLED_LIB_DIR"
-          
-          # Crea directory wheelhouse se non esiste
-          mkdir -p wheelhouse
-          
           for wheel in dist/*.whl; do
             if [ -f "$wheel" ]; then
-              echo "Repairing wheel: $wheel"
-              # Usa auditwheel per riparare la wheel e renderla compatibile con manylinux
-              # Sintassi corretta: repair prima di --plat-tag
               $PYTHON_PATH/bin/auditwheel repair \
                 "$wheel" \
-                --plat "${MANYLINUX_VERSION}_${CI_ARCH}" \
+                --plat "${{ matrix.MANYLINUX_VERSION }}_${{ matrix.CI_ARCH }}" \
                 --wheel-dir wheelhouse
             fi
           done
-          
-          echo "Listing repaired wheels in wheelhouse/:"
-          ls -la wheelhouse/*.whl || echo "No wheels found in wheelhouse/"
-          
-          # Sposta le wheel riparate in dist/ per coerenza con gli altri job
-          if ls wheelhouse/*.whl 1> /dev/null 2>&1; then
-            cp wheelhouse/*.whl dist/
-            echo "✅ Copied repaired wheels to dist/:"
-            ls -la dist/*.whl
-          fi
+          cp wheelhouse/*.whl dist/
+          echo "✅ Repaired wheels:"
+          ls -la dist/*.whl
 
-      - name: Verify wheel contents and metadata
-        run: |
-          echo "🔍 Verifying wheel contents..."
-          for wheel in dist/*.whl; do
-            if [ -f "$wheel" ]; then
-              echo "=== Wheel: $wheel ==="
-              $PYTHON_PATH/bin/python -m zipfile -l "$wheel" | head -20
-              echo ""
-              # Verifica metadata con auditwheel
-              echo "=== Auditwheel show output ==="
-              $PYTHON_PATH/bin/auditwheel show "$wheel" || echo "Auditwheel show failed"
-              echo ""
-            fi
-          done
-
+      # 11. Caricamento degli artifact
       - name: Upload wheel artifacts
         uses: actions/upload-artifact@v4
-        timeout-minutes: 5
         with:
           name: python-wheels-${{ matrix.MANYLINUX_VERSION }}-${{ matrix.CI_ARCH }}-py${{ matrix.PYVERSION }}
           path: dist/*.whl
 
-  # Job separato per la pubblicazione (solo quando richiesto)
+  # Job per la pubblicazione su PyPI
   publish-to-pypi:
     needs: build-manylinux
     runs-on: ubuntu-latest
@@ -362,9 +237,8 @@ jobs:
     environment:
       name: pypi
       url: https://pypi.org/p/synthizer3d
-
     permissions:
-      id-token: write  # Per PyPI trusted publishing
+      id-token: write
       
     steps:
       - name: Download all wheel artifacts
@@ -374,29 +248,12 @@ jobs:
           path: dist
           merge-multiple: true
 
-      - name: List all wheels to be published
-        run: |
-          echo "🎯 Wheels ready for publication:"
-          ls -la dist/*.whl
-          echo ""
-          echo "Total wheels: $(ls dist/*.whl | wc -l)"
-
-      - name: Publish to Test PyPI (for testing)
-        if: github.event_name == 'workflow_dispatch'
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/
-          packages-dir: dist/
-          verbose: true
-
-      - name: Publish to PyPI (production)
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist/
-          verbose: true
 
-  # Job finale per summary
+  # Job per il riepilogo finale
   build-summary:
     needs: build-manylinux
     runs-on: ubuntu-latest
@@ -407,20 +264,8 @@ jobs:
         run: |
           echo "# 🎵 Synthizer3D v${{ env.SYNTHIZER_VERSION }} Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
-          echo "- **x86_64 wheels**: 5 versions (Python 3.8-3.12) with manylinux_2_28" >> $GITHUB_STEP_SUMMARY
-          echo "- **i686 wheels**: 5 versions (Python 3.8-3.12) with manylinux2014" >> $GITHUB_STEP_SUMMARY
-          echo "- **Total expected wheels**: 10" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Audio Libraries Included" >> $GITHUB_STEP_SUMMARY
-          echo "- 🎵 **Opus**: Advanced audio codec" >> $GITHUB_STEP_SUMMARY
-          echo "- 🎵 **Vorbis**: OGG Vorbis audio codec" >> $GITHUB_STEP_SUMMARY
-          echo "- 🎵 **FAAD2**: AAC audio decoder" >> $GITHUB_STEP_SUMMARY
-          echo "- 🎵 **OGG**: Container format support" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
           if [ "${{ needs.build-manylinux.result }}" = "success" ]; then
             echo "✅ **Build Status**: SUCCESS" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Build Status**: FAILED" >> $GITHUB_STEP_SUMMARY
           fi
- 

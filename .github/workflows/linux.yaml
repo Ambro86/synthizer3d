@@ -120,7 +120,6 @@ jobs:
           elif [ "${{ matrix.PYVERSION }}" = "3.12" ]; then echo "PYTHON_PATH=/opt/python/cp312-cp312" >> $GITHUB_ENV
           elif [ "${{ matrix.PYVERSION }}" = "3.13" ]; then echo "PYTHON_PATH=/opt/python/cp313-cp313" >> $GITHUB_ENV
           fi
-
       - name: Install system and Python build dependencies
         timeout-minutes: 20
         run: |
@@ -134,7 +133,7 @@ jobs:
           # Solo per le build i686, installiamo il compilatore Rust a 32-bit
           if [ "${{ matrix.CI_ARCH }}" = "i686" ]; then
             echo "Installing 32-bit Rust toolchain for i686 build..."
-            # CORREZIONE FINALE: Aggiungiamo --default-host per forzare la versione a 32-bit
+            # CORREZIONE: Aggiungiamo --default-host per forzare la versione a 32-bit
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable --default-host i686-unknown-linux-gnu -y
             echo "$HOME/.cargo/bin" >> $GITHUB_PATH
           fi
@@ -142,7 +141,6 @@ jobs:
           echo "📦 Installing Python build tools (including ninja)..."
           $PYTHON_PATH/bin/python -m pip install --upgrade pip
           $PYTHON_PATH/bin/pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build auditwheel twine
-
       - name: Set vcpkg Cache Path
         run: echo "VCPKG_DEFAULT_BINARY_CACHE=${{ github.workspace }}/vcpkg_cache" >> $GITHUB_ENV
 

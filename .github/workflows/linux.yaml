@@ -26,7 +26,7 @@ env:
 jobs:
   build-manylinux:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
@@ -59,27 +59,27 @@ jobs:
           # i686 builds
           - CI_ARCH: i686
             VCPKG_TRIPLET: x86-linux
-            MANYLINUX_VERSION: manylinux2014
+            MANYLINUX_VERSION: manylinux_2_28
             PYVERSION: '3.8'
           - CI_ARCH: i686
             VCPKG_TRIPLET: x86-linux
-            MANYLINUX_VERSION: manylinux2014
+            MANYLINUX_VERSION: manylinux_2_28
             PYVERSION: '3.9'
           - CI_ARCH: i686
             VCPKG_TRIPLET: x86-linux
-            MANYLINUX_VERSION: manylinux2014
+            MANYLINUX_VERSION: manylinux_2_28
             PYVERSION: '3.10'
           - CI_ARCH: i686
             VCPKG_TRIPLET: x86-linux
-            MANYLINUX_VERSION: manylinux2014
+            MANYLINUX_VERSION: manylinux_2_28
             PYVERSION: '3.11'
           - CI_ARCH: i686
             VCPKG_TRIPLET: x86-linux
-            MANYLINUX_VERSION: manylinux2014
+            MANYLINUX_VERSION: manylinux_2_28
             PYVERSION: '3.12'
           - CI_ARCH: i686
             VCPKG_TRIPLET: x86-linux
-            MANYLINUX_VERSION: manylinux2014
+            MANYLINUX_VERSION: manylinux_2_28
             PYVERSION: '3.13'
 
     name: "Build ManyLinux (${{ matrix.CI_ARCH }}, ${{ matrix.MANYLINUX_VERSION }}) Python ${{ matrix.PYVERSION }}"
@@ -109,7 +109,15 @@ jobs:
           git clone https://github.com/${{ github.repository }}.git .
           git checkout ${{ github.sha }}
           git submodule update --init --recursive
-      
+
+      - name: Cache Rust toolchain
+        if: matrix.CI_ARCH == 'i686' # Esegui solo per le build che installano Rust
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.rustup
+            ~/.cargo
+          key: rust-toolchain-${{ runner.os }}-${{ matrix.CI_ARCH }}
       - name: Set environment variables for Python path
         run: |
           echo "🐍 Setting up Python ${{ matrix.PYVERSION }} environment..."
@@ -121,13 +129,18 @@ jobs:
           elif [ "${{ matrix.PYVERSION }}" = "3.13" ]; then echo "PYTHON_PATH=/opt/python/cp313-cp313" >> $GITHUB_ENV
           fi
       - name: Install system and Python build dependencies
-        timeout-minutes: 30
+        timeout-minutes: 40
         run: |
           echo "📦 Installing system dependencies..."
           if command -v dnf >/dev/null 2>&1; then
-            dnf install -y curl zip unzip tar cmake make gcc-c++ openssl-devel
+            dnf install -y curl zip unzip tar cmake make gcc-c++ openssl-devel libffi-devel zlib-devel bzip2-devel xz-devel sqlite-devel \
+ncurses-devel readline-devel tk-devel gdbm-devel db4-devel \
+libpcap-devel expat-devel
           elif command -v yum >/dev/null 2>&1; then
-            yum install -y curl zip unzip tar cmake make gcc-c++ openssl-devel
+            yum install -y curl zip unzip tar cmake make gcc-c++ openssl-devel libffi-devel zlib-devel bzip2-devel xz-devel sqlite-devel \
+            ncurses-devel readline-devel tk-devel gdbm-devel db4-devel \
+            libpcap-devel expat-devel
+
           fi
           
           # Solo per le build i686, installiamo il compilatore Rust a 32-bit
@@ -139,7 +152,20 @@ jobs:
           
           echo "📦 Installing Python build tools (including ninja)..."
           $PYTHON_PATH/bin/python -m pip install --upgrade pip
-          $PYTHON_PATH/bin/pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build auditwheel twine
+
+          $PYTHON_PATH/bin/pip install \
+          ninja \
+          cmake \
+          tomli \
+          packaging \
+          distro \
+          scikit-build \
+          cython \
+          build \
+          auditwheel \
+          twine \
+          "cryptography>=3.4.8,<4.0" \
+          --only-binary=cryptography
 
       - name: Set vcpkg Cache Path
         run: echo "VCPKG_DEFAULT_BINARY_CACHE=${{ github.workspace }}/vcpkg_cache" >> $GITHUB_ENV
@@ -159,11 +185,16 @@ jobs:
           runVcpkgInstall: false
       
       - name: Install vcpkg audio dependencies (Opus, Vorbis, FAAD2)
-        timeout-minutes: 25
+        timeout-minutes: 30
         run: |
           echo "🎵 Installing audio libraries via vcpkg..."
           cd synthizer-c
-          "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions
+          export VCPKG_KEEP_ENV_VARS="PATH;PKG_CONFIG_PATH;LD_LIBRARY_PATH"
+          "$VCPKG_ROOT/vcpkg" install \
+          --triplet=$VCPKG_DEFAULT_TRIPLET \
+          --feature-flags=versions \
+          --x-install-root="${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}" \
+          --debug
           echo "Setting CMAKE_PREFIX_PATH and library paths..."
           TARGET_CMAKE_PREFIX_PATH="${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/$VCPKG_DEFAULT_TRIPLET"
           echo "CMAKE_PREFIX_PATH=$TARGET_CMAKE_PREFIX_PATH" >> $GITHUB_ENV
@@ -203,8 +234,12 @@ jobs:
         timeout-minutes: 45
         env:
           RUSTFLAGS: "-A warnings"
-          CXXFLAGS: "-Wno-template-id-cdtor -Wno-cast-function-type -Wno-error"
-          CFLAGS: "-Wno-error"
+          CXXFLAGS: "-Wno-template-id-cdtor -Wno-cast-function-type -Wno-error -fPIC"
+          CFLAGS: "-Wno-error -fPIC"
+          LDFLAGS: "-fPIC"
+          CMAKE_BUILD_TYPE: Release                    # ← Aggiungi
+          CMAKE_POSITION_INDEPENDENT_CODE: ON          # ← Aggiungi
+          SETUPTOOLS_SCM_PRETEND_VERSION: ${{ env.SYNTHIZER_VERSION }}  # ← Aggiungi
         run: |
           $PYTHON_PATH/bin/python -m build --wheel --no-isolation
 

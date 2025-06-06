@@ -289,6 +289,14 @@ jobs:
         run: |
           $PYTHON_PATH/bin/python -m build --wheel --no-isolation
 
+      - name: Debug vcpkg libraries and dependencies
+        run: |
+          echo "🔍 Checking vcpkg installed libraries..."
+          find ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/$VCPKG_DEFAULT_TRIPLET -name "*.so*" | head -20
+          echo "🔍 Checking wheel dependencies before repair..."
+          $PYTHON_PATH/bin/python -m auditwheel show dist/*.whl
+          echo "🔍 Checking ldd on synthizer module..."
+          find dist -name "*.so" -exec ldd {} \;
       - name: Repair wheels with auditwheel
         timeout-minutes: 10
         run: |

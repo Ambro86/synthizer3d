@@ -1,7 +1,5 @@
-# Synthizer3D v1.0.1 (Finale) - ManyLinux Python Wheels Build Workflow
+# Synthizer3D v1.0.2 (Finale e Corretto) - ManyLinux Python Wheels Build Workflow
 # Questo workflow compila wheel Python manylinux compatibili per Synthizer3D.
-# Autore: Assistant & Team Synthizer3D
-# Ultimo aggiornamento: 6 Giugno 2025
 
 name: Build and Publish Python Wheels for ManyLinux
 
@@ -22,8 +20,6 @@ on:
           - 'false'
 
 env:
-  # CORREZIONE: Usa il sistema di cache locale 'default' per vcpkg.
-  # 'actions/cache' si occuperà di salvare e ripristinare questa cache.
   VCPKG_BINARY_SOURCES: "clear;default,readwrite"
   SYNTHIZER_VERSION: ${{ github.event.inputs.version || '0.9.1' }}
 
@@ -100,7 +96,6 @@ jobs:
       EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: ${{ github.workspace }}/vcpkg_installed
 
     steps:
-      # 1. Checkout del codice (con logica separata per 32-bit e 64-bit)
       - name: Checkout source code (for 64-bit jobs)
         if: matrix.CI_ARCH == 'x86_64'
         uses: actions/checkout@v4
@@ -115,7 +110,6 @@ jobs:
           git checkout ${{ github.sha }}
           git submodule update --init --recursive
       
-      # 2. Impostazione del percorso di Python specifico per la build
       - name: Set environment variables for Python path
         run: |
           echo "🐍 Setting up Python ${{ matrix.PYVERSION }} environment..."
@@ -127,9 +121,8 @@ jobs:
           elif [ "${{ matrix.PYVERSION }}" = "3.13" ]; then echo "PYTHON_PATH=/opt/python/cp313-cp313" >> $GITHUB_ENV
           fi
 
-      # 3. Installazione delle dipendenze di sistema e di build Python
       - name: Install system and Python build dependencies
-        timeout-minutes: 20 # Aumentato per l'installazione di Rust
+        timeout-minutes: 20
         run: |
           echo "📦 Installing system dependencies..."
           if command -v dnf >/dev/null 2>&1; then
@@ -138,18 +131,18 @@ jobs:
             yum install -y curl zip unzip tar cmake make gcc-c++
           fi
           
-          # Solo per le build i686, installiamo il compilatore Rust
+          # Solo per le build i686, installiamo il compilatore Rust a 32-bit
           if [ "${{ matrix.CI_ARCH }}" = "i686" ]; then
-            echo "Installing Rust toolchain for i686 build..."
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable -y
-            # Aggiungiamo il compilatore Rust (cargo) al PATH per trovarlo
+            echo "Installing 32-bit Rust toolchain for i686 build..."
+            # CORREZIONE FINALE: Aggiungiamo --default-host per forzare la versione a 32-bit
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable --default-host i686-unknown-linux-gnu -y
             echo "$HOME/.cargo/bin" >> $GITHUB_PATH
           fi
           
           echo "📦 Installing Python build tools (including ninja)..."
           $PYTHON_PATH/bin/python -m pip install --upgrade pip
           $PYTHON_PATH/bin/pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build auditwheel twine
-      # 4. Impostazione e ripristino della cache di vcpkg
+
       - name: Set vcpkg Cache Path
         run: echo "VCPKG_DEFAULT_BINARY_CACHE=${{ github.workspace }}/vcpkg_cache" >> $GITHUB_ENV
 
@@ -161,14 +154,12 @@ jobs:
           restore-keys: |
             vcpkg-cache-${{ matrix.VCPKG_TRIPLET }}-
 
-      # 5. Setup di vcpkg
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgJsonGlob: 'vcpkg.json'
           runVcpkgInstall: false
       
-      # 6. Installazione delle librerie audio C++ con vcpkg
       - name: Install vcpkg audio dependencies (Opus, Vorbis, FAAD2)
         timeout-minutes: 25
         run: |
@@ -181,7 +172,6 @@ jobs:
           echo "LD_LIBRARY_PATH=$TARGET_CMAKE_PREFIX_PATH/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
           echo "PKG_CONFIG_PATH=$TARGET_CMAKE_PREFIX_PATH/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
 
-      # 7. Impostazione della versione del pacchetto
       - name: Set version in setup.py and pyproject.toml
         run: |
           echo "🏷️ Setting version to: ${{ env.SYNTHIZER_VERSION }}"
@@ -192,13 +182,11 @@ jobs:
             sed -i "s/version = ['\"][^'\"]*['\"]/version = \"${{ env.SYNTHIZER_VERSION }}\"/g" pyproject.toml
           fi
 
-      # 8. Esecuzione dello script di vendoring
       - name: Run C/C++ code vendoring script
         timeout-minutes: 5
         run: |
           $PYTHON_PATH/bin/python synthizer-c/vendor.py synthizer-vendored
 
-      # 9. Applicazione di patch al codice C++ se necessario
       - name: Fix C++ compilation issues for modern compilers
         run: |
           echo "🔧 Fixing C++ compilation issues..."
@@ -213,7 +201,6 @@ jobs:
           find synthizer-vendored -name "CMakeLists.txt" -exec sed -i 's/-Werror//g' {} \;
           find synthizer-vendored -name "*.cmake" -exec sed -i 's/-Werror//g' {} \;
 
-      # 10. Compilazione dei wheel Python
       - name: Build Python Wheels (ManyLinux ${{ matrix.CI_ARCH }})
         timeout-minutes: 20
         env:
@@ -222,7 +209,6 @@ jobs:
         run: |
           $PYTHON_PATH/bin/python -m build --wheel --no-isolation
 
-      # 11. Riparazione dei wheel per la compatibilità ManyLinux
       - name: Repair wheels with auditwheel
         timeout-minutes: 10
         run: |
@@ -235,21 +221,18 @@ jobs:
                 --wheel-dir wheelhouse
             fi
           done
-          # Copia le wheel riparate nella cartella dist per lo step di upload
           if ls wheelhouse/*.whl 1> /dev/null 2>&1; then
             cp wheelhouse/*.whl dist/
           fi
           echo "✅ Repaired wheels:"
           ls -la dist/*.whl
 
-      # 12. Caricamento degli artifact
       - name: Upload wheel artifacts
         uses: actions/upload-artifact@v4
         with:
           name: python-wheels-${{ matrix.MANYLINUX_VERSION }}-${{ matrix.CI_ARCH }}-py${{ matrix.PYVERSION }}
           path: dist/*.whl
 
-  # Job per la pubblicazione su PyPI
   publish-to-pypi:
     needs: build-manylinux
     runs-on: ubuntu-latest
@@ -276,7 +259,6 @@ jobs:
         with:
           packages-dir: dist/
 
-  # Job per il riepilogo finale
   build-summary:
     needs: build-manylinux
     runs-on: ubuntu-latest

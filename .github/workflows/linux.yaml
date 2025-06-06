@@ -130,12 +130,12 @@ jobs:
             yum install -y curl zip unzip tar cmake make gcc-c++
           fi
           
-          # Solo per le build i686, installiamo il compilatore Rust a 32-bit
           if [ "${{ matrix.CI_ARCH }}" = "i686" ]; then
             echo "Installing 32-bit Rust toolchain for i686 build..."
-            # CORREZIONE: Aggiungiamo --default-host per forzare la versione a 32-bit
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable --default-host i686-unknown-linux-gnu -y
-            echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+            
+            # CORREZIONE FINALE: Attiva l'ambiente Rust nella shell corrente
+            source "$HOME/.cargo/env"
           fi
           
           echo "📦 Installing Python build tools (including ninja)..."

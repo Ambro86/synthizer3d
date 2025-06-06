@@ -273,6 +273,7 @@ jobs:
           fi
           find synthizer-vendored -name "CMakeLists.txt" -exec sed -i 's/-Werror//g' {} \;
           find synthizer-vendored -name "*.cmake" -exec sed -i 's/-Werror//g' {} \;
+
       - name: Set CMake paths for vcpkg dependencies
         run: |
           echo "🔧 Setting up CMake paths for vcpkg libraries..."
@@ -280,29 +281,34 @@ jobs:
           echo "🔍 Debug: Finding vcpkg installation paths..."
           echo "VCPKG_ROOT: $VCPKG_ROOT"
           echo "VCPKG_DEFAULT_TRIPLET: $VCPKG_DEFAULT_TRIPLET"
+          echo "EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: $EFFECTIVE_VCPKG_INSTALLED_DIR_BASE"
           
-          # Trova dove sono realmente installate le librerie
-          echo "📂 Looking for vcpkg installed directories..."
-          find "$VCPKG_ROOT" -name "installed" -type d 2>/dev/null || echo "No installed dir found"
-          find "$VCPKG_ROOT" -name "*x64-linux*" -type d 2>/dev/null || echo "No x64-linux dir found"
-          
-          # Controlla se EFFECTIVE_VCPKG_INSTALLED_DIR_BASE contiene le librerie
-          echo "📂 Checking EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: $EFFECTIVE_VCPKG_INSTALLED_DIR_BASE"
-          ls -la "$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE" 2>/dev/null || echo "EFFECTIVE_VCPKG_INSTALLED_DIR_BASE not found"
-          
-          # Trova dove sono i file .cmake di vorbis
-          echo "🔍 Finding Vorbis CMake files..."
-          find / -name "*vorbis*config*.cmake" 2>/dev/null | head -5 || echo "No vorbis cmake files found"
-          find / -path "*/vcpkg_installed/*" -name "*.cmake" 2>/dev/null | head -10 || echo "No vcpkg_installed cmake files found"
-          
-          # Usa EFFECTIVE_VCPKG_INSTALLED_DIR_BASE che è il path corretto
+          # Use the EFFECTIVE_VCPKG_INSTALLED_DIR_BASE that's set by run-vcpkg action
           VCPKG_INSTALLED_PATH="$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE/$VCPKG_DEFAULT_TRIPLET"
-          echo "✅ Using EFFECTIVE path: $VCPKG_INSTALLED_PATH"
           
-          echo "📍 Final VCPKG installed path: $VCPKG_INSTALLED_PATH"
-          ls -la "$VCPKG_INSTALLED_PATH" || echo "Final path not found"
-          ls -la "$VCPKG_INSTALLED_PATH/lib" || echo "Lib directory not found"
-          ls -la "$VCPKG_INSTALLED_PATH/lib/cmake" || echo "CMake directory not found"
+          echo "📍 Using EFFECTIVE path: $VCPKG_INSTALLED_PATH"
+          echo "🔍 Verifying path exists..."
+          
+          if [ ! -d "$VCPKG_INSTALLED_PATH" ]; then
+            echo "❌ Expected path not found, searching for actual installation..."
+            # Find the actual vcpkg installation directory
+            ACTUAL_VCPKG_DIR=$(find "$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE" -name "$VCPKG_DEFAULT_TRIPLET" -type d | head -1)
+            if [ -n "$ACTUAL_VCPKG_DIR" ]; then
+              VCPKG_INSTALLED_PATH="$ACTUAL_VCPKG_DIR"
+              echo "✅ Found actual path: $VCPKG_INSTALLED_PATH"
+            else
+              echo "❌ Could not find vcpkg installation directory"
+              echo "📂 Listing EFFECTIVE_VCPKG_INSTALLED_DIR_BASE contents:"
+              ls -la "$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE" || echo "Directory not accessible"
+              exit 1
+            fi
+          else
+            echo "✅ Path exists: $VCPKG_INSTALLED_PATH"
+          fi
+          
+          echo "📂 Checking CMake files in share directory..."
+          ls -la "$VCPKG_INSTALLED_PATH/share/" || echo "No share directory found"
+          ls -la "$VCPKG_INSTALLED_PATH/share/Vorbis/" || echo "No Vorbis directory found"
           
           # Set environment variables
           echo "CMAKE_PREFIX_PATH=${VCPKG_INSTALLED_PATH}" >> $GITHUB_ENV
@@ -315,17 +321,12 @@ jobs:
       - name: Build Python wheel
         timeout-minutes: 20
         env:
-          # Forza CMake a usare il percorso vcpkg
-          CMAKE_PREFIX_PATH: ${{ env.VCPKG_ROOT }}/installed/${{ env.VCPKG_DEFAULT_TRIPLET }}
-          PKG_CONFIG_PATH: ${{ env.VCPKG_ROOT }}/installed/${{ env.VCPKG_DEFAULT_TRIPLET }}/lib/pkgconfig:${{ env.PKG_CONFIG_PATH }}
-          LD_LIBRARY_PATH: ${{ env.VCPKG_ROOT }}/installed/${{ env.VCPKG_DEFAULT_TRIPLET }}/lib:${{ env.LD_LIBRARY_PATH }}
           # Flags per disabilitare errori di compilazione
           RUSTFLAGS: "-A warnings"
           CXXFLAGS: "-Wno-template-id-cdtor -Wno-cast-function-type -Wno-error"
           CFLAGS: "-Wno-error"
         run: |
-          echo "🔨 Building Python wheel with explicit CMake paths..."
-          VCPKG_INSTALLED_PATH="${VCPKG_ROOT}/installed/${VCPKG_DEFAULT_TRIPLET}"
+          echo "🔨 Building Python wheel with vcpkg toolchain..."
           
           echo "📍 Using paths:"
           echo "  CMAKE_PREFIX_PATH: $CMAKE_PREFIX_PATH"
@@ -334,15 +335,19 @@ jobs:
           echo "  VCPKG_INSTALLED_PATH: $VCPKG_INSTALLED_PATH"
           
           echo "🔍 Final verification of vcpkg installation:"
-          ./vcpkg/vcpkg list | grep -E "(vorbis|opus|ogg|faad)" || echo "No audio libraries found in vcpkg list"
+          "$VCPKG_ROOT/vcpkg" list | grep -E "(vorbis|opus|ogg|faad)" || echo "No audio libraries found in vcpkg list"
           
           echo "🚀 Starting Python wheel build..."
           $PYTHON_PATH/bin/python -m build --wheel --no-isolation \
-            --config-setting="cmake.args=-DCMAKE_PREFIX_PATH=${VCPKG_INSTALLED_PATH}" \
-            --config-setting="cmake.args=-DCMAKE_FIND_ROOT_PATH=${VCPKG_INSTALLED_PATH}" \
+            --config-setting="cmake.args=-DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
             --config-setting="cmake.args=-DVCPKG_TARGET_TRIPLET=${VCPKG_DEFAULT_TRIPLET}" \
-            --config-setting="cmake.args=-DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+            --config-setting="cmake.args=-DCMAKE_PREFIX_PATH=${VCPKG_INSTALLED_PATH}" \
+            --config-setting="cmake.args=-DVorbis_DIR=${VCPKG_INSTALLED_PATH}/share/Vorbis" \
+            --config-setting="cmake.args=-DOgg_DIR=${VCPKG_INSTALLED_PATH}/share/Ogg" \
+            --config-setting="cmake.args=-DOpus_DIR=${VCPKG_INSTALLED_PATH}/share/Opus" \
+            --config-setting="cmake.args=-DOpusFile_DIR=${VCPKG_INSTALLED_PATH}/share/opusfile"
 
+ 
       - name: Debug vcpkg libraries and dependencies
         run: |
           echo "🔍 Environment variables:"

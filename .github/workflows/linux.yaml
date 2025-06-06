@@ -121,7 +121,7 @@ jobs:
           elif [ "${{ matrix.PYVERSION }}" = "3.13" ]; then echo "PYTHON_PATH=/opt/python/cp313-cp313" >> $GITHUB_ENV
           fi
       - name: Install system and Python build dependencies
-        timeout-minutes: 20
+        timeout-minutes: 30
         run: |
           echo "📦 Installing system dependencies..."
           if command -v dnf >/dev/null 2>&1; then
@@ -200,7 +200,7 @@ jobs:
           find synthizer-vendored -name "*.cmake" -exec sed -i 's/-Werror//g' {} \;
 
       - name: Build Python Wheels (ManyLinux ${{ matrix.CI_ARCH }})
-        timeout-minutes: 20
+        timeout-minutes: 45
         env:
           CXXFLAGS: "-Wno-template-id-cdtor -Wno-cast-function-type -Wno-error"
           CFLAGS: "-Wno-error"

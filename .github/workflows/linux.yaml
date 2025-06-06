@@ -38,8 +38,9 @@ env:
 jobs:
   build-manylinux:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90  # Aumentato per gestire i download lenti
     strategy:
+      fail-fast: false  # Permette agli altri job di continuare se uno fallisce
       matrix:
         include:
           # x86_64 - usa manylinux_2_28 moderno (AlmaLinux 8)
@@ -88,10 +89,10 @@ jobs:
       EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: ${{ github.workspace }}/vcpkg_installed
 
     steps:
-      - name: Pull Docker image with retry
-        timeout-minutes: 15
+      - name: Container environment check
+        timeout-minutes: 5
         run: |
-          echo "🐳 Ensuring Docker image is fully loaded..."
+          echo "🐳 Container loaded successfully!"
           echo "Container info:"
           cat /etc/os-release || true
           echo "Python versions available:"
@@ -99,6 +100,12 @@ jobs:
           
           # Fix potential Git permission issues in container
           git config --global --add safe.directory "*"
+          
+          # Verifica che il container sia funzionante
+          echo "Testing basic commands..."
+          whoami
+          pwd
+          which python3 || echo "python3 not found"
 
       - name: Checkout Synthizer3D source code (without submodules)
         uses: actions/checkout@v4
@@ -501,3 +508,4 @@ jobs:
           else
             echo "❌ **Build Status**: FAILED" >> $GITHUB_STEP_SUMMARY
           fi
+ 

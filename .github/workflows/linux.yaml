@@ -9,27 +9,17 @@
 name: Build and Publish Python Wheels for ManyLinux
 
 on:
-  push:
-    tags:
-      - 'v*'
-    branches: [ main, develop, master ]
-  pull_request:
-    branches: [ main, develop, master ]
   workflow_dispatch:
     inputs:
       version:
         description: 'Version to build (e.g., 0.9.1)'
         required: true
         default: '0.9.1'
-        type: string
       upload_to_pypi:
         description: 'Upload to PyPI (true/false)'
         required: false
         default: 'false'
         type: choice
-        options:
-          - 'false'
-          - 'true'
         options:
           - 'true'
           - 'false'

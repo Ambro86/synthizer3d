@@ -260,21 +260,6 @@ jobs:
           vcpkgJsonGlob: 'vcpkg.json'
           runVcpkgInstall: false
           
-      - name: Cache vcpkg binary cache
-        uses: actions/cache@v4
-        timeout-minutes: 5
-        with:
-          path: ${{ github.workspace }}/vcpkg_cache
-          key: vcpkg-${{ matrix.MANYLINUX_VERSION }}-${{ matrix.CI_ARCH }}-${{ hashFiles('synthizer-c/vcpkg.json') }}
-          restore-keys: |
-            vcpkg-${{ matrix.MANYLINUX_VERSION }}-${{ matrix.CI_ARCH }}-
-
-      - name: Set vcpkg environment variables
-        run: |
-          mkdir -p "${{ github.workspace }}/vcpkg_cache"
-          echo "VCPKG_DEFAULT_BINARY_CACHE=${{ github.workspace }}/vcpkg_cache" >> $GITHUB_ENV
-          echo "VCPKG_ROOT=${{ github.workspace }}/vcpkg" >> $GITHUB_ENV
-
       - name: Install vcpkg audio dependencies (Opus, Vorbis, FAAD2)
         timeout-minutes: 25
         run: |

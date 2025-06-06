@@ -276,22 +276,44 @@ jobs:
       - name: Set CMake paths for vcpkg dependencies
         run: |
           echo "🔧 Setting up CMake paths for vcpkg libraries..."
-          VCPKG_INSTALLED_PATH="${VCPKG_ROOT}/installed/${VCPKG_DEFAULT_TRIPLET}"
           
-          echo "📍 VCPKG installed path: $VCPKG_INSTALLED_PATH"
-          ls -la "$VCPKG_INSTALLED_PATH" || echo "Directory not found"
+          echo "🔍 Debug: Finding vcpkg installation paths..."
+          echo "VCPKG_ROOT: $VCPKG_ROOT"
+          echo "VCPKG_DEFAULT_TRIPLET: $VCPKG_DEFAULT_TRIPLET"
+          
+          # Trova dove sono realmente installate le librerie
+          echo "📂 Looking for vcpkg installed directories..."
+          find "$VCPKG_ROOT" -name "installed" -type d 2>/dev/null || echo "No installed dir found"
+          find "$VCPKG_ROOT" -name "*x64-linux*" -type d 2>/dev/null || echo "No x64-linux dir found"
+          
+          # Controlla se EFFECTIVE_VCPKG_INSTALLED_DIR_BASE contiene le librerie
+          echo "📂 Checking EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: $EFFECTIVE_VCPKG_INSTALLED_DIR_BASE"
+          ls -la "$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE" 2>/dev/null || echo "EFFECTIVE_VCPKG_INSTALLED_DIR_BASE not found"
+          
+          # Trova dove sono i file .cmake di vorbis
+          echo "🔍 Finding Vorbis CMake files..."
+          find / -name "*vorbis*config*.cmake" 2>/dev/null | head -5 || echo "No vorbis cmake files found"
+          find / -path "*/vcpkg_installed/*" -name "*.cmake" 2>/dev/null | head -10 || echo "No vcpkg_installed cmake files found"
+          
+          # Usa EFFECTIVE_VCPKG_INSTALLED_DIR_BASE se esiste
+          if [ -d "$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE/$VCPKG_DEFAULT_TRIPLET" ]; then
+            VCPKG_INSTALLED_PATH="$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE/$VCPKG_DEFAULT_TRIPLET"
+            echo "✅ Using EFFECTIVE path: $VCPKG_INSTALLED_PATH"
+          else
+            VCPKG_INSTALLED_PATH="${VCPKG_ROOT}/installed/${VCPKG_DEFAULT_TRIPLET}"
+            echo "🔄 Using default path: $VCPKG_INSTALLED_PATH"
+          fi
+          
+          echo "📍 Final VCPKG installed path: $VCPKG_INSTALLED_PATH"
+          ls -la "$VCPKG_INSTALLED_PATH" || echo "Final path not found"
           ls -la "$VCPKG_INSTALLED_PATH/lib" || echo "Lib directory not found"
           ls -la "$VCPKG_INSTALLED_PATH/lib/cmake" || echo "CMake directory not found"
           
-          # Debug: trova tutti i file di configurazione CMake
-          echo "🔍 Finding CMake configuration files..."
-          find "$VCPKG_INSTALLED_PATH" -name "*Config.cmake" -o -name "*-config.cmake" | head -20 || echo "No config files found"
-          find "$VCPKG_INSTALLED_PATH" -name "*vorbis*" -o -name "*Vorbis*" | head -10 || echo "No vorbis files found"
-          
-          # Set environment variables per il build Python
+          # Set environment variables
           echo "CMAKE_PREFIX_PATH=${VCPKG_INSTALLED_PATH}" >> $GITHUB_ENV
           echo "PKG_CONFIG_PATH=${VCPKG_INSTALLED_PATH}/lib/pkgconfig:${PKG_CONFIG_PATH}" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=${VCPKG_INSTALLED_PATH}/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
+          echo "VCPKG_INSTALLED_PATH=${VCPKG_INSTALLED_PATH}" >> $GITHUB_ENV
           
           echo "✅ Environment variables set for CMake"
 

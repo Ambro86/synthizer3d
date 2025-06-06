@@ -246,7 +246,7 @@ jobs:
         timeout-minutes: 20
         with:
           # FIXED: Updated to latest vcpkg commit (2025.04.09)
-          vcpkgGitCommitId: 'ce613c4dd9e2ea4bb5b14d658c8839e4e5d6f78a'
+          vcpkgGitCommitId: '19a89729828d15a5f9e83f06565c407519508d98'
           vcpkgJsonGlob: 'synthizer-c/vcpkg.json'
           runVcpkgInstall: false
           

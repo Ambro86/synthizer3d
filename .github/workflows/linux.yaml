@@ -134,11 +134,11 @@ jobs:
           echo "📦 Installing system dependencies..."
           if command -v dnf >/dev/null 2>&1; then
             dnf install -y curl zip unzip tar cmake make gcc-c++ openssl-devel libffi-devel zlib-devel bzip2-devel xz-devel sqlite-devel \
-            ncurses-devel readline-devel tk-devel gdbm-devel db4-devel \
+            ncurses-devel readline-devel tk-devel gdbm-devel \
             libpcap-devel expat-devel
           elif command -v yum >/dev/null 2>&1; then
             yum install -y curl zip unzip tar cmake make gcc-c++ openssl-devel libffi-devel zlib-devel bzip2-devel xz-devel sqlite-devel \
-            ncurses-devel readline-devel tk-devel gdbm-devel db4-devel \
+            ncurses-devel readline-devel tk-devel gdbm-devel \
             libpcap-devel expat-devel
 
           fi

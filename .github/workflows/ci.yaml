@@ -301,6 +301,8 @@ jobs:
                 --wheel-dir wheelhouse
             fi
           done
+          # RIMUOVI le wheel originali e mantieni solo quelle riparate
+          rm -f dist/*.whl
           if ls wheelhouse/*.whl 1> /dev/null 2>&1; then
             cp wheelhouse/*.whl dist/
           fi

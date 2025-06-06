@@ -108,6 +108,12 @@ jobs:
           fetch-depth: 1
           submodules: false
           clean: false
+      - name: Debug Matrix and Environment
+        run: |
+          echo "--- Inizio Debug ---"
+          echo "Valore ricevuto da 'matrix.PYVERSION': ${{ matrix.PYVERSION }}"
+          echo "Valore della variabile d'ambiente 'env.PYVERSION': ${{ env.PYVERSION }}"
+          echo "--- Fine Debug ---"
 
       - name: Check if synthizer-c directory exists
         run: |
@@ -246,7 +252,6 @@ jobs:
         timeout-minutes: 20
         with:
           # FIXED: Updated to latest vcpkg commit (2025.04.09)
-          vcpkgGitCommitId: '19a89729828d15a5f9e83f06565c407519508d98'
           vcpkgJsonGlob: 'synthizer-c/vcpkg.json'
           runVcpkgInstall: false
           

@@ -287,38 +287,8 @@ jobs:
           echo "Using vcpkg executable: $VCPKG_ROOT/vcpkg"
           echo "Triplet: $VCPKG_DEFAULT_TRIPLET"
           
-          # Fix versioning issues in vcpkg.json by using compatible versions
-          echo "🔧 Checking and fixing vcpkg.json version compatibility..."
-          if [ -f "vcpkg.json" ]; then
-            echo "Original vcpkg.json:"
-            cat vcpkg.json
-            
-            # Backup originale
-            cp vcpkg.json vcpkg.json.backup
-            
-            # Aggiorna le versioni alle versioni disponibili compatibili
-            echo "Updating vcpkg.json with compatible versions..."
-            cat > vcpkg.json << 'EOF'
-{
-  "name": "synthizer",
-  "version": "0.15.6",
-  "dependencies": [
-    "opus",
-    "libvorbis",
-    "libogg",
-    "faad2",
-    "vcpkg-cmake",
-    "vcpkg-cmake-config"
-  ]
-}
-EOF
-            
-            echo "Updated vcpkg.json:"
-            cat vcpkg.json
-          fi
-          
           echo "Running vcpkg install command..."
-          "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET
+          "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions
           
           echo "Setting CMAKE_PREFIX_PATH and library paths..."
           TARGET_CMAKE_PREFIX_PATH="${EFFECTIVE_VCPKG_INSTALLED_DIR_BASE}/$VCPKG_DEFAULT_TRIPLET"

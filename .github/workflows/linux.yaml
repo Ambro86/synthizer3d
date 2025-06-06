@@ -1,4 +1,4 @@
-# Synthizer3D v0.9.2 - ManyLinux Python Wheels Build Workflow
+# Synthizer3D v0.9.1 - ManyLinux Python Wheels Build Workflow
 # Questo workflow compila wheel Python manylinux compatibili per Synthizer3D,
 # una libreria audio 3D. Include tutte le dipendenze audio (Opus, Vorbis, FAAD2)
 # e supporta sia architetture x86_64 che i686.
@@ -12,20 +12,24 @@ on:
   push:
     tags:
       - 'v*'
-    branches: [ main, develop ]
+    branches: [ main, develop, master ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, master ]
   workflow_dispatch:
     inputs:
       version:
         description: 'Version to build (e.g., 0.9.1)'
         required: true
         default: '0.9.1'
+        type: string
       upload_to_pypi:
         description: 'Upload to PyPI (true/false)'
         required: false
         default: 'false'
         type: choice
+        options:
+          - 'false'
+          - 'true'
         options:
           - 'true'
           - 'false'
@@ -583,4 +587,5 @@ EOF
           else
             echo "❌ **Build Status**: FAILED" >> $GITHUB_STEP_SUMMARY
           fi
+ 
  

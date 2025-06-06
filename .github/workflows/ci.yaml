@@ -295,14 +295,9 @@ jobs:
           find / -name "*vorbis*config*.cmake" 2>/dev/null | head -5 || echo "No vorbis cmake files found"
           find / -path "*/vcpkg_installed/*" -name "*.cmake" 2>/dev/null | head -10 || echo "No vcpkg_installed cmake files found"
           
-          # Usa EFFECTIVE_VCPKG_INSTALLED_DIR_BASE se esiste
-          if [ -d "$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE/$VCPKG_DEFAULT_TRIPLET" ]; then
-            VCPKG_INSTALLED_PATH="$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE/$VCPKG_DEFAULT_TRIPLET"
-            echo "✅ Using EFFECTIVE path: $VCPKG_INSTALLED_PATH"
-          else
-            VCPKG_INSTALLED_PATH="${VCPKG_ROOT}/installed/${VCPKG_DEFAULT_TRIPLET}"
-            echo "🔄 Using default path: $VCPKG_INSTALLED_PATH"
-          fi
+          # Usa EFFECTIVE_VCPKG_INSTALLED_DIR_BASE che è il path corretto
+          VCPKG_INSTALLED_PATH="$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE/$VCPKG_DEFAULT_TRIPLET"
+          echo "✅ Using EFFECTIVE path: $VCPKG_INSTALLED_PATH"
           
           echo "📍 Final VCPKG installed path: $VCPKG_INSTALLED_PATH"
           ls -la "$VCPKG_INSTALLED_PATH" || echo "Final path not found"

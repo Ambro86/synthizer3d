@@ -242,25 +242,19 @@ jobs:
           key: vcpkg-cache-${{ env.VCPKG_DEFAULT_TRIPLET }}-${{ hashFiles('**/vcpkg.json') }}
           restore-keys: |
             vcpkg-cache-${{ env.VCPKG_DEFAULT_TRIPLET }}-
-
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgJsonGlob: 'vcpkg.json'
-          runVcpkgInstall: false
-      
-      - name: Install vcpkg audio dependencies (Opus, Vorbis, FAAD2)
+          vcpkgJsonGlob: 'synthizer-c/vcpkg.json'  # ← Specifica il path corretto
+          runVcpkgInstall: true                     # ← Abilita l'installazione automatica
+      - name: Install vcpkg audio dependencies manually (backup)
         timeout-minutes: 25
         run: |
           echo "🎵 Installing audio libraries via vcpkg..."
           cd synthizer-c
           "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions
-          echo "Setting CMAKE_PREFIX_PATH and library paths..."
-          TARGET_CMAKE_PREFIX_PATH="${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/$VCPKG_DEFAULT_TRIPLET"
-          echo "CMAKE_PREFIX_PATH=$TARGET_CMAKE_PREFIX_PATH" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=$TARGET_CMAKE_PREFIX_PATH/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-          echo "PKG_CONFIG_PATH=$TARGET_CMAKE_PREFIX_PATH/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
-
+          echo "✅ Installed packages:"
+          "$VCPKG_ROOT/vcpkg" list
       - name: Run C/C++ code vendoring script
         timeout-minutes: 5
         run: |

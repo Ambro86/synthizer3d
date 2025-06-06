@@ -1,4 +1,4 @@
-# Synthizer3D v1.0.0 (Finale) - ManyLinux Python Wheels Build Workflow
+# Synthizer3D v1.0.1 (Finale) - ManyLinux Python Wheels Build Workflow
 # Questo workflow compila wheel Python manylinux compatibili per Synthizer3D.
 # Autore: Assistant & Team Synthizer3D
 # Ultimo aggiornamento: 6 Giugno 2025
@@ -22,8 +22,9 @@ on:
           - 'false'
 
 env:
-  # CORREZIONE: Usa il moderno sistema di cache 'gits' per vcpkg
-  VCPKG_BINARY_SOURCES: "clear;gits,readwrite"
+  # CORREZIONE: Usa il sistema di cache locale 'default' per vcpkg.
+  # 'actions/cache' si occuperà di salvare e ripristinare questa cache.
+  VCPKG_BINARY_SOURCES: "clear;default,readwrite"
   SYNTHIZER_VERSION: ${{ github.event.inputs.version || '0.9.1' }}
 
 jobs:
@@ -141,14 +142,26 @@ jobs:
           $PYTHON_PATH/bin/python -m pip install --upgrade pip
           $PYTHON_PATH/bin/pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build auditwheel twine
 
-      # 4. Setup di vcpkg
+      # 4. Impostazione e ripristino della cache di vcpkg
+      - name: Set vcpkg Cache Path
+        run: echo "VCPKG_DEFAULT_BINARY_CACHE=${{ github.workspace }}/vcpkg_cache" >> $GITHUB_ENV
+
+      - name: Cache vcpkg binary cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/vcpkg_cache
+          key: vcpkg-cache-${{ matrix.VCPKG_TRIPLET }}-${{ hashFiles('**/vcpkg.json') }}
+          restore-keys: |
+            vcpkg-cache-${{ matrix.VCPKG_TRIPLET }}-
+
+      # 5. Setup di vcpkg
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgJsonGlob: 'vcpkg.json'
           runVcpkgInstall: false
       
-      # 5. Installazione delle librerie audio C++ con vcpkg
+      # 6. Installazione delle librerie audio C++ con vcpkg
       - name: Install vcpkg audio dependencies (Opus, Vorbis, FAAD2)
         timeout-minutes: 25
         run: |
@@ -161,7 +174,7 @@ jobs:
           echo "LD_LIBRARY_PATH=$TARGET_CMAKE_PREFIX_PATH/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
           echo "PKG_CONFIG_PATH=$TARGET_CMAKE_PREFIX_PATH/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
 
-      # 6. Impostazione della versione del pacchetto
+      # 7. Impostazione della versione del pacchetto
       - name: Set version in setup.py and pyproject.toml
         run: |
           echo "🏷️ Setting version to: ${{ env.SYNTHIZER_VERSION }}"
@@ -172,13 +185,13 @@ jobs:
             sed -i "s/version = ['\"][^'\"]*['\"]/version = \"${{ env.SYNTHIZER_VERSION }}\"/g" pyproject.toml
           fi
 
-      # 7. Esecuzione dello script di vendoring
+      # 8. Esecuzione dello script di vendoring
       - name: Run C/C++ code vendoring script
         timeout-minutes: 5
         run: |
           $PYTHON_PATH/bin/python synthizer-c/vendor.py synthizer-vendored
 
-      # 8. Applicazione di patch al codice C++ se necessario
+      # 9. Applicazione di patch al codice C++ se necessario
       - name: Fix C++ compilation issues for modern compilers
         run: |
           echo "🔧 Fixing C++ compilation issues..."
@@ -193,7 +206,7 @@ jobs:
           find synthizer-vendored -name "CMakeLists.txt" -exec sed -i 's/-Werror//g' {} \;
           find synthizer-vendored -name "*.cmake" -exec sed -i 's/-Werror//g' {} \;
 
-      # 9. Compilazione dei wheel Python
+      # 10. Compilazione dei wheel Python
       - name: Build Python Wheels (ManyLinux ${{ matrix.CI_ARCH }})
         timeout-minutes: 20
         env:
@@ -202,7 +215,7 @@ jobs:
         run: |
           $PYTHON_PATH/bin/python -m build --wheel --no-isolation
 
-      # 10. Riparazione dei wheel per la compatibilità ManyLinux
+      # 11. Riparazione dei wheel per la compatibilità ManyLinux
       - name: Repair wheels with auditwheel
         timeout-minutes: 10
         run: |
@@ -215,11 +228,14 @@ jobs:
                 --wheel-dir wheelhouse
             fi
           done
-          cp wheelhouse/*.whl dist/
+          # Copia le wheel riparate nella cartella dist per lo step di upload
+          if ls wheelhouse/*.whl 1> /dev/null 2>&1; then
+            cp wheelhouse/*.whl dist/
+          fi
           echo "✅ Repaired wheels:"
           ls -la dist/*.whl
 
-      # 11. Caricamento degli artifact
+      # 12. Caricamento degli artifact
       - name: Upload wheel artifacts
         uses: actions/upload-artifact@v4
         with:

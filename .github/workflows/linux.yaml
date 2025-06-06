@@ -108,6 +108,11 @@ jobs:
           fetch-depth: 1
           submodules: false
           clean: false
+      - name: Force and Verify PYVERSION from Matrix
+        run: |
+          echo "Forcing PYVERSION to be '${{ matrix.PYVERSION }}'"
+          echo "PYVERSION=${{ matrix.PYVERSION }}" >> $GITHUB_ENV
+          echo "PYVERSION has been set in the environment."
       - name: Debug Matrix and Environment
         run: |
           echo "--- Inizio Debug ---"
@@ -252,7 +257,7 @@ jobs:
         timeout-minutes: 20
         with:
           # FIXED: Updated to latest vcpkg commit (2025.04.09)
-          vcpkgJsonGlob: 'synthizer-c/vcpkg.json'
+          vcpkgJsonGlob: 'vcpkg.json'
           runVcpkgInstall: false
           
       - name: Cache vcpkg binary cache

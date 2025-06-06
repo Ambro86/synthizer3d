@@ -40,35 +40,41 @@ jobs:
           # x86_64 - usa manylinux_2_28 moderno (AlmaLinux 8)
           - CI_ARCH: x86_64
             MANYLINUX_VERSION: manylinux_2_28
-            PYVERSION: 3.8
+            PYVERSION: '3.8'
           - CI_ARCH: x86_64
             MANYLINUX_VERSION: manylinux_2_28
-            PYVERSION: 3.9
+            PYVERSION: '3.9'
           - CI_ARCH: x86_64
             MANYLINUX_VERSION: manylinux_2_28
-            PYVERSION: 3.10
+            PYVERSION: '3.10'
           - CI_ARCH: x86_64
             MANYLINUX_VERSION: manylinux_2_28
-            PYVERSION: 3.11
+            PYVERSION: '3.11'
           - CI_ARCH: x86_64
             MANYLINUX_VERSION: manylinux_2_28
-            PYVERSION: 3.12
+            PYVERSION: '3.12'
+          - CI_ARCH: x86_64
+            MANYLINUX_VERSION: manylinux_2_28
+            PYVERSION: '3.13'
           # i686 - usa manylinux2014 (CentOS 7, ultimo che supporta i686)
           - CI_ARCH: i686
             MANYLINUX_VERSION: manylinux2014
-            PYVERSION: 3.8
+            PYVERSION: '3.8'
           - CI_ARCH: i686
             MANYLINUX_VERSION: manylinux2014
-            PYVERSION: 3.9
+            PYVERSION: '3.9'
           - CI_ARCH: i686
             MANYLINUX_VERSION: manylinux2014
-            PYVERSION: 3.10
+            PYVERSION: '3.10'
           - CI_ARCH: i686
             MANYLINUX_VERSION: manylinux2014
-            PYVERSION: 3.11
+            PYVERSION: '3.11'
           - CI_ARCH: i686
             MANYLINUX_VERSION: manylinux2014
-            PYVERSION: 3.12
+            PYVERSION: '3.12'
+          - CI_ARCH: i686
+            MANYLINUX_VERSION: manylinux2014
+            PYVERSION: '3.13'
 
     name: "Build ManyLinux (${{ matrix.CI_ARCH }}, ${{ matrix.MANYLINUX_VERSION }}) Python ${{ matrix.PYVERSION }}"
 
@@ -247,6 +253,8 @@ jobs:
             echo "PYTHON_PATH=/opt/python/cp311-cp311" >> $GITHUB_ENV
           elif [ "${{ matrix.PYVERSION }}" = "3.12" ]; then
             echo "PYTHON_PATH=/opt/python/cp312-cp312" >> $GITHUB_ENV
+          elif [ "${{ matrix.PYVERSION }}" = "3.13" ]; then
+            echo "PYTHON_PATH=/opt/python/cp313-cp313" >> $GITHUB_ENV
           fi
           
           # Verifica che il path sia stato impostato correttamente

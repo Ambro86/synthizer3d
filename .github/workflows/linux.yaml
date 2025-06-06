@@ -129,7 +129,7 @@ jobs:
 
       # 3. Installazione delle dipendenze di sistema e di build Python
       - name: Install system and Python build dependencies
-        timeout-minutes: 10
+        timeout-minutes: 20 # Aumentato per l'installazione di Rust
         run: |
           echo "📦 Installing system dependencies..."
           if command -v dnf >/dev/null 2>&1; then
@@ -138,10 +138,17 @@ jobs:
             yum install -y curl zip unzip tar cmake make gcc-c++
           fi
           
+          # Solo per le build i686, installiamo il compilatore Rust
+          if [ "${{ matrix.CI_ARCH }}" = "i686" ]; then
+            echo "Installing Rust toolchain for i686 build..."
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable -y
+            # Aggiungiamo il compilatore Rust (cargo) al PATH per trovarlo
+            echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          fi
+          
           echo "📦 Installing Python build tools (including ninja)..."
           $PYTHON_PATH/bin/python -m pip install --upgrade pip
           $PYTHON_PATH/bin/pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build auditwheel twine
-
       # 4. Impostazione e ripristino della cache di vcpkg
       - name: Set vcpkg Cache Path
         run: echo "VCPKG_DEFAULT_BINARY_CACHE=${{ github.workspace }}/vcpkg_cache" >> $GITHUB_ENV

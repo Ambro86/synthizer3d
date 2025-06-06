@@ -273,7 +273,6 @@ jobs:
           fi
           find synthizer-vendored -name "CMakeLists.txt" -exec sed -i 's/-Werror//g' {} \;
           find synthizer-vendored -name "*.cmake" -exec sed -i 's/-Werror//g' {} \;
-
       - name: Set CMake paths for vcpkg dependencies
         run: |
           echo "🔧 Setting up CMake paths for vcpkg libraries..."
@@ -295,6 +294,7 @@ jobs:
           echo "LD_LIBRARY_PATH=${VCPKG_INSTALLED_PATH}/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
           
           echo "✅ Environment variables set for CMake"
+
       - name: Build Python wheel
         timeout-minutes: 20
         env:
@@ -304,9 +304,8 @@ jobs:
           LD_LIBRARY_PATH: ${{ env.VCPKG_ROOT }}/installed/${{ env.VCPKG_DEFAULT_TRIPLET }}/lib:${{ env.LD_LIBRARY_PATH }}
           # Flags per disabilitare errori di compilazione
           RUSTFLAGS: "-A warnings"
-          CXXFLAGS: "-Wno-template-id-cdtor -Wno-cast-function-type -Wno-error -I${{ env.VCPKG_ROOT }}/installed/ ${{ env.VCPKG_DEFAULT_TRIPLET }}/include"
-          CFLAGS: "-Wno-error -I${{ env.VCPKG_ROOT }}/installed/${{ env.VCPKG_DEFAULT_TRIPLET }}/include"
-          LDFLAGS: "-L${{ env.VCPKG_ROOT }}/installed/${{ env.VCPKG_DEFAULT_TRIPLET }}/lib"
+          CXXFLAGS: "-Wno-template-id-cdtor -Wno-cast-function-type -Wno-error"
+          CFLAGS: "-Wno-error"
         run: |
           echo "🔨 Building Python wheel with explicit CMake paths..."
           VCPKG_INSTALLED_PATH="${VCPKG_ROOT}/installed/${VCPKG_DEFAULT_TRIPLET}"

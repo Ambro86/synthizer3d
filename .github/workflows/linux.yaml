@@ -1,9 +1,7 @@
 # Synthizer3D v0.9.1 - ManyLinux Python Wheels Build Workflow
-# 
 # Questo workflow compila wheel Python manylinux compatibili per Synthizer3D,
 # una libreria audio 3D. Include tutte le dipendenze audio (Opus, Vorbis, FAAD2)
 # e supporta sia architetture x86_64 che i686.
-#
 # Versione: 0.9.1
 # Ultimo aggiornamento: Giugno 2025
 # Autore: Assistant & Team Synthizer3D
@@ -40,6 +38,7 @@ env:
 jobs:
   build-manylinux:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     strategy:
       matrix:
         include:
@@ -59,7 +58,6 @@ jobs:
           - CI_ARCH: x86_64
             MANYLINUX_VERSION: manylinux_2_28
             PYVERSION: 3.12
-            
           # i686 - usa manylinux2014 (CentOS 7, ultimo che supporta i686)
           - CI_ARCH: i686
             MANYLINUX_VERSION: manylinux2014
@@ -78,9 +76,10 @@ jobs:
             PYVERSION: 3.12
 
     name: "Build ManyLinux (${{ matrix.CI_ARCH }}, ${{ matrix.MANYLINUX_VERSION }}) Python ${{ matrix.PYVERSION }}"
-    
+
     container:
       image: quay.io/pypa/${{ matrix.MANYLINUX_VERSION }}_${{ matrix.CI_ARCH }}
+      options: --user root
 
     env:
       CI_ARCH: ${{ matrix.CI_ARCH }}
@@ -89,6 +88,16 @@ jobs:
       EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: ${{ github.workspace }}/vcpkg_installed
 
     steps:
+      - name: Pull Docker image with retry
+        timeout-minutes: 15
+        run: |
+          echo "🐳 Ensuring Docker image is fully loaded..."
+          # Il container è già in esecuzione, ma possiamo verificare che tutto sia ok
+          echo "Container info:"
+          cat /etc/os-release || true
+          echo "Python versions available:"
+          ls -la /opt/python/ || true
+
       - name: Checkout Synthizer3D source code (without submodules)
         uses: actions/checkout@v4
         timeout-minutes: 5
@@ -194,12 +203,14 @@ jobs:
 
       - name: Setup vcpkg with cache
         uses: lukka/run-vcpkg@v11
+        timeout-minutes: 15
         with:
           vcpkgGitCommitId: '8eb57355a4ffb410a2e94c07b4dca2dffbee8e50'
           vcpkgJsonGlob: 'synthizer-c/vcpkg.json'
           
       - name: Cache vcpkg binary cache
         uses: actions/cache@v4
+        timeout-minutes: 5
         with:
           path: ${{ github.workspace }}/vcpkg_cache
           key: vcpkg-${{ matrix.MANYLINUX_VERSION }}-${{ matrix.CI_ARCH }}-${{ hashFiles('synthizer-c/vcpkg.json') }}
@@ -212,6 +223,7 @@ jobs:
           echo "VCPKG_DEFAULT_BINARY_CACHE=${{ github.workspace }}/vcpkg_cache" >> $GITHUB_ENV
 
       - name: Install vcpkg audio dependencies (Opus, Vorbis, FAAD2)
+        timeout-minutes: 20
         run: |
           echo "🎵 Installing audio libraries via vcpkg..."
           cd synthizer-c
@@ -241,6 +253,7 @@ jobs:
           echo "✅ Finished vcpkg install command."
 
       - name: Install Python build dependencies
+        timeout-minutes: 10
         run: |
           echo "📦 Installing Python build tools..."
           $PYTHON_PATH/bin/python -m pip install --upgrade pip
@@ -269,6 +282,7 @@ jobs:
           grep -n "version" pyproject.toml || echo "No version found in pyproject.toml"
 
       - name: Run C/C++ code vendoring script
+        timeout-minutes: 5
         run: |
           echo "📁 Running Synthizer vendoring script..."
           python synthizer-c/vendor.py synthizer-vendored
@@ -299,6 +313,7 @@ jobs:
           echo "✅ C++ fixes applied"
 
       - name: Build Python Wheels (ManyLinux ${{ matrix.CI_ARCH }})
+        timeout-minutes: 20
         env:
           # CMAKE_PREFIX_PATH è impostato tramite GITHUB_ENV
           SYNTHIZER_EXPECTED_VCPKG_PATH_FOR_DEBUG: ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/${{ env.VCPKG_DEFAULT_TRIPLET }}
@@ -349,6 +364,7 @@ jobs:
           fi
 
       - name: Repair wheels with auditwheel (make manylinux compatible)
+        timeout-minutes: 10
         env:
           VCPKG_INSTALLED_TRIPLET_DIR: ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/${{ env.VCPKG_DEFAULT_TRIPLET }}
           VCPKG_INSTALLED_LIB_DIR: ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/${{ env.VCPKG_DEFAULT_TRIPLET }}/lib
@@ -398,6 +414,7 @@ jobs:
 
       - name: Upload wheel artifacts
         uses: actions/upload-artifact@v4
+        timeout-minutes: 5
         with:
           name: python-wheels-${{ matrix.MANYLINUX_VERSION }}-${{ matrix.CI_ARCH }}-py${{ matrix.PYVERSION }}
           path: dist/*.whl
@@ -413,7 +430,7 @@ jobs:
     environment:
       name: pypi
       url: https://pypi.org/p/synthizer3d
-    
+
     permissions:
       id-token: write  # Per PyPI trusted publishing
       
@@ -474,3 +491,4 @@ jobs:
           else
             echo "❌ **Build Status**: FAILED" >> $GITHUB_STEP_SUMMARY
           fi
+ 

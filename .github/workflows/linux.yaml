@@ -265,31 +265,8 @@ jobs:
           echo "VCPKG_DEFAULT_BINARY_CACHE=${{ github.workspace }}/vcpkg_cache" >> $GITHUB_ENV
           echo "VCPKG_ROOT=${{ github.workspace }}/vcpkg" >> $GITHUB_ENV
 
-      - name: Check vcpkg.json for version conflicts before install
-        run: |
-          echo "🔍 Checking vcpkg.json for potential version conflicts..."
-          cd synthizer-c
-          
-          if [ -f "vcpkg.json" ]; then
-            echo "Contents of vcpkg.json:"
-            cat vcpkg.json
-            echo ""
-            
-            # Check if versions are specified that might not be available
-            echo "Checking for potential version conflicts with vcpkg commit ce613c4..."
-            
-            # If there are version overrides, we might need to adjust them
-            if grep -q '"version"' vcpkg.json; then
-              echo "⚠️  Found version specifications in vcpkg.json"
-              echo "These will be checked against available versions in vcpkg"
-            fi
-          else
-            echo "❌ vcpkg.json not found in synthizer-c directory"
-            exit 1
-          fi
-
-      - name: Install vcpkg audio dependencies (Opus, Vorbis, FAAD2) with fallback
-        timeout-minutes: 30
+      - name: Install vcpkg audio dependencies (Opus, Vorbis, FAAD2)
+        timeout-minutes: 25
         run: |
           echo "🎵 Installing audio libraries via vcpkg..."
           cd synthizer-c
@@ -311,41 +288,8 @@ jobs:
           echo "Using vcpkg executable: $VCPKG_ROOT/vcpkg"
           echo "Triplet: $VCPKG_DEFAULT_TRIPLET"
           
-          # Try install with error handling
           echo "Running vcpkg install command..."
-          
-          # First attempt: try with feature-flags=versions
-          if ! "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions; then
-            echo "⚠️  First attempt failed, trying without version constraints..."
-            
-            # Backup original vcpkg.json
-            cp vcpkg.json vcpkg.json.backup
-            
-            # Try to remove version constraints if they exist
-            if command -v jq >/dev/null 2>&1; then
-              echo "Using jq to remove version overrides..."
-              jq 'del(.overrides) | del(.["builtin-baseline"])' vcpkg.json > vcpkg.json.tmp && mv vcpkg.json.tmp vcpkg.json
-            else
-              # Fallback: manual sed replacements for common version patterns
-              echo "Using sed to remove version overrides..."
-              sed -i '/"builtin-baseline"/d' vcpkg.json
-              sed -i '/"overrides"/,/]/d' vcpkg.json
-            fi
-            
-            echo "Modified vcpkg.json:"
-            cat vcpkg.json
-            
-            # Second attempt: try with modified vcpkg.json
-            if ! "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET; then
-              echo "❌ Second attempt failed, trying individual packages..."
-              
-              # Third attempt: try installing packages individually
-              for pkg in opus libvorbis libogg faad2; do
-                echo "Trying to install $pkg individually..."
-                "$VCPKG_ROOT/vcpkg" install $pkg:$VCPKG_DEFAULT_TRIPLET || echo "Failed to install $pkg, continuing..."
-              done
-            fi
-          fi
+          "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions
           
           echo "Setting CMAKE_PREFIX_PATH and library paths..."
           TARGET_CMAKE_PREFIX_PATH="${EFFECTIVE_VCPKG_INSTALLED_DIR_BASE}/$VCPKG_DEFAULT_TRIPLET"
@@ -360,9 +304,7 @@ jobs:
             echo "❌ ERROR: Expected vcpkg installed directory not found: $TARGET_CMAKE_PREFIX_PATH"
             echo "Available directories in $EFFECTIVE_VCPKG_INSTALLED_DIR_BASE:"
             ls -la "$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE" || echo "Base directory not found"
-            
-            # Don't exit - continue with build anyway in case some packages were installed
-            echo "⚠️  Continuing with build despite missing vcpkg directory..."
+            exit 1
           fi
           
           echo "✅ Finished vcpkg install command."
@@ -427,8 +369,8 @@ jobs:
           
           echo "✅ C++ fixes applied"
 
-      - name: Build Python Wheels (ManyLinux ${{ matrix.CI_ARCH }}) with enhanced error handling
-        timeout-minutes: 25
+      - name: Build Python Wheels (ManyLinux ${{ matrix.CI_ARCH }})
+        timeout-minutes: 20
         env:
           # CMAKE_PREFIX_PATH è impostato tramite GITHUB_ENV
           SYNTHIZER_EXPECTED_VCPKG_PATH_FOR_DEBUG: ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/${{ env.VCPKG_DEFAULT_TRIPLET }}
@@ -448,34 +390,8 @@ jobs:
           echo "CXXFLAGS: $CXXFLAGS"
           echo "CFLAGS: $CFLAGS"
           
-          # Try building with enhanced error handling
-          set +e  # Don't exit on first error
-          
-          echo "Attempting to build wheel..."
-          BUILD_OUTPUT=$($PYTHON_PATH/bin/python -m build --wheel --no-isolation 2>&1)
-          BUILD_EXIT_CODE=$?
-          
-          echo "Build output:"
-          echo "$BUILD_OUTPUT"
-          
-          if [ $BUILD_EXIT_CODE -eq 0 ]; then
-            echo "✅ Wheel built successfully!"
-          else
-            echo "❌ Wheel build failed with exit code $BUILD_EXIT_CODE"
-            echo "Attempting build with verbose output..."
-            
-            # Try with verbose output for debugging
-            $PYTHON_PATH/bin/python -m build --wheel --no-isolation -v || {
-              echo "❌ Build failed even with verbose output"
-              echo "Checking if any partial artifacts were created..."
-              ls -la dist/ || echo "No dist directory found"
-              
-              # Continue anyway to see what we can salvage
-              echo "Proceeding to next steps to gather debug information..."
-            }
-          fi
-          
-          set -e  # Re-enable exit on error
+          $PYTHON_PATH/bin/python -m build --wheel --no-isolation
+          echo "✅ Wheel built successfully!"
 
       - name: Debug vcpkg installation
         run: |
@@ -506,7 +422,6 @@ jobs:
 
       - name: Repair wheels with auditwheel (make manylinux compatible)
         timeout-minutes: 10
-        continue-on-error: true  # Don't fail if no wheels were built
         env:
           VCPKG_INSTALLED_TRIPLET_DIR: ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/${{ env.VCPKG_DEFAULT_TRIPLET }}
           VCPKG_INSTALLED_LIB_DIR: ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/${{ env.VCPKG_DEFAULT_TRIPLET }}/lib
@@ -517,63 +432,49 @@ jobs:
           # Crea directory wheelhouse se non esiste
           mkdir -p wheelhouse
           
-          # Check if dist directory exists and has wheels
-          if [ -d "dist" ] && ls dist/*.whl 1> /dev/null 2>&1; then
-            for wheel in dist/*.whl; do
-              if [ -f "$wheel" ]; then
-                echo "Repairing wheel: $wheel"
-                # Usa auditwheel per riparare la wheel e renderla compatibile con manylinux
-                # Sintassi corretta: repair prima di --plat-tag
-                $PYTHON_PATH/bin/auditwheel repair \
-                  "$wheel" \
-                  --plat-tag "${MANYLINUX_VERSION}_${CI_ARCH}" \
-                  --wheel-dir wheelhouse
-              fi
-            done
-            
-            echo "Listing repaired wheels in wheelhouse/:"
-            ls -la wheelhouse/*.whl || echo "No wheels found in wheelhouse/"
-            
-            # Sposta le wheel riparate in dist/ per coerenza con gli altri job
-            if ls wheelhouse/*.whl 1> /dev/null 2>&1; then
-              cp wheelhouse/*.whl dist/
-              echo "✅ Copied repaired wheels to dist/:"
-              ls -la dist/*.whl
+          for wheel in dist/*.whl; do
+            if [ -f "$wheel" ]; then
+              echo "Repairing wheel: $wheel"
+              # Usa auditwheel per riparare la wheel e renderla compatibile con manylinux
+              # Sintassi corretta: repair prima di --plat-tag
+              $PYTHON_PATH/bin/auditwheel repair \
+                "$wheel" \
+                --plat-tag "${MANYLINUX_VERSION}_${CI_ARCH}" \
+                --wheel-dir wheelhouse
             fi
-          else
-            echo "⚠️  No wheels found in dist/ directory, skipping auditwheel repair"
-            ls -la dist/ || echo "dist/ directory does not exist"
+          done
+          
+          echo "Listing repaired wheels in wheelhouse/:"
+          ls -la wheelhouse/*.whl || echo "No wheels found in wheelhouse/"
+          
+          # Sposta le wheel riparate in dist/ per coerenza con gli altri job
+          if ls wheelhouse/*.whl 1> /dev/null 2>&1; then
+            cp wheelhouse/*.whl dist/
+            echo "✅ Copied repaired wheels to dist/:"
+            ls -la dist/*.whl
           fi
 
       - name: Verify wheel contents and metadata
-        continue-on-error: true  # Don't fail if no wheels were built
         run: |
           echo "🔍 Verifying wheel contents..."
-          if [ -d "dist" ] && ls dist/*.whl 1> /dev/null 2>&1; then
-            for wheel in dist/*.whl; do
-              if [ -f "$wheel" ]; then
-                echo "=== Wheel: $wheel ==="
-                $PYTHON_PATH/bin/python -m zipfile -l "$wheel" | head -20
-                echo ""
-                # Verifica metadata con auditwheel
-                echo "=== Auditwheel show output ==="
-                $PYTHON_PATH/bin/auditwheel show "$wheel" || echo "Auditwheel show failed"
-                echo ""
-              fi
-            done
-          else
-            echo "⚠️  No wheels found to verify"
-          fi
+          for wheel in dist/*.whl; do
+            if [ -f "$wheel" ]; then
+              echo "=== Wheel: $wheel ==="
+              $PYTHON_PATH/bin/python -m zipfile -l "$wheel" | head -20
+              echo ""
+              # Verifica metadata con auditwheel
+              echo "=== Auditwheel show output ==="
+              $PYTHON_PATH/bin/auditwheel show "$wheel" || echo "Auditwheel show failed"
+              echo ""
+            fi
+          done
 
       - name: Upload wheel artifacts
         uses: actions/upload-artifact@v4
         timeout-minutes: 5
-        # Only upload if wheels actually exist
-        if: always()
         with:
           name: python-wheels-${{ matrix.MANYLINUX_VERSION }}-${{ matrix.CI_ARCH }}-py${{ matrix.PYVERSION }}
           path: dist/*.whl
-          if-no-files-found: warn  # Changed from error to warn
 
   # Job separato per la pubblicazione (solo quando richiesto)
   publish-to-pypi:
@@ -601,10 +502,50 @@ jobs:
       - name: List all wheels to be published
         run: |
           echo "🎯 Wheels ready for publication:"
-          ls -la dist/*.whl 2>/dev/null || echo "No wheels found"
+          ls -la dist/*.whl
           echo ""
-          echo "Total wheels: $(ls dist/*.whl 2>/dev/null | wc -l)"
+          echo "Total wheels: $(ls dist/*.whl | wc -l)"
 
       - name: Publish to Test PyPI (for testing)
-        if: github.event_name == 
+        if: github.event_name == 'workflow_dispatch'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages-dir: dist/
+          verbose: true
+
+      - name: Publish to PyPI (production)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+          verbose: true
+
+  # Job finale per summary
+  build-summary:
+    needs: build-manylinux
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Build Summary
+        run: |
+          echo "# 🎵 Synthizer3D v${{ env.SYNTHIZER_VERSION }} Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
+          echo "- **x86_64 wheels**: 5 versions (Python 3.8-3.12) with manylinux_2_28" >> $GITHUB_STEP_SUMMARY
+          echo "- **i686 wheels**: 5 versions (Python 3.8-3.12) with manylinux2014" >> $GITHUB_STEP_SUMMARY
+          echo "- **Total expected wheels**: 10" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Audio Libraries Included" >> $GITHUB_STEP_SUMMARY
+          echo "- 🎵 **Opus**: Advanced audio codec" >> $GITHUB_STEP_SUMMARY
+          echo "- 🎵 **Vorbis**: OGG Vorbis audio codec" >> $GITHUB_STEP_SUMMARY
+          echo "- 🎵 **FAAD2**: AAC audio decoder" >> $GITHUB_STEP_SUMMARY
+          echo "- 🎵 **OGG**: Container format support" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.build-manylinux.result }}" = "success" ]; then
+            echo "✅ **Build Status**: SUCCESS" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Build Status**: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
  

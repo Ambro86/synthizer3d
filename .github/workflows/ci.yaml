@@ -55,9 +55,35 @@ jobs:
         with:
           arch: ${{ env.CI_ARCH_LOWER }}
 
-      - name: Setup vcpkg (standard instance)
+      - name: Setup vcpkg with retry
         uses: lukka/run-vcpkg@v11
-        # Questo configura $env:VCPKG_ROOT (es. $GITHUB_WORKSPACE/vcpkg)
+        with:
+          vcpkgJsonGlob: 'vcpkg.json'
+          runVcpkgInstall: true
+        continue-on-error: true
+        
+      - name: Retry vcpkg install on failure
+        if: failure()
+        timeout-minutes: 30
+        run: |
+          echo "🔄 Retrying vcpkg install due to network issues..."
+          sleep 30
+          
+          for i in {1..3}; do
+            echo "📦 Attempt $i of 3..."
+            if "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions; then
+              echo "✅ vcpkg install succeeded on attempt $i"
+              break
+            else
+              if [ $i -lt 3 ]; then
+                echo "❌ Attempt $i failed, waiting $(($i * 60)) seconds..."
+                sleep $(($i * 60))
+              else
+                echo "❌ All retry attempts failed"
+                exit 1
+              fi
+            fi
+          done
 
       - name: Install dependencies and set CMAKE_PREFIX_PATH (Windows)
         shell: pwsh
@@ -247,14 +273,6 @@ jobs:
         with:
           vcpkgJsonGlob: 'vcpkg.json'  # ← Specifica il path corretto
           runVcpkgInstall: true                     # ← Abilita l'installazione automatica
-      - name: Install vcpkg audio dependencies manually (backup)
-        timeout-minutes: 25
-        run: |
-          echo "🎵 Installing audio libraries via vcpkg..."
-          cd synthizer-c
-          "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions
-          echo "✅ Installed packages:"
-          "$VCPKG_ROOT/vcpkg" list
       - name: Run C/C++ code vendoring script
         timeout-minutes: 5
         run: |

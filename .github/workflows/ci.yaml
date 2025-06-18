@@ -420,14 +420,45 @@ jobs:
         timeout-minutes: 10
         run: |
           echo "🛠️ Repairing wheels with auditwheel..."
+          
+          # Definisci il percorso delle librerie vcpkg
+          VCPKG_LIB_PATH="$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE/$VCPKG_DEFAULT_TRIPLET/lib"
+          
+          echo "📂 Using vcpkg library path: $VCPKG_LIB_PATH"
+          
+          # Verifica che il percorso esista
+          if [ ! -d "$VCPKG_LIB_PATH" ]; then
+            echo "❌ vcpkg lib directory not found: $VCPKG_LIB_PATH"
+            echo "🔍 Searching for actual lib directory..."
+            find "$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE" -name "lib" -type d | head -5
+            
+            # Fallback: usa il percorso trovato dinamicamente nel step precedente
+            if [ -n "$VCPKG_INSTALLED_PATH" ]; then
+              VCPKG_LIB_PATH="$VCPKG_INSTALLED_PATH/lib"
+              echo "🔄 Trying fallback path: $VCPKG_LIB_PATH"
+            fi
+            
+            if [ ! -d "$VCPKG_LIB_PATH" ]; then
+              echo "❌ Still no lib directory found, exiting"
+              exit 1
+            fi
+          fi
+          
+          # Lista le librerie disponibili
+          echo "📚 Available libraries in vcpkg:"
+          ls -la "$VCPKG_LIB_PATH" | grep -E "\.(so|a)$" | head -10
+          
           for wheel in dist/*.whl; do
             if [ -f "$wheel" ]; then
+              echo "🔧 Repairing wheel: $wheel"
               $PYTHON_PATH/bin/auditwheel repair \
                 "$wheel" \
                 --plat "${{ env.MANYLINUX_VERSION }}_${{ env.CI_ARCH }}" \
+                --library-path "$VCPKG_LIB_PATH" \
                 --wheel-dir wheelhouse
             fi
           done
+          
           # RIMUOVI le wheel originali e mantieni solo quelle riparate
           rm -f dist/*.whl
           if ls wheelhouse/*.whl 1> /dev/null 2>&1; then
@@ -435,7 +466,6 @@ jobs:
           fi
           echo "✅ Repaired wheels:"
           ls -la dist/*.whl
-
       - name: Upload wheel artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -535,14 +565,48 @@ jobs:
           echo "Building with CMAKE_PREFIX_PATH = $CMAKE_PREFIX_PATH"
           echo "Current DYLD_LIBRARY_PATH for build = $DYLD_LIBRARY_PATH"
           python -m build --wheel --no-isolation
-
       - name: Repair Wheel with Delocate (macOS x64)
         run: |
+          # Definisci il percorso delle librerie vcpkg
+          VCPKG_LIB_PATH="$GITHUB_WORKSPACE/vcpkg_installed/$VCPKG_DEFAULT_TRIPLET/lib"
+          
+          echo "📂 Using vcpkg library path: $VCPKG_LIB_PATH"
+          
+          # Verifica che il percorso esista
+          if [ ! -d "$VCPKG_LIB_PATH" ]; then
+            echo "❌ vcpkg lib directory not found: $VCPKG_LIB_PATH"
+            echo "🔍 Searching for actual lib directory..."
+            find "$GITHUB_WORKSPACE/vcpkg_installed" -name "lib" -type d | head -5
+            
+            # Fallback: usa il percorso trovato dinamicamente nel step precedente
+            if [ -n "$CMAKE_PREFIX_PATH" ]; then
+              VCPKG_LIB_PATH="$CMAKE_PREFIX_PATH/lib"
+              echo "🔄 Trying fallback path: $VCPKG_LIB_PATH"
+            fi
+            
+            if [ ! -d "$VCPKG_LIB_PATH" ]; then
+              echo "❌ Still no lib directory found, exiting"
+              exit 1
+            fi
+          fi
+          
+          echo "🔍 Available libraries in vcpkg:"
+          ls -la "$VCPKG_LIB_PATH" | grep -E "\.(dylib|a)$" | head -10 || echo "No libraries found"
+          
+          # Aggiungi il percorso vcpkg alle variabili d'ambiente per delocate
+          export DYLD_LIBRARY_PATH="$VCPKG_LIB_PATH:$DYLD_LIBRARY_PATH"
+          
           for wheel in dist/*.whl; do
-            delocate-wheel -w dist/ "$wheel" 
+            echo "🔧 Repairing wheel: $wheel"
+            # Usa --lib-dir per specificare dove cercare le librerie
+            delocate-wheel \
+              --lib-dir "$VCPKG_LIB_PATH" \
+              -w dist/ \
+              "$wheel"
           done
-          ls -l dist/ # Aggiunto per mostrare le wheel riparate
-
+          
+          echo "✅ Repaired wheels:"
+          ls -l dist/
       - name: Upload Python Wheel Artifact (macOS x64)
         uses: actions/upload-artifact@v4
         with:
@@ -645,11 +709,46 @@ jobs:
 
       - name: Repair Wheel with Delocate (macOS arm64)
         run: |
+          # Definisci il percorso delle librerie vcpkg
+          VCPKG_LIB_PATH="$GITHUB_WORKSPACE/vcpkg_installed/$VCPKG_DEFAULT_TRIPLET/lib"
+          
+          echo "📂 Using vcpkg library path: $VCPKG_LIB_PATH"
+          
+          # Verifica che il percorso esista
+          if [ ! -d "$VCPKG_LIB_PATH" ]; then
+            echo "❌ vcpkg lib directory not found: $VCPKG_LIB_PATH"
+            echo "🔍 Searching for actual lib directory..."
+            find "$GITHUB_WORKSPACE/vcpkg_installed" -name "lib" -type d | head -5
+            
+            # Fallback: usa il percorso trovato dinamicamente nel step precedente
+            if [ -n "$CMAKE_PREFIX_PATH" ]; then
+              VCPKG_LIB_PATH="$CMAKE_PREFIX_PATH/lib"
+              echo "🔄 Trying fallback path: $VCPKG_LIB_PATH"
+            fi
+            
+            if [ ! -d "$VCPKG_LIB_PATH" ]; then
+              echo "❌ Still no lib directory found, exiting"
+              exit 1
+            fi
+          fi
+          
+          echo "🔍 Available libraries in vcpkg:"
+          ls -la "$VCPKG_LIB_PATH" | grep -E "\.(dylib|a)$" | head -10 || echo "No libraries found"
+          
+          # Aggiungi il percorso vcpkg alle variabili d'ambiente per delocate
+          export DYLD_LIBRARY_PATH="$VCPKG_LIB_PATH:$DYLD_LIBRARY_PATH"
+          
           for wheel in dist/*.whl; do
-            delocate-wheel -w dist/ "$wheel"
+            echo "🔧 Repairing wheel: $wheel"
+            # Usa --lib-dir per specificare dove cercare le librerie
+            delocate-wheel \
+              --lib-dir "$VCPKG_LIB_PATH" \
+              -w dist/ \
+              "$wheel"
           done
-          ls -l dist/ # Aggiunto per mostrare le wheel riparate
-
+          
+          echo "✅ Repaired wheels:"
+          ls -l dist/
       - name: Upload Python Wheel Artifact (macOS arm64)
         uses: actions/upload-artifact@v4
         with:

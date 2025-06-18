@@ -421,40 +421,12 @@ jobs:
         run: |
           echo "🛠️ Repairing wheels with auditwheel..."
           
-          # Definisci il percorso delle librerie vcpkg
-          VCPKG_LIB_PATH="$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE/$VCPKG_DEFAULT_TRIPLET/lib"
-          
-          echo "📂 Using vcpkg library path: $VCPKG_LIB_PATH"
-          
-          # Verifica che il percorso esista
-          if [ ! -d "$VCPKG_LIB_PATH" ]; then
-            echo "❌ vcpkg lib directory not found: $VCPKG_LIB_PATH"
-            echo "🔍 Searching for actual lib directory..."
-            find "$EFFECTIVE_VCPKG_INSTALLED_DIR_BASE" -name "lib" -type d | head -5
-            
-            # Fallback: usa il percorso trovato dinamicamente nel step precedente
-            if [ -n "$VCPKG_INSTALLED_PATH" ]; then
-              VCPKG_LIB_PATH="$VCPKG_INSTALLED_PATH/lib"
-              echo "🔄 Trying fallback path: $VCPKG_LIB_PATH"
-            fi
-            
-            if [ ! -d "$VCPKG_LIB_PATH" ]; then
-              echo "❌ Still no lib directory found, exiting"
-              exit 1
-            fi
-          fi
-          
-          # Lista le librerie disponibili
-          echo "📚 Available libraries in vcpkg:"
-          ls -la "$VCPKG_LIB_PATH" | grep -E "\.(so|a)$" | head -10
-          
           for wheel in dist/*.whl; do
             if [ -f "$wheel" ]; then
               echo "🔧 Repairing wheel: $wheel"
               $PYTHON_PATH/bin/auditwheel repair \
                 "$wheel" \
                 --plat "${{ env.MANYLINUX_VERSION }}_${{ env.CI_ARCH }}" \
-                --lib-dir "$VCPKG_LIB_PATH" \
                 --wheel-dir wheelhouse
             fi
           done
@@ -598,10 +570,11 @@ jobs:
           
           for wheel in dist/*.whl; do
             echo "🔧 Repairing wheel: $wheel"
-            # Usa --lib-dir per specificare dove cercare le librerie
+            # Usa -L per specificare dove cercare le librerie
             delocate-wheel \
-              --lib-dir "$VCPKG_LIB_PATH" \
+              -L "$VCPKG_LIB_PATH" \
               -w dist/ \
+              -v \
               "$wheel"
           done
           
@@ -739,10 +712,11 @@ jobs:
           
           for wheel in dist/*.whl; do
             echo "🔧 Repairing wheel: $wheel"
-            # Usa --lib-dir per specificare dove cercare le librerie
+            # Usa -L per specificare dove cercare le librerie
             delocate-wheel \
-              --lib-dir "$VCPKG_LIB_PATH" \
+              -L "$VCPKG_LIB_PATH" \
               -w dist/ \
+              -v \
               "$wheel"
           done
           

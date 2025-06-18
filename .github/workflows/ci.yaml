@@ -454,7 +454,7 @@ jobs:
               $PYTHON_PATH/bin/auditwheel repair \
                 "$wheel" \
                 --plat "${{ env.MANYLINUX_VERSION }}_${{ env.CI_ARCH }}" \
-                --library-path "$VCPKG_LIB_PATH" \
+                --lib-dir "$VCPKG_LIB_PATH" \
                 --wheel-dir wheelhouse
             fi
           done
@@ -706,7 +706,6 @@ jobs:
           echo "Building with CMAKE_PREFIX_PATH = $CMAKE_PREFIX_PATH"
           echo "Current DYLD_LIBRARY_PATH for build = $DYLD_LIBRARY_PATH"
           python -m build --wheel --no-isolation
-
       - name: Repair Wheel with Delocate (macOS arm64)
         run: |
           # Definisci il percorso delle librerie vcpkg

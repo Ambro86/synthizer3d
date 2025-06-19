@@ -23,6 +23,15 @@ os.chdir(root_dir)
 
 synthizer_lib_dir = ""
 if 'CI_SDIST' not in os.environ:
+    # Set vcpkg environment variables for Windows builds
+    vcpkg_installed_base = os.environ.get('EFFECTIVE_VCPKG_INSTALLED_DIR_BASE')
+    vcpkg_triplet = os.environ.get('VCPKG_DEFAULT_TRIPLET', 'x64-windows')
+    if vcpkg_installed_base and os.path.isdir(vcpkg_installed_base):
+        vcpkg_installed_path = os.path.join(vcpkg_installed_base, vcpkg_triplet)
+        if os.path.isdir(vcpkg_installed_path):
+            os.environ['VCPKG_INSTALLED_PATH'] = vcpkg_installed_path
+            print(f"Set VCPKG_INSTALLED_PATH to {vcpkg_installed_path}")
+    
     # Build Synthizer nativo tramite CMake/Ninja
     cmake = cmaker.CMaker()
     cmake.configure(

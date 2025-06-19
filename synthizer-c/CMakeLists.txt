@@ -189,31 +189,31 @@ target_link_libraries(synthizer PRIVATE ${SYZ_LIBRARIES})
 
 target_include_directories(synthizer PRIVATE $<TARGET_PROPERTY:wdl_objlib,INTERFACE_INCLUDE_DIRECTORIES>)
 
-# Add vcpkg include directories
-if(WIN32)
-  # Use environment variable set by setup.py
-  if(DEFINED ENV{VCPKG_INSTALLED_PATH})
-    target_include_directories(synthizer PRIVATE 
-      "$ENV{VCPKG_INSTALLED_PATH}/include"
-    )
-  else()
-    # Fallback to hardcoded path
+# Add vcpkg include directories - unified approach for all platforms
+if(DEFINED ENV{VCPKG_INSTALLED_PATH})
+  # Use environment variable set by setup.py (preferred)
+  target_include_directories(synthizer PRIVATE 
+    "$ENV{VCPKG_INSTALLED_PATH}/include"
+  )
+  message(STATUS "Using vcpkg includes from VCPKG_INSTALLED_PATH: $ENV{VCPKG_INSTALLED_PATH}/include")
+else()
+  # Fallback to platform-specific hardcoded paths
+  if(WIN32)
     target_include_directories(synthizer PRIVATE 
       "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/include"
     )
-  endif()
-elseif(UNIX AND NOT APPLE)
-  # For Linux, add the vcpkg include path
-  if(DEFINED ENV{VCPKG_INSTALLED_PATH})
+    message(STATUS "Using Windows vcpkg fallback path")
+  elseif(UNIX AND NOT APPLE)
     target_include_directories(synthizer PRIVATE 
-      "$ENV{VCPKG_INSTALLED_PATH}/include"
+      "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux/include"
     )
+    message(STATUS "Using Linux vcpkg fallback path")
+  elseif(APPLE)
+    target_include_directories(synthizer PRIVATE 
+      "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-osx/include"
+    )
+    message(STATUS "Using macOS vcpkg fallback path")
   endif()
-elseif(APPLE)
-  # For macOS
-  target_include_directories(synthizer PRIVATE 
-    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-osx/include"
-  )
 endif()
 
 target_compile_definitions(synthizer PRIVATE BUILDING_SYNTHIZER WDL_RESAMPLE_TYPE=float)

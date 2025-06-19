@@ -1,0 +1,1529 @@
+2025-06-19T14:48:00.1574522Z Current runner version: '2.325.0'
+2025-06-19T14:48:00.1600378Z ##[group]Runner Image Provisioner
+2025-06-19T14:48:00.1601213Z Hosted Compute Agent
+2025-06-19T14:48:00.1601849Z Version: 20250617.347
+2025-06-19T14:48:00.1602511Z Commit: a94982a9c1baf5723aa59f6acd00bd3c220e8de7
+2025-06-19T14:48:00.1603164Z Build Date: 2025-06-17T13:43:39Z
+2025-06-19T14:48:00.1603801Z ##[endgroup]
+2025-06-19T14:48:00.1604342Z ##[group]Operating System
+2025-06-19T14:48:00.1604918Z Ubuntu
+2025-06-19T14:48:00.1605339Z 24.04.2
+2025-06-19T14:48:00.1605875Z LTS
+2025-06-19T14:48:00.1606331Z ##[endgroup]
+2025-06-19T14:48:00.1607044Z ##[group]Runner Image
+2025-06-19T14:48:00.1607850Z Image: ubuntu-24.04
+2025-06-19T14:48:00.1608326Z Version: 20250602.3.0
+2025-06-19T14:48:00.1609300Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250602.3/images/ubuntu/Ubuntu2404-Readme.md
+2025-06-19T14:48:00.1610856Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250602.3
+2025-06-19T14:48:00.1611925Z ##[endgroup]
+2025-06-19T14:48:00.1614354Z ##[group]GITHUB_TOKEN Permissions
+2025-06-19T14:48:00.1616389Z Actions: write
+2025-06-19T14:48:00.1617238Z Attestations: write
+2025-06-19T14:48:00.1617786Z Checks: write
+2025-06-19T14:48:00.1618227Z Contents: write
+2025-06-19T14:48:00.1618845Z Deployments: write
+2025-06-19T14:48:00.1619329Z Discussions: write
+2025-06-19T14:48:00.1619804Z Issues: write
+2025-06-19T14:48:00.1620316Z Metadata: read
+2025-06-19T14:48:00.1620804Z Models: read
+2025-06-19T14:48:00.1621264Z Packages: write
+2025-06-19T14:48:00.1621816Z Pages: write
+2025-06-19T14:48:00.1622308Z PullRequests: write
+2025-06-19T14:48:00.1622799Z RepositoryProjects: write
+2025-06-19T14:48:00.1623815Z SecurityEvents: write
+2025-06-19T14:48:00.1624448Z Statuses: write
+2025-06-19T14:48:00.1624992Z ##[endgroup]
+2025-06-19T14:48:00.1627674Z Secret source: Actions
+2025-06-19T14:48:00.1628606Z Prepare workflow directory
+2025-06-19T14:48:00.2212711Z Prepare all required actions
+2025-06-19T14:48:00.2250562Z Getting action download info
+2025-06-19T14:48:00.6396412Z ##[group]Download immutable action package 'actions/checkout@v4'
+2025-06-19T14:48:00.6398090Z Version: 4.2.2
+2025-06-19T14:48:00.6399182Z Digest: sha256:ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1
+2025-06-19T14:48:00.6400610Z Source commit SHA: 11bd71901bbe5b1630ceea73d27597364c9af683
+2025-06-19T14:48:00.6401381Z ##[endgroup]
+2025-06-19T14:48:00.7557164Z ##[group]Download immutable action package 'actions/cache@v4'
+2025-06-19T14:48:00.7557961Z Version: 4.2.3
+2025-06-19T14:48:00.7558798Z Digest: sha256:c8a3bb963e1f1826d8fcc8d1354f0dd29d8ac1db1d4f6f20247055ae11b81ed9
+2025-06-19T14:48:00.7559848Z Source commit SHA: 5a3ec84eff668545956fd18022155c47e93e2684
+2025-06-19T14:48:00.7560530Z ##[endgroup]
+2025-06-19T14:48:00.8632823Z Download action repository 'lukka/run-vcpkg@v11' (SHA:7d259227a1fb6471a0253dd5ab7419835228f7d7)
+2025-06-19T14:48:01.1813048Z ##[group]Download immutable action package 'actions/upload-artifact@v4'
+2025-06-19T14:48:01.1813962Z Version: 4.6.2
+2025-06-19T14:48:01.1814764Z Digest: sha256:290722aa3281d5caf23d0acdc3dbeb3424786a1a01a9cc97e72f147225e37c38
+2025-06-19T14:48:01.1815834Z Source commit SHA: ea165f8d65b6e75b540449e92b4886f43607fa02
+2025-06-19T14:48:01.1816528Z ##[endgroup]
+2025-06-19T14:48:01.4689791Z Complete job name: Build Linux (x86_64) Python 3.8
+2025-06-19T14:48:01.5203145Z ##[group]Checking docker version
+2025-06-19T14:48:01.5217085Z ##[command]/usr/bin/docker version --format '{{.Server.APIVersion}}'
+2025-06-19T14:48:01.6036395Z '1.48'
+2025-06-19T14:48:01.6048466Z Docker daemon API version: '1.48'
+2025-06-19T14:48:01.6049905Z ##[command]/usr/bin/docker version --format '{{.Client.APIVersion}}'
+2025-06-19T14:48:01.6211574Z '1.48'
+2025-06-19T14:48:01.6225656Z Docker client API version: '1.48'
+2025-06-19T14:48:01.6232009Z ##[endgroup]
+2025-06-19T14:48:01.6235333Z ##[group]Clean up resources from previous jobs
+2025-06-19T14:48:01.6241358Z ##[command]/usr/bin/docker ps --all --quiet --no-trunc --filter "label=43e476"
+2025-06-19T14:48:01.6379393Z ##[command]/usr/bin/docker network prune --force --filter "label=43e476"
+2025-06-19T14:48:01.6506016Z ##[endgroup]
+2025-06-19T14:48:01.6507194Z ##[group]Create local container network
+2025-06-19T14:48:01.6518327Z ##[command]/usr/bin/docker network create --label 43e476 github_network_15168f156f9447ecb03618bea54bb28e
+2025-06-19T14:48:01.7039397Z 26467fcf098a3868b94c7a83c9686968f3e87e48a7e9d30e3008761c9f6fa42c
+2025-06-19T14:48:01.7058790Z ##[endgroup]
+2025-06-19T14:48:01.7082458Z ##[group]Starting job container
+2025-06-19T14:48:01.7102255Z ##[command]/usr/bin/docker pull quay.io/pypa/manylinux_2_28_x86_64
+2025-06-19T14:48:01.7201624Z Using default tag: latest
+2025-06-19T14:48:02.1103468Z latest: Pulling from pypa/manylinux_2_28_x86_64
+2025-06-19T14:48:02.1106371Z 1609df1ab4d8: Pulling fs layer
+2025-06-19T14:48:02.1108384Z 07277fe42816: Pulling fs layer
+2025-06-19T14:48:02.1109595Z 3e71ff1da8ba: Pulling fs layer
+2025-06-19T14:48:02.1110668Z e9a89bd7d45e: Pulling fs layer
+2025-06-19T14:48:02.1111639Z 3dac7dfb7d2c: Pulling fs layer
+2025-06-19T14:48:02.1112545Z 63ca810b93e1: Pulling fs layer
+2025-06-19T14:48:02.1113453Z ec2f2dcf031c: Pulling fs layer
+2025-06-19T14:48:02.1114340Z 891e8728a965: Pulling fs layer
+2025-06-19T14:48:02.1115228Z 8daa6cd1f516: Pulling fs layer
+2025-06-19T14:48:02.1116142Z a367f8476dea: Pulling fs layer
+2025-06-19T14:48:02.1117292Z 0687e6c25f32: Pulling fs layer
+2025-06-19T14:48:02.1118200Z e4ee168ece01: Pulling fs layer
+2025-06-19T14:48:02.1119107Z 059fa8db8343: Pulling fs layer
+2025-06-19T14:48:02.1119990Z 45b3a7323b63: Pulling fs layer
+2025-06-19T14:48:02.1120878Z 51f2a9252993: Pulling fs layer
+2025-06-19T14:48:02.1121748Z 4f4fb700ef54: Pulling fs layer
+2025-06-19T14:48:02.1122688Z 44a7d70d0172: Pulling fs layer
+2025-06-19T14:48:02.1123572Z 0251ddcb9278: Pulling fs layer
+2025-06-19T14:48:02.1124465Z b3c5e8ab0974: Pulling fs layer
+2025-06-19T14:48:02.1125338Z f99d323c653a: Pulling fs layer
+2025-06-19T14:48:02.1126213Z 31c446d8bf07: Pulling fs layer
+2025-06-19T14:48:02.1127267Z 2e9a0c13d720: Pulling fs layer
+2025-06-19T14:48:02.1128154Z 059fa8db8343: Waiting
+2025-06-19T14:48:02.1128903Z 45b3a7323b63: Waiting
+2025-06-19T14:48:02.1129642Z 51f2a9252993: Waiting
+2025-06-19T14:48:02.1130392Z 4f4fb700ef54: Waiting
+2025-06-19T14:48:02.1131148Z 44a7d70d0172: Waiting
+2025-06-19T14:48:02.1131909Z 0251ddcb9278: Waiting
+2025-06-19T14:48:02.1132741Z b3c5e8ab0974: Waiting
+2025-06-19T14:48:02.1133507Z f99d323c653a: Waiting
+2025-06-19T14:48:02.1134260Z 31c446d8bf07: Waiting
+2025-06-19T14:48:02.1134996Z 2e9a0c13d720: Waiting
+2025-06-19T14:48:02.1135746Z e9a89bd7d45e: Waiting
+2025-06-19T14:48:02.1136508Z 3dac7dfb7d2c: Waiting
+2025-06-19T14:48:02.1137501Z 63ca810b93e1: Waiting
+2025-06-19T14:48:02.1138254Z 891e8728a965: Waiting
+2025-06-19T14:48:02.1139006Z 8daa6cd1f516: Waiting
+2025-06-19T14:48:02.1139746Z a367f8476dea: Waiting
+2025-06-19T14:48:02.1140498Z 0687e6c25f32: Waiting
+2025-06-19T14:48:02.1141257Z ec2f2dcf031c: Waiting
+2025-06-19T14:48:02.1142009Z e4ee168ece01: Waiting
+2025-06-19T14:48:02.2745593Z 3e71ff1da8ba: Verifying Checksum
+2025-06-19T14:48:02.2747652Z 3e71ff1da8ba: Download complete
+2025-06-19T14:48:02.2749180Z 07277fe42816: Verifying Checksum
+2025-06-19T14:48:02.2750703Z 07277fe42816: Download complete
+2025-06-19T14:48:02.3882901Z e9a89bd7d45e: Download complete
+2025-06-19T14:48:02.5248203Z 3dac7dfb7d2c: Verifying Checksum
+2025-06-19T14:48:02.5249972Z 3dac7dfb7d2c: Download complete
+2025-06-19T14:48:02.6000568Z 1609df1ab4d8: Verifying Checksum
+2025-06-19T14:48:02.6002410Z 1609df1ab4d8: Download complete
+2025-06-19T14:48:02.7369260Z 891e8728a965: Verifying Checksum
+2025-06-19T14:48:02.7370932Z 891e8728a965: Download complete
+2025-06-19T14:48:02.7804339Z 63ca810b93e1: Verifying Checksum
+2025-06-19T14:48:02.7805919Z 63ca810b93e1: Download complete
+2025-06-19T14:48:02.8827579Z 8daa6cd1f516: Verifying Checksum
+2025-06-19T14:48:02.8831123Z 8daa6cd1f516: Download complete
+2025-06-19T14:48:02.9419179Z a367f8476dea: Verifying Checksum
+2025-06-19T14:48:02.9420957Z a367f8476dea: Download complete
+2025-06-19T14:48:03.0197075Z 0687e6c25f32: Verifying Checksum
+2025-06-19T14:48:03.0199109Z 0687e6c25f32: Download complete
+2025-06-19T14:48:03.1583145Z e4ee168ece01: Verifying Checksum
+2025-06-19T14:48:03.1586344Z e4ee168ece01: Download complete
+2025-06-19T14:48:03.1634531Z 059fa8db8343: Verifying Checksum
+2025-06-19T14:48:03.1635594Z 059fa8db8343: Download complete
+2025-06-19T14:48:03.3307210Z 51f2a9252993: Verifying Checksum
+2025-06-19T14:48:03.3307945Z 51f2a9252993: Download complete
+2025-06-19T14:48:03.4250512Z 4f4fb700ef54: Verifying Checksum
+2025-06-19T14:48:03.4251927Z 4f4fb700ef54: Download complete
+2025-06-19T14:48:03.4371985Z 45b3a7323b63: Verifying Checksum
+2025-06-19T14:48:03.4380102Z 45b3a7323b63: Download complete
+2025-06-19T14:48:03.5952326Z 44a7d70d0172: Verifying Checksum
+2025-06-19T14:48:03.5954112Z 44a7d70d0172: Download complete
+2025-06-19T14:48:03.6169655Z 0251ddcb9278: Verifying Checksum
+2025-06-19T14:48:03.6175685Z 0251ddcb9278: Download complete
+2025-06-19T14:48:03.8020111Z f99d323c653a: Verifying Checksum
+2025-06-19T14:48:03.8020738Z f99d323c653a: Download complete
+2025-06-19T14:48:03.8559016Z b3c5e8ab0974: Verifying Checksum
+2025-06-19T14:48:03.8559832Z b3c5e8ab0974: Download complete
+2025-06-19T14:48:03.9058402Z ec2f2dcf031c: Verifying Checksum
+2025-06-19T14:48:03.9059373Z ec2f2dcf031c: Download complete
+2025-06-19T14:48:04.0872574Z 2e9a0c13d720: Verifying Checksum
+2025-06-19T14:48:04.0873607Z 2e9a0c13d720: Download complete
+2025-06-19T14:48:04.7497110Z 31c446d8bf07: Verifying Checksum
+2025-06-19T14:48:05.3270035Z 31c446d8bf07: Download complete
+2025-06-19T14:48:05.3270567Z 1609df1ab4d8: Pull complete
+2025-06-19T14:48:06.7102627Z 07277fe42816: Pull complete
+2025-06-19T14:48:06.7218812Z 3e71ff1da8ba: Pull complete
+2025-06-19T14:48:06.7381434Z e9a89bd7d45e: Pull complete
+2025-06-19T14:48:06.7518893Z 3dac7dfb7d2c: Pull complete
+2025-06-19T14:48:06.7624000Z 63ca810b93e1: Pull complete
+2025-06-19T14:48:12.3238458Z ec2f2dcf031c: Pull complete
+2025-06-19T14:48:12.3445870Z 891e8728a965: Pull complete
+2025-06-19T14:48:13.6984883Z 8daa6cd1f516: Pull complete
+2025-06-19T14:48:13.7440228Z a367f8476dea: Pull complete
+2025-06-19T14:48:13.7551974Z 0687e6c25f32: Pull complete
+2025-06-19T14:48:13.8128674Z e4ee168ece01: Pull complete
+2025-06-19T14:48:13.8252034Z 059fa8db8343: Pull complete
+2025-06-19T14:48:13.8687223Z 45b3a7323b63: Pull complete
+2025-06-19T14:48:13.8821964Z 51f2a9252993: Pull complete
+2025-06-19T14:48:13.8929851Z 4f4fb700ef54: Pull complete
+2025-06-19T14:48:13.9161794Z 44a7d70d0172: Pull complete
+2025-06-19T14:48:13.9481386Z 0251ddcb9278: Pull complete
+2025-06-19T14:48:14.1421650Z b3c5e8ab0974: Pull complete
+2025-06-19T14:48:14.1639811Z f99d323c653a: Pull complete
+2025-06-19T14:48:27.5986391Z 31c446d8bf07: Pull complete
+2025-06-19T14:48:27.6153743Z 2e9a0c13d720: Pull complete
+2025-06-19T14:48:27.6201783Z Digest: sha256:da1702ad4dc6215a216ecfc23c73f4596fecfc4727748b0dc4fc1378e217d72c
+2025-06-19T14:48:27.6214107Z Status: Downloaded newer image for quay.io/pypa/manylinux_2_28_x86_64:latest
+2025-06-19T14:48:27.6225860Z quay.io/pypa/manylinux_2_28_x86_64:latest
+2025-06-19T14:48:27.6305464Z ##[command]/usr/bin/docker create --name e0f78cd6e29243e5978027004f22c673_quayiopypamanylinux_2_28_x86_64_6276ba --label 43e476 --workdir /__w/synthizer3d/synthizer3d --network github_network_15168f156f9447ecb03618bea54bb28e --user root -e "HOME=/github/home" -e GITHUB_ACTIONS=true -e CI=true -v "/var/run/docker.sock":"/var/run/docker.sock" -v "/home/runner/work":"/__w" -v "/home/runner/actions-runner/cached/externals":"/__e":ro -v "/home/runner/work/_temp":"/__w/_temp" -v "/home/runner/work/_actions":"/__w/_actions" -v "/opt/hostedtoolcache":"/__t" -v "/home/runner/work/_temp/_github_home":"/github/home" -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" --entrypoint "tail" quay.io/pypa/manylinux_2_28_x86_64 "-f" "/dev/null"
+2025-06-19T14:48:27.6600992Z 471abb16fd58e970daa9ad01a6b7af044b988423b222dfdda47a1b63f1802c87
+2025-06-19T14:48:27.6625507Z ##[command]/usr/bin/docker start 471abb16fd58e970daa9ad01a6b7af044b988423b222dfdda47a1b63f1802c87
+2025-06-19T14:48:27.8440717Z 471abb16fd58e970daa9ad01a6b7af044b988423b222dfdda47a1b63f1802c87
+2025-06-19T14:48:27.8460398Z ##[command]/usr/bin/docker ps --all --filter id=471abb16fd58e970daa9ad01a6b7af044b988423b222dfdda47a1b63f1802c87 --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
+2025-06-19T14:48:27.8575179Z 471abb16fd58e970daa9ad01a6b7af044b988423b222dfdda47a1b63f1802c87 Up Less than a second
+2025-06-19T14:48:27.8594034Z ##[command]/usr/bin/docker inspect --format "{{range .Config.Env}}{{println .}}{{end}}" 471abb16fd58e970daa9ad01a6b7af044b988423b222dfdda47a1b63f1802c87
+2025-06-19T14:48:27.8711543Z HOME=/github/home
+2025-06-19T14:48:27.8711891Z GITHUB_ACTIONS=true
+2025-06-19T14:48:27.8712196Z CI=true
+2025-06-19T14:48:27.8712823Z PATH=/opt/rh/gcc-toolset-14/root/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+2025-06-19T14:48:27.8713545Z LANG=en_US.UTF-8
+2025-06-19T14:48:27.8713867Z AUDITWHEEL_POLICY=manylinux_2_28
+2025-06-19T14:48:27.8714269Z AUDITWHEEL_ARCH=x86_64
+2025-06-19T14:48:27.8714609Z AUDITWHEEL_PLAT=manylinux_2_28_x86_64
+2025-06-19T14:48:27.8714992Z LC_ALL=en_US.UTF-8
+2025-06-19T14:48:27.8715286Z LANGUAGE=en_US.UTF-8
+2025-06-19T14:48:27.8715648Z DEVTOOLSET_ROOTPATH=/opt/rh/gcc-toolset-14/root
+2025-06-19T14:48:27.8716512Z LD_LIBRARY_PATH=/opt/rh/gcc-toolset-14/root/usr/lib64:/opt/rh/gcc-toolset-14/root/usr/lib:/opt/rh/gcc-toolset-14/root/usr/lib64/dyninst:/opt/rh/gcc-toolset-14/root/usr/lib/dyninst
+2025-06-19T14:48:27.8717401Z PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+2025-06-19T14:48:27.8717664Z SSL_CERT_FILE=/opt/_internal/certs.pem
+2025-06-19T14:48:27.8731265Z ##[endgroup]
+2025-06-19T14:48:27.8740593Z ##[group]Waiting for all services to be ready
+2025-06-19T14:48:27.8742331Z ##[endgroup]
+2025-06-19T14:48:27.9041375Z ##[group]Run actions/checkout@v4
+2025-06-19T14:48:27.9041887Z with:
+2025-06-19T14:48:27.9042076Z   submodules: recursive
+2025-06-19T14:48:27.9042293Z   repository: Ambro86/synthizer3d
+2025-06-19T14:48:27.9042756Z   token: ***
+2025-06-19T14:48:27.9042939Z   ssh-strict: true
+2025-06-19T14:48:27.9043111Z   ssh-user: git
+2025-06-19T14:48:27.9043304Z   persist-credentials: true
+2025-06-19T14:48:27.9043511Z   clean: true
+2025-06-19T14:48:27.9043702Z   sparse-checkout-cone-mode: true
+2025-06-19T14:48:27.9043920Z   fetch-depth: 1
+2025-06-19T14:48:27.9044093Z   fetch-tags: false
+2025-06-19T14:48:27.9044267Z   show-progress: true
+2025-06-19T14:48:27.9044446Z   lfs: false
+2025-06-19T14:48:27.9044607Z   set-safe-directory: true
+2025-06-19T14:48:27.9044977Z env:
+2025-06-19T14:48:27.9045135Z   CI_ARCH: x86_64
+2025-06-19T14:48:27.9045323Z   MANYLINUX_VERSION: manylinux_2_28
+2025-06-19T14:48:27.9045548Z   PYVERSION: 3.8
+2025-06-19T14:48:27.9045725Z   VCPKG_DEFAULT_TRIPLET: x64-linux
+2025-06-19T14:48:27.9046172Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed
+2025-06-19T14:48:27.9046570Z ##[endgroup]
+2025-06-19T14:48:27.9101665Z ##[command]/usr/bin/docker exec  471abb16fd58e970daa9ad01a6b7af044b988423b222dfdda47a1b63f1802c87 sh -c "cat /etc/*release | grep ^ID"
+2025-06-19T14:48:28.1205843Z Syncing repository: Ambro86/synthizer3d
+2025-06-19T14:48:28.1207239Z ##[group]Getting Git version info
+2025-06-19T14:48:28.1207582Z Working directory is '/__w/synthizer3d/synthizer3d'
+2025-06-19T14:48:28.1208089Z [command]/usr/local/bin/git version
+2025-06-19T14:48:28.1211885Z git version 2.49.0
+2025-06-19T14:48:28.1239682Z ##[endgroup]
+2025-06-19T14:48:28.1256045Z Temporarily overriding HOME='/__w/_temp/d2104ea7-e19e-484c-b362-b834dd7ee697' before making global git config changes
+2025-06-19T14:48:28.1257504Z Adding repository directory to the temporary git global config as a safe directory
+2025-06-19T14:48:28.1263137Z [command]/usr/local/bin/git config --global --add safe.directory /__w/synthizer3d/synthizer3d
+2025-06-19T14:48:28.1295552Z Deleting the contents of '/__w/synthizer3d/synthizer3d'
+2025-06-19T14:48:28.1299446Z ##[group]Initializing the repository
+2025-06-19T14:48:28.1311590Z [command]/usr/local/bin/git init /__w/synthizer3d/synthizer3d
+2025-06-19T14:48:28.1355852Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-06-19T14:48:28.1356692Z hint: is subject to change. To configure the initial branch name to use in all
+2025-06-19T14:48:28.1357986Z hint: of your new repositories, which will suppress this warning, call:
+2025-06-19T14:48:28.1358568Z hint:
+2025-06-19T14:48:28.1358833Z hint: 	git config --global init.defaultBranch <name>
+2025-06-19T14:48:28.1359308Z hint:
+2025-06-19T14:48:28.1359576Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-06-19T14:48:28.1360040Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-06-19T14:48:28.1360404Z hint:
+2025-06-19T14:48:28.1360604Z hint: 	git branch -m <name>
+2025-06-19T14:48:28.1360940Z Initialized empty Git repository in /__w/synthizer3d/synthizer3d/.git/
+2025-06-19T14:48:28.1370040Z [command]/usr/local/bin/git remote add origin https://github.com/Ambro86/synthizer3d
+2025-06-19T14:48:28.1402768Z ##[endgroup]
+2025-06-19T14:48:28.1403333Z ##[group]Disabling automatic garbage collection
+2025-06-19T14:48:28.1406549Z [command]/usr/local/bin/git config --local gc.auto 0
+2025-06-19T14:48:28.1436458Z ##[endgroup]
+2025-06-19T14:48:28.1437191Z ##[group]Setting up auth
+2025-06-19T14:48:28.1444549Z [command]/usr/local/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-06-19T14:48:28.1475435Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-06-19T14:48:28.1839616Z [command]/usr/local/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-06-19T14:48:28.1871889Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-06-19T14:48:28.2229842Z [command]/usr/local/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-06-19T14:48:28.2268210Z ##[endgroup]
+2025-06-19T14:48:28.2268788Z ##[group]Fetching the repository
+2025-06-19T14:48:28.2276699Z [command]/usr/local/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +b44f9d6c79ddba33a2e631bd4658138c465d579a:refs/remotes/origin/master
+2025-06-19T14:48:28.8581080Z From https://github.com/Ambro86/synthizer3d
+2025-06-19T14:48:28.8581894Z  * [new ref]         b44f9d6c79ddba33a2e631bd4658138c465d579a -> origin/master
+2025-06-19T14:48:28.8612293Z ##[endgroup]
+2025-06-19T14:48:28.8613877Z ##[group]Determining the checkout info
+2025-06-19T14:48:28.8614978Z ##[endgroup]
+2025-06-19T14:48:28.8616870Z [command]/usr/local/bin/git sparse-checkout disable
+2025-06-19T14:48:28.8659300Z [command]/usr/local/bin/git config --local --unset-all extensions.worktreeConfig
+2025-06-19T14:48:28.8692778Z ##[group]Checking out the ref
+2025-06-19T14:48:28.8696551Z [command]/usr/local/bin/git checkout --progress --force -B master refs/remotes/origin/master
+2025-06-19T14:48:29.1497679Z Reset branch 'master'
+2025-06-19T14:48:29.1499049Z branch 'master' set up to track 'origin/master'.
+2025-06-19T14:48:29.1516101Z ##[endgroup]
+2025-06-19T14:48:29.1516524Z ##[group]Setting up auth for fetching submodules
+2025-06-19T14:48:29.1522489Z [command]/usr/local/bin/git config --global http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-06-19T14:48:29.1561926Z [command]/usr/local/bin/git config --global --unset-all url.https://github.com/.insteadOf
+2025-06-19T14:48:29.1596603Z [command]/usr/local/bin/git config --global --add url.https://github.com/.insteadOf git@github.com:
+2025-06-19T14:48:29.1630134Z [command]/usr/local/bin/git config --global --add url.https://github.com/.insteadOf org-58132298@github.com:
+2025-06-19T14:48:29.1656929Z ##[endgroup]
+2025-06-19T14:48:29.1657265Z ##[group]Fetching submodules
+2025-06-19T14:48:29.1660870Z [command]/usr/local/bin/git submodule sync --recursive
+2025-06-19T14:48:29.2035666Z [command]/usr/local/bin/git -c protocol.version=2 submodule update --init --force --depth=1 --recursive
+2025-06-19T14:48:29.2403408Z [command]/usr/local/bin/git submodule foreach --recursive git config --local gc.auto 0
+2025-06-19T14:48:29.2760573Z ##[endgroup]
+2025-06-19T14:48:29.2761208Z ##[group]Persisting credentials for submodules
+2025-06-19T14:48:29.2766549Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'url\.https\:\/\/github\.com\/\.insteadOf' && git config --local --unset-all 'url.https://github.com/.insteadOf' || :"
+2025-06-19T14:48:29.3132817Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local 'http.https://github.com/.extraheader' 'AUTHORIZATION: basic ***' && git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2025-06-19T14:48:29.3491668Z [command]/usr/local/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'git@github.com:'
+2025-06-19T14:48:29.3851497Z [command]/usr/local/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'org-58132298@github.com:'
+2025-06-19T14:48:29.4207731Z ##[endgroup]
+2025-06-19T14:48:29.4244571Z [command]/usr/local/bin/git log -1 --format=%H
+2025-06-19T14:48:29.4270094Z b44f9d6c79ddba33a2e631bd4658138c465d579a
+2025-06-19T14:48:29.4455819Z ##[group]Run echo "🐍 Setting up Python 3.8 environment..."
+2025-06-19T14:48:29.4456262Z [36;1mecho "🐍 Setting up Python 3.8 environment..."[0m
+2025-06-19T14:48:29.4456693Z [36;1mif [ "3.8" = "3.8" ]; then echo "PYTHON_PATH=/opt/python/cp38-cp38" >> $GITHUB_ENV[0m
+2025-06-19T14:48:29.4457493Z [36;1melif [ "3.8" = "3.9" ]; then echo "PYTHON_PATH=/opt/python/cp39-cp39" >> $GITHUB_ENV[0m
+2025-06-19T14:48:29.4457957Z [36;1melif [ "3.8" = "3.10" ]; then echo "PYTHON_PATH=/opt/python/cp310-cp310" >> $GITHUB_ENV[0m
+2025-06-19T14:48:29.4458416Z [36;1melif [ "3.8" = "3.11" ]; then echo "PYTHON_PATH=/opt/python/cp311-cp311" >> $GITHUB_ENV[0m
+2025-06-19T14:48:29.4458843Z [36;1melif [ "3.8" = "3.12" ]; then echo "PYTHON_PATH=/opt/python/cp312-cp312" >> $GITHUB_ENV[0m
+2025-06-19T14:48:29.4459262Z [36;1melif [ "3.8" = "3.13" ]; then echo "PYTHON_PATH=/opt/python/cp313-cp313" >> $GITHUB_ENV[0m
+2025-06-19T14:48:29.4459585Z [36;1mfi[0m
+2025-06-19T14:48:29.4462906Z shell: sh -e {0}
+2025-06-19T14:48:29.4463109Z env:
+2025-06-19T14:48:29.4463273Z   CI_ARCH: x86_64
+2025-06-19T14:48:29.4463466Z   MANYLINUX_VERSION: manylinux_2_28
+2025-06-19T14:48:29.4463708Z   PYVERSION: 3.8
+2025-06-19T14:48:29.4463905Z   VCPKG_DEFAULT_TRIPLET: x64-linux
+2025-06-19T14:48:29.4464321Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed
+2025-06-19T14:48:29.4464731Z ##[endgroup]
+2025-06-19T14:48:29.5057353Z 🐍 Setting up Python 3.8 environment...
+2025-06-19T14:48:29.5126338Z ##[group]Run echo "📦 Installing system dependencies..."
+2025-06-19T14:48:29.5127128Z [36;1mecho "📦 Installing system dependencies..."[0m
+2025-06-19T14:48:29.5127473Z [36;1mif command -v dnf >/dev/null 2>&1; then[0m
+2025-06-19T14:48:29.5127843Z [36;1m  dnf install -y curl zip unzip tar cmake make gcc-c++ openssl-devel[0m
+2025-06-19T14:48:29.5128212Z [36;1melif command -v yum >/dev/null 2>&1; then[0m
+2025-06-19T14:48:29.5128558Z [36;1m  yum install -y curl zip unzip tar cmake make gcc-c++ openssl-devel[0m
+2025-06-19T14:48:29.5128872Z [36;1mfi[0m
+2025-06-19T14:48:29.5129029Z [36;1m[0m
+2025-06-19T14:48:29.5129285Z [36;1mecho "📦 Installing Python build tools (including ninja)..."[0m
+2025-06-19T14:48:29.5129679Z [36;1m$PYTHON_PATH/bin/python -m pip install --upgrade pip[0m
+2025-06-19T14:48:29.5130270Z [36;1m$PYTHON_PATH/bin/pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build auditwheel twine[0m
+2025-06-19T14:48:29.5130939Z shell: sh -e {0}
+2025-06-19T14:48:29.5131112Z env:
+2025-06-19T14:48:29.5131459Z   CI_ARCH: x86_64
+2025-06-19T14:48:29.5131648Z   MANYLINUX_VERSION: manylinux_2_28
+2025-06-19T14:48:29.5131875Z   PYVERSION: 3.8
+2025-06-19T14:48:29.5132057Z   VCPKG_DEFAULT_TRIPLET: x64-linux
+2025-06-19T14:48:29.5132472Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed
+2025-06-19T14:48:29.5132907Z   PYTHON_PATH: /opt/python/cp38-cp38
+2025-06-19T14:48:29.5133139Z ##[endgroup]
+2025-06-19T14:48:29.5675025Z 📦 Installing system dependencies...
+2025-06-19T14:48:30.3354406Z AlmaLinux 8 - BaseOS                             53 MB/s |  27 MB     00:00    
+2025-06-19T14:48:33.8716075Z AlmaLinux 8 - AppStream                         100 MB/s |  19 MB     00:00    
+2025-06-19T14:48:36.9358380Z AlmaLinux 8 - Extras                            141 kB/s |  14 kB     00:00    
+2025-06-19T14:48:37.5004269Z AlmaLinux 8 - PowerTools                        9.1 MB/s | 4.6 MB     00:00    
+2025-06-19T14:48:39.9684234Z Extra Packages for Enterprise Linux 8 - x86_64  8.3 MB/s |  14 MB     00:01    
+2025-06-19T14:48:45.5710597Z Package curl-7.61.1-34.el8_10.3.x86_64 is already installed.
+2025-06-19T14:48:45.5726725Z Package unzip-6.0-48.el8_10.x86_64 is already installed.
+2025-06-19T14:48:45.5736284Z Package tar-2:1.30-10.el8_10.x86_64 is already installed.
+2025-06-19T14:48:45.5748280Z Package make-1:4.2.1-11.el8.x86_64 is already installed.
+2025-06-19T14:48:45.6058159Z Dependencies resolved.
+2025-06-19T14:48:45.6079711Z ================================================================================
+2025-06-19T14:48:45.6080317Z  Package                Arch      Version                    Repository    Size
+2025-06-19T14:48:45.6080909Z ================================================================================
+2025-06-19T14:48:45.6081353Z Installing:
+2025-06-19T14:48:45.6081759Z  cmake                  x86_64    3.26.5-2.el8               appstream     14 M
+2025-06-19T14:48:45.6082411Z  gcc-c++                x86_64    8.5.0-26.el8_10.alma.1     appstream     12 M
+2025-06-19T14:48:45.6083091Z  openssl-devel          x86_64    1:1.1.1k-14.el8_6          baseos       2.3 M
+2025-06-19T14:48:45.6083668Z  zip                    x86_64    3.0-23.el8                 baseos       270 k
+2025-06-19T14:48:45.6084005Z Installing dependencies:
+2025-06-19T14:48:45.6084339Z  cmake-data             noarch    3.26.5-2.el8               appstream    1.9 M
+2025-06-19T14:48:45.6084806Z  cmake-filesystem       x86_64    3.26.5-2.el8               appstream     44 k
+2025-06-19T14:48:45.6085294Z  cmake-rpm-macros       noarch    3.26.5-2.el8               appstream     43 k
+2025-06-19T14:48:45.6085781Z  keyutils-libs-devel    x86_64    1.5.10-9.el8               baseos        47 k
+2025-06-19T14:48:45.6086237Z  krb5-devel             x86_64    1.18.2-32.el8_10           baseos       562 k
+2025-06-19T14:48:45.6086682Z  libcom_err-devel       x86_64    1.45.6-6.el8_10            baseos        38 k
+2025-06-19T14:48:45.6087674Z  libselinux-devel       x86_64    2.9-10.el8_10              baseos       199 k
+2025-06-19T14:48:45.6088160Z  libsepol-devel         x86_64    2.9-3.el8                  baseos        86 k
+2025-06-19T14:48:45.6088583Z  libuv                  x86_64    1:1.41.1-2.el8_10          appstream    155 k
+2025-06-19T14:48:45.6089007Z  libverto-devel         x86_64    0.3.2-2.el8                baseos        17 k
+2025-06-19T14:48:45.6089452Z  pcre2-devel            x86_64    10.32-3.el8_6              baseos       604 k
+2025-06-19T14:48:45.6089886Z  pcre2-utf16            x86_64    10.32-3.el8_6              baseos       228 k
+2025-06-19T14:48:45.6090567Z  pcre2-utf32            x86_64    10.32-3.el8_6              baseos       219 k
+2025-06-19T14:48:45.6091332Z  vim-filesystem         noarch    2:8.0.1763-19.el8_6.4      appstream     49 k
+2025-06-19T14:48:45.6091825Z 
+2025-06-19T14:48:45.6091964Z Transaction Summary
+2025-06-19T14:48:45.6092321Z ================================================================================
+2025-06-19T14:48:45.6092814Z Install  18 Packages
+2025-06-19T14:48:45.6093275Z 
+2025-06-19T14:48:45.6093429Z Total download size: 33 M
+2025-06-19T14:48:45.6093787Z Installed size: 84 M
+2025-06-19T14:48:45.6095916Z Downloading Packages:
+2025-06-19T14:48:45.7836482Z (1/18): libcom_err-devel-1.45.6-6.el8_10.x86_64 3.8 MB/s |  38 kB     00:00    
+2025-06-19T14:48:45.7890352Z (2/18): libselinux-devel-2.9-10.el8_10.x86_64.r  40 MB/s | 199 kB     00:00    
+2025-06-19T14:48:45.7931925Z (3/18): libsepol-devel-2.9-3.el8.x86_64.rpm      23 MB/s |  86 kB     00:00    
+2025-06-19T14:48:45.7944828Z (4/18): keyutils-libs-devel-1.5.10-9.el8.x86_64 2.2 MB/s |  47 kB     00:00    
+2025-06-19T14:48:45.7998674Z (5/18): krb5-devel-1.18.2-32.el8_10.x86_64.rpm   21 MB/s | 562 kB     00:00    
+2025-06-19T14:48:45.8139542Z (6/18): openssl-devel-1.1.1k-14.el8_6.x86_64.rp 123 MB/s | 2.3 MB     00:00    
+2025-06-19T14:48:45.8152564Z (7/18): libverto-devel-0.3.2-2.el8.x86_64.rpm   781 kB/s |  17 kB     00:00    
+2025-06-19T14:48:45.8194108Z (8/18): pcre2-devel-10.32-3.el8_6.x86_64.rpm     31 MB/s | 604 kB     00:00    
+2025-06-19T14:48:45.8216667Z (9/18): pcre2-utf16-10.32-3.el8_6.x86_64.rpm     30 MB/s | 228 kB     00:00    
+2025-06-19T14:48:45.8311729Z (10/18): pcre2-utf32-10.32-3.el8_6.x86_64.rpm    14 MB/s | 219 kB     00:00    
+2025-06-19T14:48:45.8333350Z (11/18): zip-3.0-23.el8.x86_64.rpm               19 MB/s | 270 kB     00:00    
+2025-06-19T14:48:45.8373814Z (12/18): cmake-filesystem-3.26.5-2.el8.x86_64.r  12 MB/s |  44 kB     00:00    
+2025-06-19T14:48:45.8421193Z (13/18): cmake-rpm-macros-3.26.5-2.el8.noarch.r  10 MB/s |  43 kB     00:00    
+2025-06-19T14:48:45.8569800Z (14/18): cmake-data-3.26.5-2.el8.noarch.rpm      75 MB/s | 1.9 MB     00:00    
+2025-06-19T14:48:45.8637494Z (15/18): libuv-1.41.1-2.el8_10.x86_64.rpm        24 MB/s | 155 kB     00:00    
+2025-06-19T14:48:45.8685453Z (16/18): vim-filesystem-8.0.1763-19.el8_6.4.noa  11 MB/s |  49 kB     00:00    
+2025-06-19T14:48:45.9470779Z (17/18): cmake-3.26.5-2.el8.x86_64.rpm          109 MB/s |  14 MB     00:00    
+2025-06-19T14:48:45.9679390Z (18/18): gcc-c++-8.5.0-26.el8_10.alma.1.x86_64.  98 MB/s |  12 MB     00:00    
+2025-06-19T14:48:45.9683767Z --------------------------------------------------------------------------------
+2025-06-19T14:48:45.9685831Z Total                                            91 MB/s |  33 MB     00:00     
+2025-06-19T14:48:46.2394312Z Running transaction check
+2025-06-19T14:48:46.2631861Z Transaction check succeeded.
+2025-06-19T14:48:46.2632463Z Running transaction test
+2025-06-19T14:48:46.4296613Z Transaction test succeeded.
+2025-06-19T14:48:46.4324362Z Running transaction
+2025-06-19T14:48:46.6585387Z   Preparing        :                                                        1/1 
+2025-06-19T14:48:46.6698842Z   Installing       : cmake-rpm-macros-3.26.5-2.el8.noarch                  1/18 
+2025-06-19T14:48:46.6798304Z   Installing       : cmake-filesystem-3.26.5-2.el8.x86_64                  2/18 
+2025-06-19T14:48:46.6961225Z   Installing       : vim-filesystem-2:8.0.1763-19.el8_6.4.noarch           3/18 
+2025-06-19T14:48:47.1803860Z   Installing       : libuv-1:1.41.1-2.el8_10.x86_64                        4/18 
+2025-06-19T14:48:48.0558471Z   Installing       : cmake-data-3.26.5-2.el8.noarch                        5/18 
+2025-06-19T14:48:48.0772899Z   Installing       : cmake-3.26.5-2.el8.x86_64                             6/18 
+2025-06-19T14:48:48.0991245Z   Installing       : pcre2-utf32-10.32-3.el8_6.x86_64                      7/18 
+2025-06-19T14:48:48.1405020Z   Installing       : pcre2-utf16-10.32-3.el8_6.x86_64                      8/18 
+2025-06-19T14:48:48.1475499Z   Installing       : pcre2-devel-10.32-3.el8_6.x86_64                      9/18 
+2025-06-19T14:48:48.1592825Z   Installing       : libverto-devel-0.3.2-2.el8.x86_64                    10/18 
+2025-06-19T14:48:48.1727387Z   Installing       : libsepol-devel-2.9-3.el8.x86_64                      11/18 
+2025-06-19T14:48:48.1812648Z   Installing       : libselinux-devel-2.9-10.el8_10.x86_64                12/18 
+2025-06-19T14:48:48.1880367Z   Installing       : libcom_err-devel-1.45.6-6.el8_10.x86_64              13/18 
+2025-06-19T14:48:48.2359690Z   Installing       : keyutils-libs-devel-1.5.10-9.el8.x86_64              14/18 
+2025-06-19T14:48:48.4123287Z   Installing       : krb5-devel-1.18.2-32.el8_10.x86_64                   15/18 
+2025-06-19T14:48:49.1926209Z   Installing       : openssl-devel-1:1.1.1k-14.el8_6.x86_64               16/18 
+2025-06-19T14:48:49.2196326Z   Installing       : gcc-c++-8.5.0-26.el8_10.alma.1.x86_64                17/18 
+2025-06-19T14:48:49.2264791Z   Installing       : zip-3.0-23.el8.x86_64                                18/18 
+2025-06-19T14:48:49.3086519Z   Running scriptlet: zip-3.0-23.el8.x86_64                                18/18 
+2025-06-19T14:48:49.3089161Z   Verifying        : keyutils-libs-devel-1.5.10-9.el8.x86_64               1/18 
+2025-06-19T14:48:49.3089942Z   Verifying        : krb5-devel-1.18.2-32.el8_10.x86_64                    2/18 
+2025-06-19T14:48:49.3090737Z   Verifying        : libcom_err-devel-1.45.6-6.el8_10.x86_64               3/18 
+2025-06-19T14:48:49.3091531Z   Verifying        : libselinux-devel-2.9-10.el8_10.x86_64                 4/18 
+2025-06-19T14:48:49.3094801Z   Verifying        : libsepol-devel-2.9-3.el8.x86_64                       5/18 
+2025-06-19T14:48:49.3095635Z   Verifying        : libverto-devel-0.3.2-2.el8.x86_64                     6/18 
+2025-06-19T14:48:49.3096405Z   Verifying        : openssl-devel-1:1.1.1k-14.el8_6.x86_64                7/18 
+2025-06-19T14:48:49.3097369Z   Verifying        : pcre2-devel-10.32-3.el8_6.x86_64                      8/18 
+2025-06-19T14:48:49.3097926Z   Verifying        : pcre2-utf16-10.32-3.el8_6.x86_64                      9/18 
+2025-06-19T14:48:49.3098366Z   Verifying        : pcre2-utf32-10.32-3.el8_6.x86_64                     10/18 
+2025-06-19T14:48:49.3098792Z   Verifying        : zip-3.0-23.el8.x86_64                                11/18 
+2025-06-19T14:48:49.3099214Z   Verifying        : cmake-3.26.5-2.el8.x86_64                            12/18 
+2025-06-19T14:48:49.3099679Z   Verifying        : cmake-data-3.26.5-2.el8.noarch                       13/18 
+2025-06-19T14:48:49.3100153Z   Verifying        : cmake-filesystem-3.26.5-2.el8.x86_64                 14/18 
+2025-06-19T14:48:49.3100629Z   Verifying        : cmake-rpm-macros-3.26.5-2.el8.noarch                 15/18 
+2025-06-19T14:48:49.3101075Z   Verifying        : gcc-c++-8.5.0-26.el8_10.alma.1.x86_64                16/18 
+2025-06-19T14:48:49.3101485Z   Verifying        : libuv-1:1.41.1-2.el8_10.x86_64                       17/18 
+2025-06-19T14:48:49.4003502Z   Verifying        : vim-filesystem-2:8.0.1763-19.el8_6.4.noarch          18/18 
+2025-06-19T14:48:49.4004128Z 
+2025-06-19T14:48:49.4004265Z Installed:
+2025-06-19T14:48:49.4004595Z   cmake-3.26.5-2.el8.x86_64                                                     
+2025-06-19T14:48:49.4005181Z   cmake-data-3.26.5-2.el8.noarch                                                
+2025-06-19T14:48:49.4005986Z   cmake-filesystem-3.26.5-2.el8.x86_64                                          
+2025-06-19T14:48:49.4006529Z   cmake-rpm-macros-3.26.5-2.el8.noarch                                          
+2025-06-19T14:48:49.4007308Z   gcc-c++-8.5.0-26.el8_10.alma.1.x86_64                                         
+2025-06-19T14:48:49.4007802Z   keyutils-libs-devel-1.5.10-9.el8.x86_64                                       
+2025-06-19T14:48:49.4008294Z   krb5-devel-1.18.2-32.el8_10.x86_64                                            
+2025-06-19T14:48:49.4008757Z   libcom_err-devel-1.45.6-6.el8_10.x86_64                                       
+2025-06-19T14:48:49.4009248Z   libselinux-devel-2.9-10.el8_10.x86_64                                         
+2025-06-19T14:48:49.4009735Z   libsepol-devel-2.9-3.el8.x86_64                                               
+2025-06-19T14:48:49.4010188Z   libuv-1:1.41.1-2.el8_10.x86_64                                                
+2025-06-19T14:48:49.4010644Z   libverto-devel-0.3.2-2.el8.x86_64                                             
+2025-06-19T14:48:49.4011278Z   openssl-devel-1:1.1.1k-14.el8_6.x86_64                                        
+2025-06-19T14:48:49.4011764Z   pcre2-devel-10.32-3.el8_6.x86_64                                              
+2025-06-19T14:48:49.4012235Z   pcre2-utf16-10.32-3.el8_6.x86_64                                              
+2025-06-19T14:48:49.4012679Z   pcre2-utf32-10.32-3.el8_6.x86_64                                              
+2025-06-19T14:48:49.4013154Z   vim-filesystem-2:8.0.1763-19.el8_6.4.noarch                                   
+2025-06-19T14:48:49.4013596Z   zip-3.0-23.el8.x86_64                                                         
+2025-06-19T14:48:49.4013857Z 
+2025-06-19T14:48:49.4013939Z Complete!
+2025-06-19T14:48:49.4627624Z 📦 Installing Python build tools (including ninja)...
+2025-06-19T14:48:50.5204192Z WARNING: The directory '/github/home/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.
+2025-06-19T14:48:50.6149048Z Requirement already satisfied: pip in /opt/_internal/cpython-3.8.20/lib/python3.8/site-packages (25.0.1)
+2025-06-19T14:48:50.7218484Z WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+2025-06-19T14:48:51.0845732Z WARNING: The directory '/github/home/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.
+2025-06-19T14:48:51.1766592Z Collecting ninja
+2025-06-19T14:48:51.2068622Z   Downloading ninja-1.11.1.4-py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.whl.metadata (5.0 kB)
+2025-06-19T14:48:51.3380538Z Collecting cmake
+2025-06-19T14:48:51.3460132Z   Downloading cmake-4.0.3-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.3 kB)
+2025-06-19T14:48:51.3475175Z Requirement already satisfied: wheel in /opt/_internal/cpython-3.8.20/lib/python3.8/site-packages (0.45.1)
+2025-06-19T14:48:51.3480186Z Requirement already satisfied: tomli in /opt/_internal/cpython-3.8.20/lib/python3.8/site-packages (2.2.1)
+2025-06-19T14:48:51.3484492Z Requirement already satisfied: setuptools in /opt/_internal/cpython-3.8.20/lib/python3.8/site-packages (75.3.2)
+2025-06-19T14:48:51.3489519Z Requirement already satisfied: packaging in /opt/_internal/cpython-3.8.20/lib/python3.8/site-packages (25.0)
+2025-06-19T14:48:51.3597504Z Collecting distro
+2025-06-19T14:48:51.3672054Z   Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+2025-06-19T14:48:51.3829106Z Collecting scikit-build
+2025-06-19T14:48:51.3946205Z   Downloading scikit_build-0.18.1-py3-none-any.whl.metadata (18 kB)
+2025-06-19T14:48:51.6199821Z Collecting cython
+2025-06-19T14:48:51.6275558Z   Downloading cython-3.1.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.6 kB)
+2025-06-19T14:48:51.6290084Z Requirement already satisfied: build in /opt/_internal/cpython-3.8.20/lib/python3.8/site-packages (1.2.2.post1)
+2025-06-19T14:48:51.6449705Z Collecting auditwheel
+2025-06-19T14:48:51.6556900Z   Downloading auditwheel-6.1.0-py3-none-any.whl.metadata (8.1 kB)
+2025-06-19T14:48:51.6774215Z Collecting twine
+2025-06-19T14:48:51.6848849Z   Downloading twine-6.1.0-py3-none-any.whl.metadata (3.7 kB)
+2025-06-19T14:48:51.7199481Z Requirement already satisfied: pyproject_hooks in /opt/_internal/cpython-3.8.20/lib/python3.8/site-packages (from build) (1.2.0)
+2025-06-19T14:48:51.7206466Z Requirement already satisfied: importlib-metadata>=4.6 in /opt/_internal/cpython-3.8.20/lib/python3.8/site-packages (from build) (8.5.0)
+2025-06-19T14:48:51.7323578Z Collecting pyelftools>=0.24 (from auditwheel)
+2025-06-19T14:48:51.7396189Z   Downloading pyelftools-0.32-py3-none-any.whl.metadata (372 bytes)
+2025-06-19T14:48:51.7562029Z Collecting readme-renderer>=35.0 (from twine)
+2025-06-19T14:48:51.7634407Z   Downloading readme_renderer-43.0-py3-none-any.whl.metadata (2.8 kB)
+2025-06-19T14:48:51.7935311Z Collecting requests>=2.20 (from twine)
+2025-06-19T14:48:51.8010928Z   Downloading requests-2.32.4-py3-none-any.whl.metadata (4.9 kB)
+2025-06-19T14:48:51.8157691Z Collecting requests-toolbelt!=0.9.0,>=0.8.0 (from twine)
+2025-06-19T14:48:51.8231462Z   Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl.metadata (14 kB)
+2025-06-19T14:48:51.8498760Z Collecting urllib3>=1.26.0 (from twine)
+2025-06-19T14:48:51.8572366Z   Downloading urllib3-2.2.3-py3-none-any.whl.metadata (6.5 kB)
+2025-06-19T14:48:51.8981449Z Collecting keyring>=15.1 (from twine)
+2025-06-19T14:48:51.9053729Z   Downloading keyring-25.5.0-py3-none-any.whl.metadata (20 kB)
+2025-06-19T14:48:51.9232454Z Collecting rfc3986>=1.4.0 (from twine)
+2025-06-19T14:48:51.9305604Z   Downloading rfc3986-2.0.0-py2.py3-none-any.whl.metadata (6.6 kB)
+2025-06-19T14:48:51.9869094Z Collecting rich>=12.0.0 (from twine)
+2025-06-19T14:48:51.9944396Z   Downloading rich-14.0.0-py3-none-any.whl.metadata (18 kB)
+2025-06-19T14:48:52.0063747Z Collecting id (from twine)
+2025-06-19T14:48:52.0138217Z   Downloading id-1.5.0-py3-none-any.whl.metadata (5.2 kB)
+2025-06-19T14:48:52.0227174Z Requirement already satisfied: zipp>=3.20 in /opt/_internal/cpython-3.8.20/lib/python3.8/site-packages (from importlib-metadata>=4.6->build) (3.20.2)
+2025-06-19T14:48:52.0353181Z Collecting jaraco.classes (from keyring>=15.1->twine)
+2025-06-19T14:48:52.0428780Z   Downloading jaraco.classes-3.4.0-py3-none-any.whl.metadata (2.6 kB)
+2025-06-19T14:48:52.0608848Z Collecting jaraco.functools (from keyring>=15.1->twine)
+2025-06-19T14:48:52.0685918Z   Downloading jaraco.functools-4.1.0-py3-none-any.whl.metadata (2.9 kB)
+2025-06-19T14:48:52.0837598Z Collecting jaraco.context (from keyring>=15.1->twine)
+2025-06-19T14:48:52.0912138Z   Downloading jaraco.context-6.0.1-py3-none-any.whl.metadata (4.1 kB)
+2025-06-19T14:48:52.1166714Z Collecting importlib-resources (from keyring>=15.1->twine)
+2025-06-19T14:48:52.1242640Z   Downloading importlib_resources-6.4.5-py3-none-any.whl.metadata (4.0 kB)
+2025-06-19T14:48:52.1391823Z Collecting SecretStorage>=3.2 (from keyring>=15.1->twine)
+2025-06-19T14:48:52.1467327Z   Downloading SecretStorage-3.3.3-py3-none-any.whl.metadata (4.0 kB)
+2025-06-19T14:48:52.1586485Z Collecting jeepney>=0.4.2 (from keyring>=15.1->twine)
+2025-06-19T14:48:52.1660375Z   Downloading jeepney-0.9.0-py3-none-any.whl.metadata (1.2 kB)
+2025-06-19T14:48:52.1994828Z Collecting nh3>=0.2.14 (from readme-renderer>=35.0->twine)
+2025-06-19T14:48:52.2072781Z   Downloading nh3-0.2.21-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.0 kB)
+2025-06-19T14:48:52.2222750Z Collecting docutils>=0.13.1 (from readme-renderer>=35.0->twine)
+2025-06-19T14:48:52.2297232Z   Downloading docutils-0.20.1-py3-none-any.whl.metadata (2.8 kB)
+2025-06-19T14:48:52.2507341Z Collecting Pygments>=2.5.1 (from readme-renderer>=35.0->twine)
+2025-06-19T14:48:52.2582403Z   Downloading pygments-2.19.1-py3-none-any.whl.metadata (2.5 kB)
+2025-06-19T14:48:52.3336314Z Collecting charset_normalizer<4,>=2 (from requests>=2.20->twine)
+2025-06-19T14:48:52.3413984Z   Downloading charset_normalizer-3.4.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (35 kB)
+2025-06-19T14:48:52.3572397Z Collecting idna<4,>=2.5 (from requests>=2.20->twine)
+2025-06-19T14:48:52.3648054Z   Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
+2025-06-19T14:48:52.3976340Z Collecting certifi>=2017.4.17 (from requests>=2.20->twine)
+2025-06-19T14:48:52.4052273Z   Downloading certifi-2025.6.15-py3-none-any.whl.metadata (2.4 kB)
+2025-06-19T14:48:52.4373122Z Collecting markdown-it-py>=2.2.0 (from rich>=12.0.0->twine)
+2025-06-19T14:48:52.4448590Z   Downloading markdown_it_py-3.0.0-py3-none-any.whl.metadata (6.9 kB)
+2025-06-19T14:48:52.4757142Z Collecting typing-extensions<5.0,>=4.0.0 (from rich>=12.0.0->twine)
+2025-06-19T14:48:52.4843711Z   Downloading typing_extensions-4.13.2-py3-none-any.whl.metadata (3.0 kB)
+2025-06-19T14:48:52.5040547Z Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich>=12.0.0->twine)
+2025-06-19T14:48:52.5113144Z   Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+2025-06-19T14:48:52.6842269Z Collecting cryptography>=2.0 (from SecretStorage>=3.2->keyring>=15.1->twine)
+2025-06-19T14:48:52.6919338Z   Downloading cryptography-45.0.4-cp37-abi3-manylinux_2_28_x86_64.whl.metadata (5.7 kB)
+2025-06-19T14:48:52.7273195Z Collecting more-itertools (from jaraco.classes->keyring>=15.1->twine)
+2025-06-19T14:48:52.7353299Z   Downloading more_itertools-10.5.0-py3-none-any.whl.metadata (36 kB)
+2025-06-19T14:48:52.7477105Z Collecting backports.tarfile (from jaraco.context->keyring>=15.1->twine)
+2025-06-19T14:48:52.7560840Z   Downloading backports.tarfile-1.2.0-py3-none-any.whl.metadata (2.0 kB)
+2025-06-19T14:48:52.8756325Z Collecting cffi>=1.14 (from cryptography>=2.0->SecretStorage>=3.2->keyring>=15.1->twine)
+2025-06-19T14:48:52.8833269Z   Downloading cffi-1.17.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.5 kB)
+2025-06-19T14:48:52.8998054Z Collecting pycparser (from cffi>=1.14->cryptography>=2.0->SecretStorage>=3.2->keyring>=15.1->twine)
+2025-06-19T14:48:52.9080216Z   Downloading pycparser-2.22-py3-none-any.whl.metadata (943 bytes)
+2025-06-19T14:48:52.9192147Z Downloading ninja-1.11.1.4-py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.whl (422 kB)
+2025-06-19T14:48:52.9389141Z Downloading cmake-4.0.3-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (27.9 MB)
+2025-06-19T14:48:53.0261699Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 27.9/27.9 MB 329.3 MB/s eta 0:00:00
+2025-06-19T14:48:53.0337884Z Downloading distro-1.9.0-py3-none-any.whl (20 kB)
+2025-06-19T14:48:53.0432307Z Downloading scikit_build-0.18.1-py3-none-any.whl (85 kB)
+2025-06-19T14:48:53.0509979Z Downloading cython-3.1.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.3 MB)
+2025-06-19T14:48:53.0614172Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 391.7 MB/s eta 0:00:00
+2025-06-19T14:48:53.0763004Z Downloading auditwheel-6.1.0-py3-none-any.whl (44 kB)
+2025-06-19T14:48:53.0843189Z Downloading twine-6.1.0-py3-none-any.whl (40 kB)
+2025-06-19T14:48:53.0919023Z Downloading keyring-25.5.0-py3-none-any.whl (39 kB)
+2025-06-19T14:48:53.0992998Z Downloading pyelftools-0.32-py3-none-any.whl (188 kB)
+2025-06-19T14:48:53.1076003Z Downloading readme_renderer-43.0-py3-none-any.whl (13 kB)
+2025-06-19T14:48:53.1149452Z Downloading requests-2.32.4-py3-none-any.whl (64 kB)
+2025-06-19T14:48:53.1222290Z Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl (54 kB)
+2025-06-19T14:48:53.1295977Z Downloading rfc3986-2.0.0-py2.py3-none-any.whl (31 kB)
+2025-06-19T14:48:53.1370517Z Downloading rich-14.0.0-py3-none-any.whl (243 kB)
+2025-06-19T14:48:53.1447336Z Downloading urllib3-2.2.3-py3-none-any.whl (126 kB)
+2025-06-19T14:48:53.1524835Z Downloading id-1.5.0-py3-none-any.whl (13 kB)
+2025-06-19T14:48:53.1599682Z Downloading certifi-2025.6.15-py3-none-any.whl (157 kB)
+2025-06-19T14:48:53.1678880Z Downloading charset_normalizer-3.4.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (147 kB)
+2025-06-19T14:48:53.1755798Z Downloading docutils-0.20.1-py3-none-any.whl (572 kB)
+2025-06-19T14:48:53.1790398Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 572.7/572.7 kB 517.7 MB/s eta 0:00:00
+2025-06-19T14:48:53.1862502Z Downloading idna-3.10-py3-none-any.whl (70 kB)
+2025-06-19T14:48:53.1958954Z Downloading jeepney-0.9.0-py3-none-any.whl (49 kB)
+2025-06-19T14:48:53.2035494Z Downloading markdown_it_py-3.0.0-py3-none-any.whl (87 kB)
+2025-06-19T14:48:53.2112991Z Downloading nh3-0.2.21-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (739 kB)
+2025-06-19T14:48:53.2148251Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 739.0/739.0 kB 491.9 MB/s eta 0:00:00
+2025-06-19T14:48:53.2222206Z Downloading pygments-2.19.1-py3-none-any.whl (1.2 MB)
+2025-06-19T14:48:53.2269041Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 444.4 MB/s eta 0:00:00
+2025-06-19T14:48:53.2341675Z Downloading SecretStorage-3.3.3-py3-none-any.whl (15 kB)
+2025-06-19T14:48:53.2415849Z Downloading typing_extensions-4.13.2-py3-none-any.whl (45 kB)
+2025-06-19T14:48:53.2490442Z Downloading importlib_resources-6.4.5-py3-none-any.whl (36 kB)
+2025-06-19T14:48:53.2568514Z Downloading jaraco.classes-3.4.0-py3-none-any.whl (6.8 kB)
+2025-06-19T14:48:53.2642271Z Downloading jaraco.context-6.0.1-py3-none-any.whl (6.8 kB)
+2025-06-19T14:48:53.2717387Z Downloading jaraco.functools-4.1.0-py3-none-any.whl (10 kB)
+2025-06-19T14:48:53.2792639Z Downloading cryptography-45.0.4-cp37-abi3-manylinux_2_28_x86_64.whl (4.5 MB)
+2025-06-19T14:48:53.2922666Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 410.8 MB/s eta 0:00:00
+2025-06-19T14:48:53.3008295Z Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+2025-06-19T14:48:53.3085041Z Downloading backports.tarfile-1.2.0-py3-none-any.whl (30 kB)
+2025-06-19T14:48:53.3159718Z Downloading more_itertools-10.5.0-py3-none-any.whl (60 kB)
+2025-06-19T14:48:53.3250004Z Downloading cffi-1.17.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (446 kB)
+2025-06-19T14:48:53.3328483Z Downloading pycparser-2.22-py3-none-any.whl (117 kB)
+2025-06-19T14:48:53.5264204Z Installing collected packages: pyelftools, urllib3, typing-extensions, rfc3986, Pygments, pycparser, ninja, nh3, more-itertools, mdurl, jeepney, importlib-resources, idna, docutils, distro, cython, cmake, charset_normalizer, certifi, backports.tarfile, auditwheel, scikit-build, requests, readme-renderer, markdown-it-py, jaraco.functools, jaraco.context, jaraco.classes, cffi, rich, requests-toolbelt, id, cryptography, SecretStorage, keyring, twine
+2025-06-19T14:48:57.2069228Z Successfully installed Pygments-2.19.1 SecretStorage-3.3.3 auditwheel-6.1.0 backports.tarfile-1.2.0 certifi-2025.6.15 cffi-1.17.1 charset_normalizer-3.4.2 cmake-4.0.3 cryptography-45.0.4 cython-3.1.2 distro-1.9.0 docutils-0.20.1 id-1.5.0 idna-3.10 importlib-resources-6.4.5 jaraco.classes-3.4.0 jaraco.context-6.0.1 jaraco.functools-4.1.0 jeepney-0.9.0 keyring-25.5.0 markdown-it-py-3.0.0 mdurl-0.1.2 more-itertools-10.5.0 nh3-0.2.21 ninja-1.11.1.4 pycparser-2.22 pyelftools-0.32 readme-renderer-43.0 requests-2.32.4 requests-toolbelt-1.0.0 rfc3986-2.0.0 rich-14.0.0 scikit-build-0.18.1 twine-6.1.0 typing-extensions-4.13.2 urllib3-2.2.3
+2025-06-19T14:48:57.2073103Z WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+2025-06-19T14:48:57.3530277Z ##[group]Run echo "VCPKG_DEFAULT_BINARY_CACHE=/home/runner/work/synthizer3d/synthizer3d/vcpkg_cache" >> $GITHUB_ENV
+2025-06-19T14:48:57.3531051Z [36;1mecho "VCPKG_DEFAULT_BINARY_CACHE=/home/runner/work/synthizer3d/synthizer3d/vcpkg_cache" >> $GITHUB_ENV[0m
+2025-06-19T14:48:57.3531642Z shell: sh -e {0}
+2025-06-19T14:48:57.3531825Z env:
+2025-06-19T14:48:57.3531979Z   CI_ARCH: x86_64
+2025-06-19T14:48:57.3532171Z   MANYLINUX_VERSION: manylinux_2_28
+2025-06-19T14:48:57.3532397Z   PYVERSION: 3.8
+2025-06-19T14:48:57.3552931Z   VCPKG_DEFAULT_TRIPLET: x64-linux
+2025-06-19T14:48:57.3553395Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed
+2025-06-19T14:48:57.3553869Z   PYTHON_PATH: /opt/python/cp38-cp38
+2025-06-19T14:48:57.3554117Z ##[endgroup]
+2025-06-19T14:48:57.7355213Z ##[group]Run actions/cache@v4
+2025-06-19T14:48:57.7355468Z with:
+2025-06-19T14:48:57.7355716Z   path: /home/runner/work/synthizer3d/synthizer3d/vcpkg_cache
+2025-06-19T14:48:57.7356236Z   key: vcpkg-cache-x64-linux-44b67e06ff0d8c07f369515270f58a6f5d530d16cfac158e65c7c48edd75fbb5
+2025-06-19T14:48:57.7356693Z   restore-keys: vcpkg-cache-x64-linux-
+
+2025-06-19T14:48:57.7357424Z   enableCrossOsArchive: false
+2025-06-19T14:48:57.7357898Z   fail-on-cache-miss: false
+2025-06-19T14:48:57.7358111Z   lookup-only: false
+2025-06-19T14:48:57.7358304Z   save-always: false
+2025-06-19T14:48:57.7358479Z env:
+2025-06-19T14:48:57.7358632Z   CI_ARCH: x86_64
+2025-06-19T14:48:57.7358816Z   MANYLINUX_VERSION: manylinux_2_28
+2025-06-19T14:48:57.7359047Z   PYVERSION: 3.8
+2025-06-19T14:48:57.7359232Z   VCPKG_DEFAULT_TRIPLET: x64-linux
+2025-06-19T14:48:57.7359644Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed
+2025-06-19T14:48:57.7360120Z   PYTHON_PATH: /opt/python/cp38-cp38
+2025-06-19T14:48:57.7360488Z   VCPKG_DEFAULT_BINARY_CACHE: /home/runner/work/synthizer3d/synthizer3d/vcpkg_cache
+2025-06-19T14:48:57.7360850Z ##[endgroup]
+2025-06-19T14:48:57.7363909Z ##[command]/usr/bin/docker exec  471abb16fd58e970daa9ad01a6b7af044b988423b222dfdda47a1b63f1802c87 sh -c "cat /etc/*release | grep ^ID"
+2025-06-19T14:48:58.0803113Z Cache not found for input keys: vcpkg-cache-x64-linux-44b67e06ff0d8c07f369515270f58a6f5d530d16cfac158e65c7c48edd75fbb5, vcpkg-cache-x64-linux-
+2025-06-19T14:48:58.1001965Z ##[group]Run lukka/run-vcpkg@v11
+2025-06-19T14:48:58.1002236Z with:
+2025-06-19T14:48:58.1002450Z   vcpkgJsonGlob: vcpkg.json
+2025-06-19T14:48:58.1002680Z   runVcpkgInstall: true
+2025-06-19T14:48:58.1003102Z   vcpkgDirectory: /home/runner/work/synthizer3d/synthizer3d/vcpkg
+2025-06-19T14:48:58.1003521Z   vcpkgGitURL: https://github.com/microsoft/vcpkg.git
+2025-06-19T14:48:58.1003810Z   doNotUpdateVcpkg: false
+2025-06-19T14:48:58.1004021Z   doNotCache: true
+2025-06-19T14:48:58.1004213Z   vcpkgJsonIgnores: ['**/vcpkg/**']
+2025-06-19T14:48:58.1004549Z   vcpkgConfigurationJsonGlob: **/vcpkg-configuration.json
+2025-06-19T14:48:58.1005313Z   runVcpkgFormatString: [`install`, `--recurse`, `--clean-after-build`, `--x-install-root`, `$[env.VCPKG_INSTALLED_DIR]`, `--triplet`, `$[env.VCPKG_DEFAULT_TRIPLET]`]
+2025-06-19T14:48:58.1005914Z   useShell: true
+2025-06-19T14:48:58.1006512Z   logCollectionRegExps: \s*"(.+CMakeOutput\.log)"\.\s*;\s*"(.+CMakeError\.log)"\.\s*;\s*(.+out\.log)\s*;\s+(.+err\.log)\s*;\s*(.+vcpkg.+\.log)\s*
+2025-06-19T14:48:58.1007155Z env:
+2025-06-19T14:48:58.1007325Z   CI_ARCH: x86_64
+2025-06-19T14:48:58.1007512Z   MANYLINUX_VERSION: manylinux_2_28
+2025-06-19T14:48:58.1007778Z   PYVERSION: 3.8
+2025-06-19T14:48:58.1008050Z   VCPKG_DEFAULT_TRIPLET: x64-linux
+2025-06-19T14:48:58.1008539Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed
+2025-06-19T14:48:58.1008965Z   PYTHON_PATH: /opt/python/cp38-cp38
+2025-06-19T14:48:58.1009360Z   VCPKG_DEFAULT_BINARY_CACHE: /home/runner/work/synthizer3d/synthizer3d/vcpkg_cache
+2025-06-19T14:48:58.1009824Z ##[endgroup]
+2025-06-19T14:48:58.1014079Z ##[command]/usr/bin/docker exec  471abb16fd58e970daa9ad01a6b7af044b988423b222dfdda47a1b63f1802c87 sh -c "cat /etc/*release | grep ^ID"
+2025-06-19T14:48:58.4041586Z ##[group]Prepare output directories
+2025-06-19T14:48:58.4043752Z The vpckg root directory: '/__w/synthizer3d/synthizer3d/vcpkg'
+2025-06-19T14:48:58.4066377Z ##[endgroup]
+2025-06-19T14:48:58.4067393Z ⏱ elapsed: 0.003 seconds
+2025-06-19T14:48:58.4110510Z Running command '/usr/local/bin/git' with args 'submodule,status,/__w/synthizer3d/synthizer3d/vcpkg' in current directory '/__w/synthizer3d/synthizer3d'.
+2025-06-19T14:48:58.4387748Z fatal: detected dubious ownership in repository at '/__w/synthizer3d/synthizer3d'
+2025-06-19T14:48:58.4388715Z To add an exception for this directory, call:
+2025-06-19T14:48:58.4389006Z 
+2025-06-19T14:48:58.4389270Z 	git config --global --add safe.directory /__w/synthizer3d/synthizer3d
+2025-06-19T14:48:58.4412259Z ##[group]Searching for vcpkg.json with glob expression 'vcpkg.json'
+2025-06-19T14:48:58.4475370Z Found vcpkg.json at 'vcpkg.json'.
+2025-06-19T14:48:58.4480422Z ##[endgroup]
+2025-06-19T14:48:58.4480853Z ⏱ elapsed: 0.007 seconds
+2025-06-19T14:48:58.4481938Z ##[group]The vcpkgCommitId is not provided, searching for a vcpkg-configuration.json using **/vcpkg-configuration.json
+2025-06-19T14:48:58.4483691Z Searching for 'vcpkg-configuration.json' using: '**/vcpkg-configuration.json'
+2025-06-19T14:48:58.4738903Z The file 'vcpkg-configuration.json' was not found with glob expression '**/vcpkg-configuration.json'.
+2025-06-19T14:48:58.4740122Z A vcpkg-configuration.json is not found.
+2025-06-19T14:48:58.4757927Z ##[endgroup]
+2025-06-19T14:48:58.4758517Z ⏱ elapsed: 0.028 seconds
+2025-06-19T14:48:58.4759464Z Found baseline '8f63c9ed5897d7367a92a442a79f91721e0fd38f', this is the Git commit id going to be used to fetch vcpkg from the repository
+2025-06-19T14:48:58.4787638Z ##[group]Setup to run on GitHub Action runners
+2025-06-19T14:48:58.4788998Z Set the workflow environment variable 'VCPKG_BINARY_SOURCES' to value 'clear;x-gha,readwrite'
+2025-06-19T14:48:58.4791106Z Set the workflow environment variable 'ACTIONS_CACHE_URL' to value 'https://acghubeus2.actions.githubusercontent.com/bwbzopuV3oKlbowlUKWdOnf6KF0vjv7EYqCB3ZHqukKhTVgy74/'
+2025-06-19T14:48:58.4833020Z Set the workflow environment variable 'ACTIONS_RUNTIME_TOKEN' to value '***'
+2025-06-19T14:48:58.4833771Z ##[endgroup]
+2025-06-19T14:48:58.4834543Z ⏱ elapsed: 0.001 seconds
+2025-06-19T14:48:58.4835041Z ##[group]Retrieving the vcpkg Git commit id at: '/__w/synthizer3d/synthizer3d/vcpkg'
+2025-06-19T14:48:58.4836122Z Fetching the Git commit id at '/__w/synthizer3d/synthizer3d/vcpkg' ...
+2025-06-19T14:48:58.4837180Z Running command '/usr/local/bin/git' with args 'rev-parse,HEAD' in current directory '/__w/synthizer3d/synthizer3d/vcpkg'.
+2025-06-19T14:48:58.4839912Z fatal: detected dubious ownership in repository at '/__w/synthizer3d/synthizer3d'
+2025-06-19T14:48:58.4840650Z To add an exception for this directory, call:
+2025-06-19T14:48:58.4840858Z 
+2025-06-19T14:48:58.4841148Z 	git config --global --add safe.directory /__w/synthizer3d/synthizer3d
+2025-06-19T14:48:58.4845722Z Git commit id not found.
+2025-06-19T14:48:58.4846729Z ##[endgroup]
+2025-06-19T14:48:58.4847540Z ⏱ elapsed: 0.007 seconds
+2025-06-19T14:48:58.4848195Z ##[group]Check whether vcpkg repository is up to date
+2025-06-19T14:48:58.4848964Z Checking whether vcpkg's repository is updated to commit id '' ...
+2025-06-19T14:48:58.4850761Z Current commit id of vcpkg: ''.
+2025-06-19T14:48:58.4851973Z Is vcpkg repository updated? No
+2025-06-19T14:48:58.4852895Z ##[endgroup]
+2025-06-19T14:48:58.4853453Z ⏱ elapsed: 0.001 seconds
+2025-06-19T14:48:58.4854155Z ##[group]Download vcpkg source code repository
+2025-06-19T14:48:58.4855761Z Cloning vcpkg in '/__w/synthizer3d/synthizer3d/vcpkg'...
+2025-06-19T14:48:58.4875931Z Running command '/usr/local/bin/git' with args 'clone,https://github.com/microsoft/vcpkg.git,-n,.' in current directory '/__w/synthizer3d/synthizer3d/vcpkg'.
+2025-06-19T14:48:58.4918462Z Cloning into '.'...
+2025-06-19T14:49:07.6639687Z Running command '/usr/local/bin/git' with args 'checkout,--force,8f63c9ed5897d7367a92a442a79f91721e0fd38f' in current directory '/__w/synthizer3d/synthizer3d/vcpkg'.
+2025-06-19T14:49:08.3356991Z Note: switching to '8f63c9ed5897d7367a92a442a79f91721e0fd38f'.
+2025-06-19T14:49:08.3357546Z 
+2025-06-19T14:49:08.3358071Z You are in 'detached HEAD' state. You can look around, make experimental
+2025-06-19T14:49:08.3358745Z changes and commit them, and you can discard any commits you make in this
+2025-06-19T14:49:08.3359418Z state without impacting any branches by switching back to a branch.
+2025-06-19T14:49:08.3359725Z 
+2025-06-19T14:49:08.3360191Z If you want to create a new branch to retain commits you create, you may
+2025-06-19T14:49:08.3360801Z do so (now or later) by using -c with the switch command. Example:
+2025-06-19T14:49:08.3361087Z 
+2025-06-19T14:49:08.3361268Z   git switch -c <new-branch-name>
+2025-06-19T14:49:08.3361458Z 
+2025-06-19T14:49:08.3361618Z Or undo this operation with:
+2025-06-19T14:49:08.3361788Z 
+2025-06-19T14:49:08.3361900Z   git switch -
+2025-06-19T14:49:08.3362024Z 
+2025-06-19T14:49:08.3362392Z Turn off this advice by setting config variable advice.detachedHead to false
+2025-06-19T14:49:08.3362733Z 
+2025-06-19T14:49:08.3363044Z HEAD is now at 8f63c9ed58 [tree-sitter-c] update to 0.24.1 (#45715)
+2025-06-19T14:49:08.3380838Z Clone vcpkg in '/__w/synthizer3d/synthizer3d/vcpkg'.
+2025-06-19T14:49:08.3381591Z ##[endgroup]
+2025-06-19T14:49:08.3382257Z ⏱ elapsed: 9.853 seconds
+2025-06-19T14:49:08.3382843Z ##[group]Build vcpkg executable
+2025-06-19T14:49:08.3393747Z Running command 'chmod' with args '+x,/__w/synthizer3d/synthizer3d/vcpkg/bootstrap-vcpkg.sh' in current directory 'undefined'.
+2025-06-19T14:49:08.3446460Z Running command '/usr/bin/sh' with args '-c,/__w/synthizer3d/synthizer3d/vcpkg/bootstrap-vcpkg.sh' in current directory '/__w/synthizer3d/synthizer3d/vcpkg'.
+2025-06-19T14:49:08.3627848Z Downloading vcpkg-glibc...
+2025-06-19T14:49:08.5959670Z vcpkg package management program version 2025-05-19-ece4c0f6b8fae9e94513d544c7aa753dd2c82337
+2025-06-19T14:49:08.5960076Z 
+2025-06-19T14:49:08.5960259Z See LICENSE.txt for license information.
+2025-06-19T14:49:08.5978675Z Telemetry
+2025-06-19T14:49:08.5978974Z ---------
+2025-06-19T14:49:08.5979658Z vcpkg collects usage data in order to help us improve your experience.
+2025-06-19T14:49:08.5980563Z The data collected by Microsoft is anonymous.
+2025-06-19T14:49:08.5981171Z You can opt-out of telemetry by re-running the bootstrap-vcpkg script with -disableMetrics,
+2025-06-19T14:49:08.5981735Z passing --disable-metrics to vcpkg on the command line,
+2025-06-19T14:49:08.5982417Z or by setting the VCPKG_DISABLE_METRICS environment variable.
+2025-06-19T14:49:08.5982836Z 
+2025-06-19T14:49:08.5983253Z Read more about vcpkg telemetry at docs/about/privacy.md
+2025-06-19T14:49:08.5994950Z Fetching the Git commit id at '/__w/synthizer3d/synthizer3d/vcpkg' ...
+2025-06-19T14:49:08.5999196Z Running command '/usr/local/bin/git' with args 'rev-parse,HEAD' in current directory '/__w/synthizer3d/synthizer3d/vcpkg'.
+2025-06-19T14:49:08.6038678Z 8f63c9ed5897d7367a92a442a79f91721e0fd38f
+2025-06-19T14:49:08.6047443Z Stored last built vcpkg commit id '8f63c9ed5897d7367a92a442a79f91721e0fd38f' in file '/__w/synthizer3d/synthizer3d/vcpkg/vcpkgLastBuiltCommitId'.
+2025-06-19T14:49:08.6048605Z ##[endgroup]
+2025-06-19T14:49:08.6049235Z ⏱ elapsed: 0.267 seconds
+2025-06-19T14:49:08.6050005Z ##[group]Add to PATH vcpkg at '/__w/synthizer3d/synthizer3d/vcpkg'
+2025-06-19T14:49:08.6050846Z ##[endgroup]
+2025-06-19T14:49:08.6051807Z ⏱ elapsed: 0.000 seconds
+2025-06-19T14:49:08.6052492Z ##[group]Install/Update ports using vcpkg.json
+2025-06-19T14:49:08.6056731Z Running 'vcpkg install,--recurse,--clean-after-build,--x-install-root,/__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed,--triplet,x64-linux' in directory '/__w/synthizer3d/synthizer3d' ...
+2025-06-19T14:49:08.6059196Z Running command '/__w/synthizer3d/synthizer3d/vcpkg/vcpkg' with args 'install,--recurse,--clean-after-build,--x-install-root,/__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed,--triplet,x64-linux' in current directory '/__w/synthizer3d/synthizer3d'.
+2025-06-19T14:49:10.3191336Z Detecting compiler hash for triplet x64-linux...
+2025-06-19T14:49:11.0626490Z Compiler found: /opt/rh/gcc-toolset-14/root/usr/bin/c++
+2025-06-19T14:49:11.0697786Z The following packages will be built and installed:
+2025-06-19T14:49:11.0698473Z     libogg:x64-linux@1.3.5#2
+2025-06-19T14:49:11.0698996Z     libvorbis:x64-linux@1.3.7#4
+2025-06-19T14:49:11.0699478Z     opus:x64-linux@1.5.2
+2025-06-19T14:49:11.0699992Z     opusfile:x64-linux@0.12+20221121#1
+2025-06-19T14:49:11.0700546Z   * vcpkg-cmake:x64-linux@2024-04-23
+2025-06-19T14:49:11.0701135Z   * vcpkg-cmake-config:x64-linux@2024-05-23
+2025-06-19T14:49:11.0701943Z Additional packages (*) will be modified to complete this operation.
+2025-06-19T14:49:11.0709140Z $VCPKG_BINARY_SOURCES: warning: The 'x-gha' binary caching backend has been removed. Consider using a NuGet-based binary caching provider instead, see extended documentation at https://learn.microsoft.com/vcpkg/users/binarycaching?WT.mc_id=vcpkg_inproduct_cli.
+2025-06-19T14:49:11.0710786Z   on expression: clear;x-gha,readwrite
+2025-06-19T14:49:11.0711377Z                                       ^
+2025-06-19T14:49:11.0711773Z Installing 1/6 vcpkg-cmake-config:x64-linux@2024-05-23...
+2025-06-19T14:49:11.0712202Z Building vcpkg-cmake-config:x64-linux@2024-05-23...
+2025-06-19T14:49:11.2411578Z -- Installing: /__w/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake-config_x64-linux/share/vcpkg-cmake-config/vcpkg_cmake_config_fixup.cmake
+2025-06-19T14:49:11.2420234Z -- Installing: /__w/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake-config_x64-linux/share/vcpkg-cmake-config/vcpkg-port-config.cmake
+2025-06-19T14:49:11.2422148Z -- Installing: /__w/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake-config_x64-linux/share/vcpkg-cmake-config/copyright
+2025-06-19T14:49:11.2439563Z -- Skipping post-build validation due to VCPKG_POLICY_EMPTY_PACKAGE
+2025-06-19T14:49:11.2448768Z Elapsed time to handle vcpkg-cmake-config:x64-linux: 175 ms
+2025-06-19T14:49:11.2450601Z vcpkg-cmake-config:x64-linux package ABI: 363882f17f4f2571030827d3e78269b7dbea395d63cab8f644e26c1685d891d7
+2025-06-19T14:49:11.2451931Z Installing 2/6 vcpkg-cmake:x64-linux@2024-04-23...
+2025-06-19T14:49:11.2452616Z Building vcpkg-cmake:x64-linux@2024-04-23...
+2025-06-19T14:49:11.4162849Z -- Installing: /__w/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-linux/share/vcpkg-cmake/vcpkg_cmake_configure.cmake
+2025-06-19T14:49:11.4170155Z -- Installing: /__w/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-linux/share/vcpkg-cmake/vcpkg_cmake_build.cmake
+2025-06-19T14:49:11.4173265Z -- Installing: /__w/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-linux/share/vcpkg-cmake/vcpkg_cmake_install.cmake
+2025-06-19T14:49:11.4175558Z -- Installing: /__w/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-linux/share/vcpkg-cmake/vcpkg-port-config.cmake
+2025-06-19T14:49:11.4179643Z -- Installing: /__w/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-linux/share/vcpkg-cmake/copyright
+2025-06-19T14:49:11.4189245Z -- Performing post-build validation
+2025-06-19T14:49:11.4205325Z Elapsed time to handle vcpkg-cmake:x64-linux: 176 ms
+2025-06-19T14:49:11.4206344Z vcpkg-cmake:x64-linux package ABI: ac88e4dec74e861499ccff4bec61abd7477a39fecbe216b4bdc885c7b3fdeee5
+2025-06-19T14:49:11.4207099Z Installing 3/6 libogg:x64-linux@1.3.5#2...
+2025-06-19T14:49:11.4207426Z Building libogg:x64-linux@1.3.5#2...
+2025-06-19T14:49:11.5948513Z Downloading https://gitlab.xiph.org/xiph/ogg/-/archive/v1.3.5/ogg-v1.3.5.tar.gz -> xiph-ogg-v1.3.5.tar.gz
+2025-06-19T14:49:12.3311685Z Successfully downloaded xiph-ogg-v1.3.5.tar.gz
+2025-06-19T14:49:12.3323344Z -- Extracting source /__w/synthizer3d/synthizer3d/vcpkg/downloads/xiph-ogg-v1.3.5.tar.gz
+2025-06-19T14:49:12.3435352Z -- Using source at /__w/synthizer3d/synthizer3d/vcpkg/buildtrees/libogg/src/v1.3.5-1a4243fef9.clean
+2025-06-19T14:49:12.3495313Z -- Configuring x64-linux
+2025-06-19T14:49:13.7897713Z -- Building x64-linux-dbg
+2025-06-19T14:49:13.8893268Z -- Building x64-linux-rel
+2025-06-19T14:49:14.2847609Z -- Fixing pkgconfig file: /__w/synthizer3d/synthizer3d/vcpkg/packages/libogg_x64-linux/lib/pkgconfig/ogg.pc
+2025-06-19T14:49:14.2879277Z -- Fixing pkgconfig file: /__w/synthizer3d/synthizer3d/vcpkg/packages/libogg_x64-linux/debug/lib/pkgconfig/ogg.pc
+2025-06-19T14:49:14.2907279Z -- Installing: /__w/synthizer3d/synthizer3d/vcpkg/packages/libogg_x64-linux/share/libogg/copyright
+2025-06-19T14:49:14.2934923Z -- Performing post-build validation
+2025-06-19T14:49:14.3026706Z Elapsed time to handle libogg:x64-linux: 2.9 s
+2025-06-19T14:49:14.3027696Z libogg:x64-linux package ABI: d8b44cc3ade59b8efaffc796447810e39d0f97191561856b8f993fecff5206c7
+2025-06-19T14:49:14.3028357Z Installing 4/6 libvorbis:x64-linux@1.3.7#4...
+2025-06-19T14:49:14.3028766Z Building libvorbis:x64-linux@1.3.7#4...
+2025-06-19T14:49:14.4783490Z Downloading https://github.com/xiph/vorbis/archive/v1.3.7.tar.gz -> xiph-vorbis-v1.3.7.tar.gz
+2025-06-19T14:49:14.8043283Z Successfully downloaded xiph-vorbis-v1.3.7.tar.gz
+2025-06-19T14:49:14.8077977Z -- Extracting source /__w/synthizer3d/synthizer3d/vcpkg/downloads/xiph-vorbis-v1.3.7.tar.gz
+2025-06-19T14:49:14.8390020Z -- Applying patch 0001-Dont-export-vorbisenc-functions.patch
+2025-06-19T14:49:14.8413886Z -- Applying patch 0002-Fixup-pkgconfig-libs.patch
+2025-06-19T14:49:14.8437653Z -- Applying patch 0003-def-mingw-compat.patch
+2025-06-19T14:49:14.8462526Z -- Applying patch 0004-ogg-find-dependency.patch
+2025-06-19T14:49:14.8488523Z -- Using source at /__w/synthizer3d/synthizer3d/vcpkg/buildtrees/libvorbis/src/v1.3.7-c32164610e.clean
+2025-06-19T14:49:14.8545333Z -- Configuring x64-linux
+2025-06-19T14:49:15.3521622Z -- Building x64-linux-dbg
+2025-06-19T14:49:16.3888341Z -- Building x64-linux-rel
+2025-06-19T14:49:19.3558359Z -- Fixing pkgconfig file: /__w/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-linux/lib/pkgconfig/vorbis.pc
+2025-06-19T14:49:19.3563728Z -- Fixing pkgconfig file: /__w/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-linux/lib/pkgconfig/vorbisenc.pc
+2025-06-19T14:49:19.3568918Z -- Fixing pkgconfig file: /__w/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-linux/lib/pkgconfig/vorbisfile.pc
+2025-06-19T14:49:19.3646077Z -- Fixing pkgconfig file: /__w/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-linux/debug/lib/pkgconfig/vorbis.pc
+2025-06-19T14:49:19.3654590Z -- Fixing pkgconfig file: /__w/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-linux/debug/lib/pkgconfig/vorbisenc.pc
+2025-06-19T14:49:19.3662381Z -- Fixing pkgconfig file: /__w/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-linux/debug/lib/pkgconfig/vorbisfile.pc
+2025-06-19T14:49:19.3740585Z -- Installing: /__w/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-linux/share/libvorbis/usage
+2025-06-19T14:49:19.3749370Z -- Installing: /__w/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-linux/share/libvorbis/copyright
+2025-06-19T14:49:19.3815467Z -- Performing post-build validation
+2025-06-19T14:49:19.4001440Z Elapsed time to handle libvorbis:x64-linux: 5.1 s
+2025-06-19T14:49:19.4002460Z libvorbis:x64-linux package ABI: f382c4569460cf6689ec63ea01d5f3fc4abeb00efa059b9f7be7f85d2443987b
+2025-06-19T14:49:19.4003136Z Installing 5/6 opus:x64-linux@1.5.2...
+2025-06-19T14:49:19.4003511Z Building opus:x64-linux@1.5.2...
+2025-06-19T14:49:19.5753889Z Downloading https://github.com/xiph/opus/archive/v1.5.2.tar.gz -> xiph-opus-v1.5.2.tar.gz
+2025-06-19T14:49:19.8320835Z Successfully downloaded xiph-opus-v1.5.2.tar.gz
+2025-06-19T14:49:19.8418481Z -- Extracting source /__w/synthizer3d/synthizer3d/vcpkg/downloads/xiph-opus-v1.5.2.tar.gz
+2025-06-19T14:49:19.9138142Z -- Applying patch fix-pkgconfig-version.patch
+2025-06-19T14:49:19.9163010Z -- Using source at /__w/synthizer3d/synthizer3d/vcpkg/buildtrees/opus/src/v1.5.2-81ed242155.clean
+2025-06-19T14:49:19.9229629Z -- Configuring x64-linux
+2025-06-19T14:49:21.9810097Z -- Building x64-linux-dbg
+2025-06-19T14:49:24.9508616Z -- Building x64-linux-rel
+2025-06-19T14:49:32.5319509Z -- Fixing pkgconfig file: /__w/synthizer3d/synthizer3d/vcpkg/packages/opus_x64-linux/lib/pkgconfig/opus.pc
+2025-06-19T14:49:32.5350407Z -- Fixing pkgconfig file: /__w/synthizer3d/synthizer3d/vcpkg/packages/opus_x64-linux/debug/lib/pkgconfig/opus.pc
+2025-06-19T14:49:32.5382306Z -- Installing: /__w/synthizer3d/synthizer3d/vcpkg/packages/opus_x64-linux/share/opus/copyright
+2025-06-19T14:49:32.5413849Z -- Performing post-build validation
+2025-06-19T14:49:32.5734697Z Elapsed time to handle opus:x64-linux: 13 s
+2025-06-19T14:49:32.5735779Z opus:x64-linux package ABI: 04f9dad90a5c36dd9951b4320c6722e27baf1ea313be502ce109428f71906b14
+2025-06-19T14:49:32.5736721Z Installing 6/6 opusfile:x64-linux@0.12+20221121#1...
+2025-06-19T14:49:32.5737608Z Building opusfile:x64-linux@0.12+20221121#1...
+2025-06-19T14:49:32.7483155Z Downloading https://github.com/xiph/opusfile/archive/9d718345ce03b2fad5d7d28e0bcd1cc69ab2b166.tar.gz -> xiph-opusfile-9d718345ce03b2fad5d7d28e0bcd1cc69ab2b166.tar.gz
+2025-06-19T14:49:33.0570236Z Successfully downloaded xiph-opusfile-9d718345ce03b2fad5d7d28e0bcd1cc69ab2b166.tar.gz
+2025-06-19T14:49:33.0583173Z -- Extracting source /__w/synthizer3d/synthizer3d/vcpkg/downloads/xiph-opusfile-9d718345ce03b2fad5d7d28e0bcd1cc69ab2b166.tar.gz
+2025-06-19T14:49:33.0672168Z -- Using source at /__w/synthizer3d/synthizer3d/vcpkg/buildtrees/opusfile/src/c69ab2b166-6cc7de23ec.clean
+2025-06-19T14:49:33.0734331Z -- Configuring x64-linux
+2025-06-19T14:49:33.3981442Z -- Building x64-linux-dbg
+2025-06-19T14:49:33.6522452Z -- Building x64-linux-rel
+2025-06-19T14:49:34.8136226Z -- Fixing pkgconfig file: /__w/synthizer3d/synthizer3d/vcpkg/packages/opusfile_x64-linux/lib/pkgconfig/opusfile.pc
+2025-06-19T14:49:34.8168593Z -- Fixing pkgconfig file: /__w/synthizer3d/synthizer3d/vcpkg/packages/opusfile_x64-linux/debug/lib/pkgconfig/opusfile.pc
+2025-06-19T14:49:34.8211778Z -- Installing: /__w/synthizer3d/synthizer3d/vcpkg/packages/opusfile_x64-linux/share/opusfile/copyright
+2025-06-19T14:49:34.8217454Z -- Installing: /__w/synthizer3d/synthizer3d/vcpkg/packages/opusfile_x64-linux/share/opusfile/usage
+2025-06-19T14:49:34.8289290Z -- Performing post-build validation
+2025-06-19T14:49:34.8354199Z Elapsed time to handle opusfile:x64-linux: 2.3 s
+2025-06-19T14:49:34.8355422Z opusfile:x64-linux package ABI: fd7612ad2bcd93fc69239f81d47b9bc3a46993db1f75734c5126e65414d71bef
+2025-06-19T14:49:34.8362254Z libogg provides CMake targets:
+2025-06-19T14:49:34.8362648Z 
+2025-06-19T14:49:34.8363053Z   # this is heuristically generated, and may not be correct
+2025-06-19T14:49:34.8363672Z   find_package(Ogg CONFIG REQUIRED)
+2025-06-19T14:49:34.8368660Z   target_link_libraries(main PRIVATE Ogg::ogg)
+2025-06-19T14:49:34.8369013Z 
+2025-06-19T14:49:34.8369274Z libogg provides pkg-config modules:
+2025-06-19T14:49:34.8369554Z 
+2025-06-19T14:49:34.8369888Z   # ogg is a library for manipulating ogg bitstreams
+2025-06-19T14:49:34.8370318Z   ogg
+2025-06-19T14:49:34.8370461Z 
+2025-06-19T14:49:34.8372971Z The package libvorbis provides CMake targets:
+2025-06-19T14:49:34.8373319Z 
+2025-06-19T14:49:34.8373690Z     # Vorbis reference encoder and decoder, low-level API
+2025-06-19T14:49:34.8374086Z     find_package(Vorbis CONFIG REQUIRED)
+2025-06-19T14:49:34.8374495Z     target_link_libraries(main PRIVATE Vorbis::vorbis)
+2025-06-19T14:49:34.8374703Z 
+2025-06-19T14:49:34.8374961Z     # Audio stream decoding and basic manipulation, high-level API
+2025-06-19T14:49:34.8375352Z     find_package(Vorbis CONFIG REQUIRED)
+2025-06-19T14:49:34.8375857Z     target_link_libraries(main PRIVATE Vorbis::vorbisfile)
+2025-06-19T14:49:34.8376246Z 
+2025-06-19T14:49:34.8376676Z     # Convenience API for setting up an encoding environment
+2025-06-19T14:49:34.8377727Z     find_package(Vorbis CONFIG REQUIRED)
+2025-06-19T14:49:34.8378418Z     target_link_libraries(main PRIVATE Vorbis::vorbisenc)
+2025-06-19T14:49:34.8378781Z 
+2025-06-19T14:49:34.8379022Z opus provides CMake targets:
+2025-06-19T14:49:34.8379275Z 
+2025-06-19T14:49:34.8379654Z   # this is heuristically generated, and may not be correct
+2025-06-19T14:49:34.8380281Z   find_package(Opus CONFIG REQUIRED)
+2025-06-19T14:49:34.8380890Z   target_link_libraries(main PRIVATE Opus::opus)
+2025-06-19T14:49:34.8381214Z 
+2025-06-19T14:49:34.8381470Z opus provides pkg-config modules:
+2025-06-19T14:49:34.8381756Z 
+2025-06-19T14:49:34.8381979Z   # Opus IETF audio codec ( build)
+2025-06-19T14:49:34.8382245Z   opus
+2025-06-19T14:49:34.8382439Z 
+2025-06-19T14:49:34.8382770Z The package opusfile provides CMake targets:
+2025-06-19T14:49:34.8383105Z 
+2025-06-19T14:49:34.8383414Z     find_package(OpusFile CONFIG REQUIRED)
+2025-06-19T14:49:34.8384099Z     target_link_libraries(main PRIVATE OpusFile::opusfile)
+2025-06-19T14:49:34.8384488Z 
+2025-06-19T14:49:34.8384698Z     # To use the opusurl API
+2025-06-19T14:49:34.8385306Z     target_link_libraries(main PRIVATE OpusFile::opusurl)
+2025-06-19T14:49:34.8385645Z 
+2025-06-19T14:49:34.8386000Z All requested installations completed successfully in: 24 s
+2025-06-19T14:49:34.8387442Z ##[endgroup]
+2025-06-19T14:49:34.8388108Z ⏱ elapsed: 26.233 seconds
+2025-06-19T14:49:34.8388715Z ##[group]Set output environment variables
+2025-06-19T14:49:34.8389593Z Set the workflow environment variable 'RUNVCPKG_VCPKG_ROOT' to value '/__w/synthizer3d/synthizer3d/vcpkg'
+2025-06-19T14:49:34.8391566Z Set the workflow environment variable 'VCPKG_ROOT' to value '/__w/synthizer3d/synthizer3d/vcpkg'
+2025-06-19T14:49:34.8393140Z Set the step output variable 'RUNVCPKG_VCPKG_ROOT_OUT' to value '/__w/synthizer3d/synthizer3d/vcpkg''
+2025-06-19T14:49:34.8394342Z Set the workflow environment variable 'VCPKG_DEFAULT_TRIPLET' to value 'x64-linux'
+2025-06-19T14:49:34.8395598Z Set the step output variable 'RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT' to value 'x64-linux''
+2025-06-19T14:49:34.8396442Z ##[endgroup]
+2025-06-19T14:49:34.8397191Z ⏱ elapsed: 0.001 seconds
+2025-06-19T14:49:34.8399342Z run-vcpkg action execution succeeded
+2025-06-19T14:49:34.8507510Z ##[group]Run $PYTHON_PATH/bin/python synthizer-c/vendor.py synthizer-vendored
+2025-06-19T14:49:34.8508073Z [36;1m$PYTHON_PATH/bin/python synthizer-c/vendor.py synthizer-vendored[0m
+2025-06-19T14:49:34.8508865Z shell: sh -e {0}
+2025-06-19T14:49:34.8509042Z env:
+2025-06-19T14:49:34.8509210Z   CI_ARCH: x86_64
+2025-06-19T14:49:34.8509402Z   MANYLINUX_VERSION: manylinux_2_28
+2025-06-19T14:49:34.8509633Z   PYVERSION: 3.8
+2025-06-19T14:49:34.8509817Z   VCPKG_DEFAULT_TRIPLET: x64-linux
+2025-06-19T14:49:34.8510224Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed
+2025-06-19T14:49:34.8510641Z   PYTHON_PATH: /opt/python/cp38-cp38
+2025-06-19T14:49:34.8511093Z   VCPKG_DEFAULT_BINARY_CACHE: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_cache
+2025-06-19T14:49:34.8511556Z   VCPKG_BINARY_SOURCES: clear;x-gha,readwrite
+2025-06-19T14:49:34.8512160Z   ACTIONS_CACHE_URL: https://acghubeus2.actions.githubusercontent.com/bwbzopuV3oKlbowlUKWdOnf6KF0vjv7EYqCB3ZHqukKhTVgy74/
+2025-06-19T14:49:34.8549200Z   ACTIONS_RUNTIME_TOKEN: ***
+2025-06-19T14:49:34.8549502Z   RUNVCPKG_VCPKG_ROOT: /__w/synthizer3d/synthizer3d/vcpkg
+2025-06-19T14:49:34.8549816Z   VCPKG_ROOT: /__w/synthizer3d/synthizer3d/vcpkg
+2025-06-19T14:49:34.8550074Z ##[endgroup]
+2025-06-19T14:49:35.2811246Z ##[group]Run echo "🔧 Fixing C++ compilation issues..."
+2025-06-19T14:49:35.2811946Z [36;1mecho "🔧 Fixing C++ compilation issues..."[0m
+2025-06-19T14:49:35.2812800Z [36;1mif [ -f "synthizer-vendored/include/synthizer/property_automation_timeline.hpp" ]; then[0m
+2025-06-19T14:49:35.2814353Z [36;1m  sed -i 's/PropertyAutomationPoint<N>(const PropertyAutomationPoint<N> &) = default;/PropertyAutomationPoint(const PropertyAutomationPoint<N> \&) = default;/g' \[0m
+2025-06-19T14:49:35.2815855Z [36;1m    synthizer-vendored/include/synthizer/property_automation_timeline.hpp[0m
+2025-06-19T14:49:35.2816538Z [36;1mfi[0m
+2025-06-19T14:49:35.2817308Z [36;1mif [ -f "synthizer-vendored/include/synthizer/decoders/mp3.hpp" ]; then[0m
+2025-06-19T14:49:35.2818441Z [36;1m  sed -i 's/local_seek_cb_for_init = (drmp3_seek_proc)seek_cb;/local_seek_cb_for_init = reinterpret_cast<drmp3_seek_proc>(seek_cb);/g' \[0m
+2025-06-19T14:49:35.2819500Z [36;1m    synthizer-vendored/include/synthizer/decoders/mp3.hpp[0m
+2025-06-19T14:49:35.2820059Z [36;1mfi[0m
+2025-06-19T14:49:35.2820641Z [36;1mfind synthizer-vendored -name "CMakeLists.txt" -exec sed -i 's/-Werror//g' {} \;[0m
+2025-06-19T14:49:35.2821577Z [36;1mfind synthizer-vendored -name "*.cmake" -exec sed -i 's/-Werror//g' {} \;[0m
+2025-06-19T14:49:35.2822319Z shell: sh -e {0}
+2025-06-19T14:49:35.2822621Z env:
+2025-06-19T14:49:35.2822874Z   CI_ARCH: x86_64
+2025-06-19T14:49:35.2823198Z   MANYLINUX_VERSION: manylinux_2_28
+2025-06-19T14:49:35.2823592Z   PYVERSION: 3.8
+2025-06-19T14:49:35.2823920Z   VCPKG_DEFAULT_TRIPLET: x64-linux
+2025-06-19T14:49:35.2824634Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed
+2025-06-19T14:49:35.2825389Z   PYTHON_PATH: /opt/python/cp38-cp38
+2025-06-19T14:49:35.2826176Z   VCPKG_DEFAULT_BINARY_CACHE: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_cache
+2025-06-19T14:49:35.2827263Z   VCPKG_BINARY_SOURCES: clear;x-gha,readwrite
+2025-06-19T14:49:35.2828299Z   ACTIONS_CACHE_URL: https://acghubeus2.actions.githubusercontent.com/bwbzopuV3oKlbowlUKWdOnf6KF0vjv7EYqCB3ZHqukKhTVgy74/
+2025-06-19T14:49:35.2884360Z   ACTIONS_RUNTIME_TOKEN: ***
+2025-06-19T14:49:35.2884671Z   RUNVCPKG_VCPKG_ROOT: /__w/synthizer3d/synthizer3d/vcpkg
+2025-06-19T14:49:35.2884992Z   VCPKG_ROOT: /__w/synthizer3d/synthizer3d/vcpkg
+2025-06-19T14:49:35.2885259Z ##[endgroup]
+2025-06-19T14:49:35.3495631Z 🔧 Fixing C++ compilation issues...
+2025-06-19T14:49:35.4524407Z ##[group]Run echo "🔧 Setting up CMake paths for vcpkg libraries..."
+2025-06-19T14:49:35.4524933Z [36;1mecho "🔧 Setting up CMake paths for vcpkg libraries..."[0m
+2025-06-19T14:49:35.4525232Z [36;1m[0m
+2025-06-19T14:49:35.4525490Z [36;1mecho "🔍 Debug: Environment variables from run-vcpkg action..."[0m
+2025-06-19T14:49:35.4525825Z [36;1mecho "VCPKG_ROOT: $VCPKG_ROOT"[0m
+2025-06-19T14:49:35.4526133Z [36;1mecho "VCPKG_DEFAULT_TRIPLET: $VCPKG_DEFAULT_TRIPLET"[0m
+2025-06-19T14:49:35.4526412Z [36;1m[0m
+2025-06-19T14:49:35.4526630Z [36;1m# Find the actual vcpkg installation directory[0m
+2025-06-19T14:49:35.4527427Z [36;1mecho "🔍 Searching for vcpkg installation directory..."[0m
+2025-06-19T14:49:35.4527763Z [36;1mVCPKG_INSTALLED_PATH=""[0m
+2025-06-19T14:49:35.4527969Z [36;1m[0m
+2025-06-19T14:49:35.4528201Z [36;1m# Method 1: Look for the actual installation directory[0m
+2025-06-19T14:49:35.4528534Z [36;1mif [ -d "$(pwd)/vcpkg_installed" ]; then[0m
+2025-06-19T14:49:35.4528935Z [36;1m  VCPKG_INSTALLED_PATH="$(pwd)/vcpkg_installed/$VCPKG_DEFAULT_TRIPLET"[0m
+2025-06-19T14:49:35.4529313Z [36;1m  echo "✅ Found Method 1: $VCPKG_INSTALLED_PATH"[0m
+2025-06-19T14:49:35.4529573Z [36;1mfi[0m
+2025-06-19T14:49:35.4529724Z [36;1m[0m
+2025-06-19T14:49:35.4529983Z [36;1m# Method 2: Search in workspace for any vcpkg_installed directory[0m
+2025-06-19T14:49:35.4530422Z [36;1mif [ -z "$VCPKG_INSTALLED_PATH" ] || [ ! -d "$VCPKG_INSTALLED_PATH" ]; then[0m
+2025-06-19T14:49:35.4530847Z [36;1m  SEARCH_PATH=$(find "$(pwd)" -name "vcpkg_installed" -type d | head -1)[0m
+2025-06-19T14:49:35.4531202Z [36;1m  if [ -n "$SEARCH_PATH" ]; then[0m
+2025-06-19T14:49:35.4531516Z [36;1m    VCPKG_INSTALLED_PATH="$SEARCH_PATH/$VCPKG_DEFAULT_TRIPLET"[0m
+2025-06-19T14:49:35.4531876Z [36;1m    echo "✅ Found Method 2: $VCPKG_INSTALLED_PATH"[0m
+2025-06-19T14:49:35.4532138Z [36;1m  fi[0m
+2025-06-19T14:49:35.4532293Z [36;1mfi[0m
+2025-06-19T14:49:35.4532449Z [36;1m[0m
+2025-06-19T14:49:35.4532659Z [36;1m# Method 3: Use the RUNVCPKG output (if available)[0m
+2025-06-19T14:49:35.4533054Z [36;1mif [ -z "$VCPKG_INSTALLED_PATH" ] || [ ! -d "$VCPKG_INSTALLED_PATH" ]; then[0m
+2025-06-19T14:49:35.4533436Z [36;1m  # Look for any directory containing the triplet name[0m
+2025-06-19T14:49:35.4533869Z [36;1m  TRIPLET_DIR=$(find "$(pwd)" -name "$VCPKG_DEFAULT_TRIPLET" -type d | grep vcpkg | head -1)[0m
+2025-06-19T14:49:35.4534258Z [36;1m  if [ -n "$TRIPLET_DIR" ]; then[0m
+2025-06-19T14:49:35.4534513Z [36;1m    VCPKG_INSTALLED_PATH="$TRIPLET_DIR"[0m
+2025-06-19T14:49:35.4534821Z [36;1m    echo "✅ Found Method 3: $VCPKG_INSTALLED_PATH"[0m
+2025-06-19T14:49:35.4535075Z [36;1m  fi[0m
+2025-06-19T14:49:35.4535236Z [36;1mfi[0m
+2025-06-19T14:49:35.4535391Z [36;1m[0m
+2025-06-19T14:49:35.4535562Z [36;1m# Verify the path exists[0m
+2025-06-19T14:49:35.4535877Z [36;1mif [ -z "$VCPKG_INSTALLED_PATH" ] || [ ! -d "$VCPKG_INSTALLED_PATH" ]; then[0m
+2025-06-19T14:49:35.4536280Z [36;1m  echo "❌ Could not find vcpkg installation directory"[0m
+2025-06-19T14:49:35.4536585Z [36;1m  echo "📂 Workspace contents:"[0m
+2025-06-19T14:49:35.4537080Z [36;1m  find "$(pwd)" -name "*vcpkg*" -type d | head -10[0m
+2025-06-19T14:49:35.4537437Z [36;1m  echo "📂 Looking for any $VCPKG_DEFAULT_TRIPLET directories:"[0m
+2025-06-19T14:49:35.4537809Z [36;1m  find "$(pwd)" -name "$VCPKG_DEFAULT_TRIPLET" -type d | head -5[0m
+2025-06-19T14:49:35.4538105Z [36;1m  exit 1[0m
+2025-06-19T14:49:35.4538266Z [36;1mfi[0m
+2025-06-19T14:49:35.4538424Z [36;1m[0m
+2025-06-19T14:49:35.4538637Z [36;1mecho "✅ Using vcpkg path: $VCPKG_INSTALLED_PATH"[0m
+2025-06-19T14:49:35.4539091Z [36;1m[0m
+2025-06-19T14:49:35.4539269Z [36;1m# Verify libraries are installed[0m
+2025-06-19T14:49:35.4539545Z [36;1mecho "📂 Checking installed libraries..."[0m
+2025-06-19T14:49:35.4539939Z [36;1mls -la "$VCPKG_INSTALLED_PATH/lib/" | head -10 || echo "No lib directory found"[0m
+2025-06-19T14:49:35.4540581Z [36;1mls -la "$VCPKG_INSTALLED_PATH/include/" | head -5 || echo "No include directory found"[0m
+2025-06-19T14:49:35.4540951Z [36;1m[0m
+2025-06-19T14:49:35.4541147Z [36;1m# Set environment variables for the build[0m
+2025-06-19T14:49:35.4541485Z [36;1mecho "CMAKE_PREFIX_PATH=${VCPKG_INSTALLED_PATH}" >> $GITHUB_ENV[0m
+2025-06-19T14:49:35.4541973Z [36;1mecho "PKG_CONFIG_PATH=${VCPKG_INSTALLED_PATH}/lib/pkgconfig:${PKG_CONFIG_PATH}" >> $GITHUB_ENV[0m
+2025-06-19T14:49:35.4542509Z [36;1mecho "LD_LIBRARY_PATH=${VCPKG_INSTALLED_PATH}/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV[0m
+2025-06-19T14:49:35.4542976Z [36;1mecho "VCPKG_INSTALLED_PATH=${VCPKG_INSTALLED_PATH}" >> $GITHUB_ENV[0m
+2025-06-19T14:49:35.4543470Z [36;1mecho "CMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" >> $GITHUB_ENV[0m
+2025-06-19T14:49:35.4543850Z [36;1m[0m
+2025-06-19T14:49:35.4544068Z [36;1mecho "✅ Environment variables set for CMake build"[0m
+2025-06-19T14:49:35.4544436Z shell: sh -e {0}
+2025-06-19T14:49:35.4544606Z env:
+2025-06-19T14:49:35.4544764Z   CI_ARCH: x86_64
+2025-06-19T14:49:35.4544952Z   MANYLINUX_VERSION: manylinux_2_28
+2025-06-19T14:49:35.4545172Z   PYVERSION: 3.8
+2025-06-19T14:49:35.4545360Z   VCPKG_DEFAULT_TRIPLET: x64-linux
+2025-06-19T14:49:35.4545764Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed
+2025-06-19T14:49:35.4546183Z   PYTHON_PATH: /opt/python/cp38-cp38
+2025-06-19T14:49:35.4546628Z   VCPKG_DEFAULT_BINARY_CACHE: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_cache
+2025-06-19T14:49:35.4547795Z   VCPKG_BINARY_SOURCES: clear;x-gha,readwrite
+2025-06-19T14:49:35.4548406Z   ACTIONS_CACHE_URL: https://acghubeus2.actions.githubusercontent.com/bwbzopuV3oKlbowlUKWdOnf6KF0vjv7EYqCB3ZHqukKhTVgy74/
+2025-06-19T14:49:35.4585008Z   ACTIONS_RUNTIME_TOKEN: ***
+2025-06-19T14:49:35.4585325Z   RUNVCPKG_VCPKG_ROOT: /__w/synthizer3d/synthizer3d/vcpkg
+2025-06-19T14:49:35.4585647Z   VCPKG_ROOT: /__w/synthizer3d/synthizer3d/vcpkg
+2025-06-19T14:49:35.4585908Z ##[endgroup]
+2025-06-19T14:49:35.5119323Z 🔧 Setting up CMake paths for vcpkg libraries...
+2025-06-19T14:49:35.5119867Z 🔍 Debug: Environment variables from run-vcpkg action...
+2025-06-19T14:49:35.5120279Z VCPKG_ROOT: /__w/synthizer3d/synthizer3d/vcpkg
+2025-06-19T14:49:35.5120609Z VCPKG_DEFAULT_TRIPLET: x64-linux
+2025-06-19T14:49:35.5120990Z 🔍 Searching for vcpkg installation directory...
+2025-06-19T14:49:35.5965665Z ✅ Found Method 2: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux
+2025-06-19T14:49:35.5967129Z ✅ Using vcpkg path: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux
+2025-06-19T14:49:35.5967898Z 📂 Checking installed libraries...
+2025-06-19T14:49:35.5991666Z total 2200
+2025-06-19T14:49:35.5992297Z drwxr-xr-x 3 root root   4096 Jun 19 14:49 .
+2025-06-19T14:49:35.5992806Z drwxr-xr-x 6 root root   4096 Jun 19 14:49 ..
+2025-06-19T14:49:35.5993183Z -rw-r--r-- 1 root root  39554 Jun 19 14:49 libogg.a
+2025-06-19T14:49:35.5993594Z -rw-r--r-- 1 root root 954000 Jun 19 14:49 libopus.a
+2025-06-19T14:49:35.5994011Z -rw-r--r-- 1 root root  69724 Jun 19 14:49 libopusfile.a
+2025-06-19T14:49:35.5994393Z -rw-r--r-- 1 root root 316694 Jun 19 14:49 libvorbis.a
+2025-06-19T14:49:35.5994783Z -rw-r--r-- 1 root root 804150 Jun 19 14:49 libvorbisenc.a
+2025-06-19T14:49:35.5995283Z -rw-r--r-- 1 root root  41012 Jun 19 14:49 libvorbisfile.a
+2025-06-19T14:49:35.5995972Z drwxr-xr-x 2 root root   4096 Jun 19 14:49 pkgconfig
+2025-06-19T14:49:35.6017264Z total 20
+2025-06-19T14:49:35.6017802Z drwxr-xr-x 5 root root 4096 Jun 19 14:49 .
+2025-06-19T14:49:35.6018769Z drwxr-xr-x 6 root root 4096 Jun 19 14:49 ..
+2025-06-19T14:49:35.6019396Z drwxr-xr-x 2 root root 4096 Jun 19 14:49 ogg
+2025-06-19T14:49:35.6020042Z drwxr-xr-x 2 root root 4096 Jun 19 14:49 opus
+2025-06-19T14:49:35.6022891Z ✅ Environment variables set for CMake build
+2025-06-19T14:49:35.6078466Z ##[group]Run echo "🔨 Building Python wheel with vcpkg toolchain..."
+2025-06-19T14:49:35.6078971Z [36;1mecho "🔨 Building Python wheel with vcpkg toolchain..."[0m
+2025-06-19T14:49:35.6079325Z [36;1m[0m
+2025-06-19T14:49:35.6079501Z [36;1mecho "📍 Using paths:"[0m
+2025-06-19T14:49:35.6079770Z [36;1mecho "  CMAKE_PREFIX_PATH: $CMAKE_PREFIX_PATH"[0m
+2025-06-19T14:49:35.6080076Z [36;1mecho "  PKG_CONFIG_PATH: $PKG_CONFIG_PATH"[0m
+2025-06-19T14:49:35.6080379Z [36;1mecho "  VCPKG_ROOT: $VCPKG_ROOT"[0m
+2025-06-19T14:49:35.6080688Z [36;1mecho "  VCPKG_INSTALLED_PATH: $VCPKG_INSTALLED_PATH"[0m
+2025-06-19T14:49:35.6080969Z [36;1m[0m
+2025-06-19T14:49:35.6081194Z [36;1mecho "🔍 Final verification of vcpkg installation:"[0m
+2025-06-19T14:49:35.6081682Z [36;1m"$VCPKG_ROOT/vcpkg" list | grep -E "(vorbis|opus|ogg|faad)" || echo "No audio libraries found in vcpkg list"[0m
+2025-06-19T14:49:35.6082091Z [36;1m[0m
+2025-06-19T14:49:35.6082319Z [36;1mecho "🚀 Starting Python wheel build..."[0m
+2025-06-19T14:49:35.6082668Z [36;1m$PYTHON_PATH/bin/python -m build --wheel --no-isolation \[0m
+2025-06-19T14:49:35.6083199Z [36;1m  --config-setting="cmake.args=-DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \[0m
+2025-06-19T14:49:35.6083795Z [36;1m  --config-setting="cmake.args=-DVCPKG_TARGET_TRIPLET=${VCPKG_DEFAULT_TRIPLET}" \[0m
+2025-06-19T14:49:35.6084295Z [36;1m  --config-setting="cmake.args=-DCMAKE_PREFIX_PATH=${VCPKG_INSTALLED_PATH}" \[0m
+2025-06-19T14:49:35.6084802Z [36;1m  --config-setting="cmake.args=-DVorbis_DIR=${VCPKG_INSTALLED_PATH}/share/Vorbis" \[0m
+2025-06-19T14:49:35.6085285Z [36;1m  --config-setting="cmake.args=-DOgg_DIR=${VCPKG_INSTALLED_PATH}/share/Ogg" \[0m
+2025-06-19T14:49:35.6085800Z [36;1m  --config-setting="cmake.args=-DOpus_DIR=${VCPKG_INSTALLED_PATH}/share/Opus" \[0m
+2025-06-19T14:49:35.6086325Z [36;1m  --config-setting="cmake.args=-DOpusFile_DIR=${VCPKG_INSTALLED_PATH}/share/opusfile"[0m
+2025-06-19T14:49:35.6087071Z shell: sh -e {0}
+2025-06-19T14:49:35.6087379Z env:
+2025-06-19T14:49:35.6087620Z   CI_ARCH: x86_64
+2025-06-19T14:49:35.6087814Z   MANYLINUX_VERSION: manylinux_2_28
+2025-06-19T14:49:35.6088046Z   PYVERSION: 3.8
+2025-06-19T14:49:35.6088240Z   VCPKG_DEFAULT_TRIPLET: x64-linux
+2025-06-19T14:49:35.6088648Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed
+2025-06-19T14:49:35.6089064Z   PYTHON_PATH: /opt/python/cp38-cp38
+2025-06-19T14:49:35.6089511Z   VCPKG_DEFAULT_BINARY_CACHE: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_cache
+2025-06-19T14:49:35.6089980Z   VCPKG_BINARY_SOURCES: clear;x-gha,readwrite
+2025-06-19T14:49:35.6090554Z   ACTIONS_CACHE_URL: https://acghubeus2.actions.githubusercontent.com/bwbzopuV3oKlbowlUKWdOnf6KF0vjv7EYqCB3ZHqukKhTVgy74/
+2025-06-19T14:49:35.6128669Z   ACTIONS_RUNTIME_TOKEN: ***
+2025-06-19T14:49:35.6128978Z   RUNVCPKG_VCPKG_ROOT: /__w/synthizer3d/synthizer3d/vcpkg
+2025-06-19T14:49:35.6129316Z   VCPKG_ROOT: /__w/synthizer3d/synthizer3d/vcpkg
+2025-06-19T14:49:35.6129829Z   CMAKE_PREFIX_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux
+2025-06-19T14:49:35.6130622Z   PKG_CONFIG_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux/lib/pkgconfig:/usr/local/lib/pkgconfig
+2025-06-19T14:49:35.6131954Z   LD_LIBRARY_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux/lib:/opt/rh/gcc-toolset-14/root/usr/lib64:/opt/rh/gcc-toolset-14/root/usr/lib:/opt/rh/gcc-toolset-14/root/usr/lib64/dyninst:/opt/rh/gcc-toolset-14/root/usr/lib/dyninst
+2025-06-19T14:49:35.6133180Z   VCPKG_INSTALLED_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux
+2025-06-19T14:49:35.6133974Z   CMAKE_TOOLCHAIN_FILE: /__w/synthizer3d/synthizer3d/vcpkg/scripts/buildsystems/vcpkg.cmake
+2025-06-19T14:49:35.6134370Z   RUSTFLAGS: -A warnings
+2025-06-19T14:49:35.6134819Z   CXXFLAGS: -Wno-template-id-cdtor -Wno-cast-function-type -Wno-error
+2025-06-19T14:49:35.6135148Z   CFLAGS: -Wno-error
+2025-06-19T14:49:35.6135333Z ##[endgroup]
+2025-06-19T14:49:35.6690399Z 🔨 Building Python wheel with vcpkg toolchain...
+2025-06-19T14:49:35.6691100Z 📍 Using paths:
+2025-06-19T14:49:35.6692166Z   CMAKE_PREFIX_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux
+2025-06-19T14:49:35.6694075Z   PKG_CONFIG_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux/lib/pkgconfig:/usr/local/lib/pkgconfig
+2025-06-19T14:49:35.6695367Z   VCPKG_ROOT: /__w/synthizer3d/synthizer3d/vcpkg
+2025-06-19T14:49:35.6696618Z   VCPKG_INSTALLED_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux
+2025-06-19T14:49:35.6698016Z 🔍 Final verification of vcpkg installation:
+2025-06-19T14:49:35.6710056Z No packages are installed. Did you mean `search`?
+2025-06-19T14:49:35.7367262Z No audio libraries found in vcpkg list
+2025-06-19T14:49:35.7368211Z 🚀 Starting Python wheel build...
+2025-06-19T14:49:35.8296401Z * Getting build dependencies for wheel...
+2025-06-19T14:49:36.3448670Z 
+2025-06-19T14:49:36.3448694Z 
+2025-06-19T14:49:36.3449515Z --------------------------------------------------------------------------------
+2025-06-19T14:49:36.3450219Z -- Trying 'Ninja' generator
+2025-06-19T14:49:36.3450684Z --------------------------------
+2025-06-19T14:49:36.3451118Z ---------------------------
+2025-06-19T14:49:36.3451513Z ----------------------
+2025-06-19T14:49:36.3451865Z -----------------
+2025-06-19T14:49:36.3452156Z ------------
+2025-06-19T14:49:36.3452419Z -------
+2025-06-19T14:49:36.3452671Z --
+2025-06-19T14:49:36.3495210Z CMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):
+2025-06-19T14:49:36.3496162Z Not searching for unused variables given on the command line.
+2025-06-19T14:49:36.3497275Z   Compatibility with CMake < 3.10 will be removed from a future version of
+2025-06-19T14:49:36.3497849Z   CMake.
+2025-06-19T14:49:36.3498037Z 
+2025-06-19T14:49:36.3498567Z   Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+2025-06-19T14:49:36.3499541Z   to tell CMake that the project requires at least <min> but has been updated
+2025-06-19T14:49:36.3500349Z   to work with policies introduced by <max> or earlier.
+2025-06-19T14:49:36.3500710Z 
+2025-06-19T14:49:36.3500720Z 
+2025-06-19T14:49:36.4045852Z -- The C compiler identification is GNU 14.2.1
+2025-06-19T14:49:36.4349156Z -- Detecting C compiler ABI info
+2025-06-19T14:49:36.4871817Z -- Detecting C compiler ABI info - done
+2025-06-19T14:49:36.5020558Z -- Check for working C compiler: /opt/rh/gcc-toolset-14/root/usr/bin/cc - skipped
+2025-06-19T14:49:36.5024579Z -- Detecting C compile features
+2025-06-19T14:49:36.5030822Z -- Detecting C compile features - done
+2025-06-19T14:49:36.5916682Z -- The CXX compiler identification is GNU 14.2.1
+2025-06-19T14:49:36.6085185Z -- Detecting CXX compiler ABI info
+2025-06-19T14:49:36.6842821Z -- Detecting CXX compiler ABI info - done
+2025-06-19T14:49:36.6998271Z -- Check for working CXX compiler: /opt/rh/gcc-toolset-14/root/usr/bin/c++ - skipped
+2025-06-19T14:49:36.7002681Z -- Detecting CXX compile features
+2025-06-19T14:49:36.7014182Z -- Detecting CXX compile features - done
+2025-06-19T14:49:36.7100143Z -- Configuring done (0.4s)
+2025-06-19T14:49:36.7156394Z -- Generating done (0.0s)
+2025-06-19T14:49:36.7161613Z -- Build files have been written to: /__w/synthizer3d/synthizer3d/_cmake_test_compile/build
+2025-06-19T14:49:36.7198426Z --
+2025-06-19T14:49:36.7198738Z -------
+2025-06-19T14:49:36.7198966Z ------------
+2025-06-19T14:49:36.7199182Z -----------------
+2025-06-19T14:49:36.7199414Z ----------------------
+2025-06-19T14:49:36.7199667Z ---------------------------
+2025-06-19T14:49:36.7200193Z --------------------------------
+2025-06-19T14:49:36.7200486Z -- Trying 'Ninja' generator - success
+2025-06-19T14:49:36.7200910Z --------------------------------------------------------------------------------
+2025-06-19T14:49:36.7201294Z 
+2025-06-19T14:49:36.7226660Z Configuring Project
+2025-06-19T14:49:36.7227170Z   Working directory:
+2025-06-19T14:49:36.7227590Z     /__w/synthizer3d/synthizer3d/_skbuild/linux-x86_64-3.8/cmake-build
+2025-06-19T14:49:36.7227919Z   Command:
+2025-06-19T14:49:36.7233807Z     /opt/_internal/cpython-3.8.20/lib/python3.8/site-packages/cmake/data/bin/cmake /__w/synthizer3d/synthizer3d/synthizer-vendored -G Ninja -DCMAKE_MAKE_PROGRAM:FILEPATH=/opt/python/cp38-cp38/bin/ninja --no-warn-unused-cli -DCMAKE_INSTALL_PREFIX:PATH=/__w/synthizer3d/synthizer3d/_skbuild/linux-x86_64-3.8/cmake-install -DPYTHON_VERSION_STRING:STRING=3.8.20 -DSKBUILD:INTERNAL=TRUE -DCMAKE_MODULE_PATH:PATH=/opt/python/cp38-cp38/lib/python3.8/site-packages/skbuild/resources/cmake -DPYTHON_EXECUTABLE:PATH=/opt/python/cp38-cp38/bin/python -DPYTHON_INCLUDE_DIR:PATH=/opt/_internal/cpython-3.8.20/include/python3.8 -DPython_EXECUTABLE:PATH=/opt/python/cp38-cp38/bin/python -DPython_ROOT_DIR:PATH=/opt/python/cp38-cp38 -DPython_FIND_REGISTRY:STRING=NEVER -DPython_INCLUDE_DIR:PATH=/opt/_internal/cpython-3.8.20/include/python3.8 -DPython3_EXECUTABLE:PATH=/opt/python/cp38-cp38/bin/python -DPython3_ROOT_DIR:PATH=/opt/python/cp38-cp38 -DPython3_FIND_REGISTRY:STRING=NEVER -DPython3_INCLUDE_DIR:PATH=/opt/_internal/cpython-3.8.20/include/python3.8 -DCMAKE_MAKE_PROGRAM:FILEPATH=/opt/python/cp38-cp38/bin/ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL -DSYZ_STATIC_RUNTIME=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DSYZ_INTEGRATING=ON
+2025-06-19T14:49:36.7238251Z 
+2025-06-19T14:49:36.7808126Z Not searching for unused variables given on the command line.
+2025-06-19T14:49:36.7808686Z -- The C compiler identification is GNU 14.2.1
+2025-06-19T14:49:36.8688758Z -- The CXX compiler identification is GNU 14.2.1
+2025-06-19T14:49:36.8802906Z -- Detecting C compiler ABI info
+2025-06-19T14:49:36.9328301Z -- Detecting C compiler ABI info - done
+2025-06-19T14:49:36.9477700Z -- Check for working C compiler: /opt/rh/gcc-toolset-14/root/usr/bin/cc - skipped
+2025-06-19T14:49:36.9481036Z -- Detecting C compile features
+2025-06-19T14:49:36.9486404Z -- Detecting C compile features - done
+2025-06-19T14:49:36.9633608Z -- Detecting CXX compiler ABI info
+2025-06-19T14:49:37.0383654Z -- Detecting CXX compiler ABI info - done
+2025-06-19T14:49:37.0538512Z -- Check for working CXX compiler: /opt/rh/gcc-toolset-14/root/usr/bin/c++ - skipped
+2025-06-19T14:49:37.0542830Z -- Detecting CXX compile features
+2025-06-19T14:49:37.0554465Z -- Detecting CXX compile features - done
+2025-06-19T14:49:37.0808464Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2025-06-19T14:49:37.1407175Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+2025-06-19T14:49:37.1407652Z -- Looking for pthread_create in pthreads
+2025-06-19T14:49:37.1857682Z -- Looking for pthread_create in pthreads - not found
+2025-06-19T14:49:37.1858453Z -- Looking for pthread_create in pthread
+2025-06-19T14:49:37.2399362Z -- Looking for pthread_create in pthread - found
+2025-06-19T14:49:37.2408923Z -- Found Threads: TRUE
+2025-06-19T14:49:38.0734435Z -- Performing Test FILESYSTEM_OK
+2025-06-19T14:49:38.5489221Z -- Performing Test FILESYSTEM_OK - Success
+2025-06-19T14:49:38.5489847Z -- Found C++17 filesystem support
+2025-06-19T14:49:38.5558478Z -- Configuring done (1.8s)
+2025-06-19T14:49:38.5757850Z -- Generating done (0.0s)
+2025-06-19T14:49:38.5764008Z -- Build files have been written to: /__w/synthizer3d/synthizer3d/_skbuild/linux-x86_64-3.8/cmake-build
+2025-06-19T14:49:40.6297225Z [1/28] Building CXX object CMakeFiles/synthizer.dir/src/audio_output.cpp.o
+2025-06-19T14:49:40.8220101Z [2/28] Building CXX object CMakeFiles/synthizer.dir/src/byte_stream.cpp.o
+2025-06-19T14:49:41.3058544Z [3/28] Building CXX object CMakeFiles/synthizer.dir/src/base_object.cpp.o
+2025-06-19T14:49:41.4517313Z [4/28] Building CXX object CMakeFiles/synthizer.dir/src/error.cpp.o
+2025-06-19T14:49:43.4455682Z [5/28] Building CXX object CMakeFiles/synthizer.dir/src/event_timeline.cpp.o
+2025-06-19T14:49:44.0476010Z [6/28] Building CXX object CMakeFiles/synthizer.dir/src/decoding.cpp.o
+2025-06-19T14:49:44.5458365Z [7/28] Building CXX object CMakeFiles/synthizer.dir/src/events.cpp.o
+2025-06-19T14:49:44.8462303Z [8/28] Building CXX object CMakeFiles/synthizer.dir/src/logging.cpp.o
+2025-06-19T14:49:46.7202676Z [9/28] Building CXX object CMakeFiles/synthizer.dir/src/generator.cpp.o
+2025-06-19T14:49:47.2078468Z [10/28] Building CXX object CMakeFiles/synthizer.dir/src/memory.cpp.o
+2025-06-19T14:49:47.7207204Z [11/28] Building CXX object CMakeFiles/synthizer.dir/src/pausable.cpp.o
+2025-06-19T14:49:48.3642317Z [12/28] Building CXX object CMakeFiles/synthizer.dir/src/property_internals.cpp.o
+2025-06-19T14:49:48.4609003Z [13/28] Building CXX object CMakeFiles/synthizer.dir/src/shared_object.cpp.o
+2025-06-19T14:49:48.7258568Z [14/28] Building CXX object CMakeFiles/synthizer.dir/src/data/arrays.cpp.o
+2025-06-19T14:49:49.1571322Z [15/28] Building CXX object CMakeFiles/synthizer.dir/src/data/hrtf.cpp.o
+2025-06-19T14:49:49.3418565Z [16/28] Building CXX object CMakeFiles/synthizer.dir/src/routable.cpp.o
+2025-06-19T14:49:51.0066709Z [17/28] Building CXX object CMakeFiles/synthizer.dir/src/streams/custom_stream.cpp.o
+2025-06-19T14:49:51.2235673Z [18/28] Building CXX object CMakeFiles/synthizer.dir/src/streams/file.cpp.o
+2025-06-19T14:49:52.2736130Z [19/28] Building CXX object CMakeFiles/synthizer.dir/src/streams/memory_stream.cpp.o
+2025-06-19T14:49:52.5921430Z [20/28] Building CXX object CMakeFiles/synthizer.dir/include/synthizer/decoders/ogg.cpp.o
+2025-06-19T14:49:53.7648637Z [21/28] Building CXX object CMakeFiles/synthizer.dir/include/synthizer/decoders/opus.cpp.o
+2025-06-19T14:49:53.9443046Z [22/28] Building CXX object _deps/wdl-build/CMakeFiles/wdl_objlib.dir/WDL/resample.cpp.o
+2025-06-19T14:49:57.9416247Z [23/28] Building CXX object CMakeFiles/synthizer.dir/src/context.cpp.o
+2025-06-19T14:49:59.5153790Z [24/28] Building CXX object CMakeFiles/synthizer.dir/src/router.cpp.o
+2025-06-19T14:50:02.5046599Z [25/28] Building C object CMakeFiles/synthizer_single_file_libs.dir/src/single_file_libs.c.o
+2025-06-19T14:50:02.5047411Z In file included from /usr/include/endian.h:21,
+2025-06-19T14:50:02.5048084Z                  from /__w/synthizer3d/synthizer3d/synthizer-vendored/deps/deps/third_party/dr_libs/dr_flac.h:1336,
+2025-06-19T14:50:02.5048812Z                  from /__w/synthizer3d/synthizer3d/synthizer-vendored/src/single_file_libs.c:4:
+2025-06-19T14:50:02.5080347Z ##[warning]/usr/include/features.h:184:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
+2025-06-19T14:50:02.5087859Z   184 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+2025-06-19T14:50:02.5088269Z       |   ^~~~~~~
+2025-06-19T14:50:05.9682627Z [26/28] Building CXX object CMakeFiles/synthizer.dir/src/c_api/unity.cpp.o
+2025-06-19T14:50:06.0193464Z [27/28] Linking CXX static library libsynthizer.a
+2025-06-19T14:50:06.0194154Z [27/28] Install the project...
+2025-06-19T14:50:06.0237693Z -- Install configuration: "Release"
+2025-06-19T14:50:06.0249097Z -- Installing: /__w/synthizer3d/synthizer3d/_skbuild/linux-x86_64-3.8/cmake-install/lib/libsynthizer.a
+2025-06-19T14:50:07.4597241Z Compiling synthizer/synthizer.pyx because it changed.
+2025-06-19T14:50:07.4597872Z [1/1] Cythonizing synthizer/synthizer.pyx
+2025-06-19T14:50:07.4823143Z running egg_info
+2025-06-19T14:50:07.4871669Z writing synthizer3d.egg-info/PKG-INFO
+2025-06-19T14:50:07.4877929Z writing dependency_links to synthizer3d.egg-info/dependency_links.txt
+2025-06-19T14:50:07.4882023Z writing top-level names to synthizer3d.egg-info/top_level.txt
+2025-06-19T14:50:07.5003384Z dependency /__w/synthizer3d/synthizer3d/synthizer-vendored/include/synthizer.h won't be automatically included in the manifest: the path must be relative
+2025-06-19T14:50:07.5005638Z dependency /__w/synthizer3d/synthizer3d/synthizer-vendored/include/synthizer_constants.h won't be automatically included in the manifest: the path must be relative
+2025-06-19T14:50:07.5039182Z reading manifest file 'synthizer3d.egg-info/SOURCES.txt'
+2025-06-19T14:50:07.5262692Z reading manifest template 'MANIFEST.in'
+2025-06-19T14:50:07.5760559Z no previously-included directories found matching 'synthizer-c'
+2025-06-19T14:50:07.5761291Z adding license file 'LICENSE'
+2025-06-19T14:50:07.6038622Z writing manifest file 'synthizer3d.egg-info/SOURCES.txt'
+2025-06-19T14:50:07.8683274Z * Building wheel...
+2025-06-19T14:50:08.2024285Z 
+2025-06-19T14:50:08.2024304Z 
+2025-06-19T14:50:08.2025096Z --------------------------------------------------------------------------------
+2025-06-19T14:50:08.2025600Z -- Trying 'Ninja' generator
+2025-06-19T14:50:08.2025896Z --------------------------------
+2025-06-19T14:50:08.2026184Z ---------------------------
+2025-06-19T14:50:08.2026436Z ----------------------
+2025-06-19T14:50:08.2026914Z -----------------
+2025-06-19T14:50:08.2027113Z ------------
+2025-06-19T14:50:08.2027289Z -------
+2025-06-19T14:50:08.2027450Z --
+2025-06-19T14:50:08.2071310Z CMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):
+2025-06-19T14:50:08.2072116Z Not searching for unused variables given on the command line.
+2025-06-19T14:50:08.2073056Z   Compatibility with CMake < 3.10 will be removed from a future version of
+2025-06-19T14:50:08.2073643Z   CMake.
+2025-06-19T14:50:08.2073798Z 
+2025-06-19T14:50:08.2074313Z   Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+2025-06-19T14:50:08.2075241Z   to tell CMake that the project requires at least <min> but has been updated
+2025-06-19T14:50:08.2075713Z   to work with policies introduced by <max> or earlier.
+2025-06-19T14:50:08.2075918Z 
+2025-06-19T14:50:08.2075924Z 
+2025-06-19T14:50:08.2621873Z -- The C compiler identification is GNU 14.2.1
+2025-06-19T14:50:08.2923913Z -- Detecting C compiler ABI info
+2025-06-19T14:50:08.3449892Z -- Detecting C compiler ABI info - done
+2025-06-19T14:50:08.3599938Z -- Check for working C compiler: /opt/rh/gcc-toolset-14/root/usr/bin/cc - skipped
+2025-06-19T14:50:08.3603519Z -- Detecting C compile features
+2025-06-19T14:50:08.3609003Z -- Detecting C compile features - done
+2025-06-19T14:50:08.4501742Z -- The CXX compiler identification is GNU 14.2.1
+2025-06-19T14:50:08.4670013Z -- Detecting CXX compiler ABI info
+2025-06-19T14:50:08.5440738Z -- Detecting CXX compiler ABI info - done
+2025-06-19T14:50:08.5596415Z -- Check for working CXX compiler: /opt/rh/gcc-toolset-14/root/usr/bin/c++ - skipped
+2025-06-19T14:50:08.5600625Z -- Detecting CXX compile features
+2025-06-19T14:50:08.5612440Z -- Detecting CXX compile features - done
+2025-06-19T14:50:08.5700304Z -- Configuring done (0.4s)
+2025-06-19T14:50:08.5756545Z -- Generating done (0.0s)
+2025-06-19T14:50:08.5761283Z -- Build files have been written to: /__w/synthizer3d/synthizer3d/_cmake_test_compile/build
+2025-06-19T14:50:08.5798372Z --
+2025-06-19T14:50:08.5798672Z -------
+2025-06-19T14:50:08.5798937Z ------------
+2025-06-19T14:50:08.5799297Z -----------------
+2025-06-19T14:50:08.5799715Z ----------------------
+2025-06-19T14:50:08.5800137Z ---------------------------
+2025-06-19T14:50:08.5800613Z --------------------------------
+2025-06-19T14:50:08.5801141Z -- Trying 'Ninja' generator - success
+2025-06-19T14:50:08.5801907Z --------------------------------------------------------------------------------
+2025-06-19T14:50:08.5802307Z 
+2025-06-19T14:50:08.5824119Z Configuring Project
+2025-06-19T14:50:08.5824568Z   Working directory:
+2025-06-19T14:50:08.5825257Z     /__w/synthizer3d/synthizer3d/_skbuild/linux-x86_64-3.8/cmake-build
+2025-06-19T14:50:08.5825812Z   Command:
+2025-06-19T14:50:08.5835731Z     /opt/_internal/cpython-3.8.20/lib/python3.8/site-packages/cmake/data/bin/cmake /__w/synthizer3d/synthizer3d/synthizer-vendored -G Ninja -DCMAKE_MAKE_PROGRAM:FILEPATH=/opt/python/cp38-cp38/bin/ninja --no-warn-unused-cli -DCMAKE_INSTALL_PREFIX:PATH=/__w/synthizer3d/synthizer3d/_skbuild/linux-x86_64-3.8/cmake-install -DPYTHON_VERSION_STRING:STRING=3.8.20 -DSKBUILD:INTERNAL=TRUE -DCMAKE_MODULE_PATH:PATH=/opt/python/cp38-cp38/lib/python3.8/site-packages/skbuild/resources/cmake -DPYTHON_EXECUTABLE:PATH=/opt/python/cp38-cp38/bin/python -DPYTHON_INCLUDE_DIR:PATH=/opt/_internal/cpython-3.8.20/include/python3.8 -DPython_EXECUTABLE:PATH=/opt/python/cp38-cp38/bin/python -DPython_ROOT_DIR:PATH=/opt/python/cp38-cp38 -DPython_FIND_REGISTRY:STRING=NEVER -DPython_INCLUDE_DIR:PATH=/opt/_internal/cpython-3.8.20/include/python3.8 -DPython3_EXECUTABLE:PATH=/opt/python/cp38-cp38/bin/python -DPython3_ROOT_DIR:PATH=/opt/python/cp38-cp38 -DPython3_FIND_REGISTRY:STRING=NEVER -DPython3_INCLUDE_DIR:PATH=/opt/_internal/cpython-3.8.20/include/python3.8 -DCMAKE_MAKE_PROGRAM:FILEPATH=/opt/python/cp38-cp38/bin/ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL -DSYZ_STATIC_RUNTIME=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DSYZ_INTEGRATING=ON
+2025-06-19T14:50:08.5841938Z 
+2025-06-19T14:50:08.9275674Z Not searching for unused variables given on the command line.
+2025-06-19T14:50:08.9276377Z -- Found C++17 filesystem support
+2025-06-19T14:50:08.9289675Z -- Configuring done (0.3s)
+2025-06-19T14:50:08.9485851Z -- Generating done (0.0s)
+2025-06-19T14:50:08.9491540Z -- Build files have been written to: /__w/synthizer3d/synthizer3d/_skbuild/linux-x86_64-3.8/cmake-build
+2025-06-19T14:50:08.9707154Z [0/1] Install the project...
+2025-06-19T14:50:08.9748302Z -- Install configuration: "Release"
+2025-06-19T14:50:08.9759513Z -- Up-to-date: /__w/synthizer3d/synthizer3d/_skbuild/linux-x86_64-3.8/cmake-install/lib/libsynthizer.a
+2025-06-19T14:50:09.1304158Z running bdist_wheel
+2025-06-19T14:50:09.1505535Z running build
+2025-06-19T14:50:09.1505984Z running build_py
+2025-06-19T14:50:09.1546238Z creating build/lib.linux-x86_64-cpython-38/synthizer
+2025-06-19T14:50:09.1549983Z copying synthizer/__init__.py -> build/lib.linux-x86_64-cpython-38/synthizer
+2025-06-19T14:50:09.1551289Z running egg_info
+2025-06-19T14:50:09.1589159Z writing synthizer3d.egg-info/PKG-INFO
+2025-06-19T14:50:09.1594331Z writing dependency_links to synthizer3d.egg-info/dependency_links.txt
+2025-06-19T14:50:09.1598807Z writing top-level names to synthizer3d.egg-info/top_level.txt
+2025-06-19T14:50:09.1614908Z dependency /__w/synthizer3d/synthizer3d/synthizer-vendored/include/synthizer.h won't be automatically included in the manifest: the path must be relative
+2025-06-19T14:50:09.1618377Z dependency /__w/synthizer3d/synthizer3d/synthizer-vendored/include/synthizer_constants.h won't be automatically included in the manifest: the path must be relative
+2025-06-19T14:50:09.1652746Z reading manifest file 'synthizer3d.egg-info/SOURCES.txt'
+2025-06-19T14:50:09.1872492Z reading manifest template 'MANIFEST.in'
+2025-06-19T14:50:09.2368129Z no previously-included directories found matching 'synthizer-c'
+2025-06-19T14:50:09.2368793Z adding license file 'LICENSE'
+2025-06-19T14:50:09.2644567Z writing manifest file 'synthizer3d.egg-info/SOURCES.txt'
+2025-06-19T14:50:09.2888486Z copying synthizer/__init__.pyi -> build/lib.linux-x86_64-cpython-38/synthizer
+2025-06-19T14:50:09.2890187Z copying synthizer/py.typed -> build/lib.linux-x86_64-cpython-38/synthizer
+2025-06-19T14:50:09.2893535Z copying synthizer/synthizer.cpp -> build/lib.linux-x86_64-cpython-38/synthizer
+2025-06-19T14:50:09.2923994Z copying synthizer/synthizer.pxd -> build/lib.linux-x86_64-cpython-38/synthizer
+2025-06-19T14:50:09.2926293Z copying synthizer/synthizer.pyi -> build/lib.linux-x86_64-cpython-38/synthizer
+2025-06-19T14:50:09.2929353Z copying synthizer/synthizer.pyx -> build/lib.linux-x86_64-cpython-38/synthizer
+2025-06-19T14:50:09.2932976Z copying synthizer/synthizer_constants.pxd -> build/lib.linux-x86_64-cpython-38/synthizer
+2025-06-19T14:50:09.2936065Z running build_ext
+2025-06-19T14:50:09.2971655Z building 'synthizer.synthizer' extension
+2025-06-19T14:50:09.2973033Z creating build/temp.linux-x86_64-cpython-38/synthizer
+2025-06-19T14:50:09.2978019Z g++ -pthread -Wno-template-id-cdtor -Wno-cast-function-type -Wno-error -fPIC -I/__w/synthizer3d/synthizer3d/synthizer-vendored/include -I/opt/_internal/cpython-3.8.20/include/python3.8 -c synthizer/synthizer.cpp -o build/temp.linux-x86_64-cpython-38/synthizer/synthizer.o
+2025-06-19T14:50:12.0375712Z g++ -pthread -Wno-template-id-cdtor -Wno-cast-function-type -Wno-error -pthread -shared -Wno-template-id-cdtor -Wno-cast-function-type -Wno-error build/temp.linux-x86_64-cpython-38/synthizer/synthizer.o -L/__w/synthizer3d/synthizer3d/_skbuild/linux-x86_64-3.8/cmake-install/lib -lsynthizer -o build/lib.linux-x86_64-cpython-38/synthizer/synthizer.cpython-38-x86_64-linux-gnu.so
+2025-06-19T14:50:12.1484866Z installing to build/bdist.linux-x86_64/wheel
+2025-06-19T14:50:12.1485238Z running install
+2025-06-19T14:50:12.1555260Z running install_lib
+2025-06-19T14:50:12.1595686Z creating build/bdist.linux-x86_64/wheel
+2025-06-19T14:50:12.1599849Z creating build/bdist.linux-x86_64/wheel/synthizer
+2025-06-19T14:50:12.1602917Z copying build/lib.linux-x86_64-cpython-38/synthizer/synthizer.pyi -> build/bdist.linux-x86_64/wheel/./synthizer
+2025-06-19T14:50:12.1605107Z copying build/lib.linux-x86_64-cpython-38/synthizer/__init__.pyi -> build/bdist.linux-x86_64/wheel/./synthizer
+2025-06-19T14:50:12.1607456Z copying build/lib.linux-x86_64-cpython-38/synthizer/synthizer.pxd -> build/bdist.linux-x86_64/wheel/./synthizer
+2025-06-19T14:50:12.1609572Z copying build/lib.linux-x86_64-cpython-38/synthizer/synthizer.pyx -> build/bdist.linux-x86_64/wheel/./synthizer
+2025-06-19T14:50:12.1612509Z copying build/lib.linux-x86_64-cpython-38/synthizer/__init__.py -> build/bdist.linux-x86_64/wheel/./synthizer
+2025-06-19T14:50:12.1614635Z copying build/lib.linux-x86_64-cpython-38/synthizer/synthizer.cpp -> build/bdist.linux-x86_64/wheel/./synthizer
+2025-06-19T14:50:12.1645051Z copying build/lib.linux-x86_64-cpython-38/synthizer/synthizer.cpython-38-x86_64-linux-gnu.so -> build/bdist.linux-x86_64/wheel/./synthizer
+2025-06-19T14:50:12.1676219Z copying build/lib.linux-x86_64-cpython-38/synthizer/synthizer_constants.pxd -> build/bdist.linux-x86_64/wheel/./synthizer
+2025-06-19T14:50:12.1678111Z copying build/lib.linux-x86_64-cpython-38/synthizer/py.typed -> build/bdist.linux-x86_64/wheel/./synthizer
+2025-06-19T14:50:12.1679442Z running install_egg_info
+2025-06-19T14:50:12.1762653Z Copying synthizer3d.egg-info to build/bdist.linux-x86_64/wheel/./synthizer3d-0.13.2-py3.8.egg-info
+2025-06-19T14:50:12.1771805Z running install_scripts
+2025-06-19T14:50:12.1923043Z creating build/bdist.linux-x86_64/wheel/synthizer3d-0.13.2.dist-info/WHEEL
+2025-06-19T14:50:12.1928410Z creating '/__w/synthizer3d/synthizer3d/dist/.tmp-1p83qucg/synthizer3d-0.13.2-cp38-cp38-linux_x86_64.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+2025-06-19T14:50:12.1931132Z adding 'synthizer/__init__.py'
+2025-06-19T14:50:12.1934238Z adding 'synthizer/__init__.pyi'
+2025-06-19T14:50:12.1936532Z adding 'synthizer/py.typed'
+2025-06-19T14:50:12.2487804Z adding 'synthizer/synthizer.cpp'
+2025-06-19T14:50:12.4131316Z adding 'synthizer/synthizer.cpython-38-x86_64-linux-gnu.so'
+2025-06-19T14:50:12.4159011Z adding 'synthizer/synthizer.pxd'
+2025-06-19T14:50:12.4162806Z adding 'synthizer/synthizer.pyi'
+2025-06-19T14:50:12.4175959Z adding 'synthizer/synthizer.pyx'
+2025-06-19T14:50:12.4179451Z adding 'synthizer/synthizer_constants.pxd'
+2025-06-19T14:50:12.4183754Z adding 'synthizer3d-0.13.2.dist-info/LICENSE'
+2025-06-19T14:50:12.4185951Z adding 'synthizer3d-0.13.2.dist-info/METADATA'
+2025-06-19T14:50:12.4188637Z adding 'synthizer3d-0.13.2.dist-info/WHEEL'
+2025-06-19T14:50:12.4190563Z adding 'synthizer3d-0.13.2.dist-info/top_level.txt'
+2025-06-19T14:50:12.4193015Z adding 'synthizer3d-0.13.2.dist-info/RECORD'
+2025-06-19T14:50:12.4194715Z removing build/bdist.linux-x86_64/wheel
+2025-06-19T14:50:12.4600922Z Successfully built synthizer3d-0.13.2-cp38-cp38-linux_x86_64.whl
+2025-06-19T14:50:12.4786436Z ##[group]Run echo "🔍 Environment variables:"
+2025-06-19T14:50:12.4787372Z [36;1mecho "🔍 Environment variables:"[0m
+2025-06-19T14:50:12.4787862Z [36;1mecho "VCPKG_ROOT: $VCPKG_ROOT"[0m
+2025-06-19T14:50:12.4788341Z [36;1mecho "EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed"[0m
+2025-06-19T14:50:12.4788876Z [36;1mecho "VCPKG_DEFAULT_TRIPLET: $VCPKG_DEFAULT_TRIPLET"[0m
+2025-06-19T14:50:12.4789161Z [36;1m[0m
+2025-06-19T14:50:12.4789401Z [36;1mecho "🔍 Checking if vcpkg installed directory exists..."[0m
+2025-06-19T14:50:12.4789937Z [36;1mls -la /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed/ || echo "Directory not found!"[0m
+2025-06-19T14:50:12.4790370Z [36;1m[0m
+2025-06-19T14:50:12.4790586Z [36;1mecho "🔍 Checking vcpkg installed libraries..."[0m
+2025-06-19T14:50:12.4791089Z [36;1mif [ -d "/home/runner/work/synthizer3d/synthizer3d/vcpkg_installed/$VCPKG_DEFAULT_TRIPLET" ]; then[0m
+2025-06-19T14:50:12.4791839Z [36;1m  find /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed/$VCPKG_DEFAULT_TRIPLET -name "*.so*" | head -20[0m
+2025-06-19T14:50:12.4792406Z [36;1m  echo "🔍 Looking for audio libraries specifically..."[0m
+2025-06-19T14:50:12.4793039Z [36;1m  find /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed/$VCPKG_DEFAULT_TRIPLET -name "*ogg*" -o -name "*vorbis*" -o -name "*opus*"[0m
+2025-06-19T14:50:12.4793606Z [36;1melse[0m
+2025-06-19T14:50:12.4793815Z [36;1m  echo "❌ vcpkg installed directory not found!"[0m
+2025-06-19T14:50:12.4794117Z [36;1m  echo "Looking for vcpkg directories..."[0m
+2025-06-19T14:50:12.4794571Z [36;1m  find /home/runner/work -name "vcpkg_installed" -type d 2>/dev/null || echo "No vcpkg_installed found"[0m
+2025-06-19T14:50:12.4794989Z [36;1mfi[0m
+2025-06-19T14:50:12.4795142Z [36;1m[0m
+2025-06-19T14:50:12.4795338Z [36;1mecho "🔍 Checking built wheel content..."[0m
+2025-06-19T14:50:12.4795625Z [36;1mif ls dist/*.whl 1> /dev/null 2>&1; then[0m
+2025-06-19T14:50:12.4795888Z [36;1m  echo "Found wheels:"[0m
+2025-06-19T14:50:12.4796113Z [36;1m  ls -la dist/*.whl[0m
+2025-06-19T14:50:12.4796383Z [36;1m  echo "🔍 Checking wheel dependencies before repair..."[0m
+2025-06-19T14:50:12.4796954Z [36;1m  $PYTHON_PATH/bin/python -m auditwheel show dist/*.whl[0m
+2025-06-19T14:50:12.4797296Z [36;1melse[0m
+2025-06-19T14:50:12.4797493Z [36;1m  echo "❌ No wheels found in dist/"[0m
+2025-06-19T14:50:12.4797727Z [36;1mfi[0m
+2025-06-19T14:50:12.4797880Z [36;1m[0m
+2025-06-19T14:50:12.4798103Z [36;1mecho "🔍 Checking synthizer module dependencies..."[0m
+2025-06-19T14:50:12.4798570Z [36;1mfind . -name "*.so" -type f -exec echo "Checking: {}" \; -exec ldd {} \; 2>/dev/null || echo "No .so files found"[0m
+2025-06-19T14:50:12.4799118Z shell: sh -e {0}
+2025-06-19T14:50:12.4799284Z env:
+2025-06-19T14:50:12.4799440Z   CI_ARCH: x86_64
+2025-06-19T14:50:12.4799626Z   MANYLINUX_VERSION: manylinux_2_28
+2025-06-19T14:50:12.4799858Z   PYVERSION: 3.8
+2025-06-19T14:50:12.4800057Z   VCPKG_DEFAULT_TRIPLET: x64-linux
+2025-06-19T14:50:12.4800456Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed
+2025-06-19T14:50:12.4800890Z   PYTHON_PATH: /opt/python/cp38-cp38
+2025-06-19T14:50:12.4801345Z   VCPKG_DEFAULT_BINARY_CACHE: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_cache
+2025-06-19T14:50:12.4801810Z   VCPKG_BINARY_SOURCES: clear;x-gha,readwrite
+2025-06-19T14:50:12.4802386Z   ACTIONS_CACHE_URL: https://acghubeus2.actions.githubusercontent.com/bwbzopuV3oKlbowlUKWdOnf6KF0vjv7EYqCB3ZHqukKhTVgy74/
+2025-06-19T14:50:12.4839226Z   ACTIONS_RUNTIME_TOKEN: ***
+2025-06-19T14:50:12.4839520Z   RUNVCPKG_VCPKG_ROOT: /__w/synthizer3d/synthizer3d/vcpkg
+2025-06-19T14:50:12.4839840Z   VCPKG_ROOT: /__w/synthizer3d/synthizer3d/vcpkg
+2025-06-19T14:50:12.4840320Z   CMAKE_PREFIX_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux
+2025-06-19T14:50:12.4841300Z   PKG_CONFIG_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux/lib/pkgconfig:/usr/local/lib/pkgconfig
+2025-06-19T14:50:12.4842651Z   LD_LIBRARY_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux/lib:/opt/rh/gcc-toolset-14/root/usr/lib64:/opt/rh/gcc-toolset-14/root/usr/lib:/opt/rh/gcc-toolset-14/root/usr/lib64/dyninst:/opt/rh/gcc-toolset-14/root/usr/lib/dyninst
+2025-06-19T14:50:12.4843977Z   VCPKG_INSTALLED_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux
+2025-06-19T14:50:12.4844598Z   CMAKE_TOOLCHAIN_FILE: /__w/synthizer3d/synthizer3d/vcpkg/scripts/buildsystems/vcpkg.cmake
+2025-06-19T14:50:12.4844991Z ##[endgroup]
+2025-06-19T14:50:12.5428505Z 🔍 Environment variables:
+2025-06-19T14:50:12.5429170Z VCPKG_ROOT: /__w/synthizer3d/synthizer3d/vcpkg
+2025-06-19T14:50:12.5430197Z EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed
+2025-06-19T14:50:12.5430742Z VCPKG_DEFAULT_TRIPLET: x64-linux
+2025-06-19T14:50:12.5431168Z 🔍 Checking if vcpkg installed directory exists...
+2025-06-19T14:50:12.5449598Z ls: cannot access '/home/runner/work/synthizer3d/synthizer3d/vcpkg_installed/': No such file or directory
+2025-06-19T14:50:12.5452742Z Directory not found!
+2025-06-19T14:50:12.5453418Z 🔍 Checking vcpkg installed libraries...
+2025-06-19T14:50:12.5453905Z ❌ vcpkg installed directory not found!
+2025-06-19T14:50:12.5454228Z Looking for vcpkg directories...
+2025-06-19T14:50:12.5471617Z No vcpkg_installed found
+2025-06-19T14:50:12.5472246Z 🔍 Checking built wheel content...
+2025-06-19T14:50:12.5490960Z Found wheels:
+2025-06-19T14:50:12.5512490Z -rw-r--r-- 1 root root 1550766 Jun 19 14:50 dist/synthizer3d-0.13.2-cp38-cp38-linux_x86_64.whl
+2025-06-19T14:50:12.5515142Z 🔍 Checking wheel dependencies before repair...
+2025-06-19T14:50:12.9555919Z 
+2025-06-19T14:50:12.9556652Z synthizer3d-0.13.2-cp38-cp38-linux_x86_64.whl is consistent with the
+2025-06-19T14:50:12.9557593Z following platform tag: "manylinux_2_27_x86_64".
+2025-06-19T14:50:12.9557859Z 
+2025-06-19T14:50:12.9558147Z The wheel references external versioned symbols in these
+2025-06-19T14:50:12.9558773Z system-provided shared libraries: libgcc_s.so.1 with versions
+2025-06-19T14:50:12.9559406Z {'GCC_3.0'}, libm.so.6 with versions {'GLIBC_2.2.5', 'GLIBC_2.27'},
+2025-06-19T14:50:12.9559986Z libstdc++.so.6 with versions {'CXXABI_1.3.9', 'CXXABI_1.3',
+2025-06-19T14:50:12.9560589Z 'GLIBCXX_3.4.14', 'CXXABI_1.3.7', 'CXXABI_1.3.5', 'GLIBCXX_3.4.11',
+2025-06-19T14:50:12.9561215Z 'GLIBCXX_3.4.21', 'GLIBCXX_3.4.20', 'GLIBCXX_3.4.22', 'GLIBCXX_3.4',
+2025-06-19T14:50:12.9561843Z 'GLIBCXX_3.4.18', 'CXXABI_1.3.8', 'GLIBCXX_3.4.9', 'GLIBCXX_3.4.15'},
+2025-06-19T14:50:12.9562461Z libc.so.6 with versions {'GLIBC_2.2.5', 'GLIBC_2.14', 'GLIBC_2.6',
+2025-06-19T14:50:12.9563082Z 'GLIBC_2.17', 'GLIBC_2.4', 'GLIBC_2.3', 'GLIBC_2.7'}, libpthread.so.0
+2025-06-19T14:50:12.9563619Z with versions {'GLIBC_2.2.5', 'GLIBC_2.3.2'}
+2025-06-19T14:50:12.9563910Z 
+2025-06-19T14:50:12.9564307Z This constrains the platform tag to "manylinux_2_27_x86_64". In order
+2025-06-19T14:50:12.9564979Z to achieve a more compatible tag, you would need to recompile a new
+2025-06-19T14:50:12.9565593Z wheel from source on a system with earlier versions of these
+2025-06-19T14:50:12.9566100Z libraries, such as a recent manylinux image.
+2025-06-19T14:50:12.9685643Z 🔍 Checking synthizer module dependencies...
+2025-06-19T14:50:13.0501775Z Checking: ./build/lib.linux-x86_64-cpython-38/synthizer/synthizer.cpython-38-x86_64-linux-gnu.so
+2025-06-19T14:50:13.0551874Z 	linux-vdso.so.1 (0x00007fdc0868b000)
+2025-06-19T14:50:13.0552610Z 	libstdc++.so.6 => /lib64/libstdc++.so.6 (0x00007fdc07c6b000)
+2025-06-19T14:50:13.0553347Z 	libm.so.6 => /lib64/libm.so.6 (0x00007fdc078e9000)
+2025-06-19T14:50:13.0554050Z 	libgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007fdc076d1000)
+2025-06-19T14:50:13.0554850Z 	libpthread.so.0 => /lib64/libpthread.so.0 (0x00007fdc074b1000)
+2025-06-19T14:50:13.0555641Z 	libc.so.6 => /lib64/libc.so.6 (0x00007fdc070da000)
+2025-06-19T14:50:13.0556037Z 	/lib64/ld-linux-x86-64.so.2 (0x00007fdc08400000)
+2025-06-19T14:50:13.0629643Z ##[group]Run echo "🛠️ Repairing wheels with auditwheel..."
+2025-06-19T14:50:13.0630214Z [36;1mecho "🛠️ Repairing wheels with auditwheel..."[0m
+2025-06-19T14:50:13.0630552Z [36;1mecho "🔍 Current LD_LIBRARY_PATH: $LD_LIBRARY_PATH"[0m
+2025-06-19T14:50:13.0630903Z [36;1mecho "🔍 VCPKG_INSTALLED_PATH: $VCPKG_INSTALLED_PATH"[0m
+2025-06-19T14:50:13.0631199Z [36;1m[0m
+2025-06-19T14:50:13.0631409Z [36;1m# Make sure auditwheel can find vcpkg libraries[0m
+2025-06-19T14:50:13.0631719Z [36;1mif [ -d "$VCPKG_INSTALLED_PATH/lib" ]; then[0m
+2025-06-19T14:50:13.0632074Z [36;1m  echo "📂 vcpkg libraries found in: $VCPKG_INSTALLED_PATH/lib"[0m
+2025-06-19T14:50:13.0632500Z [36;1m  ls -la "$VCPKG_INSTALLED_PATH/lib/" | grep -E "\.(so|so\.[0-9]+)$" | head -10[0m
+2025-06-19T14:50:13.0632834Z [36;1melse[0m
+2025-06-19T14:50:13.0633097Z [36;1m  echo "❌ vcpkg lib directory not found: $VCPKG_INSTALLED_PATH/lib"[0m
+2025-06-19T14:50:13.0633410Z [36;1mfi[0m
+2025-06-19T14:50:13.0633616Z [36;1m[0m
+2025-06-19T14:50:13.0633784Z [36;1mfor wheel in dist/*.whl; do[0m
+2025-06-19T14:50:13.0634029Z [36;1m  if [ -f "$wheel" ]; then[0m
+2025-06-19T14:50:13.0634265Z [36;1m    echo "🔧 Repairing wheel: $wheel"[0m
+2025-06-19T14:50:13.0634542Z [36;1m    $PYTHON_PATH/bin/auditwheel repair \[0m
+2025-06-19T14:50:13.0634791Z [36;1m      "$wheel" \[0m
+2025-06-19T14:50:13.0635010Z [36;1m      --plat "manylinux_2_28_x86_64" \[0m
+2025-06-19T14:50:13.0635266Z [36;1m      --wheel-dir wheelhouse \[0m
+2025-06-19T14:50:13.0635525Z [36;1m      --lib-dir "$VCPKG_INSTALLED_PATH/lib"[0m
+2025-06-19T14:50:13.0635771Z [36;1m  fi[0m
+2025-06-19T14:50:13.0635924Z [36;1mdone[0m
+2025-06-19T14:50:13.0636083Z [36;1m[0m
+2025-06-19T14:50:13.0636314Z [36;1m# RIMUOVI le wheel originali e mantieni solo quelle riparate[0m
+2025-06-19T14:50:13.0636622Z [36;1mrm -f dist/*.whl[0m
+2025-06-19T14:50:13.0637131Z [36;1mif ls wheelhouse/*.whl 1> /dev/null 2>&1; then[0m
+2025-06-19T14:50:13.0637412Z [36;1m  cp wheelhouse/*.whl dist/[0m
+2025-06-19T14:50:13.0637626Z [36;1mfi[0m
+2025-06-19T14:50:13.0637800Z [36;1mecho "✅ Repaired wheels:"[0m
+2025-06-19T14:50:13.0638028Z [36;1mls -la dist/*.whl[0m
+2025-06-19T14:50:13.0638277Z shell: sh -e {0}
+2025-06-19T14:50:13.0638448Z env:
+2025-06-19T14:50:13.0638596Z   CI_ARCH: x86_64
+2025-06-19T14:50:13.0638782Z   MANYLINUX_VERSION: manylinux_2_28
+2025-06-19T14:50:13.0639004Z   PYVERSION: 3.8
+2025-06-19T14:50:13.0639182Z   VCPKG_DEFAULT_TRIPLET: x64-linux
+2025-06-19T14:50:13.0639575Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: /home/runner/work/synthizer3d/synthizer3d/vcpkg_installed
+2025-06-19T14:50:13.0639992Z   PYTHON_PATH: /opt/python/cp38-cp38
+2025-06-19T14:50:13.0640432Z   VCPKG_DEFAULT_BINARY_CACHE: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_cache
+2025-06-19T14:50:13.0640898Z   VCPKG_BINARY_SOURCES: clear;x-gha,readwrite
+2025-06-19T14:50:13.0641471Z   ACTIONS_CACHE_URL: https://acghubeus2.actions.githubusercontent.com/bwbzopuV3oKlbowlUKWdOnf6KF0vjv7EYqCB3ZHqukKhTVgy74/
+2025-06-19T14:50:13.0678477Z   ACTIONS_RUNTIME_TOKEN: ***
+2025-06-19T14:50:13.0678784Z   RUNVCPKG_VCPKG_ROOT: /__w/synthizer3d/synthizer3d/vcpkg
+2025-06-19T14:50:13.0679097Z   VCPKG_ROOT: /__w/synthizer3d/synthizer3d/vcpkg
+2025-06-19T14:50:13.0679580Z   CMAKE_PREFIX_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux
+2025-06-19T14:50:13.0680369Z   PKG_CONFIG_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux/lib/pkgconfig:/usr/local/lib/pkgconfig
+2025-06-19T14:50:13.0682014Z   LD_LIBRARY_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux/lib:/__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux/lib:/opt/rh/gcc-toolset-14/root/usr/lib64:/opt/rh/gcc-toolset-14/root/usr/lib:/opt/rh/gcc-toolset-14/root/usr/lib64/dyninst:/opt/rh/gcc-toolset-14/root/usr/lib/dyninst
+2025-06-19T14:50:13.0683735Z   VCPKG_INSTALLED_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux
+2025-06-19T14:50:13.0684495Z   CMAKE_TOOLCHAIN_FILE: /__w/synthizer3d/synthizer3d/vcpkg/scripts/buildsystems/vcpkg.cmake
+2025-06-19T14:50:13.0684878Z ##[endgroup]
+2025-06-19T14:50:13.1281030Z 🛠️ Repairing wheels with auditwheel...
+2025-06-19T14:50:13.1287212Z 🔍 Current LD_LIBRARY_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux/lib:/__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux/lib:/opt/rh/gcc-toolset-14/root/usr/lib64:/opt/rh/gcc-toolset-14/root/usr/lib:/opt/rh/gcc-toolset-14/root/usr/lib64/dyninst:/opt/rh/gcc-toolset-14/root/usr/lib/dyninst
+2025-06-19T14:50:13.1290753Z 🔍 VCPKG_INSTALLED_PATH: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux
+2025-06-19T14:50:13.1292604Z 📂 vcpkg libraries found in: /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux/lib
+2025-06-19T14:50:13.1318168Z 🔧 Repairing wheel: dist/synthizer3d-0.13.2-cp38-cp38-linux_x86_64.whl
+2025-06-19T14:50:13.2288657Z usage: auditwheel [-h] [-V] [-v] command ...
+2025-06-19T14:50:13.2289821Z auditwheel: error: unrecognized arguments: --lib-dir /__w/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed/x64-linux/lib
+2025-06-19T14:50:13.2440189Z ##[error]Process completed with exit code 2.
+2025-06-19T14:50:13.2497100Z Post job cleanup.
+2025-06-19T14:50:13.2500774Z ##[command]/usr/bin/docker exec  471abb16fd58e970daa9ad01a6b7af044b988423b222dfdda47a1b63f1802c87 sh -c "cat /etc/*release | grep ^ID"
+2025-06-19T14:50:13.4570406Z [command]/usr/local/bin/git version
+2025-06-19T14:50:13.4607481Z git version 2.49.0
+2025-06-19T14:50:13.4654862Z Temporarily overriding HOME='/__w/_temp/4344a41a-a989-429c-be35-49181b7c5537' before making global git config changes
+2025-06-19T14:50:13.4656259Z Adding repository directory to the temporary git global config as a safe directory
+2025-06-19T14:50:13.4661787Z [command]/usr/local/bin/git config --global --add safe.directory /__w/synthizer3d/synthizer3d
+2025-06-19T14:50:13.4697842Z [command]/usr/local/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-06-19T14:50:13.4734421Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-06-19T14:50:13.5118299Z [command]/usr/local/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-06-19T14:50:13.5142468Z http.https://github.com/.extraheader
+2025-06-19T14:50:13.5155090Z [command]/usr/local/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-06-19T14:50:13.5188097Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-06-19T14:50:13.5716050Z Stop and remove container: e0f78cd6e29243e5978027004f22c673_quayiopypamanylinux_2_28_x86_64_6276ba
+2025-06-19T14:50:13.5721218Z ##[command]/usr/bin/docker rm --force 471abb16fd58e970daa9ad01a6b7af044b988423b222dfdda47a1b63f1802c87
+2025-06-19T14:50:14.0749650Z 471abb16fd58e970daa9ad01a6b7af044b988423b222dfdda47a1b63f1802c87
+2025-06-19T14:50:14.0779309Z Remove container network: github_network_15168f156f9447ecb03618bea54bb28e
+2025-06-19T14:50:14.0783680Z ##[command]/usr/bin/docker network rm github_network_15168f156f9447ecb03618bea54bb28e
+2025-06-19T14:50:14.1950662Z github_network_15168f156f9447ecb03618bea54bb28e
+2025-06-19T14:50:14.2010805Z Cleaning up orphan processes

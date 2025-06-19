@@ -23,14 +23,34 @@ os.chdir(root_dir)
 
 synthizer_lib_dir = ""
 if 'CI_SDIST' not in os.environ:
-    # Set vcpkg environment variables for Windows builds
+    # Set vcpkg environment variables for all platforms
     vcpkg_installed_base = os.environ.get('EFFECTIVE_VCPKG_INSTALLED_DIR_BASE')
-    vcpkg_triplet = os.environ.get('VCPKG_DEFAULT_TRIPLET', 'x64-windows')
+    vcpkg_triplet = os.environ.get('VCPKG_DEFAULT_TRIPLET')
+    
+    # Set default triplet based on platform if not provided
+    if not vcpkg_triplet:
+        import platform
+        system = platform.system().lower()
+        machine = platform.machine().lower()
+        
+        if system == 'windows':
+            vcpkg_triplet = 'x64-windows' if machine in ['amd64', 'x86_64'] else 'x86-windows'
+        elif system == 'darwin':  # macOS
+            vcpkg_triplet = 'x64-osx'
+        elif system == 'linux':
+            vcpkg_triplet = 'x64-linux'
+        else:
+            vcpkg_triplet = 'x64-linux'  # fallback
+    
     if vcpkg_installed_base and os.path.isdir(vcpkg_installed_base):
         vcpkg_installed_path = os.path.join(vcpkg_installed_base, vcpkg_triplet)
         if os.path.isdir(vcpkg_installed_path):
             os.environ['VCPKG_INSTALLED_PATH'] = vcpkg_installed_path
             print(f"Set VCPKG_INSTALLED_PATH to {vcpkg_installed_path}")
+        else:
+            print(f"Warning: vcpkg path does not exist: {vcpkg_installed_path}")
+    else:
+        print(f"Warning: EFFECTIVE_VCPKG_INSTALLED_DIR_BASE not set or invalid: {vcpkg_installed_base}")
     
     # Build Synthizer nativo tramite CMake/Ninja
     cmake = cmaker.CMaker()

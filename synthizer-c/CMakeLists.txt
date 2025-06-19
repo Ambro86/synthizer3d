@@ -191,9 +191,17 @@ target_include_directories(synthizer PRIVATE $<TARGET_PROPERTY:wdl_objlib,INTERF
 
 # Add vcpkg include directories
 if(WIN32)
-  target_include_directories(synthizer PRIVATE 
-    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/include"
-  )
+  # Use environment variable set by setup.py
+  if(DEFINED ENV{VCPKG_INSTALLED_PATH})
+    target_include_directories(synthizer PRIVATE 
+      "$ENV{VCPKG_INSTALLED_PATH}/include"
+    )
+  else()
+    # Fallback to hardcoded path
+    target_include_directories(synthizer PRIVATE 
+      "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/include"
+    )
+  endif()
 elseif(UNIX AND NOT APPLE)
   # For Linux, add the vcpkg include path
   if(DEFINED ENV{VCPKG_INSTALLED_PATH})

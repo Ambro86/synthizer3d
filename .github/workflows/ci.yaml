@@ -373,14 +373,35 @@ jobs:
           "$VCPKG_ROOT/vcpkg" list | grep -E "(vorbis|opus|ogg|faad)" || echo "No audio libraries found in vcpkg list"
           
           echo "🔍 Checking for op_read_float symbol in opusfile library:"
+          echo "📂 Available opusfile libraries:"
+          find "${VCPKG_INSTALLED_PATH}" -name "*opus*" -type f | head -10
+          
           if [ -f "${VCPKG_INSTALLED_PATH}/lib/libopusfile.a" ]; then
-            nm "${VCPKG_INSTALLED_PATH}/lib/libopusfile.a" | grep op_read_float || echo "op_read_float not found in libopusfile.a"
-          fi
-          if [ -f "${VCPKG_INSTALLED_PATH}/lib/libopusfile.so" ]; then
-            nm -D "${VCPKG_INSTALLED_PATH}/lib/libopusfile.so" | grep op_read_float || echo "op_read_float not found in libopusfile.so"
+            echo "✅ Found libopusfile.a"
+            nm "${VCPKG_INSTALLED_PATH}/lib/libopusfile.a" | grep -E "(op_read|U op_)" || echo "No op_read symbols found in libopusfile.a"
+            echo "🔍 All symbols in libopusfile.a containing 'op_':"
+            nm "${VCPKG_INSTALLED_PATH}/lib/libopusfile.a" | grep " T " | grep "op_" | head -10 || echo "No exported op_ symbols"
+          else
+            echo "❌ libopusfile.a not found"
           fi
           
-          echo "🚀 Starting Python wheel build..."
+          if [ -f "${VCPKG_INSTALLED_PATH}/lib/libopusfile.so" ]; then
+            echo "✅ Found libopusfile.so"
+            nm -D "${VCPKG_INSTALLED_PATH}/lib/libopusfile.so" | grep op_read_float || echo "op_read_float not found in libopusfile.so"
+          else
+            echo "❌ libopusfile.so not found"
+          fi
+          
+          echo "🔍 Checking opusfile header availability:"
+          if [ -f "${VCPKG_INSTALLED_PATH}/include/opus/opusfile.h" ]; then
+            echo "✅ opusfile.h header found"
+            grep -n "op_read_float" "${VCPKG_INSTALLED_PATH}/include/opus/opusfile.h" | head -3
+          else
+            echo "❌ opusfile.h header not found"
+            find "${VCPKG_INSTALLED_PATH}" -name "opusfile.h" -type f
+          fi
+          
+          echo "🚀 Starting Python wheel build with automatic op_read_float detection..."
           $PYTHON_PATH/bin/python -m build --wheel --no-isolation \
             --config-setting="cmake.args=-DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
             --config-setting="cmake.args=-DVCPKG_TARGET_TRIPLET=${VCPKG_DEFAULT_TRIPLET}" \
@@ -390,7 +411,8 @@ jobs:
             --config-setting="cmake.args=-DOpus_DIR=${VCPKG_INSTALLED_PATH}/share/Opus" \
             --config-setting="cmake.args=-DOpusFile_DIR=${VCPKG_INSTALLED_PATH}/share/opusfile" \
             --config-setting="cmake.args=-DCMAKE_EXE_LINKER_FLAGS=-static-libgcc -static-libstdc++" \
-            --config-setting="cmake.args=-DCMAKE_SHARED_LINKER_FLAGS=-static-libgcc -static-libstdc++"
+            --config-setting="cmake.args=-DCMAKE_SHARED_LINKER_FLAGS=-static-libgcc -static-libstdc++" \
+            --config-setting="cmake.verbose=True"
 
  
       - name: Debug vcpkg libraries and dependencies

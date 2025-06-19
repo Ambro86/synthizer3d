@@ -4,7 +4,7 @@
 #include "synthizer/logging.hpp"
 
 extern "C" {
-#include <opusfile.h>
+#include <opus/opusfile.h>
 }
 
 #ifndef OPUSCALL

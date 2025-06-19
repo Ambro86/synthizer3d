@@ -163,17 +163,33 @@ if(WIN32)
 elseif(UNIX AND NOT APPLE)
   # Linux-specific linking for static libraries with whole-archive
   # Force include all symbols to ensure op_read_float is available
-  list(APPEND SYZ_LIBRARIES
-    -Wl,--whole-archive
-    OpusFile::opusfile
-    Opus::opus
-    -Wl,--no-whole-archive
-    Ogg::ogg
-    Vorbis::vorbis
-    Vorbis::vorbisfile
-    m  # Math library
-    dl  # Dynamic loading library
-  )
+  if(DEFINED ENV{VCPKG_INSTALLED_PATH})
+    # Use vcpkg libraries directly with whole-archive
+    list(APPEND SYZ_LIBRARIES
+      -Wl,--whole-archive
+      "$ENV{VCPKG_INSTALLED_PATH}/lib/libopusfile.a"
+      "$ENV{VCPKG_INSTALLED_PATH}/lib/libopus.a"
+      -Wl,--no-whole-archive
+      "$ENV{VCPKG_INSTALLED_PATH}/lib/libogg.a"
+      "$ENV{VCPKG_INSTALLED_PATH}/lib/libvorbis.a"
+      "$ENV{VCPKG_INSTALLED_PATH}/lib/libvorbisfile.a"
+      m  # Math library
+      dl  # Dynamic loading library
+    )
+  else()
+    # Fallback to CMake targets
+    list(APPEND SYZ_LIBRARIES
+      -Wl,--whole-archive
+      OpusFile::opusfile
+      Opus::opus
+      -Wl,--no-whole-archive
+      Ogg::ogg
+      Vorbis::vorbis
+      Vorbis::vorbisfile
+      m  # Math library
+      dl  # Dynamic loading library
+    )
+  endif()
 elseif(APPLE)
   # macOS linking
   list(APPEND SYZ_LIBRARIES

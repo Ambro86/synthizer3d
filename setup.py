@@ -55,42 +55,46 @@ machine = platform.machine()
 
 vcpkg_lib_dir = None
 
-if system == "Windows":
-    if arch == "64bit":
-        vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "x64-windows", "lib")
-    else:
-        vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "x86-windows", "lib")
-elif system == "Darwin":
-    # ARM (Apple Silicon)
-    if machine in ("arm64", "aarch64"):
-        vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "arm64-osx", "lib")
-    else:
-        vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "x64-osx", "lib")
-elif system == "Linux":
-    if machine in ("arm64", "aarch64"):
-        vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "arm64-linux", "lib")
-    elif arch == "64bit":
-        vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "x64-linux", "lib")
-    else:
-        vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "x86-linux", "lib")
+# Try to find vcpkg installation directory from environment or common locations
+vcpkg_installed_path = os.environ.get('VCPKG_INSTALLED_PATH')
+if vcpkg_installed_path and os.path.isdir(os.path.join(vcpkg_installed_path, "lib")):
+    vcpkg_lib_dir = os.path.join(vcpkg_installed_path, "lib")
+    print(f"Found vcpkg lib directory from environment: {vcpkg_lib_dir}")
+else:
+    # Fallback to the old logic
+    if system == "Windows":
+        if arch == "64bit":
+            vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "x64-windows", "lib")
+        else:
+            vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "x86-windows", "lib")
+    elif system == "Darwin":
+        # ARM (Apple Silicon)
+        if machine in ("arm64", "aarch64"):
+            vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "arm64-osx", "lib")
+        else:
+            vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "x64-osx", "lib")
+    elif system == "Linux":
+        if machine in ("arm64", "aarch64"):
+            vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "arm64-linux", "lib")
+        elif arch == "64bit":
+            vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "x64-linux", "lib")
+        else:
+            vcpkg_lib_dir = os.path.join(root_dir, "vcpkg_installed", "x86-linux", "lib")
 
 if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
     extension_args["library_dirs"].append(vcpkg_lib_dir)
-    # Add libraries in correct dependency order: dependencies first, dependents last
-    extension_args["libraries"].extend([
-        "ogg", "opus", "vorbis", "vorbisenc", "opusfile", "vorbisfile"
-    ])
     print(f"Using vcpkg lib dir: {vcpkg_lib_dir} for {system} {machine or arch}")
     
-    # On Linux, ensure we have proper linking flags for static libraries
+    # Different linking strategies per platform
     if system == "Linux":
-        if "extra_link_args" not in extension_args:
-            extension_args["extra_link_args"] = []
-        # Remove duplicate libraries from the main list for Linux since we're handling them explicitly
-        extension_args["libraries"] = ["synthizer"]
-        extension_args["extra_link_args"].extend([
-            "-Wl,--start-group", "-lopusfile", "-lopus", "-logg", "-lvorbis", 
-            "-lvorbisfile", "-lvorbisenc", "-Wl,--end-group", "-lm"
+        # For Linux, only link synthizer since it should contain all static libraries
+        # But we still need math library for some symbols
+        extension_args["libraries"].extend(["m"])
+        print("Linux: Using static library linking via CMake with math library")
+    else:
+        # For Windows and macOS, add individual libraries
+        extension_args["libraries"].extend([
+            "ogg", "opus", "vorbis", "vorbisenc", "opusfile", "vorbisfile"
         ])
 
 extensions = [

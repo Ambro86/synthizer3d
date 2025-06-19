@@ -149,11 +149,6 @@ set(SYZ_LIBRARIES
   ${SYZ_DEPS}
   Threads::Threads
   ${CMAKE_DL_LIBS}
-  Ogg::ogg
-  Opus::opus
-  Vorbis::vorbis
-  Vorbis::vorbisfile
-  OpusFile::opusfile
 )
 if(WIN32)
   list(APPEND SYZ_LIBRARIES
@@ -165,11 +160,25 @@ if(WIN32)
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/vorbisenc.lib"
   )
 elseif(UNIX AND NOT APPLE)
-  # Linux-specific linking for static libraries
+  # Linux-specific linking for static libraries with whole-archive
   list(APPEND SYZ_LIBRARIES
-    -Wl,--start-group
     -Wl,--whole-archive
-    -Wl,--end-group
+    OpusFile::opusfile
+    Opus::opus
+    Ogg::ogg
+    Vorbis::vorbis
+    Vorbis::vorbisfile
+    -Wl,--no-whole-archive
+    m  # Math library
+  )
+elseif(APPLE)
+  # macOS linking
+  list(APPEND SYZ_LIBRARIES
+    Ogg::ogg
+    Opus::opus
+    Vorbis::vorbis
+    Vorbis::vorbisfile
+    OpusFile::opusfile
     m  # Math library
   )
 endif()

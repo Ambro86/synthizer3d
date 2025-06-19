@@ -140,28 +140,22 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
             extension_args["extra_link_args"] = []
             
         if system == "Linux":
-            # Linux: Use --whole-archive to ensure all symbols are included
+            # Linux: Use --whole-archive for ALL audio libraries to ensure all symbols are included
             link_args = []
             for lib in existing_libs:
-                if "opusfile" in lib or "opus" in lib:
-                    # Force include these libraries with all symbols
-                    link_args.extend(["-Wl,--whole-archive", lib, "-Wl,--no-whole-archive"])
-                else:
-                    link_args.append(lib)
+                # Apply --whole-archive to all audio libraries, not just opus
+                link_args.extend(["-Wl,--whole-archive", lib, "-Wl,--no-whole-archive"])
             extension_args["extra_link_args"].extend(link_args)
             extension_args["libraries"].extend(["m", "dl"])
-            print(f"Linux: Using --whole-archive static linking with {len(existing_libs)} libraries")
+            print(f"Linux: Using --whole-archive for ALL {len(existing_libs)} libraries")
         else:  # macOS
-            # macOS: Use -force_load for critical libraries
+            # macOS: Use -force_load for ALL audio libraries
             link_args = []
             for lib in existing_libs:
-                if "opusfile" in lib or "opus" in lib:
-                    # Force load these libraries with all symbols
-                    link_args.extend(["-Wl,-force_load", lib])
-                else:
-                    link_args.append(lib)
+                # Apply -force_load to all audio libraries, not just opus
+                link_args.extend(["-Wl,-force_load", lib])
             extension_args["extra_link_args"].extend(link_args)
-            print(f"macOS: Using -force_load static linking with {len(existing_libs)} libraries")
+            print(f"macOS: Using -force_load for ALL {len(existing_libs)} libraries")
         
         print(f"Static libraries found: {[os.path.basename(lib) for lib in existing_libs]}")
         print(f"Link args: {extension_args['extra_link_args']}")

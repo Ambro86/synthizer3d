@@ -114,17 +114,19 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
     extension_args["library_dirs"].append(vcpkg_lib_dir)
     print(f"Using vcpkg lib dir: {vcpkg_lib_dir} for {system} {machine or arch}")
     
-    # Different linking strategies per platform
+    # Unified linking strategy for all platforms - use individual libraries
+    extension_args["libraries"].extend([
+        "ogg", "opus", "vorbis", "vorbisenc", "opusfile", "vorbisfile"
+    ])
+    
+    # Add platform-specific libraries
     if system == "Linux":
-        # For Linux, only link synthizer since it should contain all static libraries
-        # But we still need math library for some symbols
-        extension_args["libraries"].extend(["m"])
-        print("Linux: Using static library linking via CMake with math library")
+        extension_args["libraries"].extend(["m", "dl"])
+        print("Linux: Using individual library linking with math and dl libraries")
+    elif system == "Darwin":
+        print("macOS: Using individual library linking")
     else:
-        # For Windows and macOS, add individual libraries
-        extension_args["libraries"].extend([
-            "ogg", "opus", "vorbis", "vorbisenc", "opusfile", "vorbisfile"
-        ])
+        print("Windows: Using individual library linking")
 
 extensions = [
     Extension("synthizer.synthizer", ["synthizer/synthizer.pyx"], **extension_args),

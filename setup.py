@@ -114,19 +114,38 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
     extension_args["library_dirs"].append(vcpkg_lib_dir)
     print(f"Using vcpkg lib dir: {vcpkg_lib_dir} for {system} {machine or arch}")
     
-    # Unified linking strategy for all platforms - use individual libraries
-    extension_args["libraries"].extend([
-        "ogg", "opus", "vorbis", "vorbisenc", "opusfile", "vorbisfile"
-    ])
-    
-    # Add platform-specific libraries
-    if system == "Linux":
-        extension_args["libraries"].extend(["m", "dl"])
-        print("Linux: Using individual library linking with math and dl libraries")
-    elif system == "Darwin":
-        print("macOS: Using individual library linking")
+    # Platform-specific linking strategies
+    if system == "Windows":
+        # Windows uses dynamic linking with individual libraries
+        extension_args["libraries"].extend([
+            "ogg", "opus", "vorbis", "vorbisenc", "opusfile", "vorbisfile"
+        ])
+        print("Windows: Using dynamic library linking")
     else:
-        print("Windows: Using individual library linking")
+        # Linux and macOS: Force static linking by specifying full paths to .a files
+        static_libs = [
+            os.path.join(vcpkg_lib_dir, "libogg.a"),
+            os.path.join(vcpkg_lib_dir, "libopus.a"), 
+            os.path.join(vcpkg_lib_dir, "libvorbis.a"),
+            os.path.join(vcpkg_lib_dir, "libvorbisenc.a"),
+            os.path.join(vcpkg_lib_dir, "libopusfile.a"),
+            os.path.join(vcpkg_lib_dir, "libvorbisfile.a")
+        ]
+        
+        # Filter out non-existent files and add them as extra objects
+        existing_libs = [lib for lib in static_libs if os.path.exists(lib)]
+        if "extra_objects" not in extension_args:
+            extension_args["extra_objects"] = []
+        extension_args["extra_objects"].extend(existing_libs)
+        
+        # Add system libraries
+        if system == "Linux":
+            extension_args["libraries"].extend(["m", "dl"])
+            print(f"Linux: Using static library linking with {len(existing_libs)} libraries")
+        else:  # macOS
+            print(f"macOS: Using static library linking with {len(existing_libs)} libraries")
+        
+        print(f"Static libraries found: {[os.path.basename(lib) for lib in existing_libs]}")
 
 extensions = [
     Extension("synthizer.synthizer", ["synthizer/synthizer.pyx"], **extension_args),

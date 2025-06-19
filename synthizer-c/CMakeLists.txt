@@ -28,6 +28,7 @@ find_package(Ogg REQUIRED)
 find_package(Opus REQUIRED)
 find_package(OpusFile REQUIRED)
 
+
 # Check if op_read_float is available
 include(CheckCXXSourceCompiles)
 set(CMAKE_REQUIRED_LIBRARIES OpusFile::opusfile Opus::opus Ogg::ogg)
@@ -161,15 +162,17 @@ if(WIN32)
   )
 elseif(UNIX AND NOT APPLE)
   # Linux-specific linking for static libraries with whole-archive
+  # Force include all symbols to ensure op_read_float is available
   list(APPEND SYZ_LIBRARIES
     -Wl,--whole-archive
     OpusFile::opusfile
     Opus::opus
+    -Wl,--no-whole-archive
     Ogg::ogg
     Vorbis::vorbis
     Vorbis::vorbisfile
-    -Wl,--no-whole-archive
     m  # Math library
+    dl  # Dynamic loading library
   )
 elseif(APPLE)
   # macOS linking
@@ -185,6 +188,26 @@ endif()
 target_link_libraries(synthizer PRIVATE ${SYZ_LIBRARIES})
 
 target_include_directories(synthizer PRIVATE $<TARGET_PROPERTY:wdl_objlib,INTERFACE_INCLUDE_DIRECTORIES>)
+
+# Add vcpkg include directories
+if(WIN32)
+  target_include_directories(synthizer PRIVATE 
+    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/include"
+  )
+elseif(UNIX AND NOT APPLE)
+  # For Linux, add the vcpkg include path
+  if(DEFINED ENV{VCPKG_INSTALLED_PATH})
+    target_include_directories(synthizer PRIVATE 
+      "$ENV{VCPKG_INSTALLED_PATH}/include"
+    )
+  endif()
+elseif(APPLE)
+  # For macOS
+  target_include_directories(synthizer PRIVATE 
+    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-osx/include"
+  )
+endif()
+
 target_compile_definitions(synthizer PRIVATE BUILDING_SYNTHIZER WDL_RESAMPLE_TYPE=float)
 if("${SYNTHIZER_LIB_TYPE}" STREQUAL "SHARED")
   target_compile_definitions(synthizer PRIVATE SYNTHIZER_SHARED)

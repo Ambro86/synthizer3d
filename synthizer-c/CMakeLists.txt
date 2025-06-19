@@ -191,15 +191,29 @@ elseif(UNIX AND NOT APPLE)
     )
   endif()
 elseif(APPLE)
-  # macOS linking
-  list(APPEND SYZ_LIBRARIES
-    Ogg::ogg
-    Opus::opus
-    Vorbis::vorbis
-    Vorbis::vorbisfile
-    OpusFile::opusfile
-    m  # Math library
-  )
+  # macOS-specific linking for static libraries with force_load
+  # Force include all symbols to ensure op_read_float is available
+  if(DEFINED ENV{VCPKG_INSTALLED_PATH})
+    # Use vcpkg libraries directly with force_load
+    list(APPEND SYZ_LIBRARIES
+      -force_load "$ENV{VCPKG_INSTALLED_PATH}/lib/libopusfile.a"
+      -force_load "$ENV{VCPKG_INSTALLED_PATH}/lib/libopus.a"
+      "$ENV{VCPKG_INSTALLED_PATH}/lib/libogg.a"
+      "$ENV{VCPKG_INSTALLED_PATH}/lib/libvorbis.a"
+      "$ENV{VCPKG_INSTALLED_PATH}/lib/libvorbisfile.a"
+      m  # Math library
+    )
+  else()
+    # Fallback to CMake targets
+    list(APPEND SYZ_LIBRARIES
+      Ogg::ogg
+      Opus::opus
+      Vorbis::vorbis
+      Vorbis::vorbisfile
+      OpusFile::opusfile
+      m  # Math library
+    )
+  endif()
 endif()
 target_link_libraries(synthizer PRIVATE ${SYZ_LIBRARIES})
 

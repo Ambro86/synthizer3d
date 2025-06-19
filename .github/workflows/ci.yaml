@@ -418,29 +418,19 @@ jobs:
           find . -name "*.so" -type f -exec echo "Checking: {}" \; -exec ldd {} \; 2>/dev/null || echo "No .so files found"
       - name: Repair wheels with auditwheel
         timeout-minutes: 10
-        env:
-          LD_LIBRARY_PATH: ${{ env.VCPKG_INSTALLED_PATH }}/lib:${{ env.LD_LIBRARY_PATH }}
         run: |
           echo "🛠️ Repairing wheels with auditwheel..."
           echo "🔍 Current LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
           echo "🔍 VCPKG_INSTALLED_PATH: $VCPKG_INSTALLED_PATH"
           
-          # Make sure auditwheel can find vcpkg libraries
-          if [ -d "$VCPKG_INSTALLED_PATH/lib" ]; then
-            echo "📂 vcpkg libraries found in: $VCPKG_INSTALLED_PATH/lib"
-            ls -la "$VCPKG_INSTALLED_PATH/lib/" | grep -E "\.(so|so\.[0-9]+)$" | head -10
-          else
-            echo "❌ vcpkg lib directory not found: $VCPKG_INSTALLED_PATH/lib"
-          fi
-          
+          # Since we use static libraries, auditwheel should work without extra lib-dir
           for wheel in dist/*.whl; do
             if [ -f "$wheel" ]; then
               echo "🔧 Repairing wheel: $wheel"
               $PYTHON_PATH/bin/auditwheel repair \
                 "$wheel" \
-                --plat "${{ env.MANYLINUX_VERSION }}_${{ env.CI_ARCH }}" \
-                --wheel-dir wheelhouse \
-                --lib-dir "$VCPKG_INSTALLED_PATH/lib"
+                --plat "${MANYLINUX_VERSION}_${CI_ARCH}" \
+                --wheel-dir wheelhouse
             fi
           done
           

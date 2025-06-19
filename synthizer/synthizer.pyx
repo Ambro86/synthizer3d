@@ -14,10 +14,14 @@ from cpython.ref cimport PyObject, Py_DECREF, Py_INCREF
 from weakref import ref
 
 # We want the ability to acquire and release the GIL, which means making sure it's initialized.
-# It's unclear if you need this for with nogil as well as for with gil, but let's just avoid the headache entirely.
+# In Python 3.7+, the GIL is always initialized, so PyEval_InitThreads() is deprecated.
+# We only call it for older Python versions.
 cdef extern from "Python.h":
     int PyEval_InitThreads()
-PyEval_InitThreads()
+    
+import sys
+if sys.version_info < (3, 9):
+    PyEval_InitThreads()
 cdef extern from "string.h":
     void *memcpy(void *dest, const void *src, size_t count)
 

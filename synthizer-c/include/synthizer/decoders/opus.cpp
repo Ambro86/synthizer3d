@@ -82,25 +82,22 @@ public:
         unsigned int ch_out = channels_req < 1 ? channels : channels_req;
         unsigned long long written = 0;
         
-        // Try to use float version first, fallback to integer if not available
-        #ifdef OP_READ_FLOAT_AVAILABLE
+        // Always try float version first, then fallback to integer conversion
         std::vector<float> tmp_buf(config::BLOCK_SIZE * channels);
-        #else
         std::vector<opus_int16> tmp_buf_int(config::BLOCK_SIZE * channels);
-        std::vector<float> tmp_buf(config::BLOCK_SIZE * channels);
-        #endif
 
         while (written < num) {
             int to_read = static_cast<int>(std::min<unsigned long long>(num - written, config::BLOCK_SIZE));
-            int frames;
+            int frames = 0;
             
+            // Try op_read_float first (if available at runtime)
             #ifdef OP_READ_FLOAT_AVAILABLE
             frames = op_read_float(of, tmp_buf.data(), to_read * channels, nullptr);
             #else
-            // Use integer version and convert to float
+            // Fallback: Use integer version and convert to float
             frames = op_read(of, tmp_buf_int.data(), to_read * channels, nullptr);
             if (frames > 0) {
-                // Convert from int16 to float
+                // Convert from int16 to float with proper scaling
                 for (int i = 0; i < frames * channels; ++i) {
                     tmp_buf[i] = static_cast<float>(tmp_buf_int[i]) / 32768.0f;
                 }

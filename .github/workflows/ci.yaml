@@ -418,8 +418,20 @@ jobs:
           find . -name "*.so" -type f -exec echo "Checking: {}" \; -exec ldd {} \; 2>/dev/null || echo "No .so files found"
       - name: Repair wheels with auditwheel
         timeout-minutes: 10
+        env:
+          LD_LIBRARY_PATH: ${{ env.VCPKG_INSTALLED_PATH }}/lib:${{ env.LD_LIBRARY_PATH }}
         run: |
           echo "🛠️ Repairing wheels with auditwheel..."
+          echo "🔍 Current LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
+          echo "🔍 VCPKG_INSTALLED_PATH: $VCPKG_INSTALLED_PATH"
+          
+          # Make sure auditwheel can find vcpkg libraries
+          if [ -d "$VCPKG_INSTALLED_PATH/lib" ]; then
+            echo "📂 vcpkg libraries found in: $VCPKG_INSTALLED_PATH/lib"
+            ls -la "$VCPKG_INSTALLED_PATH/lib/" | grep -E "\.(so|so\.[0-9]+)$" | head -10
+          else
+            echo "❌ vcpkg lib directory not found: $VCPKG_INSTALLED_PATH/lib"
+          fi
           
           for wheel in dist/*.whl; do
             if [ -f "$wheel" ]; then
@@ -427,7 +439,8 @@ jobs:
               $PYTHON_PATH/bin/auditwheel repair \
                 "$wheel" \
                 --plat "${{ env.MANYLINUX_VERSION }}_${{ env.CI_ARCH }}" \
-                --wheel-dir wheelhouse
+                --wheel-dir wheelhouse \
+                --lib-dir "$VCPKG_INSTALLED_PATH/lib"
             fi
           done
           
@@ -567,6 +580,14 @@ jobs:
           
           # Aggiungi il percorso vcpkg alle variabili d'ambiente per delocate
           export DYLD_LIBRARY_PATH="$VCPKG_LIB_PATH:$DYLD_LIBRARY_PATH"
+          
+          # Check wheel dependencies before repair
+          for wheel in dist/*.whl; do
+            if [ -f "$wheel" ]; then
+              echo "🔍 Analyzing wheel dependencies before repair: $wheel"
+              delocate-listdeps "$wheel" || echo "Could not list dependencies"
+            fi
+          done
           
           for wheel in dist/*.whl; do
             echo "🔧 Repairing wheel: $wheel"
@@ -709,6 +730,14 @@ jobs:
           
           # Aggiungi il percorso vcpkg alle variabili d'ambiente per delocate
           export DYLD_LIBRARY_PATH="$VCPKG_LIB_PATH:$DYLD_LIBRARY_PATH"
+          
+          # Check wheel dependencies before repair
+          for wheel in dist/*.whl; do
+            if [ -f "$wheel" ]; then
+              echo "🔍 Analyzing wheel dependencies before repair: $wheel"
+              delocate-listdeps "$wheel" || echo "Could not list dependencies"
+            fi
+          done
           
           for wheel in dist/*.whl; do
             echo "🔧 Repairing wheel: $wheel"

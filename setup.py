@@ -76,8 +76,9 @@ elif system == "Linux":
 
 if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
     extension_args["library_dirs"].append(vcpkg_lib_dir)
+    # Add libraries based on what we actually have in vcpkg.json
     extension_args["libraries"].extend([
-        "ogg", "vorbis", "vorbisfile", "opus", "opusfile", "vorbisenc"
+        "ogg", "vorbis", "vorbisfile", "vorbisenc", "opus", "opusfile"
     ])
     print(f"Using vcpkg lib dir: {vcpkg_lib_dir} for {system} {machine or arch}")
 

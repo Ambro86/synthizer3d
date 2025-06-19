@@ -147,7 +147,16 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
                 link_args.extend(["-Wl,--whole-archive", lib, "-Wl,--no-whole-archive"])
             extension_args["extra_link_args"].extend(link_args)
             extension_args["libraries"].extend(["m", "dl"])
-            print(f"Linux: Using --whole-archive for ALL {len(existing_libs)} libraries")
+            
+            # Use modern feature macros instead of deprecated ones
+            if "extra_compile_args" not in extension_args:
+                extension_args["extra_compile_args"] = []
+            extension_args["extra_compile_args"].extend([
+                "-D_DEFAULT_SOURCE",  # Modern replacement for _BSD_SOURCE and _SVID_SOURCE
+                "-D_GNU_SOURCE",      # Enable GNU extensions
+                "-Wno-unused-variable"  # Suppress warnings from third-party headers (vorbis)
+            ])
+            print(f"Linux: Using --whole-archive for ALL {len(existing_libs)} libraries with modern feature macros")
         else:  # macOS
             # macOS: Use -force_load for ALL audio libraries
             link_args = []
@@ -155,7 +164,14 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
                 # Apply -force_load to all audio libraries, not just opus
                 link_args.extend(["-Wl,-force_load", lib])
             extension_args["extra_link_args"].extend(link_args)
-            print(f"macOS: Using -force_load for ALL {len(existing_libs)} libraries")
+            
+            # Suppress warnings from third-party headers
+            if "extra_compile_args" not in extension_args:
+                extension_args["extra_compile_args"] = []
+            extension_args["extra_compile_args"].extend([
+                "-Wno-unused-variable"  # Suppress warnings from third-party headers (vorbis)
+            ])
+            print(f"macOS: Using -force_load for ALL {len(existing_libs)} libraries with modern APIs")
         
         print(f"Static libraries found: {[os.path.basename(lib) for lib in existing_libs]}")
         print(f"Link args: {extension_args['extra_link_args']}")

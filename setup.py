@@ -122,7 +122,7 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
         ])
         print("Windows: Using dynamic library linking")
     else:
-        # Linux and macOS: Force static linking by specifying full paths to .a files
+        # Linux and macOS: Force static linking using extra_link_args
         static_libs = [
             os.path.join(vcpkg_lib_dir, "libogg.a"),
             os.path.join(vcpkg_lib_dir, "libopus.a"), 
@@ -132,20 +132,39 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
             os.path.join(vcpkg_lib_dir, "libvorbisfile.a")
         ]
         
-        # Filter out non-existent files and add them as extra objects
+        # Filter out non-existent files
         existing_libs = [lib for lib in static_libs if os.path.exists(lib)]
-        if "extra_objects" not in extension_args:
-            extension_args["extra_objects"] = []
-        extension_args["extra_objects"].extend(existing_libs)
         
-        # Add system libraries
+        # Use extra_link_args to force static linking with whole-archive
+        if "extra_link_args" not in extension_args:
+            extension_args["extra_link_args"] = []
+            
         if system == "Linux":
+            # Linux: Use --whole-archive to ensure all symbols are included
+            link_args = []
+            for lib in existing_libs:
+                if "opusfile" in lib or "opus" in lib:
+                    # Force include these libraries with all symbols
+                    link_args.extend(["-Wl,--whole-archive", lib, "-Wl,--no-whole-archive"])
+                else:
+                    link_args.append(lib)
+            extension_args["extra_link_args"].extend(link_args)
             extension_args["libraries"].extend(["m", "dl"])
-            print(f"Linux: Using static library linking with {len(existing_libs)} libraries")
+            print(f"Linux: Using --whole-archive static linking with {len(existing_libs)} libraries")
         else:  # macOS
-            print(f"macOS: Using static library linking with {len(existing_libs)} libraries")
+            # macOS: Use -force_load for critical libraries
+            link_args = []
+            for lib in existing_libs:
+                if "opusfile" in lib or "opus" in lib:
+                    # Force load these libraries with all symbols
+                    link_args.extend(["-Wl,-force_load", lib])
+                else:
+                    link_args.append(lib)
+            extension_args["extra_link_args"].extend(link_args)
+            print(f"macOS: Using -force_load static linking with {len(existing_libs)} libraries")
         
         print(f"Static libraries found: {[os.path.basename(lib) for lib in existing_libs]}")
+        print(f"Link args: {extension_args['extra_link_args']}")
 
 extensions = [
     Extension("synthizer.synthizer", ["synthizer/synthizer.pyx"], **extension_args),

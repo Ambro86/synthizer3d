@@ -147,17 +147,7 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
                 link_args.extend(["-Wl,--whole-archive", lib, "-Wl,--no-whole-archive"])
             extension_args["extra_link_args"].extend(link_args)
             extension_args["libraries"].extend(["m", "dl"])
-            
-            # Add compiler flags to suppress common warnings
-            if "extra_compile_args" not in extension_args:
-                extension_args["extra_compile_args"] = []
-            extension_args["extra_compile_args"].extend([
-                "-Wno-deprecated-declarations",  # Suppress PyEval_InitThreads warning
-                "-Wno-unused-variable",          # Suppress OV_CALLBACKS_* warnings
-                "-Wno-cpp",                      # Suppress _BSD_SOURCE/_SVID_SOURCE warnings
-                "-D_DEFAULT_SOURCE"              # Use modern feature macro
-            ])
-            print(f"Linux: Using --whole-archive for ALL {len(existing_libs)} libraries with warning suppressions")
+            print(f"Linux: Using --whole-archive for ALL {len(existing_libs)} libraries")
         else:  # macOS
             # macOS: Use -force_load for ALL audio libraries
             link_args = []
@@ -165,15 +155,7 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
                 # Apply -force_load to all audio libraries, not just opus
                 link_args.extend(["-Wl,-force_load", lib])
             extension_args["extra_link_args"].extend(link_args)
-            
-            # Add compiler flags to suppress common warnings on macOS too
-            if "extra_compile_args" not in extension_args:
-                extension_args["extra_compile_args"] = []
-            extension_args["extra_compile_args"].extend([
-                "-Wno-deprecated-declarations",  # Suppress PyEval_InitThreads warning
-                "-Wno-unused-variable"           # Suppress unused variable warnings
-            ])
-            print(f"macOS: Using -force_load for ALL {len(existing_libs)} libraries with warning suppressions")
+            print(f"macOS: Using -force_load for ALL {len(existing_libs)} libraries")
         
         print(f"Static libraries found: {[os.path.basename(lib) for lib in existing_libs]}")
         print(f"Link args: {extension_args['extra_link_args']}")

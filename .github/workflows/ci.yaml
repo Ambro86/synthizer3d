@@ -372,6 +372,14 @@ jobs:
           echo "🔍 Final verification of vcpkg installation:"
           "$VCPKG_ROOT/vcpkg" list | grep -E "(vorbis|opus|ogg|faad)" || echo "No audio libraries found in vcpkg list"
           
+          echo "🔍 Checking for op_read_float symbol in opusfile library:"
+          if [ -f "${VCPKG_INSTALLED_PATH}/lib/libopusfile.a" ]; then
+            nm "${VCPKG_INSTALLED_PATH}/lib/libopusfile.a" | grep op_read_float || echo "op_read_float not found in libopusfile.a"
+          fi
+          if [ -f "${VCPKG_INSTALLED_PATH}/lib/libopusfile.so" ]; then
+            nm -D "${VCPKG_INSTALLED_PATH}/lib/libopusfile.so" | grep op_read_float || echo "op_read_float not found in libopusfile.so"
+          fi
+          
           echo "🚀 Starting Python wheel build..."
           $PYTHON_PATH/bin/python -m build --wheel --no-isolation \
             --config-setting="cmake.args=-DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
@@ -380,7 +388,9 @@ jobs:
             --config-setting="cmake.args=-DVorbis_DIR=${VCPKG_INSTALLED_PATH}/share/Vorbis" \
             --config-setting="cmake.args=-DOgg_DIR=${VCPKG_INSTALLED_PATH}/share/Ogg" \
             --config-setting="cmake.args=-DOpus_DIR=${VCPKG_INSTALLED_PATH}/share/Opus" \
-            --config-setting="cmake.args=-DOpusFile_DIR=${VCPKG_INSTALLED_PATH}/share/opusfile"
+            --config-setting="cmake.args=-DOpusFile_DIR=${VCPKG_INSTALLED_PATH}/share/opusfile" \
+            --config-setting="cmake.args=-DCMAKE_EXE_LINKER_FLAGS=-static-libgcc -static-libstdc++" \
+            --config-setting="cmake.args=-DCMAKE_SHARED_LINKER_FLAGS=-static-libgcc -static-libstdc++"
 
  
       - name: Debug vcpkg libraries and dependencies

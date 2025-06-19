@@ -126,10 +126,10 @@ set(SYZ_LIBRARIES
   ${SYZ_DEPS}
   Threads::Threads
   ${CMAKE_DL_LIBS}
-  Vorbis::vorbis
-  Vorbis::vorbisfile
   Ogg::ogg
   Opus::opus
+  Vorbis::vorbis
+  Vorbis::vorbisfile
   OpusFile::opusfile
 )
 if(WIN32)
@@ -140,6 +140,14 @@ if(WIN32)
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/opus.lib"
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/opusfile.lib"
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/vorbisenc.lib"
+  )
+elseif(UNIX AND NOT APPLE)
+  # Linux-specific linking for static libraries
+  list(APPEND SYZ_LIBRARIES
+    -Wl,--start-group
+    -Wl,--whole-archive
+    -Wl,--end-group
+    m  # Math library
   )
 endif()
 target_link_libraries(synthizer PRIVATE ${SYZ_LIBRARIES})
@@ -173,6 +181,11 @@ add_custom_target(data
 )
 
 find_library(MATH_LIBRARY m)
+if(MATH_LIBRARY)
+  message(STATUS "Math library found: ${MATH_LIBRARY}")
+else()
+  message(STATUS "Math library not found")
+endif()
 
 function(example NAME EXT)
   if (NOT "${SYZ_INTEGRATING}")

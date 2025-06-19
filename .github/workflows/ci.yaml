@@ -3,6 +3,10 @@
 #Ver. 0.9.0
 # Trigger del workflow: si attiva ad ogni push e pull request
 on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
   workflow_dispatch: # Permette l'avvio manuale dalla tab Azioni di GitHub
 jobs:
   # Job per costruire le wheel su Windows

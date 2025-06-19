@@ -28,6 +28,28 @@ find_package(Ogg REQUIRED)
 find_package(Opus REQUIRED)
 find_package(OpusFile REQUIRED)
 
+# Check if op_read_float is available
+include(CheckCXXSourceCompiles)
+set(CMAKE_REQUIRED_LIBRARIES OpusFile::opusfile Opus::opus Ogg::ogg)
+check_cxx_source_compiles([[
+  extern "C" {
+  #include <opusfile.h>
+  }
+  int main() {
+    OggOpusFile* of = nullptr;
+    float* pcm = nullptr;
+    int result = op_read_float(of, pcm, 0, nullptr);
+    return 0;
+  }
+]] OP_READ_FLOAT_AVAILABLE)
+
+if(OP_READ_FLOAT_AVAILABLE)
+  message(STATUS "op_read_float is available")
+  add_compile_definitions(OP_READ_FLOAT_AVAILABLE)
+else()
+  message(STATUS "op_read_float is NOT available, will use op_read with conversion")
+endif()
+
 set(SYZ_DEPS
   boost_partial
   concurrentqueue
@@ -73,6 +95,7 @@ check_cxx_source_runs([[
     return 0;
   }
 ]] FILESYSTEM_OK)
+
 
 if(NOT FILESYSTEM_OK)
   message(WARNING "C++17 filesystem not found or not functional on this platform")

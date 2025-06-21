@@ -352,21 +352,15 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
   if (std::abs(pitch_factor - this->last_pitch_value) > 0.001) { // Small epsilon to avoid floating point noise
     const double semitones = 12.0 * std::log2(pitch_factor);
     
-    // Recreate SoundTouch processor for immediate pitch response
-    // This completely eliminates any internal buffering delays
-    this->soundtouch_processor = std::make_unique<soundtouch::SoundTouch>();
-    this->soundtouch_processor->setSampleRate(config::SR);
-    this->soundtouch_processor->setChannels(this->getChannels());
+    // Strategy: Clear and reconfigure instead of recreating to avoid distortion
+    this->soundtouch_processor->clear(); // Clear internal buffers
     
-    // Configure for time-stretch mode with new pitch
-    this->soundtouch_processor->setTempoChange(0);
-    
-    // Configure for low latency and fast response
-    this->soundtouch_processor->setSetting(SETTING_USE_QUICKSEEK, 1);
-    this->soundtouch_processor->setSetting(SETTING_USE_AA_FILTER, 0);
-    this->soundtouch_processor->setSetting(SETTING_SEQUENCE_MS, 20);
-    this->soundtouch_processor->setSetting(SETTING_SEEKWINDOW_MS, 10);
-    this->soundtouch_processor->setSetting(SETTING_OVERLAP_MS, 5);
+    // Configure for minimum latency while maintaining quality
+    this->soundtouch_processor->setSetting(SETTING_SEQUENCE_MS, 15);      // Very short sequences
+    this->soundtouch_processor->setSetting(SETTING_SEEKWINDOW_MS, 8);     // Minimal seek window  
+    this->soundtouch_processor->setSetting(SETTING_OVERLAP_MS, 4);        // Minimal overlap
+    this->soundtouch_processor->setSetting(SETTING_USE_QUICKSEEK, 1);     // Fast seeking
+    this->soundtouch_processor->setSetting(SETTING_USE_AA_FILTER, 1);     // Keep anti-aliasing for quality
     
     this->soundtouch_processor->setPitchSemiTones(static_cast<float>(semitones));
     this->last_pitch_value = pitch_factor;
@@ -395,43 +389,37 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
             }
           }
           
-          // Process through SoundTouch - feed enough samples for immediate output
-          // Since we might have just recreated SoundTouch, we need to prime it properly
+          // Process through SoundTouch with gentle priming
           this->soundtouch_processor->putSamples(input_samples.data(), will_read_frames);
-          
-          // Feed extra samples to ensure we get immediate output
-          std::vector<float> extra_input(will_read_frames * channels);
-          for (std::size_t i = 0; i < will_read_frames; i++) {
-            for (unsigned int ch = 0; ch < channels; ch++) {
-              extra_input[i * channels + ch] = input_samples[i * channels + ch];
-            }
-          }
-          this->soundtouch_processor->putSamples(extra_input.data(), will_read_frames);
           
           // Get processed samples
           std::vector<float> output_samples(config::BLOCK_SIZE * channels);
           std::size_t received_samples = this->soundtouch_processor->receiveSamples(output_samples.data(), config::BLOCK_SIZE);
           
-          // If still not enough samples, repeat input until we get what we need
-          int attempts = 0;
-          while (received_samples < config::BLOCK_SIZE && attempts < 3) {
+          // If we need more samples, gently prime with one extra feed (not aggressive looping)
+          if (received_samples < config::BLOCK_SIZE / 2) { // Only if we're really short
             this->soundtouch_processor->putSamples(input_samples.data(), will_read_frames);
             std::size_t additional_samples = this->soundtouch_processor->receiveSamples(
               output_samples.data() + received_samples * channels, 
               config::BLOCK_SIZE - received_samples
             );
             received_samples += additional_samples;
-            attempts++;
           }
           
-          // Apply gain and copy to output, zero-pad if necessary
+          // Apply gain and copy to output with gentle fade for missing samples
           for (std::size_t i = 0; i < config::BLOCK_SIZE; i++) {
             float gain = gain_cb(i);
             for (unsigned int ch = 0; ch < channels; ch++) {
               if (i < received_samples) {
                 output[i * channels + ch] += output_samples[i * channels + ch] * gain;
+              } else if (received_samples > 0) {
+                // Gentle fade out using last available sample to avoid clicks
+                float fade_factor = 1.0f - (float)(i - received_samples) / (float)(config::BLOCK_SIZE - received_samples);
+                fade_factor = std::max(0.0f, fade_factor);
+                std::size_t last_sample_idx = (received_samples - 1) * channels + ch;
+                output[i * channels + ch] += output_samples[last_sample_idx] * gain * fade_factor * 0.1f; // Very gentle
               }
-              // If we don't have enough samples, the output remains zero (silence)
+              // If no samples at all, output remains zero (silence)
             }
           }
         });

@@ -375,12 +375,12 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
       this->speed_processor->setPitchSemiTones(static_cast<float>(semitones));
     }
     
-    // Configure for low latency and fast response
-    this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 1);
+    // Configure for better quality with acceptable latency
+    this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);
     this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);
-    this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 15);
-    this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 8);
-    this->speed_processor->setSetting(SETTING_OVERLAP_MS, 4);
+    this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);
+    this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
+    this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);
     
     this->last_speed_value = speed_factor;
   }
@@ -402,11 +402,11 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
         this->speed_crossfade_processor->setPitchSemiTones(static_cast<float>(semitones));
       }
       
-      // Configure for low latency
-      this->speed_crossfade_processor->setSetting(SETTING_SEQUENCE_MS, 15);
-      this->speed_crossfade_processor->setSetting(SETTING_SEEKWINDOW_MS, 8);
-      this->speed_crossfade_processor->setSetting(SETTING_OVERLAP_MS, 4);
-      this->speed_crossfade_processor->setSetting(SETTING_USE_QUICKSEEK, 1);
+      // Configure for better quality
+      this->speed_crossfade_processor->setSetting(SETTING_SEQUENCE_MS, 40);
+      this->speed_crossfade_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
+      this->speed_crossfade_processor->setSetting(SETTING_OVERLAP_MS, 8);
+      this->speed_crossfade_processor->setSetting(SETTING_USE_QUICKSEEK, 0);
       this->speed_crossfade_processor->setSetting(SETTING_USE_AA_FILTER, 1);
       
       // Setup crossfade: 64 samples = ~1.3ms at 48kHz
@@ -416,16 +416,19 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
     // Configure main processor with new speed
     this->speed_processor->clear();
     
-    // Configure for minimum latency while maintaining quality
-    this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 15);
-    this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 8);
-    this->speed_processor->setSetting(SETTING_OVERLAP_MS, 4);
-    this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 1);
+    // Configure for better quality while maintaining reasonable latency
+    this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);
+    this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
+    this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);
+    this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);
     this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);
     
     this->speed_processor->setTempo(speed_factor);
     
-    // Apply current pitch
+    // Reset pitch to original before applying any pitch bend
+    this->speed_processor->setPitchSemiTones(0);
+    
+    // Apply current pitch bend if needed
     if (pitch_factor != 1.0) {
       const double semitones = 12.0 * std::log2(pitch_factor);
       this->speed_processor->setPitchSemiTones(static_cast<float>(semitones));

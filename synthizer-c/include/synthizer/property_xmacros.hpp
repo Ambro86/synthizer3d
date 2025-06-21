@@ -71,7 +71,8 @@ extern "C" {
 #define BUFFER_GENERATOR_PROPERTIES                                                                                    \
   OBJECT_P(SYZ_P_BUFFER, buffer, Buffer, Buffer)                                                                       \
   DOUBLE_P(SYZ_P_PLAYBACK_POSITION, playback_position, PlaybackPosition, 0.0, P_DOUBLE_MAX, 0.0)                       \
-  INT_P(SYZ_P_LOOPING, looping, Looping, 0, 1, 0)
+  INT_P(SYZ_P_LOOPING, looping, Looping, 0, 1, 0)                                                                      \
+  INT_P(SYZ_P_PITCH_BEND_MODE, pitch_bend_mode, PitchBendMode, 0, SYZ_PITCH_BEND_MODE_COUNT - 1, SYZ_PITCH_BEND_MODE_TIME_STRETCH)
 
 #define STREAMING_GENERATOR_PROPERTIES                                                                                 \
   DOUBLE_P(SYZ_P_PLAYBACK_POSITION, playback_position, PlaybackPosition, 0.0, P_DOUBLE_MAX, 0.0)                       \

@@ -352,12 +352,9 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
   if (std::abs(pitch_factor - this->last_pitch_value) > 0.001) { // Small epsilon to avoid floating point noise
     const double semitones = 12.0 * std::log2(pitch_factor);
     
-    // For large pitch changes, flush to avoid artifacts
-    // For small changes, let SoundTouch handle the transition smoothly
-    double pitch_change_ratio = std::abs(pitch_factor / this->last_pitch_value);
-    if (pitch_change_ratio > 1.1 || pitch_change_ratio < 0.9) { // >10% change
-      this->soundtouch_processor->flush();
-    }
+    // Always flush when pitch changes to ensure immediate response
+    // This prevents old pitch from playing for several seconds
+    this->soundtouch_processor->flush();
     
     this->soundtouch_processor->setPitchSemiTones(static_cast<float>(semitones));
     this->last_pitch_value = pitch_factor;
@@ -393,9 +390,24 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
           std::vector<float> output_samples(config::BLOCK_SIZE * channels);
           std::size_t received_samples = this->soundtouch_processor->receiveSamples(output_samples.data(), config::BLOCK_SIZE);
           
-          // If we didn't get enough samples, try to flush a bit more from SoundTouch
+          // If we didn't get enough samples after a pitch change, feed more input
           if (received_samples < config::BLOCK_SIZE) {
-            // Don't flush completely, just nudge SoundTouch to give us more samples
+            // SoundTouch might need more input samples to produce output, especially after flush
+            // Feed additional samples from the current position to prime the pipeline
+            std::size_t extra_frames = config::BLOCK_SIZE;
+            std::vector<float> extra_input(extra_frames * channels);
+            
+            // Repeat the current samples to prime SoundTouch
+            for (std::size_t i = 0; i < extra_frames; i++) {
+              for (unsigned int ch = 0; ch < channels; ch++) {
+                std::size_t src_idx = (i % will_read_frames) * channels + ch;
+                extra_input[i * channels + ch] = input_samples[src_idx];
+              }
+            }
+            
+            this->soundtouch_processor->putSamples(extra_input.data(), extra_frames);
+            
+            // Try to get more samples
             std::size_t additional_samples = this->soundtouch_processor->receiveSamples(
               output_samples.data() + received_samples * channels, 
               config::BLOCK_SIZE - received_samples

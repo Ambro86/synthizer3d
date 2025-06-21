@@ -325,8 +325,9 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
   
   // Read more data than we need for pitch shifting
   const std::size_t extra_samples = static_cast<std::size_t>(will_read_frames * std::abs(pitch_factor - 1.0) + 64);
-  const std::size_t total_read = std::min(will_read_frames + extra_samples, 
-                                         this->reader.getLengthInFrames(false) - this->getPosInSamples());
+  const std::uint64_t buffer_remaining = this->reader.getLengthInFrames(false) - this->getPosInSamples();
+  const std::size_t total_read = std::min(static_cast<std::size_t>(will_read_frames + extra_samples), 
+                                         static_cast<std::size_t>(buffer_remaining));
   
   auto mp = this->reader.getFrameSlice(this->scaled_position_in_frames / config::BUFFER_POS_MULTIPLIER,
                                        total_read, false, true);

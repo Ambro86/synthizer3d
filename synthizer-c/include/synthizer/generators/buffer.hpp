@@ -74,9 +74,11 @@ private:
   
   // SoundTouch instance for time-stretch pitch shifting
   mutable std::unique_ptr<soundtouch::SoundTouch> soundtouch_processor;
+  // Cache last pitch value to avoid unnecessary SoundTouch reconfigurations
+  mutable double last_pitch_value;
 };
 
-inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx) {}
+inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx), last_pitch_value(-1.0) {}
 
 inline int BufferGenerator::getObjectType() { return SYZ_OTYPE_BUFFER_GENERATOR; }
 
@@ -321,6 +323,8 @@ inline void BufferGenerator::generatePitchBend(float *output, FadeDriver *gd) co
 inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver *gd) const {
   assert(this->finished == false);
   
+  const double pitch_factor = this->getPitchBend();
+  
   // Initialize SoundTouch processor if needed
   if (!this->soundtouch_processor) {
     this->soundtouch_processor = std::make_unique<soundtouch::SoundTouch>();
@@ -328,14 +332,20 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
     this->soundtouch_processor->setChannels(this->getChannels());
     
     // Configure for time-stretch mode (preserve speed, change pitch)
-    this->soundtouch_processor->setPitchSemiTones(0); // Will be set below
     this->soundtouch_processor->setTempoChange(0);    // No tempo change (preserve speed)
+    
+    // Set initial pitch and cache the value
+    const double semitones = 12.0 * std::log2(pitch_factor);
+    this->soundtouch_processor->setPitchSemiTones(static_cast<float>(semitones));
+    this->last_pitch_value = pitch_factor;
   }
   
-  // Update pitch based on pitch_bend (convert to semitones)
-  const double pitch_factor = this->getPitchBend();
-  const double semitones = 12.0 * std::log2(pitch_factor); // Convert ratio to semitones
-  this->soundtouch_processor->setPitchSemiTones(static_cast<float>(semitones));
+  // Only update pitch if it has actually changed (avoid unnecessary processing)
+  if (std::abs(pitch_factor - this->last_pitch_value) > 0.001) { // Small epsilon to avoid floating point noise
+    const double semitones = 12.0 * std::log2(pitch_factor);
+    this->soundtouch_processor->setPitchSemiTones(static_cast<float>(semitones));
+    this->last_pitch_value = pitch_factor;
+  }
   
   std::size_t will_read_frames = config::BLOCK_SIZE;
   if (this->getPosInSamples() + will_read_frames > this->reader.getLengthInFrames(false) &&
@@ -363,15 +373,28 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
           // Process through SoundTouch
           this->soundtouch_processor->putSamples(input_samples.data(), will_read_frames);
           
-          // Get processed samples
+          // Get processed samples - try to get exactly BLOCK_SIZE samples
           std::vector<float> output_samples(config::BLOCK_SIZE * channels);
           std::size_t received_samples = this->soundtouch_processor->receiveSamples(output_samples.data(), config::BLOCK_SIZE);
           
-          // Apply gain and copy to output
-          for (std::size_t i = 0; i < received_samples && i < config::BLOCK_SIZE; i++) {
+          // If we didn't get enough samples, try to flush a bit more from SoundTouch
+          if (received_samples < config::BLOCK_SIZE) {
+            // Don't flush completely, just nudge SoundTouch to give us more samples
+            std::size_t additional_samples = this->soundtouch_processor->receiveSamples(
+              output_samples.data() + received_samples * channels, 
+              config::BLOCK_SIZE - received_samples
+            );
+            received_samples += additional_samples;
+          }
+          
+          // Apply gain and copy to output, zero-pad if necessary
+          for (std::size_t i = 0; i < config::BLOCK_SIZE; i++) {
             float gain = gain_cb(i);
             for (unsigned int ch = 0; ch < channels; ch++) {
-              output[i * channels + ch] += output_samples[i * channels + ch] * gain;
+              if (i < received_samples) {
+                output[i * channels + ch] += output_samples[i * channels + ch] * gain;
+              }
+              // If we don't have enough samples, the output remains zero (silence)
             }
           }
         });
@@ -392,6 +415,12 @@ inline bool BufferGenerator::handlePropertyConfig() {
   }
 
   this->reader.setBuffer(buffer.get());
+
+  // Reset SoundTouch processor when buffer changes to avoid artifacts
+  if (this->soundtouch_processor) {
+    this->soundtouch_processor->clear();
+    this->last_pitch_value = -1.0; // Force reconfiguration on next use
+  }
 
   // It is possible that the user set the buffer then changed the playback position.  It is very difficult to tell the
   // difference between this and setting the position immediately before changing the buffer without rewriting the

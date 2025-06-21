@@ -14,10 +14,13 @@
 #include <memory>
 #include <optional>
 #include <cmath>
+#include <vector>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+
+#include <SoundTouch.h>
 
 namespace synthizer {
 
@@ -68,6 +71,9 @@ private:
   bool finished = false;
 
   std::uint64_t scaled_position_in_frames = 0, scaled_position_increment = 0;
+  
+  // SoundTouch instance for time-stretch pitch shifting
+  mutable std::unique_ptr<soundtouch::SoundTouch> soundtouch_processor;
 };
 
 inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx) {}
@@ -315,8 +321,22 @@ inline void BufferGenerator::generatePitchBend(float *output, FadeDriver *gd) co
 inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver *gd) const {
   assert(this->finished == false);
   
-  // For time-stretch pitch, we use a much simpler approach:
-  // Just read at normal speed and apply simple resampling with linear interpolation
+  // Initialize SoundTouch processor if needed
+  if (!this->soundtouch_processor) {
+    this->soundtouch_processor = std::make_unique<soundtouch::SoundTouch>();
+    this->soundtouch_processor->setSampleRate(config::SR);
+    this->soundtouch_processor->setChannels(this->getChannels());
+    
+    // Configure for time-stretch mode (preserve speed, change pitch)
+    this->soundtouch_processor->setPitchSemiTones(0); // Will be set below
+    this->soundtouch_processor->setTempoChange(0);    // No tempo change (preserve speed)
+  }
+  
+  // Update pitch based on pitch_bend (convert to semitones)
+  const double pitch_factor = this->getPitchBend();
+  const double semitones = 12.0 * std::log2(pitch_factor); // Convert ratio to semitones
+  this->soundtouch_processor->setPitchSemiTones(static_cast<float>(semitones));
+  
   std::size_t will_read_frames = config::BLOCK_SIZE;
   if (this->getPosInSamples() + will_read_frames > this->reader.getLengthInFrames(false) &&
       this->getLooping() == false) {
@@ -325,43 +345,33 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
   }
 
   const unsigned int channels = this->getChannels();
-  const double pitch_factor = this->getPitchBend();
-  
-  // Read enough data for resampling
-  const std::size_t read_size = static_cast<std::size_t>(will_read_frames * std::max(pitch_factor, 1.0) + 4);
-  const std::uint64_t buffer_remaining = this->reader.getLengthInFrames(false) - this->getPosInSamples();
-  const std::size_t total_read = std::min(read_size, static_cast<std::size_t>(buffer_remaining));
   
   auto mp = this->reader.getFrameSlice(this->scaled_position_in_frames / config::BUFFER_POS_MULTIPLIER,
-                                       total_read, false, true);
+                                       will_read_frames, false, true);
   
   std::visit(
       [&](auto ptr) {
         gd->drive(this->getContextRaw()->getBlockTime(), [&](auto gain_cb) {
-          // Simple linear resampling for pitch shifting
-          // This maintains the original timing but changes pitch
-          
+          // Convert int16 samples to float for SoundTouch
+          std::vector<float> input_samples(will_read_frames * channels);
           for (std::size_t i = 0; i < will_read_frames; i++) {
-            float gain = gain_cb(i) * (1.0f / 32768.0f);
-            
-            // Calculate source position for pitch shifting
-            double src_pos = static_cast<double>(i) * pitch_factor;
-            std::size_t src_idx = static_cast<std::size_t>(src_pos);
-            
-            if (src_idx + 1 < total_read) {
-              double frac = src_pos - static_cast<double>(src_idx);
-              
-              for (unsigned int ch = 0; ch < channels; ch++) {
-                float sample1 = ptr[src_idx * channels + ch];
-                float sample2 = ptr[(src_idx + 1) * channels + ch];
-                float interpolated = sample1 * (1.0f - static_cast<float>(frac)) + sample2 * static_cast<float>(frac);
-                output[i * channels + ch] += interpolated * gain;
-              }
-            } else if (src_idx < total_read) {
-              // Use the last available sample
-              for (unsigned int ch = 0; ch < channels; ch++) {
-                output[i * channels + ch] += ptr[src_idx * channels + ch] * gain;
-              }
+            for (unsigned int ch = 0; ch < channels; ch++) {
+              input_samples[i * channels + ch] = ptr[i * channels + ch] * (1.0f / 32768.0f);
+            }
+          }
+          
+          // Process through SoundTouch
+          this->soundtouch_processor->putSamples(input_samples.data(), will_read_frames);
+          
+          // Get processed samples
+          std::vector<float> output_samples(config::BLOCK_SIZE * channels);
+          std::size_t received_samples = this->soundtouch_processor->receiveSamples(output_samples.data(), config::BLOCK_SIZE);
+          
+          // Apply gain and copy to output
+          for (std::size_t i = 0; i < received_samples && i < config::BLOCK_SIZE; i++) {
+            float gain = gain_cb(i);
+            for (unsigned int ch = 0; ch < channels; ch++) {
+              output[i * channels + ch] += output_samples[i * channels + ch] * gain;
             }
           }
         });

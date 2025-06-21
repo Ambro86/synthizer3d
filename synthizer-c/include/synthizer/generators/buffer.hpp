@@ -77,9 +77,13 @@ private:
   mutable std::unique_ptr<soundtouch::SoundTouch> soundtouch_processor;
   // Cache last pitch value to avoid unnecessary SoundTouch reconfigurations
   mutable double last_pitch_value;
+  // Crossfade system for smooth pitch transitions
+  mutable std::unique_ptr<soundtouch::SoundTouch> crossfade_processor;
+  mutable std::vector<float> crossfade_buffer;
+  mutable int crossfade_samples_remaining;
 };
 
-inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx), last_pitch_value(-1.0) {}
+inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx), last_pitch_value(-1.0), crossfade_samples_remaining(0) {}
 
 inline int BufferGenerator::getObjectType() { return SYZ_OTYPE_BUFFER_GENERATOR; }
 
@@ -352,7 +356,31 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
   if (std::abs(pitch_factor - this->last_pitch_value) > 0.001) { // Small epsilon to avoid floating point noise
     const double semitones = 12.0 * std::log2(pitch_factor);
     
-    // Strategy: Clear and reconfigure instead of recreating to avoid distortion
+    // Setup crossfade system for smooth pitch transition
+    if (this->soundtouch_processor && this->last_pitch_value > 0) {
+      // Create crossfade processor with old pitch for smooth transition
+      this->crossfade_processor = std::make_unique<soundtouch::SoundTouch>();
+      this->crossfade_processor->setSampleRate(config::SR);
+      this->crossfade_processor->setChannels(this->getChannels());
+      this->crossfade_processor->setTempoChange(0);
+      
+      // Configure for low latency
+      this->crossfade_processor->setSetting(SETTING_SEQUENCE_MS, 15);
+      this->crossfade_processor->setSetting(SETTING_SEEKWINDOW_MS, 8);
+      this->crossfade_processor->setSetting(SETTING_OVERLAP_MS, 4);
+      this->crossfade_processor->setSetting(SETTING_USE_QUICKSEEK, 1);
+      this->crossfade_processor->setSetting(SETTING_USE_AA_FILTER, 1);
+      
+      // Set old pitch for crossfade
+      const double old_semitones = 12.0 * std::log2(this->last_pitch_value);
+      this->crossfade_processor->setPitchSemiTones(static_cast<float>(old_semitones));
+      
+      // Setup crossfade: 64 samples = ~1.3ms at 48kHz (very short!)
+      this->crossfade_samples_remaining = 64;
+      this->crossfade_buffer.resize(this->crossfade_samples_remaining * this->getChannels());
+    }
+    
+    // Configure main processor with new pitch
     this->soundtouch_processor->clear(); // Clear internal buffers
     
     // Configure for minimum latency while maintaining quality
@@ -396,8 +424,8 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
           std::vector<float> output_samples(config::BLOCK_SIZE * channels);
           std::size_t received_samples = this->soundtouch_processor->receiveSamples(output_samples.data(), config::BLOCK_SIZE);
           
-          // If we need more samples, gently prime with one extra feed (not aggressive looping)
-          if (received_samples < config::BLOCK_SIZE / 2) { // Only if we're really short
+          // If we need more samples, gently prime with one extra feed
+          if (received_samples < config::BLOCK_SIZE / 2) {
             this->soundtouch_processor->putSamples(input_samples.data(), will_read_frames);
             std::size_t additional_samples = this->soundtouch_processor->receiveSamples(
               output_samples.data() + received_samples * channels, 
@@ -406,21 +434,53 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
             received_samples += additional_samples;
           }
           
-          // Apply gain and copy to output with gentle fade for missing samples
+          // Handle crossfade if active
+          std::vector<float> crossfade_samples;
+          std::size_t crossfade_received = 0;
+          
+          if (this->crossfade_processor && this->crossfade_samples_remaining > 0) {
+            // Process same input through crossfade processor (old pitch)
+            this->crossfade_processor->putSamples(input_samples.data(), will_read_frames);
+            crossfade_samples.resize(config::BLOCK_SIZE * channels);
+            crossfade_received = this->crossfade_processor->receiveSamples(crossfade_samples.data(), config::BLOCK_SIZE);
+          }
+          
+          // Apply gain and mix with crossfade
           for (std::size_t i = 0; i < config::BLOCK_SIZE; i++) {
             float gain = gain_cb(i);
-            for (unsigned int ch = 0; ch < channels; ch++) {
-              if (i < received_samples) {
-                output[i * channels + ch] += output_samples[i * channels + ch] * gain;
-              } else if (received_samples > 0) {
-                // Gentle fade out using last available sample to avoid clicks
-                float fade_factor = 1.0f - (float)(i - received_samples) / (float)(config::BLOCK_SIZE - received_samples);
-                fade_factor = std::max(0.0f, fade_factor);
-                std::size_t last_sample_idx = (received_samples - 1) * channels + ch;
-                output[i * channels + ch] += output_samples[last_sample_idx] * gain * fade_factor * 0.1f; // Very gentle
-              }
-              // If no samples at all, output remains zero (silence)
+            
+            // Calculate crossfade weights
+            float new_weight = 1.0f;
+            float old_weight = 0.0f;
+            
+            if (this->crossfade_samples_remaining > 0 && crossfade_received > 0) {
+              int samples_into_crossfade = 64 - this->crossfade_samples_remaining;
+              float crossfade_progress = (float)samples_into_crossfade / 64.0f;
+              new_weight = crossfade_progress;
+              old_weight = 1.0f - crossfade_progress;
+              this->crossfade_samples_remaining--;
             }
+            
+            for (unsigned int ch = 0; ch < channels; ch++) {
+              float final_sample = 0.0f;
+              
+              // Mix new pitch sample
+              if (i < received_samples) {
+                final_sample += output_samples[i * channels + ch] * new_weight;
+              }
+              
+              // Mix old pitch sample for crossfade
+              if (old_weight > 0.0f && i < crossfade_received) {
+                final_sample += crossfade_samples[i * channels + ch] * old_weight;
+              }
+              
+              output[i * channels + ch] += final_sample * gain;
+            }
+          }
+          
+          // Clean up crossfade processor when done
+          if (this->crossfade_samples_remaining <= 0) {
+            this->crossfade_processor.reset();
           }
         });
       },
@@ -441,10 +501,14 @@ inline bool BufferGenerator::handlePropertyConfig() {
 
   this->reader.setBuffer(buffer.get());
 
-  // Reset SoundTouch processor when buffer changes to avoid artifacts
+  // Reset SoundTouch processors when buffer changes to avoid artifacts
   if (this->soundtouch_processor) {
     this->soundtouch_processor->clear();
     this->last_pitch_value = -1.0; // Force reconfiguration on next use
+  }
+  if (this->crossfade_processor) {
+    this->crossfade_processor.reset();
+    this->crossfade_samples_remaining = 0;
   }
 
   // It is possible that the user set the buffer then changed the playback position.  It is very difficult to tell the

@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <memory>
 #include <optional>
+#include <cmath>
 
 namespace synthizer {
 
@@ -310,8 +311,8 @@ inline void BufferGenerator::generatePitchBend(float *output, FadeDriver *gd) co
 inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver *gd) const {
   assert(this->finished == false);
   
-  // For time-stretch pitch, we read at normal speed but apply pitch shifting
-  // This is a simplified implementation that uses frequency domain manipulation
+  // For time-stretch pitch, we read at normal speed (same as no pitch bend)
+  // but apply pitch shifting using a granular/overlap-add approach
   std::size_t will_read_frames = config::BLOCK_SIZE;
   if (this->getPosInSamples() + will_read_frames > this->reader.getLengthInFrames(false) &&
       this->getLooping() == false) {
@@ -322,35 +323,57 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
   const unsigned int channels = this->getChannels();
   const double pitch_factor = this->getPitchBend();
   
+  // Read more data than we need for pitch shifting
+  const std::size_t extra_samples = static_cast<std::size_t>(will_read_frames * std::abs(pitch_factor - 1.0) + 64);
+  const std::size_t total_read = std::min(will_read_frames + extra_samples, 
+                                         this->reader.getLengthInFrames(false) - this->getPosInSamples());
+  
   auto mp = this->reader.getFrameSlice(this->scaled_position_in_frames / config::BUFFER_POS_MULTIPLIER,
-                                       will_read_frames, false, true);
+                                       total_read, false, true);
   
   std::visit(
       [&](auto ptr) {
         gd->drive(this->getContextRaw()->getBlockTime(), [&](auto gain_cb) {
-          // Simple pitch shifting using linear interpolation with resampling
-          // This maintains playback speed but changes pitch
+          // Use a simple granular synthesis approach for pitch shifting
+          // This maintains timing while changing pitch
+          const double grain_size = 128.0; // Small grain size for better quality
+          
           for (std::size_t i = 0; i < will_read_frames; i++) {
             float gain = gain_cb(i) * (1.0f / 32768.0f);
             
-            // Calculate the source position for pitch shifting
-            double src_pos = i * pitch_factor;
-            std::size_t src_idx = static_cast<std::size_t>(src_pos);
-            double frac = src_pos - src_idx;
-            
-            // Ensure we don't read beyond the buffer
-            if (src_idx + 1 < will_read_frames) {
-              for (unsigned int ch = 0; ch < channels; ch++) {
-                // Linear interpolation for pitch shifting
-                float sample1 = ptr[src_idx * channels + ch];
-                float sample2 = ptr[(src_idx + 1) * channels + ch];
-                float pitched_sample = sample1 * (1.0f - frac) + sample2 * frac;
-                output[i * channels + ch] += pitched_sample * gain;
+            // For each output sample, we create a pitch-shifted version
+            // using overlapping grains
+            for (unsigned int ch = 0; ch < channels; ch++) {
+              float result = 0.0f;
+              int grain_count = 0;
+              
+              // Create overlapping grains at different phases
+              for (int grain = 0; grain < 2; grain++) {
+                double grain_offset = grain * grain_size * 0.5;
+                double src_pos = (i + grain_offset) * pitch_factor;
+                std::size_t src_idx = static_cast<std::size_t>(src_pos);
+                
+                if (src_idx + 1 < total_read) {
+                  double frac = src_pos - src_idx;
+                  float sample1 = ptr[src_idx * channels + ch];
+                  float sample2 = ptr[(src_idx + 1) * channels + ch];
+                  float grain_sample = sample1 * (1.0f - frac) + sample2 * frac;
+                  
+                  // Apply a simple window function (Hann window)
+                  double window_pos = (i + grain_offset) / grain_size;
+                  window_pos = window_pos - std::floor(window_pos); // Wrap to [0,1]
+                  double window = 0.5 * (1.0 - std::cos(2.0 * M_PI * window_pos));
+                  
+                  result += grain_sample * window;
+                  grain_count++;
+                }
               }
-            } else if (src_idx < will_read_frames) {
-              // Use the last available sample
-              for (unsigned int ch = 0; ch < channels; ch++) {
-                output[i * channels + ch] += ptr[src_idx * channels + ch] * gain;
+              
+              if (grain_count > 0) {
+                output[i * channels + ch] += (result / grain_count) * gain;
+              } else if (i < total_read) {
+                // Fallback to direct sample
+                output[i * channels + ch] += ptr[i * channels + ch] * gain;
               }
             }
           }
@@ -405,7 +428,12 @@ inline std::optional<double> BufferGenerator::startGeneratorLingering() {
     return 0.0;
   }
   auto pb = this->getPitchBend();
-  return remaining / pb;
+  // In time-stretch mode, duration is not affected by pitch
+  if (this->getPitchBendMode() == SYZ_PITCH_BEND_MODE_TIME_STRETCH) {
+    return remaining;
+  } else {
+    return remaining / pb;
+  }
 }
 
 } // namespace synthizer

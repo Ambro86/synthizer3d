@@ -54,6 +54,7 @@ private:
   void generateNoPitchBend(float *out, FadeDriver *gain_driver);
   void generatePitchBend(float *out, FadeDriver *gain_driver) const;
   void generateTimeStretchPitch(float *out, FadeDriver *gain_driver) const;
+  void generateTimeStretchSpeed(float *out, FadeDriver *gain_driver) const;
 
   /*
    * Handle configuring properties, and set the non-property state variables up appropriately.
@@ -81,9 +82,17 @@ private:
   mutable std::unique_ptr<soundtouch::SoundTouch> crossfade_processor;
   mutable std::vector<float> crossfade_buffer;
   mutable int crossfade_samples_remaining;
+  
+  // Speed control system with independent pitch preservation
+  mutable std::unique_ptr<soundtouch::SoundTouch> speed_processor;
+  mutable double last_speed_value;
+  // Speed crossfade system
+  mutable std::unique_ptr<soundtouch::SoundTouch> speed_crossfade_processor;
+  mutable std::vector<float> speed_crossfade_buffer;
+  mutable int speed_crossfade_samples_remaining;
 };
 
-inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx), last_pitch_value(-1.0), crossfade_samples_remaining(0) {}
+inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx), last_pitch_value(-1.0), crossfade_samples_remaining(0), last_speed_value(-1.0), speed_crossfade_samples_remaining(0) {}
 
 inline int BufferGenerator::getObjectType() { return SYZ_OTYPE_BUFFER_GENERATOR; }
 
@@ -131,8 +140,8 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
   
   // Check pitch bend mode to determine position increment behavior
   if (this->getPitchBendMode() == SYZ_PITCH_BEND_MODE_TIME_STRETCH) {
-    // Time-stretch mode: always advance at normal speed regardless of pitch
-    this->scaled_position_increment = config::BUFFER_POS_MULTIPLIER;
+    // Time-stretch mode: speed controlled by speed_multiplier, independent of pitch
+    this->scaled_position_increment = config::BUFFER_POS_MULTIPLIER * this->getSpeedMultiplier();
   } else {
     // Classic mode: speed changes with pitch
     this->scaled_position_increment = config::BUFFER_POS_MULTIPLIER * this->getPitchBend();
@@ -140,12 +149,31 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
   
   std::uint64_t scaled_pos_increment = this->scaled_position_increment * config::BLOCK_SIZE;
 
-  if (this->getPitchBend() == 1.0) {
-    this->generateNoPitchBend(output, gd);
-  } else if (this->getPitchBendMode() == SYZ_PITCH_BEND_MODE_TIME_STRETCH) {
-    this->generateTimeStretchPitch(output, gd);
+  if (this->getPitchBendMode() == SYZ_PITCH_BEND_MODE_TIME_STRETCH) {
+    // Time-stretch mode: check if we need pitch or speed processing
+    bool need_pitch_stretch = (this->getPitchBend() != 1.0);
+    bool need_speed_stretch = (this->getSpeedMultiplier() != 1.0);
+    
+    if (need_pitch_stretch && need_speed_stretch) {
+      // Both pitch and speed need processing - process speed first, then pitch
+      this->generateTimeStretchSpeed(output, gd);
+    } else if (need_pitch_stretch) {
+      // Only pitch needs processing
+      this->generateTimeStretchPitch(output, gd);
+    } else if (need_speed_stretch) {
+      // Only speed needs processing
+      this->generateTimeStretchSpeed(output, gd);
+    } else {
+      // No processing needed
+      this->generateNoPitchBend(output, gd);
+    }
   } else {
-    this->generatePitchBend(output, gd);
+    // Classic mode
+    if (this->getPitchBend() == 1.0) {
+      this->generateNoPitchBend(output, gd);
+    } else {
+      this->generatePitchBend(output, gd);
+    }
   }
 
   if (this->getLooping()) {
@@ -323,6 +351,180 @@ inline void BufferGenerator::generatePitchBend(float *output, FadeDriver *gd) co
         });
       },
       mp, vCond(_is_full_block));
+}
+
+inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver *gd) const {
+  assert(this->finished == false);
+  
+  const double speed_factor = this->getSpeedMultiplier();
+  const double pitch_factor = this->getPitchBend();
+  
+  // Initialize SoundTouch processor if needed
+  if (!this->speed_processor) {
+    this->speed_processor = std::make_unique<soundtouch::SoundTouch>();
+    this->speed_processor->setSampleRate(config::SR);
+    this->speed_processor->setChannels(this->getChannels());
+    
+    // Configure for speed control (preserve pitch, change tempo)
+    this->speed_processor->setPitchSemiTones(0); // Keep original pitch
+    this->speed_processor->setTempo(speed_factor); // Change speed
+    
+    // Apply pitch bend if needed
+    if (pitch_factor != 1.0) {
+      const double semitones = 12.0 * std::log2(pitch_factor);
+      this->speed_processor->setPitchSemiTones(static_cast<float>(semitones));
+    }
+    
+    // Configure for low latency and fast response
+    this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 1);
+    this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);
+    this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 15);
+    this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 8);
+    this->speed_processor->setSetting(SETTING_OVERLAP_MS, 4);
+    
+    this->last_speed_value = speed_factor;
+  }
+  
+  // Only update speed if it has actually changed
+  if (std::abs(speed_factor - this->last_speed_value) > 0.001) {
+    // Setup crossfade system for smooth speed transition
+    if (this->speed_processor && this->last_speed_value > 0) {
+      // Create crossfade processor with old speed for smooth transition
+      this->speed_crossfade_processor = std::make_unique<soundtouch::SoundTouch>();
+      this->speed_crossfade_processor->setSampleRate(config::SR);
+      this->speed_crossfade_processor->setChannels(this->getChannels());
+      this->speed_crossfade_processor->setPitchSemiTones(0);
+      this->speed_crossfade_processor->setTempo(this->last_speed_value);
+      
+      // Apply current pitch to crossfade processor
+      if (pitch_factor != 1.0) {
+        const double semitones = 12.0 * std::log2(pitch_factor);
+        this->speed_crossfade_processor->setPitchSemiTones(static_cast<float>(semitones));
+      }
+      
+      // Configure for low latency
+      this->speed_crossfade_processor->setSetting(SETTING_SEQUENCE_MS, 15);
+      this->speed_crossfade_processor->setSetting(SETTING_SEEKWINDOW_MS, 8);
+      this->speed_crossfade_processor->setSetting(SETTING_OVERLAP_MS, 4);
+      this->speed_crossfade_processor->setSetting(SETTING_USE_QUICKSEEK, 1);
+      this->speed_crossfade_processor->setSetting(SETTING_USE_AA_FILTER, 1);
+      
+      // Setup crossfade: 64 samples = ~1.3ms at 48kHz
+      this->speed_crossfade_samples_remaining = 64;
+    }
+    
+    // Configure main processor with new speed
+    this->speed_processor->clear();
+    
+    // Configure for minimum latency while maintaining quality
+    this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 15);
+    this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 8);
+    this->speed_processor->setSetting(SETTING_OVERLAP_MS, 4);
+    this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 1);
+    this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);
+    
+    this->speed_processor->setTempo(speed_factor);
+    
+    // Apply current pitch
+    if (pitch_factor != 1.0) {
+      const double semitones = 12.0 * std::log2(pitch_factor);
+      this->speed_processor->setPitchSemiTones(static_cast<float>(semitones));
+    }
+    
+    this->last_speed_value = speed_factor;
+  }
+  
+  std::size_t will_read_frames = config::BLOCK_SIZE;
+  if (this->getPosInSamples() + will_read_frames > this->reader.getLengthInFrames(false) &&
+      this->getLooping() == false) {
+    will_read_frames = this->reader.getLengthInFrames(false) - this->getPosInSamples() - 1;
+    will_read_frames = std::min<std::size_t>(will_read_frames, config::BLOCK_SIZE);
+  }
+
+  const unsigned int channels = this->getChannels();
+  
+  auto mp = this->reader.getFrameSlice(this->scaled_position_in_frames / config::BUFFER_POS_MULTIPLIER,
+                                       will_read_frames, false, true);
+  
+  std::visit(
+      [&](auto ptr) {
+        gd->drive(this->getContextRaw()->getBlockTime(), [&](auto gain_cb) {
+          // Convert int16 samples to float for SoundTouch
+          std::vector<float> input_samples(will_read_frames * channels);
+          for (std::size_t i = 0; i < will_read_frames; i++) {
+            for (unsigned int ch = 0; ch < channels; ch++) {
+              input_samples[i * channels + ch] = ptr[i * channels + ch] * (1.0f / 32768.0f);
+            }
+          }
+          
+          // Process through SoundTouch with gentle priming
+          this->speed_processor->putSamples(input_samples.data(), will_read_frames);
+          
+          // Get processed samples
+          std::vector<float> output_samples(config::BLOCK_SIZE * channels);
+          std::size_t received_samples = this->speed_processor->receiveSamples(output_samples.data(), config::BLOCK_SIZE);
+          
+          // If we need more samples, gently prime with one extra feed
+          if (received_samples < config::BLOCK_SIZE / 2) {
+            this->speed_processor->putSamples(input_samples.data(), will_read_frames);
+            std::size_t additional_samples = this->speed_processor->receiveSamples(
+              output_samples.data() + received_samples * channels, 
+              config::BLOCK_SIZE - received_samples
+            );
+            received_samples += additional_samples;
+          }
+          
+          // Handle crossfade if active
+          std::vector<float> speed_crossfade_samples;
+          std::size_t speed_crossfade_received = 0;
+          
+          if (this->speed_crossfade_processor && this->speed_crossfade_samples_remaining > 0) {
+            // Process same input through crossfade processor (old speed)
+            this->speed_crossfade_processor->putSamples(input_samples.data(), will_read_frames);
+            speed_crossfade_samples.resize(config::BLOCK_SIZE * channels);
+            speed_crossfade_received = this->speed_crossfade_processor->receiveSamples(speed_crossfade_samples.data(), config::BLOCK_SIZE);
+          }
+          
+          // Apply gain and mix with crossfade
+          for (std::size_t i = 0; i < config::BLOCK_SIZE; i++) {
+            float gain = gain_cb(i);
+            
+            // Calculate crossfade weights
+            float new_weight = 1.0f;
+            float old_weight = 0.0f;
+            
+            if (this->speed_crossfade_samples_remaining > 0 && speed_crossfade_received > 0) {
+              int samples_into_crossfade = 64 - this->speed_crossfade_samples_remaining;
+              float crossfade_progress = (float)samples_into_crossfade / 64.0f;
+              new_weight = crossfade_progress;
+              old_weight = 1.0f - crossfade_progress;
+              this->speed_crossfade_samples_remaining--;
+            }
+            
+            for (unsigned int ch = 0; ch < channels; ch++) {
+              float final_sample = 0.0f;
+              
+              // Mix new speed sample
+              if (i < received_samples) {
+                final_sample += output_samples[i * channels + ch] * new_weight;
+              }
+              
+              // Mix old speed sample for crossfade
+              if (old_weight > 0.0f && i < speed_crossfade_received) {
+                final_sample += speed_crossfade_samples[i * channels + ch] * old_weight;
+              }
+              
+              output[i * channels + ch] += final_sample * gain;
+            }
+          }
+          
+          // Clean up crossfade processor when done
+          if (this->speed_crossfade_samples_remaining <= 0) {
+            this->speed_crossfade_processor.reset();
+          }
+        });
+      },
+      mp);
 }
 
 inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver *gd) const {
@@ -510,6 +712,14 @@ inline bool BufferGenerator::handlePropertyConfig() {
     this->crossfade_processor.reset();
     this->crossfade_samples_remaining = 0;
   }
+  if (this->speed_processor) {
+    this->speed_processor->clear();
+    this->last_speed_value = -1.0; // Force reconfiguration on next use
+  }
+  if (this->speed_crossfade_processor) {
+    this->speed_crossfade_processor.reset();
+    this->speed_crossfade_samples_remaining = 0;
+  }
 
   // It is possible that the user set the buffer then changed the playback position.  It is very difficult to tell the
   // difference between this and setting the position immediately before changing the buffer without rewriting the
@@ -543,9 +753,10 @@ inline std::optional<double> BufferGenerator::startGeneratorLingering() {
     return 0.0;
   }
   auto pb = this->getPitchBend();
-  // In time-stretch mode, duration is not affected by pitch
+  auto speed = this->getSpeedMultiplier();
+  // In time-stretch mode, duration is affected by speed, not pitch
   if (this->getPitchBendMode() == SYZ_PITCH_BEND_MODE_TIME_STRETCH) {
-    return remaining;
+    return remaining / speed;
   } else {
     return remaining / pb;
   }

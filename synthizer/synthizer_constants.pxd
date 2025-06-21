@@ -59,6 +59,8 @@ cdef extern from "synthizer_constants.h":
         SYZ_P_LOOPING
         SYZ_P_NOISE_TYPE
         SYZ_P_PITCH_BEND
+        SYZ_P_PITCH_BEND_MODE
+        SYZ_P_SPEED_MULTIPLIER
         SYZ_P_INPUT_FILTER_ENABLED
         SYZ_P_INPUT_FILTER_CUTOFF
         SYZ_P_MEAN_FREE_PATH
@@ -78,6 +80,11 @@ cdef extern from "synthizer_constants.h":
         SYZ_P_CURRENT_TIME
         SYZ_P_SUGGESTED_AUTOMATION_TIME
         SYZ_P_FREQUENCY
+
+    cdef enum SYZ_PITCH_BEND_MODE:
+        SYZ_PITCH_BEND_MODE_CLASSIC
+        SYZ_PITCH_BEND_MODE_TIME_STRETCH
+        SYZ_PITCH_BEND_MODE_COUNT
 
     cdef enum SYZ_EVENT_TYPES:
         SYZ_EVENT_TYPE_INVALID

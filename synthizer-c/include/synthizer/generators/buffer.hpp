@@ -21,6 +21,7 @@
 #endif
 
 #include <soundtouch/SoundTouch.h>
+using namespace soundtouch;
 
 namespace synthizer {
 
@@ -334,6 +335,13 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
     // Configure for time-stretch mode (preserve speed, change pitch)
     this->soundtouch_processor->setTempoChange(0);    // No tempo change (preserve speed)
     
+    // Configure for low latency and fast response
+    this->soundtouch_processor->setSetting(SETTING_USE_QUICKSEEK, 1);     // Fast seeking
+    this->soundtouch_processor->setSetting(SETTING_USE_AA_FILTER, 0);     // Disable anti-aliasing for speed
+    this->soundtouch_processor->setSetting(SETTING_SEQUENCE_MS, 20);      // Shorter sequences (default 82ms)
+    this->soundtouch_processor->setSetting(SETTING_SEEKWINDOW_MS, 10);    // Shorter seek window (default 28ms)
+    this->soundtouch_processor->setSetting(SETTING_OVERLAP_MS, 5);        // Shorter overlap (default 12ms)
+    
     // Set initial pitch and cache the value
     const double semitones = 12.0 * std::log2(pitch_factor);
     this->soundtouch_processor->setPitchSemiTones(static_cast<float>(semitones));
@@ -343,6 +351,14 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
   // Only update pitch if it has actually changed (avoid unnecessary processing)
   if (std::abs(pitch_factor - this->last_pitch_value) > 0.001) { // Small epsilon to avoid floating point noise
     const double semitones = 12.0 * std::log2(pitch_factor);
+    
+    // For large pitch changes, flush to avoid artifacts
+    // For small changes, let SoundTouch handle the transition smoothly
+    double pitch_change_ratio = std::abs(pitch_factor / this->last_pitch_value);
+    if (pitch_change_ratio > 1.1 || pitch_change_ratio < 0.9) { // >10% change
+      this->soundtouch_processor->flush();
+    }
+    
     this->soundtouch_processor->setPitchSemiTones(static_cast<float>(semitones));
     this->last_pitch_value = pitch_factor;
   }

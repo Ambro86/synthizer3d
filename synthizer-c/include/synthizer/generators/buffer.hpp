@@ -355,29 +355,29 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
               // Create overlapping grains at different phases
               for (int grain = 0; grain < 2; grain++) {
                 double grain_offset = grain * grain_size * 0.5;
-                double src_pos = (i + grain_offset) * pitch_factor;
+                double src_pos = (static_cast<double>(i) + grain_offset) * pitch_factor;
                 std::size_t src_idx = static_cast<std::size_t>(src_pos);
                 
                 if (src_idx + 1 < total_read) {
-                  double frac = src_pos - src_idx;
+                  double frac = src_pos - static_cast<double>(src_idx);
                   float sample1 = ptr[src_idx * channels + ch];
                   float sample2 = ptr[(src_idx + 1) * channels + ch];
-                  float grain_sample = sample1 * (1.0f - frac) + sample2 * frac;
+                  float grain_sample = sample1 * (1.0f - static_cast<float>(frac)) + sample2 * static_cast<float>(frac);
                   
                   // Apply a simple window function (Hann window)
-                  double window_pos = (i + grain_offset) / grain_size;
+                  double window_pos = (static_cast<double>(i) + grain_offset) / grain_size;
                   window_pos = window_pos - std::floor(window_pos); // Wrap to [0,1]
                   double window = 0.5 * (1.0 - std::cos(2.0 * M_PI * window_pos));
                   
-                  result += grain_sample * window;
+                  result += static_cast<float>(grain_sample * window);
                   grain_count++;
                 }
               }
               
               if (grain_count > 0) {
-                output[i * channels + ch] += (result / grain_count) * gain;
-              } else if (i < total_read) {
-                // Fallback to direct sample
+                output[i * channels + ch] += (result / static_cast<float>(grain_count)) * gain;
+              } else if (i * channels + ch < total_read * channels) {
+                // Fallback to direct sample - ensure we don't exceed buffer bounds
                 output[i * channels + ch] += ptr[i * channels + ch] * gain;
               }
             }

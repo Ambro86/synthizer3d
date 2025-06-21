@@ -3,3 +3,4 @@ _skbuild/
 dist/
 synthizer-vendored/
 vcpkg_installed/
+vcpkg

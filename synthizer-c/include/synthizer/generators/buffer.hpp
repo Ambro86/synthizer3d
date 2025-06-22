@@ -375,12 +375,27 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
       this->speed_processor->setPitchSemiTones(static_cast<float>(semitones));
     }
     
-    // Configure for better quality with acceptable latency
+    // Configure for better quality with adaptive settings based on speed
     this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);
     this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);
-    this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);
-    this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
-    this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);
+    
+    // Adaptive quality settings based on speed factor
+    if (speed_factor >= 1.5) {
+      // Higher speeds need more processing for quality
+      this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 80);
+      this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 25);
+      this->speed_processor->setSetting(SETTING_OVERLAP_MS, 16);
+    } else if (speed_factor >= 1.2) {
+      // Medium speeds - balanced quality/latency
+      this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 60);
+      this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 20);
+      this->speed_processor->setSetting(SETTING_OVERLAP_MS, 12);
+    } else {
+      // Normal/slower speeds - favor latency
+      this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);
+      this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
+      this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);
+    }
     
     this->last_speed_value = speed_factor;
   }
@@ -402,26 +417,60 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
         this->speed_crossfade_processor->setPitchSemiTones(static_cast<float>(semitones));
       }
       
-      // Configure for better quality
-      this->speed_crossfade_processor->setSetting(SETTING_SEQUENCE_MS, 40);
-      this->speed_crossfade_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
-      this->speed_crossfade_processor->setSetting(SETTING_OVERLAP_MS, 8);
+      // Configure crossfade processor with same adaptive settings
       this->speed_crossfade_processor->setSetting(SETTING_USE_QUICKSEEK, 0);
       this->speed_crossfade_processor->setSetting(SETTING_USE_AA_FILTER, 1);
       
-      // Setup crossfade: 64 samples = ~1.3ms at 48kHz
-      this->speed_crossfade_samples_remaining = 64;
+      // Use same adaptive settings for crossfade processor
+      if (this->last_speed_value >= 1.5) {
+        this->speed_crossfade_processor->setSetting(SETTING_SEQUENCE_MS, 80);
+        this->speed_crossfade_processor->setSetting(SETTING_SEEKWINDOW_MS, 25);
+        this->speed_crossfade_processor->setSetting(SETTING_OVERLAP_MS, 16);
+      } else if (this->last_speed_value >= 1.2) {
+        this->speed_crossfade_processor->setSetting(SETTING_SEQUENCE_MS, 60);
+        this->speed_crossfade_processor->setSetting(SETTING_SEEKWINDOW_MS, 20);
+        this->speed_crossfade_processor->setSetting(SETTING_OVERLAP_MS, 12);
+      } else {
+        this->speed_crossfade_processor->setSetting(SETTING_SEQUENCE_MS, 40);
+        this->speed_crossfade_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
+        this->speed_crossfade_processor->setSetting(SETTING_OVERLAP_MS, 8);
+      }
+      
+      // Setup adaptive crossfade duration based on speed change magnitude
+      const double speed_change_ratio = std::abs(speed_factor - this->last_speed_value);
+      if (speed_change_ratio >= 0.3) {
+        // Large speed changes need longer crossfade
+        this->speed_crossfade_samples_remaining = 128; // ~2.7ms at 48kHz
+      } else if (speed_change_ratio >= 0.1) {
+        // Medium speed changes
+        this->speed_crossfade_samples_remaining = 96; // ~2ms at 48kHz
+      } else {
+        // Small speed changes - short crossfade
+        this->speed_crossfade_samples_remaining = 64; // ~1.3ms at 48kHz
+      }
     }
     
     // Configure main processor with new speed
     this->speed_processor->clear();
     
-    // Configure for better quality while maintaining reasonable latency
-    this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);
-    this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
-    this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);
+    // Configure for better quality while maintaining reasonable latency (adaptive)
     this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);
     this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);
+    
+    // Adaptive quality settings for main processor update
+    if (speed_factor >= 1.5) {
+      this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 80);
+      this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 25);
+      this->speed_processor->setSetting(SETTING_OVERLAP_MS, 16);
+    } else if (speed_factor >= 1.2) {
+      this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 60);
+      this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 20);
+      this->speed_processor->setSetting(SETTING_OVERLAP_MS, 12);
+    } else {
+      this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);
+      this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
+      this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);
+    }
     
     this->speed_processor->setTempo(speed_factor);
     
@@ -467,14 +516,26 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
           std::vector<float> output_samples(config::BLOCK_SIZE * channels);
           std::size_t received_samples = this->speed_processor->receiveSamples(output_samples.data(), config::BLOCK_SIZE);
           
-          // If we need more samples, gently prime with one extra feed
-          if (received_samples < config::BLOCK_SIZE / 2) {
-            this->speed_processor->putSamples(input_samples.data(), will_read_frames);
-            std::size_t additional_samples = this->speed_processor->receiveSamples(
-              output_samples.data() + received_samples * channels, 
-              config::BLOCK_SIZE - received_samples
-            );
-            received_samples += additional_samples;
+          // Adaptive priming based on speed factor - higher speeds need more priming
+          const std::size_t min_samples_threshold = speed_factor >= 1.5 ? 
+                                                   (config::BLOCK_SIZE * 3 / 4) : 
+                                                   (config::BLOCK_SIZE / 2);
+          
+          if (received_samples < min_samples_threshold) {
+            // For higher speeds, may need multiple priming cycles
+            const int max_prime_attempts = speed_factor >= 1.5 ? 3 : 2;
+            
+            for (int attempt = 0; attempt < max_prime_attempts && received_samples < min_samples_threshold; ++attempt) {
+              this->speed_processor->putSamples(input_samples.data(), will_read_frames);
+              std::size_t additional_samples = this->speed_processor->receiveSamples(
+                output_samples.data() + received_samples * channels, 
+                config::BLOCK_SIZE - received_samples
+              );
+              received_samples += additional_samples;
+              
+              // Break if we got enough samples
+              if (received_samples >= config::BLOCK_SIZE) break;
+            }
           }
           
           // Handle crossfade if active

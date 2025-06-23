@@ -331,11 +331,7 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 #endif
               }
               
-              // Defensive reset for clean starts
-              if (this->speed_priming_blocks == 0 && this->scaled_position_in_frames == 0) {
-                this->speed_input_accumulator.clear();
-                this->speed_processor->clear();
-              }
+              // Note: Removed defensive reset that was preventing proper priming
               
               // Process in smaller chunks for finer granularity and stability
               const std::size_t chunk_size = 2048;
@@ -343,7 +339,9 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
               
               // Don't overfeed SoundTouch - limit input if we already have enough output
               std::size_t output_available = this->speed_processor->numSamples();
-              bool should_feed_more = (output_available < config::BLOCK_SIZE * 2); // Keep some buffer
+              // For fast speeds, allow larger buffer to prevent underruns
+              std::size_t buffer_target = (speed_factor > 1.0) ? config::BLOCK_SIZE * 4 : config::BLOCK_SIZE * 2;
+              bool should_feed_more = (output_available < buffer_target);
               
               // Process chunks but respect output buffer limits
               while ((available_samples >= chunk_size || (this->finished && available_samples > 0)) && should_feed_more) {
@@ -376,7 +374,7 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 
                 // Check if we have enough output now
                 output_available = this->speed_processor->numSamples();
-                should_feed_more = (output_available < config::BLOCK_SIZE * 2);
+                should_feed_more = (output_available < buffer_target);
                 
                 // Break after flushing small leftover data to avoid infinite loop
                 if (this->finished && samples_to_feed < chunk_size) {
@@ -387,7 +385,8 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 // Break if we have enough output to avoid overfeeding
                 if (!should_feed_more) {
                   std::stringstream feed_msg;
-                  feed_msg << "Stopping feed - sufficient output available: " << output_available << " samples";
+                  feed_msg << "Stopping feed - sufficient output available: " << output_available 
+                           << " (target=" << buffer_target << ", speed=" << speed_factor << ")";
                   SYNTHIZER_LOG_INFO(feed_msg.str().c_str());
                   break;
                 }

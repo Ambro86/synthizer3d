@@ -25,6 +25,9 @@ using namespace soundtouch;
 
 namespace synthizer {
 
+// SoundTouch priming blocks needed for stable output
+constexpr int SOUND_TOUCH_SAFE_PRIMING_BLOCKS = 10;
+
 /**
  * Plays a buffer.
  *
@@ -224,28 +227,41 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 }
               }
               
+              // Defensive reset for clean starts
+              if (this->speed_priming_blocks == 0 && this->scaled_position_in_frames == 0) {
+                this->speed_input_accumulator.clear();
+                this->speed_processor->clear();
+              }
+              
               // Process in fixed chunks to ensure predictable behavior
               const std::size_t chunk_size = 4096;
               std::size_t available_samples = this->speed_input_accumulator.size() / channels;
               
-              // Process ALL available chunks in a loop (not just one per block)
-              while (available_samples >= chunk_size) {
-                // Feed exactly chunk_size samples to SoundTouch
-                this->speed_processor->putSamples(this->speed_input_accumulator.data(), chunk_size);
+              // Process ALL available chunks in a loop + flush leftover data when finished
+              while (available_samples >= chunk_size || (this->finished && available_samples > 0)) {
+                std::size_t samples_to_feed = (available_samples >= chunk_size) ? chunk_size : available_samples;
                 
-                // Erase exactly what we fed (no guessing or tracking needed)
+                // Feed samples to SoundTouch
+                this->speed_processor->putSamples(this->speed_input_accumulator.data(), samples_to_feed);
+                
+                // Erase exactly what we fed
                 this->speed_input_accumulator.erase(
                   this->speed_input_accumulator.begin(),
-                  this->speed_input_accumulator.begin() + chunk_size * channels
+                  this->speed_input_accumulator.begin() + samples_to_feed * channels
                 );
                 
                 // Update available samples count and increment priming counter
-                available_samples -= chunk_size;
+                available_samples -= samples_to_feed;
                 this->speed_priming_blocks++;
+                
+                // Break after flushing small leftover data to avoid infinite loop
+                if (this->finished && samples_to_feed < chunk_size) {
+                  break;
+                }
               }
               
               // Only start outputting after sufficient priming (SoundTouch needs more data)
-              if (this->speed_priming_blocks >= 6) {
+              if (this->speed_priming_blocks >= SOUND_TOUCH_SAFE_PRIMING_BLOCKS) {
                 // Drain all available output from SoundTouch
                 std::vector<float> temp_output(config::BLOCK_SIZE * channels);
                 std::size_t total_received = 0;
@@ -609,28 +625,41 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
               }
             }
             
+            // Defensive reset for clean starts
+            if (this->speed_priming_blocks == 0 && this->scaled_position_in_frames == 0) {
+              this->speed_input_accumulator.clear();
+              this->speed_processor->clear();
+            }
+            
             // Process in fixed chunks to ensure predictable behavior
             const std::size_t chunk_size = 4096;
             std::size_t available_samples = this->speed_input_accumulator.size() / channels;
             
-            // Process ALL available chunks in a loop (not just one per block)
-            while (available_samples >= chunk_size) {
-              // Feed exactly chunk_size samples to SoundTouch
-              this->speed_processor->putSamples(this->speed_input_accumulator.data(), chunk_size);
+            // Process ALL available chunks in a loop + flush leftover data when finished
+            while (available_samples >= chunk_size || (this->finished && available_samples > 0)) {
+              std::size_t samples_to_feed = (available_samples >= chunk_size) ? chunk_size : available_samples;
               
-              // Erase exactly what we fed (no guessing or tracking needed)
+              // Feed samples to SoundTouch
+              this->speed_processor->putSamples(this->speed_input_accumulator.data(), samples_to_feed);
+              
+              // Erase exactly what we fed
               this->speed_input_accumulator.erase(
                 this->speed_input_accumulator.begin(),
-                this->speed_input_accumulator.begin() + chunk_size * channels
+                this->speed_input_accumulator.begin() + samples_to_feed * channels
               );
               
               // Update available samples count and increment priming counter
-              available_samples -= chunk_size;
+              available_samples -= samples_to_feed;
               this->speed_priming_blocks++;
+              
+              // Break after flushing small leftover data to avoid infinite loop
+              if (this->finished && samples_to_feed < chunk_size) {
+                break;
+              }
             }
             
             // Only start outputting after sufficient priming (SoundTouch needs more data)
-            if (this->speed_priming_blocks >= 6) {
+            if (this->speed_priming_blocks >= SOUND_TOUCH_SAFE_PRIMING_BLOCKS) {
               // Drain all available output from SoundTouch
               std::vector<float> temp_output(config::BLOCK_SIZE * channels);
               std::size_t total_received = 0;

@@ -24,15 +24,31 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+// Enable debug logging for speed processing
+#define DEBUG_SYNTHIZER_SPEED 1
+
 #include <soundtouch/SoundTouch.h>
 using namespace soundtouch;
 
 // Simplified logging for MSVC compatibility - remove complex debug system
 #ifdef DEBUG_SYNTHIZER_SPEED
 #include <cstdio>
-#define SYNTHIZER_LOG_INFO(msg) printf("[SYNTHIZER INFO] %s\n", (msg).c_str())
-#define SYNTHIZER_LOG_WARNING(msg) printf("[SYNTHIZER WARNING] %s\n", (msg).c_str())
-#define SYNTHIZER_LOG_ERROR(msg) printf("[SYNTHIZER ERROR] %s\n", (msg).c_str())
+#include <fstream>
+#define SYNTHIZER_LOG_INFO(msg) do { \
+  printf("[SYNTHIZER INFO] %s\n", (msg).c_str()); \
+  std::ofstream log("synthizerlog.txt", std::ios::app); \
+  if (log.is_open()) { log << "[INFO] " << (msg) << std::endl; log.close(); } \
+} while(0)
+#define SYNTHIZER_LOG_WARNING(msg) do { \
+  printf("[SYNTHIZER WARNING] %s\n", (msg).c_str()); \
+  std::ofstream log("synthizerlog.txt", std::ios::app); \
+  if (log.is_open()) { log << "[WARNING] " << (msg) << std::endl; log.close(); } \
+} while(0)
+#define SYNTHIZER_LOG_ERROR(msg) do { \
+  printf("[SYNTHIZER ERROR] %s\n", (msg).c_str()); \
+  std::ofstream log("synthizerlog.txt", std::ios::app); \
+  if (log.is_open()) { log << "[ERROR] " << (msg) << std::endl; log.close(); } \
+} while(0)
 #else
 #define SYNTHIZER_LOG_INFO(msg) do { } while(0)
 #define SYNTHIZER_LOG_WARNING(msg) do { } while(0)

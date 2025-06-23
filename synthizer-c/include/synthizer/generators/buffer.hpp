@@ -53,6 +53,7 @@ public:
 private:
   void generateNoPitchBend(float *out, FadeDriver *gain_driver);
   void generatePitchBend(float *out, FadeDriver *gain_driver) const;
+  void generateSpeedInterpolation(float *out, FadeDriver *gain_driver) const;
   void generateTimeStretchPitch(float *out, FadeDriver *gain_driver) const;
   void generateTimeStretchSpeed(float *out, FadeDriver *gain_driver) const;
 
@@ -161,8 +162,8 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
       // Only pitch needs processing - use SoundTouch for pitch
       this->generateTimeStretchPitch(output, gd);
     } else if (need_speed_stretch) {
-      // Only speed needs processing - use interpolation like pitch bend but without pitch change
-      this->generatePitchBend(output, gd);
+      // Only speed needs processing - use interpolation without pitch change
+      this->generateSpeedInterpolation(output, gd);
     } else {
       // No processing needed
       this->generateNoPitchBend(output, gd);
@@ -326,6 +327,62 @@ inline void BufferGenerator::generatePitchBend(float *output, FadeDriver *gd) co
           // Let the compiler understand that, sometimes, it can fully unroll the loop.
           const std::size_t iters = full_block ? config::BLOCK_SIZE : params.iterations;
           const std::uint64_t delta = this->scaled_position_increment;
+
+          for (std::size_t i = 0; i < iters; i++) {
+            std::uint64_t scaled_effective_pos = params.offset + delta * i;
+            std::size_t scaled_lower = floorByPowerOfTwo(scaled_effective_pos, config::BUFFER_POS_MULTIPLIER);
+            std::size_t lower = scaled_lower / config::BUFFER_POS_MULTIPLIER;
+
+            // We are close enough to the point where floats start erroring that we probably want doubles, or at least
+            // to do some sort of actual error analysis which hasn't been done as of this writing. Thus, doubles for
+            // now.
+            //
+            // Also factor in the conversion from 16-bit signed samples into these weights.
+            double w2 = (scaled_effective_pos - scaled_lower) * (1.0 / config::BUFFER_POS_MULTIPLIER);
+            double w1 = 1.0 - w2;
+            w1 *= (1.0 / 32768.0);
+            w2 *= (1.0 / 32768.0);
+            float gain = gain_cb(i);
+
+            for (unsigned int ch = 0; ch < channels; ch++) {
+              std::int16_t l = ptr[lower * channels + ch], u = ptr[(lower + 1) * channels + ch];
+              output[i * channels + ch] = gain * (w1 * l + w2 * u);
+            }
+          }
+        });
+      },
+      mp, vCond(_is_full_block));
+}
+
+inline void BufferGenerator::generateSpeedInterpolation(float *output, FadeDriver *gd) const {
+  assert(this->finished == false);
+
+  // Use normal position increment (no speed change) for pitch preservation
+  // Speed is handled by the main generateBlock() position advancement
+  const std::uint64_t normal_increment = config::BUFFER_POS_MULTIPLIER;
+  
+  const auto params = buffer_generator_detail::computePitchBendParams(
+      this->scaled_position_in_frames, normal_increment,
+      this->reader.getLengthInFrames(false) * config::BUFFER_POS_MULTIPLIER, this->getLooping());
+
+  if (params.iterations == 0) {
+    return;
+  }
+
+  auto mp = this->reader.getFrameSlice(params.span_start, params.span_len, params.include_implicit_zero, true);
+
+  // In the case where the number of iterations is the block size, we can use VBool to let the compiler know.
+  bool _is_full_block = params.iterations == config::BLOCK_SIZE;
+
+  // the compiler is bad about telling that channels doesn't change.
+  const unsigned int channels = this->getChannels();
+
+  std::visit(
+      [&](auto ptr, auto full_block) {
+        gd->drive(this->getContextRaw()->getBlockTime(), [&](auto gain_cb) {
+          // Let the compiler understand that, sometimes, it can fully unroll the loop.
+          const std::size_t iters = full_block ? config::BLOCK_SIZE : params.iterations;
+          const std::uint64_t delta = normal_increment; // Use normal increment for pitch preservation
 
           for (std::size_t i = 0; i < iters; i++) {
             std::uint64_t scaled_effective_pos = params.offset + delta * i;

@@ -224,29 +224,19 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 }
               }
               
-              // Process when we have enough samples (4096 samples minimum for optimal SoundTouch performance)
-              const std::size_t min_process_samples = 4096;
+              // Process in fixed chunks to ensure predictable behavior
+              const std::size_t chunk_size = 4096;
               const std::size_t available_samples = this->speed_input_accumulator.size() / channels;
               
-              if (available_samples >= min_process_samples) {
-                // Track SoundTouch buffer size before and after to know actual consumption
-                std::size_t pre_buffer_size = this->speed_processor->numSamples();
-                this->speed_processor->putSamples(this->speed_input_accumulator.data(), available_samples);
-                std::size_t post_buffer_size = this->speed_processor->numSamples();
+              if (available_samples >= chunk_size) {
+                // Feed exactly chunk_size samples to SoundTouch
+                this->speed_processor->putSamples(this->speed_input_accumulator.data(), chunk_size);
                 
-                // Calculate how many samples were actually added to SoundTouch buffer
-                std::size_t samples_actually_consumed = post_buffer_size > pre_buffer_size
-                    ? (post_buffer_size - pre_buffer_size)
-                    : available_samples; // Fallback if numSamples() doesn't grow as expected
-                
-                // Only remove samples that were actually consumed
-                const std::size_t consumed_elements = samples_actually_consumed * channels;
-                if (consumed_elements > 0 && consumed_elements <= this->speed_input_accumulator.size()) {
-                  this->speed_input_accumulator.erase(
-                    this->speed_input_accumulator.begin(),
-                    this->speed_input_accumulator.begin() + consumed_elements
-                  );
-                }
+                // Erase exactly what we fed (no guessing or tracking needed)
+                this->speed_input_accumulator.erase(
+                  this->speed_input_accumulator.begin(),
+                  this->speed_input_accumulator.begin() + chunk_size * channels
+                );
                 
                 // Increment priming counter
                 this->speed_priming_blocks++;
@@ -617,29 +607,19 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
               }
             }
             
-            // Process when we have enough samples (4096 samples minimum for optimal SoundTouch performance)
-            const std::size_t min_process_samples = 4096;
+            // Process in fixed chunks to ensure predictable behavior
+            const std::size_t chunk_size = 4096;
             const std::size_t available_samples = this->speed_input_accumulator.size() / channels;
             
-            if (available_samples >= min_process_samples) {
-              // Track SoundTouch buffer size before and after to know actual consumption
-              std::size_t pre_buffer_size = this->speed_processor->numSamples();
-              this->speed_processor->putSamples(this->speed_input_accumulator.data(), available_samples);
-              std::size_t post_buffer_size = this->speed_processor->numSamples();
+            if (available_samples >= chunk_size) {
+              // Feed exactly chunk_size samples to SoundTouch
+              this->speed_processor->putSamples(this->speed_input_accumulator.data(), chunk_size);
               
-              // Calculate how many samples were actually added to SoundTouch buffer
-              std::size_t samples_actually_consumed = post_buffer_size > pre_buffer_size
-                  ? (post_buffer_size - pre_buffer_size)
-                  : available_samples; // Fallback if numSamples() doesn't grow as expected
-              
-              // Only remove samples that were actually consumed
-              const std::size_t consumed_elements = samples_actually_consumed * channels;
-              if (consumed_elements > 0 && consumed_elements <= this->speed_input_accumulator.size()) {
-                this->speed_input_accumulator.erase(
-                  this->speed_input_accumulator.begin(),
-                  this->speed_input_accumulator.begin() + consumed_elements
-                );
-              }
+              // Erase exactly what we fed (no guessing or tracking needed)
+              this->speed_input_accumulator.erase(
+                this->speed_input_accumulator.begin(),
+                this->speed_input_accumulator.begin() + chunk_size * channels
+              );
               
               // Increment priming counter
               this->speed_priming_blocks++;

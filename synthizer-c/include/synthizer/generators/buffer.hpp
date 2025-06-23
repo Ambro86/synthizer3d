@@ -543,8 +543,8 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
                 // Apply gain and output for received samples
                 for (std::size_t i = 0; i < received_samples && total_received + i < config::BLOCK_SIZE; i++) {
                   // Debug: use fixed gain to test if gain_cb is causing distortion
-                  float gain = gain_cb(total_received + i);
-                  // float gain = 1.0f; // Uncomment this line to test with fixed gain
+                  // float gain = gain_cb(total_received + i);
+                  float gain = 1.0f; // Test with fixed gain to isolate gain_cb issues
                   for (unsigned int ch = 0; ch < channels; ch++) {
                     output[(total_received + i) * channels + ch] += temp_output[i * channels + ch] * gain;
                   }

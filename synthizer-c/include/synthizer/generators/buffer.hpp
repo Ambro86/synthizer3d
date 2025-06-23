@@ -425,27 +425,20 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
         },
         mp);
   } else {
-    // Pure speed control without pitch change - use SoundTouch with optimized settings
+    // Pure speed control using setTempo (ChatGPT suggestion) - changes tempo without affecting pitch
     if (!this->speed_processor) {
       this->speed_processor = std::make_unique<soundtouch::SoundTouch>();
       this->speed_processor->setSampleRate(config::SR);
       this->speed_processor->setChannels(this->getChannels());
       
-      // Optimized settings for speed-only (no pitch change)
-      this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);
-      this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);
-      this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);
-      this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
-      this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);
-      
+      // Use setTempo for pure speed control - this preserves pitch automatically
+      this->speed_processor->setTempo(speed_factor);
       this->last_speed_value = speed_factor;
     }
     
-    // Update only if speed changed significantly
-    if (std::abs(speed_factor - this->last_speed_value) > 0.005) {
-      this->speed_processor->clear();
+    // Update tempo only if speed changed
+    if (std::abs(speed_factor - this->last_speed_value) > 0.01) {
       this->speed_processor->setTempo(speed_factor);
-      this->speed_processor->setPitchSemiTones(0); // Ensure pitch stays at 1.0
       this->last_speed_value = speed_factor;
     }
     

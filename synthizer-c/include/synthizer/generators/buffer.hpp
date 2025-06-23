@@ -374,15 +374,15 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
               }
               
               // Start outputting if we have sufficient priming OR if SoundTouch has output available
-              std::size_t available_output = this->speed_processor->numSamples();
+              std::size_t final_output_check = this->speed_processor->numSamples();
               bool priming_complete = (this->speed_priming_blocks >= SOUND_TOUCH_SAFE_PRIMING_BLOCKS);
-              bool output_available = (available_output > 0);
+              bool has_output_ready = (final_output_check > 0);
               
-              if (priming_complete || output_available) {
+              if (priming_complete || has_output_ready) {
                 std::stringstream output_msg;
                 output_msg << "Starting output processing for instance " << (void*)this 
                           << " (priming: " << this->speed_priming_blocks << "/" 
-                          << SOUND_TOUCH_SAFE_PRIMING_BLOCKS << ", available_output: " << available_output << ")";
+                          << SOUND_TOUCH_SAFE_PRIMING_BLOCKS << ", final_output: " << final_output_check << ")";
                 SYNTHIZER_LOG_INFO(output_msg.str().c_str());
                 
                 // Drain all available output from SoundTouch
@@ -390,7 +390,7 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 std::size_t total_received = 0;
                 std::size_t received_samples = 1; // Initialize to enter loop
                 
-                // Note: available_output was already checked above
+                // Note: final_output_check was already checked above
                 
                 // Use while loop instead of do-while to avoid MSVC parsing issues
                 while (received_samples > 0 && total_received < config::BLOCK_SIZE) {
@@ -449,8 +449,8 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                   SYNTHIZER_LOG_WARNING("Force flushing SoundTouch after excessive priming blocks");
                   this->speed_processor->flush();
                   // Try to get output after flush
-                  available_output = this->speed_processor->numSamples();
-                  if (available_output > 0) {
+                  std::size_t flush_output_check = this->speed_processor->numSamples();
+                  if (flush_output_check > 0) {
                     SYNTHIZER_LOG_INFO("Flush successful - attempting output");
                     // Jump back to output processing (simplified version)
                     std::vector<float> temp_output(config::BLOCK_SIZE * channels);
@@ -469,7 +469,7 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 skip_msg << "Skipping output - insufficient priming (" 
                          << this->speed_priming_blocks << "/" 
                          << SOUND_TOUCH_SAFE_PRIMING_BLOCKS 
-                         << ", available: " << available_output << ")";
+                         << ", final_available: " << final_output_check << ")";
                 SYNTHIZER_LOG_INFO(skip_msg.str().c_str());
               }
             });

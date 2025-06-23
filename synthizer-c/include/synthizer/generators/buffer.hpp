@@ -64,8 +64,8 @@ enum class SpeedQualityMode {
   HIGH_QUALITY = 2    // Maximum quality, higher latency
 };
 
-// SoundTouch priming blocks needed for stable output (ultra-conservative)
-constexpr int SOUND_TOUCH_SAFE_PRIMING_BLOCKS = 20;
+// SoundTouch priming blocks needed for stable output (practical value based on SoundTouch documentation)
+constexpr int SOUND_TOUCH_SAFE_PRIMING_BLOCKS = 2;
 
 /**
  * Plays a buffer.
@@ -217,6 +217,14 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
     bool need_pitch_stretch = (this->getPitchBend() != 1.0);
     bool need_speed_stretch = (this->getSpeedMultiplier() != 1.0);
     
+    // Debug logging to understand property values for each instance
+    std::stringstream property_debug;
+    property_debug << "Instance " << (void*)this << " properties: PitchBendMode=" 
+                   << this->getPitchBendMode() << " PitchBend=" << this->getPitchBend() 
+                   << " SpeedMultiplier=" << this->getSpeedMultiplier() 
+                   << " need_pitch=" << need_pitch_stretch << " need_speed=" << need_speed_stretch;
+    SYNTHIZER_LOG_INFO(property_debug.str().c_str());
+    
     if (need_pitch_stretch && need_speed_stretch) {
       // Both pitch and speed need processing - use SoundTouch
       this->generateTimeStretchSpeed(output, gd);
@@ -229,6 +237,11 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
       if (channels == 0) {
         return; // Invalid channel configuration
       }
+      
+      // Log speed processing entry for this instance
+      std::stringstream entry_msg;
+      entry_msg << "Entering speed-only processing for instance " << (void*)this << " with speed=" << speed_factor;
+      SYNTHIZER_LOG_INFO(entry_msg.str().c_str());
       
       // Initialize SoundTouch processor with stable settings
       this->initSpeedProcessorIfNeeded(speed_factor);
@@ -340,14 +353,24 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 }
               }
               
-              // Only start outputting after sufficient priming (SoundTouch needs more data)
-              if (this->speed_priming_blocks >= SOUND_TOUCH_SAFE_PRIMING_BLOCKS) {
-                SYNTHIZER_LOG_INFO("Starting output processing (priming complete)");
+              // Start outputting if we have sufficient priming OR if SoundTouch has output available
+              std::size_t available_output = this->speed_processor->numSamples();
+              bool priming_complete = (this->speed_priming_blocks >= SOUND_TOUCH_SAFE_PRIMING_BLOCKS);
+              bool output_available = (available_output > 0);
+              
+              if (priming_complete || output_available) {
+                std::stringstream output_msg;
+                output_msg << "Starting output processing for instance " << (void*)this 
+                          << " (priming: " << this->speed_priming_blocks << "/" 
+                          << SOUND_TOUCH_SAFE_PRIMING_BLOCKS << ", available_output: " << available_output << ")";
+                SYNTHIZER_LOG_INFO(output_msg.str().c_str());
                 
                 // Drain all available output from SoundTouch
                 std::vector<float> temp_output(config::BLOCK_SIZE * channels);
                 std::size_t total_received = 0;
                 std::size_t received_samples = 1; // Initialize to enter loop
+                
+                // Note: available_output was already checked above
                 
                 // Use while loop instead of do-while to avoid MSVC parsing issues
                 while (received_samples > 0 && total_received < config::BLOCK_SIZE) {
@@ -401,9 +424,33 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                   SYNTHIZER_LOG_INFO(msg.str().c_str());
                 }
               } else {
-                SYNTHIZER_LOG_INFO(("Skipping output - insufficient priming (" + 
-                                            std::to_string(this->speed_priming_blocks) + "/" + 
-                                            std::to_string(SOUND_TOUCH_SAFE_PRIMING_BLOCKS) + ")").c_str());
+                // If we've fed enough blocks but still no output, try flush
+                if (this->speed_priming_blocks >= 10) {
+                  SYNTHIZER_LOG_WARNING("Force flushing SoundTouch after excessive priming blocks");
+                  this->speed_processor->flush();
+                  // Try to get output after flush
+                  available_output = this->speed_processor->numSamples();
+                  if (available_output > 0) {
+                    SYNTHIZER_LOG_INFO("Flush successful - attempting output");
+                    // Jump back to output processing (simplified version)
+                    std::vector<float> temp_output(config::BLOCK_SIZE * channels);
+                    std::size_t received = this->speed_processor->receiveSamples(temp_output.data(), config::BLOCK_SIZE);
+                    if (received > 0) {
+                      for (std::size_t i = 0; i < received && i < config::BLOCK_SIZE; i++) {
+                        for (unsigned int ch = 0; ch < channels; ch++) {
+                          output[i * channels + ch] += temp_output[i * channels + ch] * gain_cb(i);
+                        }
+                      }
+                    }
+                  }
+                }
+                
+                std::stringstream skip_msg;
+                skip_msg << "Skipping output - insufficient priming (" 
+                         << this->speed_priming_blocks << "/" 
+                         << SOUND_TOUCH_SAFE_PRIMING_BLOCKS 
+                         << ", available: " << available_output << ")";
+                SYNTHIZER_LOG_INFO(skip_msg.str().c_str());
               }
             });
           },
@@ -599,13 +646,18 @@ inline void BufferGenerator::generatePitchBend(float *output, FadeDriver *gd) co
 }
 
 inline void BufferGenerator::initSpeedProcessorIfNeeded(double speed_factor) const {
+  // Add instance-specific logging to debug multiple generators
+  std::stringstream debug_msg;
+  debug_msg << "initSpeedProcessorIfNeeded called for instance " << (void*)this << " with speed=" << speed_factor;
+  SYNTHIZER_LOG_INFO(debug_msg.str().c_str());
+  
   if (!this->speed_processor) {
     this->speed_processor = std::make_unique<soundtouch::SoundTouch>();
     this->speed_processor->setSampleRate(config::SR);
     this->speed_processor->setChannels(this->getChannels());
     
     std::stringstream msg;
-    msg << "Speed processor initialized: SR=" << config::SR << " Channels=" << this->getChannels() 
+    msg << "Speed processor initialized for instance " << (void*)this << ": SR=" << config::SR << " Channels=" << this->getChannels() 
         << " Speed=" << speed_factor;
     SYNTHIZER_LOG_INFO(msg.str().c_str());
 

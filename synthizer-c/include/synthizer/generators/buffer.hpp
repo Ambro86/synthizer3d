@@ -31,76 +31,82 @@ namespace synthizer {
 
 // Advanced debug logging system for speed processing issues
 class SynthizerDebugLogger {
-private:
-  static std::ofstream log_file;
-  static bool initialized;
-  static std::chrono::steady_clock::time_point start_time;
-  
 public:
   static void initialize() {
-    if (!initialized) {
-      log_file.open("synthizerlog.txt", std::ios::out | std::ios::app);
-      start_time = std::chrono::steady_clock::now();
-      initialized = true;
+    if (!getSynthizerInitialized()) {
+      getSynthizerLogFile().open("synthizerlog.txt", std::ios::out | std::ios::app);
+      getSynthizerStartTime() = std::chrono::steady_clock::now();
+      getSynthizerInitialized() = true;
       
-      log_file << "\n========== SYNTHIZER DEBUG SESSION STARTED ==========\n";
+      getSynthizerLogFile() << "\n========== SYNTHIZER DEBUG SESSION STARTED ==========\n";
       logTimestamp();
-      log_file << "Session initialized\n";
-      log_file.flush();
+      getSynthizerLogFile() << "Session initialized\n";
+      getSynthizerLogFile().flush();
     }
   }
   
   static void logTimestamp() {
     auto now = std::chrono::steady_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time);
-    log_file << "[" << std::setfill('0') << std::setw(8) << elapsed.count() << "ms] ";
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - getSynthizerStartTime());
+    getSynthizerLogFile() << "[" << std::setfill('0') << std::setw(8) << elapsed.count() << "ms] ";
   }
   
   static void logInfo(const std::string& message) {
-    if (!initialized) initialize();
+    if (!getSynthizerInitialized()) initialize();
     logTimestamp();
-    log_file << "INFO: " << message << std::endl;
-    log_file.flush();
+    getSynthizerLogFile() << "INFO: " << message << std::endl;
+    getSynthizerLogFile().flush();
   }
   
   static void logWarning(const std::string& message) {
-    if (!initialized) initialize();
+    if (!getSynthizerInitialized()) initialize();
     logTimestamp();
-    log_file << "WARNING: " << message << std::endl;
-    log_file.flush();
+    getSynthizerLogFile() << "WARNING: " << message << std::endl;
+    getSynthizerLogFile().flush();
   }
   
   static void logError(const std::string& message) {
-    if (!initialized) initialize();
+    if (!getSynthizerInitialized()) initialize();
     logTimestamp();
-    log_file << "ERROR: " << message << std::endl;
-    log_file.flush();
+    getSynthizerLogFile() << "ERROR: " << message << std::endl;
+    getSynthizerLogFile().flush();
   }
   
   static void logAudioMetrics(const std::string& context, double speed, double pitch, 
                              size_t samples_processed, float peak_level, size_t buffer_size) {
-    if (!initialized) initialize();
+    if (!getSynthizerInitialized()) initialize();
     logTimestamp();
-    log_file << "METRICS [" << context << "] Speed=" << std::fixed << std::setprecision(3) << speed
+    getSynthizerLogFile() << "METRICS [" << context << "] Speed=" << std::fixed << std::setprecision(3) << speed
              << " Pitch=" << pitch << " Samples=" << samples_processed 
              << " Peak=" << peak_level << " BufferSize=" << buffer_size << std::endl;
-    log_file.flush();
+    getSynthizerLogFile().flush();
   }
   
   static void logSoundTouchState(const std::string& operation, size_t input_samples, 
                                 size_t output_samples, size_t buffered_samples) {
-    if (!initialized) initialize();
+    if (!getSynthizerInitialized()) initialize();
     logTimestamp();
-    log_file << "SOUNDTOUCH [" << operation << "] Input=" << input_samples 
+    getSynthizerLogFile() << "SOUNDTOUCH [" << operation << "] Input=" << input_samples 
              << " Output=" << output_samples << " Buffered=" << buffered_samples << std::endl;
-    log_file.flush();
+    getSynthizerLogFile().flush();
   }
 };
 
-// Static member definitions (will be in .cpp in real implementation)
-std::ofstream SynthizerDebugLogger::log_file;
-bool SynthizerDebugLogger::initialized = false;
-std::chrono::steady_clock::time_point SynthizerDebugLogger::start_time;
+// Static member definitions moved to inline implementation to avoid linker issues
+inline std::ofstream& getSynthizerLogFile() {
+  static std::ofstream log_file;
+  return log_file;
+}
+
+inline bool& getSynthizerInitialized() {
+  static bool initialized = false;
+  return initialized;
+}
+
+inline std::chrono::steady_clock::time_point& getSynthizerStartTime() {
+  static std::chrono::steady_clock::time_point start_time;
+  return start_time;
+}
 
 // Speed processing quality modes
 enum class SpeedQualityMode {

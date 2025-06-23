@@ -229,15 +229,24 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
               const std::size_t available_samples = this->speed_input_accumulator.size() / channels;
               
               if (available_samples >= min_process_samples) {
-                // Process ALL available samples to avoid stalling SoundTouch
+                // Track SoundTouch buffer size before and after to know actual consumption
+                std::size_t pre_buffer_size = this->speed_processor->numSamples();
                 this->speed_processor->putSamples(this->speed_input_accumulator.data(), available_samples);
+                std::size_t post_buffer_size = this->speed_processor->numSamples();
                 
-                // Remove all consumed samples from accumulator
-                const std::size_t consumed_elements = available_samples * channels;
-                this->speed_input_accumulator.erase(
-                  this->speed_input_accumulator.begin(),
-                  this->speed_input_accumulator.begin() + consumed_elements
-                );
+                // Calculate how many samples were actually added to SoundTouch buffer
+                std::size_t samples_actually_consumed = post_buffer_size > pre_buffer_size
+                    ? (post_buffer_size - pre_buffer_size)
+                    : available_samples; // Fallback if numSamples() doesn't grow as expected
+                
+                // Only remove samples that were actually consumed
+                const std::size_t consumed_elements = samples_actually_consumed * channels;
+                if (consumed_elements > 0 && consumed_elements <= this->speed_input_accumulator.size()) {
+                  this->speed_input_accumulator.erase(
+                    this->speed_input_accumulator.begin(),
+                    this->speed_input_accumulator.begin() + consumed_elements
+                  );
+                }
                 
                 // Increment priming counter
                 this->speed_priming_blocks++;
@@ -613,15 +622,24 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
             const std::size_t available_samples = this->speed_input_accumulator.size() / channels;
             
             if (available_samples >= min_process_samples) {
-              // Process ALL available samples to avoid stalling SoundTouch
+              // Track SoundTouch buffer size before and after to know actual consumption
+              std::size_t pre_buffer_size = this->speed_processor->numSamples();
               this->speed_processor->putSamples(this->speed_input_accumulator.data(), available_samples);
+              std::size_t post_buffer_size = this->speed_processor->numSamples();
               
-              // Remove all consumed samples from accumulator
-              const std::size_t consumed_elements = available_samples * channels;
-              this->speed_input_accumulator.erase(
-                this->speed_input_accumulator.begin(),
-                this->speed_input_accumulator.begin() + consumed_elements
-              );
+              // Calculate how many samples were actually added to SoundTouch buffer
+              std::size_t samples_actually_consumed = post_buffer_size > pre_buffer_size
+                  ? (post_buffer_size - pre_buffer_size)
+                  : available_samples; // Fallback if numSamples() doesn't grow as expected
+              
+              // Only remove samples that were actually consumed
+              const std::size_t consumed_elements = samples_actually_consumed * channels;
+              if (consumed_elements > 0 && consumed_elements <= this->speed_input_accumulator.size()) {
+                this->speed_input_accumulator.erase(
+                  this->speed_input_accumulator.begin(),
+                  this->speed_input_accumulator.begin() + consumed_elements
+                );
+              }
               
               // Increment priming counter
               this->speed_priming_blocks++;

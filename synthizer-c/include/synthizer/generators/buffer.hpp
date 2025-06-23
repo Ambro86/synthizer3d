@@ -129,6 +129,13 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
     return;
   }
 
+  // Clear output buffer to prevent accumulation of old samples (critical for clean audio)
+  const unsigned int channels = this->getChannels();
+  if (channels == 0) {
+    return; // No valid audio to process
+  }
+  std::fill(output, output + config::BLOCK_SIZE * channels, 0.0f);
+
   if (this->acquirePlaybackPosition(new_pos)) {
     this->seek(new_pos);
   }
@@ -431,6 +438,9 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
   } else {
     // Pure speed control using setTempo - changes tempo without affecting pitch
     const unsigned int channels = this->getChannels();
+    if (channels == 0) {
+      return; // Invalid channel configuration
+    }
     
     if (!this->speed_processor) {
       this->speed_processor = std::make_unique<soundtouch::SoundTouch>();
@@ -480,8 +490,8 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
             const std::size_t input_start = this->speed_input_accumulator.size();
             this->speed_input_accumulator.resize(input_start + will_read_frames * channels);
             
-            // Proper 16-bit to float conversion with symmetric scaling
-            const float scale = 1.0f / 32768.0f;
+            // Proper 16-bit to float conversion (32767 is max positive value for int16_t)
+            const float scale = 1.0f / 32767.0f;
             for (std::size_t i = 0; i < will_read_frames; i++) {
               for (unsigned int ch = 0; ch < channels; ch++) {
                 float sample = ptr[i * channels + ch] * scale;
@@ -528,7 +538,9 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
                 
                 // Apply gain and output for received samples
                 for (std::size_t i = 0; i < received_samples && total_received + i < config::BLOCK_SIZE; i++) {
+                  // Debug: use fixed gain to test if gain_cb is causing distortion
                   float gain = gain_cb(total_received + i);
+                  // float gain = 1.0f; // Uncomment this line to test with fixed gain
                   for (unsigned int ch = 0; ch < channels; ch++) {
                     output[(total_received + i) * channels + ch] += temp_output[i * channels + ch] * gain;
                   }

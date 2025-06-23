@@ -90,6 +90,9 @@ private:
   mutable std::unique_ptr<soundtouch::SoundTouch> speed_crossfade_processor;
   mutable std::vector<float> speed_crossfade_buffer;
   mutable int speed_crossfade_samples_remaining;
+  // Buffer accumulation for larger SoundTouch processing chunks
+  mutable std::vector<float> speed_input_accumulator;
+  mutable std::vector<float> speed_output_buffer;
 };
 
 inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx), last_pitch_value(-1.0), crossfade_samples_remaining(0), last_speed_value(-1.0), speed_crossfade_samples_remaining(0) {}
@@ -425,15 +428,22 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
         },
         mp);
   } else {
-    // Pure speed control using setTempo (ChatGPT suggestion) - changes tempo without affecting pitch
+    // Pure speed control using setTempo - changes tempo without affecting pitch
+    const unsigned int channels = this->getChannels();
+    
     if (!this->speed_processor) {
       this->speed_processor = std::make_unique<soundtouch::SoundTouch>();
       this->speed_processor->setSampleRate(config::SR);
-      this->speed_processor->setChannels(this->getChannels());
+      this->speed_processor->setChannels(channels);
       
       // Use setTempo for pure speed control - this preserves pitch automatically
       this->speed_processor->setTempo(speed_factor);
       this->last_speed_value = speed_factor;
+      
+      // Initialize larger buffers for better SoundTouch performance
+      const std::size_t buffer_size = 8192 * channels; // 8192 samples per channel
+      this->speed_input_accumulator.reserve(buffer_size);
+      this->speed_output_buffer.resize(buffer_size);
     }
     
     // Update tempo only if speed changed
@@ -448,8 +458,6 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
       will_read_frames = this->reader.getLengthInFrames(false) - this->getPosInSamples() - 1;
       will_read_frames = std::min<std::size_t>(will_read_frames, config::BLOCK_SIZE);
     }
-
-    const unsigned int channels = this->getChannels();
     
     auto mp = this->reader.getFrameSlice(this->scaled_position_in_frames / config::BUFFER_POS_MULTIPLIER,
                                          will_read_frames, false, true);
@@ -457,27 +465,45 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
     std::visit(
         [&](auto ptr) {
           gd->drive(this->getContextRaw()->getBlockTime(), [&](auto gain_cb) {
-            // Convert to float for SoundTouch
-            std::vector<float> input_samples(will_read_frames * channels);
+            // Convert and accumulate input samples for larger buffer processing
+            const std::size_t input_start = this->speed_input_accumulator.size();
+            this->speed_input_accumulator.resize(input_start + will_read_frames * channels);
+            
             for (std::size_t i = 0; i < will_read_frames; i++) {
               for (unsigned int ch = 0; ch < channels; ch++) {
-                input_samples[i * channels + ch] = ptr[i * channels + ch] * (1.0f / 32768.0f);
+                this->speed_input_accumulator[input_start + i * channels + ch] = 
+                  ptr[i * channels + ch] * (1.0f / 32768.0f);
               }
             }
             
-            // Process with SoundTouch for speed-only
-            this->speed_processor->putSamples(input_samples.data(), will_read_frames);
-            std::vector<float> output_samples(config::BLOCK_SIZE * channels);
-            std::size_t received_samples = this->speed_processor->receiveSamples(output_samples.data(), config::BLOCK_SIZE);
+            // Process when we have enough samples (4096 samples minimum)
+            const std::size_t min_process_samples = 4096;
+            const std::size_t available_samples = this->speed_input_accumulator.size() / channels;
             
-            // Apply gain and output
-            for (std::size_t i = 0; i < config::BLOCK_SIZE; i++) {
-              float gain = gain_cb(i);
-              for (unsigned int ch = 0; ch < channels; ch++) {
-                float sample = (i < received_samples) ? output_samples[i * channels + ch] : 0.0f;
-                output[i * channels + ch] += sample * gain;
-              }
+            if (available_samples >= min_process_samples) {
+              // Process with SoundTouch using larger buffer
+              this->speed_processor->putSamples(this->speed_input_accumulator.data(), available_samples);
+              this->speed_input_accumulator.clear(); // Clear after processing
             }
+            
+            // Drain all available output from SoundTouch
+            std::vector<float> temp_output(config::BLOCK_SIZE * channels);
+            std::size_t total_received = 0;
+            std::size_t received_samples;
+            
+            do {
+              received_samples = this->speed_processor->receiveSamples(
+                temp_output.data(), config::BLOCK_SIZE);
+              
+              // Apply gain and output for received samples
+              for (std::size_t i = 0; i < received_samples && total_received + i < config::BLOCK_SIZE; i++) {
+                float gain = gain_cb(total_received + i);
+                for (unsigned int ch = 0; ch < channels; ch++) {
+                  output[(total_received + i) * channels + ch] += temp_output[i * channels + ch] * gain;
+                }
+              }
+              total_received += received_samples;
+            } while (received_samples > 0 && total_received < config::BLOCK_SIZE);
           });
         },
         mp);

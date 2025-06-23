@@ -270,7 +270,12 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
         }
       }
       
-      std::size_t will_read_frames = config::BLOCK_SIZE;
+      // Calculate input needed based on speed - read more when speed < 1.0, less when speed > 1.0
+      const double input_ratio = 1.0 / speed_factor; // For 0.85 speed: 1/0.85 = 1.176
+      std::size_t will_read_frames = static_cast<std::size_t>(config::BLOCK_SIZE * input_ratio + 0.5); // Round
+      will_read_frames = std::max<std::size_t>(will_read_frames, config::BLOCK_SIZE); // Always read at least BLOCK_SIZE
+      will_read_frames = std::min<std::size_t>(will_read_frames, config::BLOCK_SIZE * 2); // Cap at 2x BLOCK_SIZE
+      
       bool near_end = false;
       if (this->getPosInSamples() + will_read_frames > this->reader.getLengthInFrames(false) &&
           this->getLooping() == false) {
@@ -278,6 +283,12 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
         will_read_frames = std::min<std::size_t>(will_read_frames, config::BLOCK_SIZE);
         near_end = true; // Flag that we're near the end for zero-padding
       }
+      
+      // Log input feeding for debugging
+      std::stringstream feed_debug;
+      feed_debug << "Reading " << will_read_frames << " input samples for speed=" << speed_factor 
+                 << " (ratio=" << input_ratio << ", output_target=" << config::BLOCK_SIZE << ")";
+      SYNTHIZER_LOG_INFO(feed_debug.str().c_str());
       
       auto mp = this->reader.getFrameSlice(this->scaled_position_in_frames / config::BUFFER_POS_MULTIPLIER,
                                            will_read_frames, false, true);

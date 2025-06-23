@@ -243,8 +243,10 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
       entry_msg << "Entering speed-only processing for instance " << (void*)this << " with speed=" << speed_factor;
       SYNTHIZER_LOG_INFO(entry_msg.str().c_str());
       
-      // Initialize SoundTouch processor with stable settings
-      this->initSpeedProcessorIfNeeded(speed_factor);
+      // Initialize SoundTouch processor with stable settings (only if needed)
+      if (!this->speed_processor) {
+        this->initSpeedProcessorIfNeeded(speed_factor);
+      }
       
       // Update tempo and ensure pitch is reset to 1.0 (avoid unnecessary clears)
       bool need_tempo_change = std::abs(speed_factor - this->last_speed_value) > 0.01;
@@ -319,8 +321,12 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
               const std::size_t chunk_size = 2048;
               std::size_t available_samples = this->speed_input_accumulator.size() / channels;
               
-              // Process ALL available chunks in a loop + flush leftover data when finished
-              while (available_samples >= chunk_size || (this->finished && available_samples > 0)) {
+              // Don't overfeed SoundTouch - limit input if we already have enough output
+              std::size_t output_available = this->speed_processor->numSamples();
+              bool should_feed_more = (output_available < config::BLOCK_SIZE * 2); // Keep some buffer
+              
+              // Process chunks but respect output buffer limits
+              while ((available_samples >= chunk_size || (this->finished && available_samples > 0)) && should_feed_more) {
                 std::size_t samples_to_feed = (available_samples >= chunk_size) ? chunk_size : available_samples;
                 
                 #ifdef DEBUG_SYNTHIZER_SPEED
@@ -342,13 +348,27 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                   this->speed_input_accumulator.begin() + samples_to_feed * channels
                 );
                 
-                // Update available samples count and increment priming counter
+                // Update available samples count and increment priming counter only during initial priming
                 available_samples -= samples_to_feed;
-                this->speed_priming_blocks++;
+                if (this->speed_priming_blocks < SOUND_TOUCH_SAFE_PRIMING_BLOCKS) {
+                  this->speed_priming_blocks++;
+                }
+                
+                // Check if we have enough output now
+                output_available = this->speed_processor->numSamples();
+                should_feed_more = (output_available < config::BLOCK_SIZE * 2);
                 
                 // Break after flushing small leftover data to avoid infinite loop
                 if (this->finished && samples_to_feed < chunk_size) {
                   SYNTHIZER_LOG_INFO("Flushed final small chunk, breaking loop");
+                  break;
+                }
+                
+                // Break if we have enough output to avoid overfeeding
+                if (!should_feed_more) {
+                  std::stringstream feed_msg;
+                  feed_msg << "Stopping feed - sufficient output available: " << output_available << " samples";
+                  SYNTHIZER_LOG_INFO(feed_msg.str().c_str());
                   break;
                 }
               }
@@ -646,12 +666,11 @@ inline void BufferGenerator::generatePitchBend(float *output, FadeDriver *gd) co
 }
 
 inline void BufferGenerator::initSpeedProcessorIfNeeded(double speed_factor) const {
-  // Add instance-specific logging to debug multiple generators
-  std::stringstream debug_msg;
-  debug_msg << "initSpeedProcessorIfNeeded called for instance " << (void*)this << " with speed=" << speed_factor;
-  SYNTHIZER_LOG_INFO(debug_msg.str().c_str());
-  
   if (!this->speed_processor) {
+    // Add instance-specific logging to debug multiple generators
+    std::stringstream debug_msg;
+    debug_msg << "Initializing speed processor for instance " << (void*)this << " with speed=" << speed_factor;
+    SYNTHIZER_LOG_INFO(debug_msg.str().c_str());
     this->speed_processor = std::make_unique<soundtouch::SoundTouch>();
     this->speed_processor->setSampleRate(config::SR);
     this->speed_processor->setChannels(this->getChannels());

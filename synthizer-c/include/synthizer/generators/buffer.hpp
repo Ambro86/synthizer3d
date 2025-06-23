@@ -365,9 +365,18 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
     this->speed_processor->setSampleRate(config::SR);
     this->speed_processor->setChannels(this->getChannels());
     
+    // Configure for optimal quality with stable settings
+    this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);
+    this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);
+    
+    // Use stable, high-quality settings for all speed ranges
+    this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 50);
+    this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
+    this->speed_processor->setSetting(SETTING_OVERLAP_MS, 10);
+    
     // Configure for speed control (preserve pitch, change tempo)
+    this->speed_processor->setTempo(speed_factor);
     this->speed_processor->setPitchSemiTones(0); // Keep original pitch
-    this->speed_processor->setTempo(speed_factor); // Change speed
     
     // Apply pitch bend if needed
     if (pitch_factor != 1.0) {
@@ -375,103 +384,19 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
       this->speed_processor->setPitchSemiTones(static_cast<float>(semitones));
     }
     
-    // Configure for better quality with adaptive settings based on speed
-    this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);
-    this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);
-    
-    // Adaptive quality settings based on speed factor
-    if (speed_factor >= 1.5) {
-      // Higher speeds need more processing for quality
-      this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 80);
-      this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 25);
-      this->speed_processor->setSetting(SETTING_OVERLAP_MS, 16);
-    } else if (speed_factor >= 1.2) {
-      // Medium speeds - balanced quality/latency
-      this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 60);
-      this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 20);
-      this->speed_processor->setSetting(SETTING_OVERLAP_MS, 12);
-    } else {
-      // Normal/slower speeds - favor latency
-      this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);
-      this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
-      this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);
-    }
-    
     this->last_speed_value = speed_factor;
   }
   
-  // Only update speed if it has actually changed
-  if (std::abs(speed_factor - this->last_speed_value) > 0.001) {
-    // Setup crossfade system for smooth speed transition
-    if (this->speed_processor && this->last_speed_value > 0) {
-      // Create crossfade processor with old speed for smooth transition
-      this->speed_crossfade_processor = std::make_unique<soundtouch::SoundTouch>();
-      this->speed_crossfade_processor->setSampleRate(config::SR);
-      this->speed_crossfade_processor->setChannels(this->getChannels());
-      this->speed_crossfade_processor->setPitchSemiTones(0);
-      this->speed_crossfade_processor->setTempo(this->last_speed_value);
-      
-      // Apply current pitch to crossfade processor
-      if (pitch_factor != 1.0) {
-        const double semitones = 12.0 * std::log2(pitch_factor);
-        this->speed_crossfade_processor->setPitchSemiTones(static_cast<float>(semitones));
-      }
-      
-      // Configure crossfade processor with same adaptive settings
-      this->speed_crossfade_processor->setSetting(SETTING_USE_QUICKSEEK, 0);
-      this->speed_crossfade_processor->setSetting(SETTING_USE_AA_FILTER, 1);
-      
-      // Use same adaptive settings for crossfade processor
-      if (this->last_speed_value >= 1.5) {
-        this->speed_crossfade_processor->setSetting(SETTING_SEQUENCE_MS, 80);
-        this->speed_crossfade_processor->setSetting(SETTING_SEEKWINDOW_MS, 25);
-        this->speed_crossfade_processor->setSetting(SETTING_OVERLAP_MS, 16);
-      } else if (this->last_speed_value >= 1.2) {
-        this->speed_crossfade_processor->setSetting(SETTING_SEQUENCE_MS, 60);
-        this->speed_crossfade_processor->setSetting(SETTING_SEEKWINDOW_MS, 20);
-        this->speed_crossfade_processor->setSetting(SETTING_OVERLAP_MS, 12);
-      } else {
-        this->speed_crossfade_processor->setSetting(SETTING_SEQUENCE_MS, 40);
-        this->speed_crossfade_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
-        this->speed_crossfade_processor->setSetting(SETTING_OVERLAP_MS, 8);
-      }
-      
-      // Setup adaptive crossfade duration based on speed change magnitude
-      const double speed_change_ratio = std::abs(speed_factor - this->last_speed_value);
-      if (speed_change_ratio >= 0.3) {
-        // Large speed changes need longer crossfade
-        this->speed_crossfade_samples_remaining = 128; // ~2.7ms at 48kHz
-      } else if (speed_change_ratio >= 0.1) {
-        // Medium speed changes
-        this->speed_crossfade_samples_remaining = 96; // ~2ms at 48kHz
-      } else {
-        // Small speed changes - short crossfade
-        this->speed_crossfade_samples_remaining = 64; // ~1.3ms at 48kHz
-      }
-    }
+  // Only update speed if it has actually changed (larger threshold to reduce instability)
+  if (std::abs(speed_factor - this->last_speed_value) > 0.01) {
+    // Disable crossfade system to eliminate distortion artifacts
+    this->speed_crossfade_processor.reset();
+    this->speed_crossfade_samples_remaining = 0;
     
-    // Configure main processor with new speed
+    // Clear processor for clean transition
     this->speed_processor->clear();
     
-    // Configure for better quality while maintaining reasonable latency (adaptive)
-    this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);
-    this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);
-    
-    // Adaptive quality settings for main processor update
-    if (speed_factor >= 1.5) {
-      this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 80);
-      this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 25);
-      this->speed_processor->setSetting(SETTING_OVERLAP_MS, 16);
-    } else if (speed_factor >= 1.2) {
-      this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 60);
-      this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 20);
-      this->speed_processor->setSetting(SETTING_OVERLAP_MS, 12);
-    } else {
-      this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);
-      this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
-      this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);
-    }
-    
+    // Update speed without changing other settings
     this->speed_processor->setTempo(speed_factor);
     
     // Reset pitch to original before applying any pitch bend
@@ -509,82 +434,37 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
             }
           }
           
-          // Process through SoundTouch with gentle priming
+          // Process through SoundTouch with simple, consistent approach
           this->speed_processor->putSamples(input_samples.data(), will_read_frames);
           
           // Get processed samples
           std::vector<float> output_samples(config::BLOCK_SIZE * channels);
           std::size_t received_samples = this->speed_processor->receiveSamples(output_samples.data(), config::BLOCK_SIZE);
           
-          // Adaptive priming based on speed factor - higher speeds need more priming
-          const std::size_t min_samples_threshold = speed_factor >= 1.5 ? 
-                                                   (config::BLOCK_SIZE * 3 / 4) : 
-                                                   (config::BLOCK_SIZE / 2);
-          
-          if (received_samples < min_samples_threshold) {
-            // For higher speeds, may need multiple priming cycles
-            const int max_prime_attempts = speed_factor >= 1.5 ? 3 : 2;
-            
-            for (int attempt = 0; attempt < max_prime_attempts && received_samples < min_samples_threshold; ++attempt) {
-              this->speed_processor->putSamples(input_samples.data(), will_read_frames);
-              std::size_t additional_samples = this->speed_processor->receiveSamples(
-                output_samples.data() + received_samples * channels, 
-                config::BLOCK_SIZE - received_samples
-              );
-              received_samples += additional_samples;
-              
-              // Break if we got enough samples
-              if (received_samples >= config::BLOCK_SIZE) break;
-            }
+          // Simple single-stage priming if needed - avoid multiple iterations that cause echo
+          if (received_samples < config::BLOCK_SIZE / 3) {
+            this->speed_processor->putSamples(input_samples.data(), will_read_frames);
+            std::size_t additional_samples = this->speed_processor->receiveSamples(
+              output_samples.data() + received_samples * channels, 
+              config::BLOCK_SIZE - received_samples
+            );
+            received_samples += additional_samples;
           }
           
-          // Handle crossfade if active
-          std::vector<float> speed_crossfade_samples;
-          std::size_t speed_crossfade_received = 0;
-          
-          if (this->speed_crossfade_processor && this->speed_crossfade_samples_remaining > 0) {
-            // Process same input through crossfade processor (old speed)
-            this->speed_crossfade_processor->putSamples(input_samples.data(), will_read_frames);
-            speed_crossfade_samples.resize(config::BLOCK_SIZE * channels);
-            speed_crossfade_received = this->speed_crossfade_processor->receiveSamples(speed_crossfade_samples.data(), config::BLOCK_SIZE);
-          }
-          
-          // Apply gain and mix with crossfade
+          // Apply gain directly without crossfade to eliminate distortion
           for (std::size_t i = 0; i < config::BLOCK_SIZE; i++) {
             float gain = gain_cb(i);
-            
-            // Calculate crossfade weights
-            float new_weight = 1.0f;
-            float old_weight = 0.0f;
-            
-            if (this->speed_crossfade_samples_remaining > 0 && speed_crossfade_received > 0) {
-              int samples_into_crossfade = 64 - this->speed_crossfade_samples_remaining;
-              float crossfade_progress = (float)samples_into_crossfade / 64.0f;
-              new_weight = crossfade_progress;
-              old_weight = 1.0f - crossfade_progress;
-              this->speed_crossfade_samples_remaining--;
-            }
             
             for (unsigned int ch = 0; ch < channels; ch++) {
               float final_sample = 0.0f;
               
-              // Mix new speed sample
+              // Use processed sample if available, otherwise silence
               if (i < received_samples) {
-                final_sample += output_samples[i * channels + ch] * new_weight;
-              }
-              
-              // Mix old speed sample for crossfade
-              if (old_weight > 0.0f && i < speed_crossfade_received) {
-                final_sample += speed_crossfade_samples[i * channels + ch] * old_weight;
+                final_sample = output_samples[i * channels + ch];
               }
               
               output[i * channels + ch] += final_sample * gain;
             }
-          }
-          
-          // Clean up crossfade processor when done
-          if (this->speed_crossfade_samples_remaining <= 0) {
-            this->speed_crossfade_processor.reset();
           }
         });
       },

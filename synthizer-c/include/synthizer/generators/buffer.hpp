@@ -15,6 +15,10 @@
 #include <optional>
 #include <cmath>
 #include <vector>
+#include <fstream>
+#include <chrono>
+#include <iomanip>
+#include <sstream>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -24,6 +28,79 @@
 using namespace soundtouch;
 
 namespace synthizer {
+
+// Advanced debug logging system for speed processing issues
+class SynthizerDebugLogger {
+private:
+  static std::ofstream log_file;
+  static bool initialized;
+  static std::chrono::steady_clock::time_point start_time;
+  
+public:
+  static void initialize() {
+    if (!initialized) {
+      log_file.open("synthizerlog.txt", std::ios::out | std::ios::app);
+      start_time = std::chrono::steady_clock::now();
+      initialized = true;
+      
+      log_file << "\n========== SYNTHIZER DEBUG SESSION STARTED ==========\n";
+      logTimestamp();
+      log_file << "Session initialized\n";
+      log_file.flush();
+    }
+  }
+  
+  static void logTimestamp() {
+    auto now = std::chrono::steady_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time);
+    log_file << "[" << std::setfill('0') << std::setw(8) << elapsed.count() << "ms] ";
+  }
+  
+  static void logInfo(const std::string& message) {
+    if (!initialized) initialize();
+    logTimestamp();
+    log_file << "INFO: " << message << std::endl;
+    log_file.flush();
+  }
+  
+  static void logWarning(const std::string& message) {
+    if (!initialized) initialize();
+    logTimestamp();
+    log_file << "WARNING: " << message << std::endl;
+    log_file.flush();
+  }
+  
+  static void logError(const std::string& message) {
+    if (!initialized) initialize();
+    logTimestamp();
+    log_file << "ERROR: " << message << std::endl;
+    log_file.flush();
+  }
+  
+  static void logAudioMetrics(const std::string& context, double speed, double pitch, 
+                             size_t samples_processed, float peak_level, size_t buffer_size) {
+    if (!initialized) initialize();
+    logTimestamp();
+    log_file << "METRICS [" << context << "] Speed=" << std::fixed << std::setprecision(3) << speed
+             << " Pitch=" << pitch << " Samples=" << samples_processed 
+             << " Peak=" << peak_level << " BufferSize=" << buffer_size << std::endl;
+    log_file.flush();
+  }
+  
+  static void logSoundTouchState(const std::string& operation, size_t input_samples, 
+                                size_t output_samples, size_t buffered_samples) {
+    if (!initialized) initialize();
+    logTimestamp();
+    log_file << "SOUNDTOUCH [" << operation << "] Input=" << input_samples 
+             << " Output=" << output_samples << " Buffered=" << buffered_samples << std::endl;
+    log_file.flush();
+  }
+};
+
+// Static member definitions (will be in .cpp in real implementation)
+std::ofstream SynthizerDebugLogger::log_file;
+bool SynthizerDebugLogger::initialized = false;
+std::chrono::steady_clock::time_point SynthizerDebugLogger::start_time;
 
 // Speed processing quality modes
 enum class SpeedQualityMode {
@@ -114,7 +191,9 @@ private:
   mutable SpeedQualityMode speed_quality_mode;
 };
 
-inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx), last_pitch_value(-1.0), crossfade_samples_remaining(0), last_speed_value(-1.0), last_combined_speed_value(-1.0), last_combined_pitch_value(-1.0), speed_crossfade_samples_remaining(0), speed_priming_blocks(0), speed_quality_mode(SpeedQualityMode::BALANCED) {}
+inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx), last_pitch_value(-1.0), crossfade_samples_remaining(0), last_speed_value(-1.0), last_combined_speed_value(-1.0), last_combined_pitch_value(-1.0), speed_crossfade_samples_remaining(0), speed_priming_blocks(0), speed_quality_mode(SpeedQualityMode::BALANCED) {
+  SynthizerDebugLogger::logInfo("BufferGenerator created with BALANCED quality mode");
+}
 
 inline int BufferGenerator::getObjectType() { return SYZ_OTYPE_BUFFER_GENERATOR; }
 
@@ -280,8 +359,14 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
               while (available_samples >= chunk_size || (this->finished && available_samples > 0)) {
                 std::size_t samples_to_feed = (available_samples >= chunk_size) ? chunk_size : available_samples;
                 
+                // Log feeding operation
+                std::size_t buffered_before = this->speed_processor->numSamples();
+                
                 // Feed samples to SoundTouch
                 this->speed_processor->putSamples(this->speed_input_accumulator.data(), samples_to_feed);
+                
+                std::size_t buffered_after = this->speed_processor->numSamples();
+                SynthizerDebugLogger::logSoundTouchState("putSamples", samples_to_feed, buffered_after, buffered_after - buffered_before);
                 
                 // Erase exactly what we fed
                 this->speed_input_accumulator.erase(
@@ -295,12 +380,15 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 
                 // Break after flushing small leftover data to avoid infinite loop
                 if (this->finished && samples_to_feed < chunk_size) {
+                  SynthizerDebugLogger::logInfo("Flushed final small chunk, breaking loop");
                   break;
                 }
               }
               
               // Only start outputting after sufficient priming (SoundTouch needs more data)
               if (this->speed_priming_blocks >= SOUND_TOUCH_SAFE_PRIMING_BLOCKS) {
+                SynthizerDebugLogger::logInfo("Starting output processing (priming complete)");
+                
                 // Drain all available output from SoundTouch
                 std::vector<float> temp_output(config::BLOCK_SIZE * channels);
                 std::size_t total_received = 0;
@@ -324,12 +412,7 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                       // ULTRA-STRICT output validation and limiting
                       if (std::isnan(processed_sample) || std::isinf(processed_sample)) {
                         processed_sample = 0.0f;
-                        #ifdef DEBUG_SYNTHIZER_SPEED
-                        static int nan_count = 0;
-                        if (++nan_count < 5) {
-                          printf("[SYNTHIZER DEBUG] NaN/Inf detected in SoundTouch output\n");
-                        }
-                        #endif
+                        SynthizerDebugLogger::logError("NaN/Inf detected in SoundTouch output - sample replaced with 0.0");
                       }
                       
                       // Soft limiting to prevent harsh clipping
@@ -339,20 +422,26 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                       float final_sample = processed_sample * gain;
                       output[(total_received + i) * channels + ch] += final_sample;
                       
-                      // Runtime quality analysis
-                      #ifdef DEBUG_SYNTHIZER_SPEED
+                      // Runtime quality analysis with file logging
                       static float peak_level = 0.0f;
                       static int sample_count = 0;
+                      static double speed_context = 1.0;
                       float abs_sample = std::abs(final_sample);
                       if (abs_sample > peak_level) peak_level = abs_sample;
-                      if (++sample_count >= config::SR) { // Log every second
+                      
+                      if (++sample_count >= config::SR / 10) { // Log every 100ms
+                        speed_context = this->getSpeedMultiplier();
+                        SynthizerDebugLogger::logAudioMetrics("speed_output", speed_context, 1.0, 
+                                                            received_samples, peak_level, 
+                                                            this->speed_input_accumulator.size());
+                        
                         if (peak_level > 0.95f) {
-                          printf("[SYNTHIZER DEBUG] High peak detected: %.3f\n", peak_level);
+                          SynthizerDebugLogger::logWarning("High peak level detected: " + std::to_string(peak_level));
                         }
+                        
                         peak_level = 0.0f;
                         sample_count = 0;
                       }
-                      #endif
                     }
                   }
                   total_received += received_samples;
@@ -360,8 +449,20 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 
                 // If no output was generated, fill remaining with silence
                 if (total_received == 0) {
+                  SynthizerDebugLogger::logWarning("No output received from SoundTouch despite priming - returning silence");
                   return; // Early return - let the caller handle silence
                 }
+                
+                // Log successful processing
+                if (total_received < config::BLOCK_SIZE) {
+                  std::stringstream msg;
+                  msg << "Partial block processed: " << total_received << "/" << config::BLOCK_SIZE << " samples";
+                  SynthizerDebugLogger::logInfo(msg.str());
+                }
+              } else {
+                SynthizerDebugLogger::logInfo("Skipping output - insufficient priming (" + 
+                                            std::to_string(this->speed_priming_blocks) + "/" + 
+                                            std::to_string(SOUND_TOUCH_SAFE_PRIMING_BLOCKS) + ")");
               }
             });
           },
@@ -561,6 +662,11 @@ inline void BufferGenerator::initSpeedProcessorIfNeeded(double speed_factor) con
     this->speed_processor = std::make_unique<soundtouch::SoundTouch>();
     this->speed_processor->setSampleRate(config::SR);
     this->speed_processor->setChannels(this->getChannels());
+    
+    std::stringstream msg;
+    msg << "Speed processor initialized: SR=" << config::SR << " Channels=" << this->getChannels() 
+        << " Speed=" << speed_factor;
+    SynthizerDebugLogger::logInfo(msg.str());
 
     // Configure SoundTouch settings based on quality mode
     switch (this->speed_quality_mode) {
@@ -570,6 +676,7 @@ inline void BufferGenerator::initSpeedProcessorIfNeeded(double speed_factor) con
         this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);       // Shorter sequences
         this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);     // Smaller seek window
         this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);         // Minimal overlap
+        SynthizerDebugLogger::logInfo("Quality mode: LOW_LATENCY (QuickSeek=1, AA=0, Seq=40ms)");
         break;
         
       case SpeedQualityMode::BALANCED:
@@ -578,6 +685,7 @@ inline void BufferGenerator::initSpeedProcessorIfNeeded(double speed_factor) con
         this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 82);       // Default sequence length
         this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 28);     // Default seek window
         this->speed_processor->setSetting(SETTING_OVERLAP_MS, 12);        // Default overlap
+        SynthizerDebugLogger::logInfo("Quality mode: BALANCED (QuickSeek=0, AA=1, Seq=82ms)");
         break;
         
       case SpeedQualityMode::HIGH_QUALITY:
@@ -586,6 +694,7 @@ inline void BufferGenerator::initSpeedProcessorIfNeeded(double speed_factor) con
         this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 100);      // Longer sequences for quality
         this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 40);     // Larger seek window
         this->speed_processor->setSetting(SETTING_OVERLAP_MS, 20);        // More overlap for smoothness
+        SynthizerDebugLogger::logInfo("Quality mode: HIGH_QUALITY (QuickSeek=0, AA=1, Seq=100ms)");
         break;
     }
     

@@ -359,116 +359,105 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
   const double speed_factor = this->getSpeedMultiplier();
   const double pitch_factor = this->getPitchBend();
   
-  // Initialize SoundTouch processor if needed
-  if (!this->speed_processor) {
-    this->speed_processor = std::make_unique<soundtouch::SoundTouch>();
-    this->speed_processor->setSampleRate(config::SR);
-    this->speed_processor->setChannels(this->getChannels());
-    
-    // Configure for optimal quality with stable settings
-    this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);
-    this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);
-    
-    // Use stable, high-quality settings for all speed ranges
-    this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 50);
-    this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
-    this->speed_processor->setSetting(SETTING_OVERLAP_MS, 10);
-    
-    // Configure for speed control (preserve pitch, change tempo)
-    this->speed_processor->setTempo(speed_factor);
-    this->speed_processor->setPitchSemiTones(0); // Keep original pitch
-    
-    // Apply pitch bend if needed
-    if (pitch_factor != 1.0) {
-      const double semitones = 12.0 * std::log2(pitch_factor);
-      this->speed_processor->setPitchSemiTones(static_cast<float>(semitones));
+  // For speed control, use simple time-domain approach to avoid SoundTouch distortion
+  // Only use SoundTouch if pitch is also being modified
+  if (pitch_factor != 1.0) {
+    // Need both speed and pitch - use SoundTouch but with minimal processing
+    if (!this->speed_processor) {
+      this->speed_processor = std::make_unique<soundtouch::SoundTouch>();
+      this->speed_processor->setSampleRate(config::SR);
+      this->speed_processor->setChannels(this->getChannels());
+      
+      // Minimal processing settings to reduce artifacts
+      this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 1);
+      this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 0);
+      this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 10);
+      this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 5);
+      this->speed_processor->setSetting(SETTING_OVERLAP_MS, 3);
+      
+      this->last_speed_value = speed_factor;
     }
     
-    this->last_speed_value = speed_factor;
-  }
-  
-  // Only update speed if it has actually changed (larger threshold to reduce instability)
-  if (std::abs(speed_factor - this->last_speed_value) > 0.01) {
-    // Disable crossfade system to eliminate distortion artifacts
-    this->speed_crossfade_processor.reset();
-    this->speed_crossfade_samples_remaining = 0;
-    
-    // Clear processor for clean transition
-    this->speed_processor->clear();
-    
-    // Update speed without changing other settings
-    this->speed_processor->setTempo(speed_factor);
-    
-    // Reset pitch to original before applying any pitch bend
-    this->speed_processor->setPitchSemiTones(0);
-    
-    // Apply current pitch bend if needed
-    if (pitch_factor != 1.0) {
+    if (std::abs(speed_factor - this->last_speed_value) > 0.01 || 
+        std::abs(pitch_factor - this->last_pitch_value) > 0.001) {
+      this->speed_processor->clear();
+      this->speed_processor->setTempo(speed_factor);
       const double semitones = 12.0 * std::log2(pitch_factor);
       this->speed_processor->setPitchSemiTones(static_cast<float>(semitones));
+      this->last_speed_value = speed_factor;
+      this->last_pitch_value = pitch_factor;
     }
     
-    this->last_speed_value = speed_factor;
-  }
-  
-  std::size_t will_read_frames = config::BLOCK_SIZE;
-  if (this->getPosInSamples() + will_read_frames > this->reader.getLengthInFrames(false) &&
-      this->getLooping() == false) {
-    will_read_frames = this->reader.getLengthInFrames(false) - this->getPosInSamples() - 1;
-    will_read_frames = std::min<std::size_t>(will_read_frames, config::BLOCK_SIZE);
-  }
+    // Use SoundTouch processing for combined pitch+speed
+    std::size_t will_read_frames = config::BLOCK_SIZE;
+    if (this->getPosInSamples() + will_read_frames > this->reader.getLengthInFrames(false) &&
+        this->getLooping() == false) {
+      will_read_frames = this->reader.getLengthInFrames(false) - this->getPosInSamples() - 1;
+      will_read_frames = std::min<std::size_t>(will_read_frames, config::BLOCK_SIZE);
+    }
 
-  const unsigned int channels = this->getChannels();
-  
-  auto mp = this->reader.getFrameSlice(this->scaled_position_in_frames / config::BUFFER_POS_MULTIPLIER,
-                                       will_read_frames, false, true);
-  
-  std::visit(
-      [&](auto ptr) {
-        gd->drive(this->getContextRaw()->getBlockTime(), [&](auto gain_cb) {
-          // Convert int16 samples to float for SoundTouch
-          std::vector<float> input_samples(will_read_frames * channels);
-          for (std::size_t i = 0; i < will_read_frames; i++) {
-            for (unsigned int ch = 0; ch < channels; ch++) {
-              input_samples[i * channels + ch] = ptr[i * channels + ch] * (1.0f / 32768.0f);
-            }
-          }
-          
-          // Process through SoundTouch with simple, consistent approach
-          this->speed_processor->putSamples(input_samples.data(), will_read_frames);
-          
-          // Get processed samples
-          std::vector<float> output_samples(config::BLOCK_SIZE * channels);
-          std::size_t received_samples = this->speed_processor->receiveSamples(output_samples.data(), config::BLOCK_SIZE);
-          
-          // Simple single-stage priming if needed - avoid multiple iterations that cause echo
-          if (received_samples < config::BLOCK_SIZE / 3) {
-            this->speed_processor->putSamples(input_samples.data(), will_read_frames);
-            std::size_t additional_samples = this->speed_processor->receiveSamples(
-              output_samples.data() + received_samples * channels, 
-              config::BLOCK_SIZE - received_samples
-            );
-            received_samples += additional_samples;
-          }
-          
-          // Apply gain directly without crossfade to eliminate distortion
-          for (std::size_t i = 0; i < config::BLOCK_SIZE; i++) {
-            float gain = gain_cb(i);
-            
-            for (unsigned int ch = 0; ch < channels; ch++) {
-              float final_sample = 0.0f;
-              
-              // Use processed sample if available, otherwise silence
-              if (i < received_samples) {
-                final_sample = output_samples[i * channels + ch];
+    const unsigned int channels = this->getChannels();
+    
+    auto mp = this->reader.getFrameSlice(this->scaled_position_in_frames / config::BUFFER_POS_MULTIPLIER,
+                                         will_read_frames, false, true);
+    
+    std::visit(
+        [&](auto ptr) {
+          gd->drive(this->getContextRaw()->getBlockTime(), [&](auto gain_cb) {
+            std::vector<float> input_samples(will_read_frames * channels);
+            for (std::size_t i = 0; i < will_read_frames; i++) {
+              for (unsigned int ch = 0; ch < channels; ch++) {
+                input_samples[i * channels + ch] = ptr[i * channels + ch] * (1.0f / 32768.0f);
               }
-              
-              output[i * channels + ch] += final_sample * gain;
             }
-          }
-        });
-      },
-      mp);
+            
+            this->speed_processor->putSamples(input_samples.data(), will_read_frames);
+            std::vector<float> output_samples(config::BLOCK_SIZE * channels);
+            std::size_t received_samples = this->speed_processor->receiveSamples(output_samples.data(), config::BLOCK_SIZE);
+            
+            for (std::size_t i = 0; i < config::BLOCK_SIZE; i++) {
+              float gain = gain_cb(i);
+              for (unsigned int ch = 0; ch < channels; ch++) {
+                float final_sample = (i < received_samples) ? output_samples[i * channels + ch] : 0.0f;
+                output[i * channels + ch] += final_sample * gain;
+              }
+            }
+          });
+        },
+        mp);
+  } else {
+    // Pure speed control without pitch change - use simple approach
+    // This avoids ALL SoundTouch processing for speed-only changes
+    
+    std::size_t will_read_frames = config::BLOCK_SIZE;
+    if (this->getPosInSamples() + will_read_frames > this->reader.getLengthInFrames(false) &&
+        this->getLooping() == false) {
+      will_read_frames = this->reader.getLengthInFrames(false) - this->getPosInSamples() - 1;
+      will_read_frames = std::min<std::size_t>(will_read_frames, config::BLOCK_SIZE);
+    }
+
+    const unsigned int channels = this->getChannels();
+    
+    auto mp = this->reader.getFrameSlice(this->scaled_position_in_frames / config::BUFFER_POS_MULTIPLIER,
+                                         will_read_frames, false, true);
+    
+    std::visit(
+        [&](auto ptr) {
+          gd->drive(this->getContextRaw()->getBlockTime(), [&](auto gain_cb) {
+            // Direct sample processing - let the position increment handle speed
+            // This is already handled by the main generateBlock() function
+            // Just output the samples directly without any processing
+            
+            for (std::size_t i = 0; i < will_read_frames; i++) {
+              float gain = gain_cb(i) * (1.0f / 32768.0f);
+              for (unsigned int ch = 0; ch < channels; ch++) {
+                output[i * channels + ch] += ptr[i * channels + ch] * gain;
+              }
+            }
+          });
+        },
+        mp);
+  }
 }
 
 inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver *gd) const {

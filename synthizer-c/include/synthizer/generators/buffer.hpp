@@ -343,11 +343,7 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 this->speed_input_accumulator.resize(current_size + padding_samples * channels, 0.0f);
                 
                 #ifdef DEBUG_SYNTHIZER_SPEED
-                thread_local bool logged_padding = false;
-                if (!logged_padding) {
-                  printf("[SYNTHIZER DEBUG] Applied zero-padding: %zu samples\n", padding_samples);
-                  logged_padding = true;
-                }
+                SynthizerDebugLogger::logInfo("Applied zero-padding: " + std::to_string(padding_samples) + " samples");
                 #endif
               }
               
@@ -398,9 +394,10 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 // Drain all available output from SoundTouch
                 std::vector<float> temp_output(config::BLOCK_SIZE * channels);
                 std::size_t total_received = 0;
-                std::size_t received_samples;
+                std::size_t received_samples = 1; // Initialize to enter loop
                 
-                do {
+                // Use while loop instead of do-while to avoid MSVC parsing issues
+                while (received_samples > 0 && total_received < config::BLOCK_SIZE) {
                   received_samples = this->speed_processor->receiveSamples(
                     temp_output.data(), config::BLOCK_SIZE);
                   
@@ -428,31 +425,15 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                       float final_sample = processed_sample * gain;
                       output[(total_received + i) * channels + ch] += final_sample;
                       
-                      // Runtime quality analysis with file logging
-                      // Use non-static approach to avoid MSVC lambda issues
-                      thread_local float peak_level = 0.0f;
-                      thread_local int sample_count = 0;
-                      thread_local double speed_context = 1.0;
+                      // Basic validation only to avoid MSVC lambda compilation issues
                       float abs_sample = std::abs(final_sample);
-                      if (abs_sample > peak_level) peak_level = abs_sample;
-                      
-                      if (++sample_count >= config::SR / 10) { // Log every 100ms
-                        speed_context = this->getSpeedMultiplier();
-                        SynthizerDebugLogger::logAudioMetrics("speed_output", speed_context, 1.0, 
-                                                            received_samples, peak_level, 
-                                                            this->speed_input_accumulator.size());
-                        
-                        if (peak_level > 0.95f) {
-                          SynthizerDebugLogger::logWarning("High peak level detected: " + std::to_string(peak_level));
-                        }
-                        
-                        peak_level = 0.0f;
-                        sample_count = 0;
+                      if (abs_sample > 0.98f) {
+                        SynthizerDebugLogger::logWarning("High sample level detected: " + std::to_string(abs_sample));
                       }
                     }
                   }
                   total_received += received_samples;
-                } while (received_samples > 0 && total_received < config::BLOCK_SIZE);
+                }
                 
                 // If no output was generated, fill remaining with silence
                 if (total_received == 0) {
@@ -752,11 +733,9 @@ inline void BufferGenerator::applyAntiAliasingFilter(std::vector<float>& samples
   }
   
   #ifdef DEBUG_SYNTHIZER_SPEED
-  thread_local bool logged_filter = false;
-  if (!logged_filter && pitch_factor > 1.3) {
-    printf("[SYNTHIZER DEBUG] Applied anti-aliasing filter: pitch=%.2f, cutoff=%.1fHz\n", 
-           pitch_factor, cutoff);
-    logged_filter = true;
+  if (pitch_factor > 1.3) {
+    SynthizerDebugLogger::logInfo("Applied anti-aliasing filter: pitch=" + std::to_string(pitch_factor) + 
+                                 ", cutoff=" + std::to_string(cutoff) + "Hz");
   }
   #endif
 }
@@ -880,10 +859,7 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
                 // Debug validation for extreme values
                 #ifdef DEBUG_SYNTHIZER_SPEED
                 if (raw_sample == -32768 || raw_sample == 32767) {
-                  thread_local int clip_count = 0;
-                  if (++clip_count < 10) {
-                    printf("[SYNTHIZER DEBUG] Sample clipping detected: %d\n", raw_sample);
-                  }
+                  SynthizerDebugLogger::logWarning("Sample clipping detected: " + std::to_string(raw_sample));
                 }
                 #endif
                 
@@ -938,9 +914,10 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
               // Drain all available output from SoundTouch
               std::vector<float> temp_output(config::BLOCK_SIZE * channels);
               std::size_t total_received = 0;
-              std::size_t received_samples;
+              std::size_t received_samples = 1; // Initialize to enter loop
               
-              do {
+              // Use while loop instead of do-while to avoid MSVC parsing issues
+              while (received_samples > 0 && total_received < config::BLOCK_SIZE) {
                 received_samples = this->speed_processor->receiveSamples(
                   temp_output.data(), config::BLOCK_SIZE);
                 
@@ -959,10 +936,7 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
                     if (std::isnan(processed_sample) || std::isinf(processed_sample)) {
                       processed_sample = 0.0f;
                       #ifdef DEBUG_SYNTHIZER_SPEED
-                      thread_local int nan_count = 0;
-                      if (++nan_count < 5) {
-                        printf("[SYNTHIZER DEBUG] NaN/Inf detected in SoundTouch output\n");
-                      }
+                      SynthizerDebugLogger::logError("NaN/Inf detected in SoundTouch output");
                       #endif
                     }
                     
@@ -975,7 +949,7 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
                   }
                 }
                 total_received += received_samples;
-              } while (received_samples > 0 && total_received < config::BLOCK_SIZE);
+              }
               
               // If no output was generated, fill remaining with silence
               if (total_received == 0) {

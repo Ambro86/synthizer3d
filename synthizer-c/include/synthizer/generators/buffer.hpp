@@ -29,6 +29,22 @@ using namespace soundtouch;
 
 namespace synthizer {
 
+// Static member definitions moved to inline implementation to avoid linker issues
+inline std::ofstream& getSynthizerLogFile() {
+  static std::ofstream log_file;
+  return log_file;
+}
+
+inline bool& getSynthizerInitialized() {
+  static bool initialized = false;
+  return initialized;
+}
+
+inline std::chrono::steady_clock::time_point& getSynthizerStartTime() {
+  static std::chrono::steady_clock::time_point start_time;
+  return start_time;
+}
+
 // Advanced debug logging system for speed processing issues
 class SynthizerDebugLogger {
 public:
@@ -91,22 +107,6 @@ public:
     getSynthizerLogFile().flush();
   }
 };
-
-// Static member definitions moved to inline implementation to avoid linker issues
-inline std::ofstream& getSynthizerLogFile() {
-  static std::ofstream log_file;
-  return log_file;
-}
-
-inline bool& getSynthizerInitialized() {
-  static bool initialized = false;
-  return initialized;
-}
-
-inline std::chrono::steady_clock::time_point& getSynthizerStartTime() {
-  static std::chrono::steady_clock::time_point start_time;
-  return start_time;
-}
 
 // Speed processing quality modes
 enum class SpeedQualityMode {

@@ -271,10 +271,19 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
       }
       
       // Calculate input needed based on speed - read more when speed < 1.0, less when speed > 1.0
-      const double input_ratio = 1.0 / speed_factor; // For 0.85 speed: 1/0.85 = 1.176
+      const double input_ratio = 1.0 / speed_factor; // For 0.85 speed: 1/0.85 = 1.176, for 1.15: 1/1.15 = 0.87
       std::size_t will_read_frames = static_cast<std::size_t>(config::BLOCK_SIZE * input_ratio + 0.5); // Round
-      will_read_frames = std::max<std::size_t>(will_read_frames, config::BLOCK_SIZE); // Always read at least BLOCK_SIZE
-      will_read_frames = std::min<std::size_t>(will_read_frames, config::BLOCK_SIZE * 2); // Cap at 2x BLOCK_SIZE
+      
+      // For speeds > 1.0, we need LESS input, for speeds < 1.0 we need MORE input
+      if (speed_factor > 1.0) {
+        // Fast speed: cap at BLOCK_SIZE, allow reading less
+        will_read_frames = std::min<std::size_t>(will_read_frames, config::BLOCK_SIZE);
+        will_read_frames = std::max<std::size_t>(will_read_frames, config::BLOCK_SIZE / 2); // Minimum half block
+      } else {
+        // Slow speed: allow reading more, cap at maximum
+        will_read_frames = std::max<std::size_t>(will_read_frames, config::BLOCK_SIZE); // At least BLOCK_SIZE
+        will_read_frames = std::min<std::size_t>(will_read_frames, config::BLOCK_SIZE * 2); // Cap at 2x BLOCK_SIZE
+      }
       
       bool near_end = false;
       if (this->getPosInSamples() + will_read_frames > this->reader.getLengthInFrames(false) &&

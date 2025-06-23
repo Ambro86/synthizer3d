@@ -93,9 +93,10 @@ private:
   // Buffer accumulation for larger SoundTouch processing chunks
   mutable std::vector<float> speed_input_accumulator;
   mutable std::vector<float> speed_output_buffer;
+  mutable int speed_priming_blocks;
 };
 
-inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx), last_pitch_value(-1.0), crossfade_samples_remaining(0), last_speed_value(-1.0), speed_crossfade_samples_remaining(0) {}
+inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx), last_pitch_value(-1.0), crossfade_samples_remaining(0), last_speed_value(-1.0), speed_crossfade_samples_remaining(0), speed_priming_blocks(0) {}
 
 inline int BufferGenerator::getObjectType() { return SYZ_OTYPE_BUFFER_GENERATOR; }
 
@@ -444,12 +445,15 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
       const std::size_t buffer_size = 8192 * channels; // 8192 samples per channel
       this->speed_input_accumulator.reserve(buffer_size);
       this->speed_output_buffer.resize(buffer_size);
+      this->speed_priming_blocks = 0; // Reset priming counter
     }
     
-    // Update tempo only if speed changed
+    // Update tempo only if speed changed (avoid unnecessary clear())
     if (std::abs(speed_factor - this->last_speed_value) > 0.01) {
       this->speed_processor->setTempo(speed_factor);
       this->last_speed_value = speed_factor;
+      // Reset priming when speed changes significantly
+      this->speed_priming_blocks = 0;
     }
     
     std::size_t will_read_frames = config::BLOCK_SIZE;
@@ -476,34 +480,46 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
               }
             }
             
-            // Process when we have enough samples (4096 samples minimum)
-            const std::size_t min_process_samples = 4096;
+            // Process when we have enough samples (6144 samples minimum for better quality)
+            const std::size_t min_process_samples = 6144;
             const std::size_t available_samples = this->speed_input_accumulator.size() / channels;
             
             if (available_samples >= min_process_samples) {
               // Process with SoundTouch using larger buffer
-              this->speed_processor->putSamples(this->speed_input_accumulator.data(), available_samples);
-              this->speed_input_accumulator.clear(); // Clear after processing
+              this->speed_processor->putSamples(this->speed_input_accumulator.data(), min_process_samples);
+              
+              // Remove only the consumed samples from accumulator (retain unprocessed data)
+              const std::size_t consumed_elements = min_process_samples * channels;
+              this->speed_input_accumulator.erase(
+                this->speed_input_accumulator.begin(),
+                this->speed_input_accumulator.begin() + consumed_elements
+              );
+              
+              // Increment priming counter
+              this->speed_priming_blocks++;
             }
             
-            // Drain all available output from SoundTouch
-            std::vector<float> temp_output(config::BLOCK_SIZE * channels);
-            std::size_t total_received = 0;
-            std::size_t received_samples;
-            
-            do {
-              received_samples = this->speed_processor->receiveSamples(
-                temp_output.data(), config::BLOCK_SIZE);
+            // Only start outputting after sufficient priming (avoid startup glitches)
+            if (this->speed_priming_blocks >= 2) {
+              // Drain all available output from SoundTouch
+              std::vector<float> temp_output(config::BLOCK_SIZE * channels);
+              std::size_t total_received = 0;
+              std::size_t received_samples;
               
-              // Apply gain and output for received samples
-              for (std::size_t i = 0; i < received_samples && total_received + i < config::BLOCK_SIZE; i++) {
-                float gain = gain_cb(total_received + i);
-                for (unsigned int ch = 0; ch < channels; ch++) {
-                  output[(total_received + i) * channels + ch] += temp_output[i * channels + ch] * gain;
+              do {
+                received_samples = this->speed_processor->receiveSamples(
+                  temp_output.data(), config::BLOCK_SIZE);
+                
+                // Apply gain and output for received samples
+                for (std::size_t i = 0; i < received_samples && total_received + i < config::BLOCK_SIZE; i++) {
+                  float gain = gain_cb(total_received + i);
+                  for (unsigned int ch = 0; ch < channels; ch++) {
+                    output[(total_received + i) * channels + ch] += temp_output[i * channels + ch] * gain;
+                  }
                 }
-              }
-              total_received += received_samples;
-            } while (received_samples > 0 && total_received < config::BLOCK_SIZE);
+                total_received += received_samples;
+              } while (received_samples > 0 && total_received < config::BLOCK_SIZE);
+            }
           });
         },
         mp);

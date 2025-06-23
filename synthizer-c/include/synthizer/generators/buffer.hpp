@@ -27,8 +27,6 @@
 #include <soundtouch/SoundTouch.h>
 using namespace soundtouch;
 
-namespace synthizer {
-
 // Simplified logging for MSVC compatibility - remove complex debug system
 #ifdef DEBUG_SYNTHIZER_SPEED
 #include <cstdio>
@@ -36,10 +34,12 @@ namespace synthizer {
 #define SYNTHIZER_LOG_WARNING(msg) printf("[SYNTHIZER WARNING] %s\n", (msg).c_str())
 #define SYNTHIZER_LOG_ERROR(msg) printf("[SYNTHIZER ERROR] %s\n", (msg).c_str())
 #else
-#define SYNTHIZER_LOG_INFO(msg) 
-#define SYNTHIZER_LOG_WARNING(msg) 
-#define SYNTHIZER_LOG_ERROR(msg) 
+#define SYNTHIZER_LOG_INFO(msg) do { } while(0)
+#define SYNTHIZER_LOG_WARNING(msg) do { } while(0)
+#define SYNTHIZER_LOG_ERROR(msg) do { } while(0)
 #endif
+
+namespace synthizer {
 
 // Speed processing quality modes
 enum class SpeedQualityMode {
@@ -294,14 +294,16 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
               while (available_samples >= chunk_size || (this->finished && available_samples > 0)) {
                 std::size_t samples_to_feed = (available_samples >= chunk_size) ? chunk_size : available_samples;
                 
+                #ifdef DEBUG_SYNTHIZER_SPEED
                 // Log feeding operation
                 std::size_t buffered_before = this->speed_processor->numSamples();
+                #endif
                 
                 // Feed samples to SoundTouch
                 this->speed_processor->putSamples(this->speed_input_accumulator.data(), samples_to_feed);
                 
-                std::size_t buffered_after = this->speed_processor->numSamples();
                 #ifdef DEBUG_SYNTHIZER_SPEED
+                std::size_t buffered_after = this->speed_processor->numSamples();
                 printf("[SYNTHIZER INFO] putSamples: %zu -> %zu (%zu)\n", samples_to_feed, buffered_after, buffered_after - buffered_before);
                 #endif
                 

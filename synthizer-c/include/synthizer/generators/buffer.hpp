@@ -179,7 +179,6 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
     } else if (need_speed_stretch) {
       // Speed-only control: ensure pitch is fully reset to 1.0
       const double speed_factor = this->getSpeedMultiplier();
-      const unsigned int channels = this->getChannels();
       if (channels == 0) {
         return; // Invalid channel configuration
       }

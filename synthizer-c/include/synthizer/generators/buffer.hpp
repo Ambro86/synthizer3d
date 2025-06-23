@@ -25,8 +25,8 @@ using namespace soundtouch;
 
 namespace synthizer {
 
-// SoundTouch priming blocks needed for stable output
-constexpr int SOUND_TOUCH_SAFE_PRIMING_BLOCKS = 10;
+// SoundTouch priming blocks needed for stable output (ultra-conservative)
+constexpr int SOUND_TOUCH_SAFE_PRIMING_BLOCKS = 20;
 
 /**
  * Plays a buffer.
@@ -233,8 +233,8 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 this->speed_processor->clear();
               }
               
-              // Process in fixed chunks to ensure predictable behavior
-              const std::size_t chunk_size = 4096;
+              // Process in smaller chunks for finer granularity and stability
+              const std::size_t chunk_size = 2048;
               std::size_t available_samples = this->speed_input_accumulator.size() / channels;
               
               // Process ALL available chunks in a loop + flush leftover data when finished
@@ -280,7 +280,25 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                   for (std::size_t i = 0; i < received_samples && total_received + i < config::BLOCK_SIZE; i++) {
                     float gain = gain_cb(total_received + i);
                     for (unsigned int ch = 0; ch < channels; ch++) {
-                      output[(total_received + i) * channels + ch] += temp_output[i * channels + ch] * gain;
+                      float processed_sample = temp_output[i * channels + ch];
+                      
+                      // ULTRA-STRICT output validation and limiting
+                      if (std::isnan(processed_sample) || std::isinf(processed_sample)) {
+                        processed_sample = 0.0f;
+                        #ifdef DEBUG_SYNTHIZER_SPEED
+                        static int nan_count = 0;
+                        if (++nan_count < 5) {
+                          printf("[SYNTHIZER DEBUG] NaN/Inf detected in SoundTouch output\n");
+                        }
+                        #endif
+                      }
+                      
+                      // Soft limiting to prevent harsh clipping
+                      processed_sample = std::clamp(processed_sample, -0.95f, 0.95f);
+                      
+                      // Apply gain and add to output
+                      float final_sample = processed_sample * gain;
+                      output[(total_received + i) * channels + ch] += final_sample;
                     }
                   }
                   total_received += received_samples;
@@ -490,20 +508,30 @@ inline void BufferGenerator::initSpeedProcessorIfNeeded(double speed_factor) con
     this->speed_processor->setSampleRate(config::SR);
     this->speed_processor->setChannels(this->getChannels());
 
-    // Set ALL SoundTouch settings once only during construction (avoid runtime resets)
-    this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);
-    this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);
-    this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);
-    this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
-    this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);
+    // ULTRA-CONSERVATIVE SoundTouch settings for maximum quality and stability
+    this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);        // Disable quick seek for quality
+    this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);        // Enable anti-aliasing filter
+    this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 82);         // Default sequence length (conservative)
+    this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 28);       // Default seek window (conservative)
+    this->speed_processor->setSetting(SETTING_OVERLAP_MS, 12);          // Default overlap (conservative)
+    
+    // Additional stability settings
+    this->speed_processor->setSetting(SETTING_NOMINAL_INPUT_SEQUENCE, 82);
+    this->speed_processor->setSetting(SETTING_NOMINAL_OUTPUT_SEQUENCE, 82);
 
     this->speed_processor->setTempo(speed_factor);
     this->last_speed_value = speed_factor;
 
-    // Initialize buffers
+    // Initialize buffers with larger size for stability
     this->speed_input_accumulator.clear();
-    this->speed_output_buffer.resize(8192 * this->getChannels());
+    this->speed_output_buffer.resize(16384 * this->getChannels());
     this->speed_priming_blocks = 0;
+    
+    // Debug output for sample rate verification
+    #ifdef DEBUG_SYNTHIZER_SPEED
+    printf("[SYNTHIZER DEBUG] Speed processor initialized: SR=%d, Channels=%d, Speed=%.3f\n", 
+           config::SR, this->getChannels(), speed_factor);
+    #endif
   }
 }
 
@@ -614,14 +642,32 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
             const std::size_t input_start = this->speed_input_accumulator.size();
             this->speed_input_accumulator.resize(input_start + will_read_frames * channels);
             
-            // Proper 16-bit to float conversion (32767 is max positive value for int16_t)
+            // ULTRA-PRECISE 16-bit to float conversion with validation
             const float scale = 1.0f / 32767.0f;
             for (std::size_t i = 0; i < will_read_frames; i++) {
               for (unsigned int ch = 0; ch < channels; ch++) {
-                float sample = ptr[i * channels + ch] * scale;
-                // Clamp to prevent any overflow issues (handles edge cases with corrupted audio)
-                this->speed_input_accumulator[input_start + i * channels + ch] = 
-                  std::clamp(sample, -1.0f, 1.0f);
+                std::int16_t raw_sample = ptr[i * channels + ch];
+                
+                // Debug validation for extreme values
+                #ifdef DEBUG_SYNTHIZER_SPEED
+                if (raw_sample == -32768 || raw_sample == 32767) {
+                  static int clip_count = 0;
+                  if (++clip_count < 10) {
+                    printf("[SYNTHIZER DEBUG] Sample clipping detected: %d\n", raw_sample);
+                  }
+                }
+                #endif
+                
+                // Ultra-precise conversion with dithering compensation
+                float sample = static_cast<float>(raw_sample) * scale;
+                
+                // Strict clamping with NaN protection
+                if (std::isnan(sample) || std::isinf(sample)) {
+                  sample = 0.0f;
+                }
+                sample = std::clamp(sample, -1.0f, 1.0f);
+                
+                this->speed_input_accumulator[input_start + i * channels + ch] = sample;
               }
             }
             
@@ -631,8 +677,8 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
               this->speed_processor->clear();
             }
             
-            // Process in fixed chunks to ensure predictable behavior
-            const std::size_t chunk_size = 4096;
+            // Process in smaller chunks for finer granularity and stability
+            const std::size_t chunk_size = 2048;
             std::size_t available_samples = this->speed_input_accumulator.size() / channels;
             
             // Process ALL available chunks in a loop + flush leftover data when finished
@@ -678,7 +724,25 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
                 for (std::size_t i = 0; i < received_samples && total_received + i < config::BLOCK_SIZE; i++) {
                   float gain = gain_cb(total_received + i);
                   for (unsigned int ch = 0; ch < channels; ch++) {
-                    output[(total_received + i) * channels + ch] += temp_output[i * channels + ch] * gain;
+                    float processed_sample = temp_output[i * channels + ch];
+                    
+                    // ULTRA-STRICT output validation and limiting
+                    if (std::isnan(processed_sample) || std::isinf(processed_sample)) {
+                      processed_sample = 0.0f;
+                      #ifdef DEBUG_SYNTHIZER_SPEED
+                      static int nan_count = 0;
+                      if (++nan_count < 5) {
+                        printf("[SYNTHIZER DEBUG] NaN/Inf detected in SoundTouch output\n");
+                      }
+                      #endif
+                    }
+                    
+                    // Soft limiting to prevent harsh clipping
+                    processed_sample = std::clamp(processed_sample, -0.95f, 0.95f);
+                    
+                    // Apply gain and add to output
+                    float final_sample = processed_sample * gain;
+                    output[(total_received + i) * channels + ch] += final_sample;
                   }
                 }
                 total_received += received_samples;

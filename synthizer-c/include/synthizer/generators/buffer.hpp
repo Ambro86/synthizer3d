@@ -35,19 +35,19 @@ using namespace soundtouch;
 #include <cstdio>
 #include <fstream>
 #define SYNTHIZER_LOG_INFO(msg) do { \
-  printf("[SYNTHIZER INFO] %s\n", (msg).c_str()); \
-  std::ofstream log("synthizerlog.txt", std::ios::app); \
-  if (log.is_open()) { log << "[INFO] " << (msg) << std::endl; log.close(); } \
+  printf("[SYNTHIZER INFO] %s\n", (msg)); \
+  { std::ofstream log("synthizerlog.txt", std::ios::app); \
+    if (log.is_open()) { log << "[INFO] " << (msg) << std::endl; } } \
 } while(0)
 #define SYNTHIZER_LOG_WARNING(msg) do { \
-  printf("[SYNTHIZER WARNING] %s\n", (msg).c_str()); \
-  std::ofstream log("synthizerlog.txt", std::ios::app); \
-  if (log.is_open()) { log << "[WARNING] " << (msg) << std::endl; log.close(); } \
+  printf("[SYNTHIZER WARNING] %s\n", (msg)); \
+  { std::ofstream log("synthizerlog.txt", std::ios::app); \
+    if (log.is_open()) { log << "[WARNING] " << (msg) << std::endl; } } \
 } while(0)
 #define SYNTHIZER_LOG_ERROR(msg) do { \
-  printf("[SYNTHIZER ERROR] %s\n", (msg).c_str()); \
-  std::ofstream log("synthizerlog.txt", std::ios::app); \
-  if (log.is_open()) { log << "[ERROR] " << (msg) << std::endl; log.close(); } \
+  printf("[SYNTHIZER ERROR] %s\n", (msg)); \
+  { std::ofstream log("synthizerlog.txt", std::ios::app); \
+    if (log.is_open()) { log << "[ERROR] " << (msg) << std::endl; } } \
 } while(0)
 #else
 #define SYNTHIZER_LOG_INFO(msg) do { } while(0)
@@ -292,7 +292,7 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 this->speed_input_accumulator.resize(current_size + padding_samples * channels, 0.0f);
                 
                 #ifdef DEBUG_SYNTHIZER_SPEED
-                SYNTHIZER_LOG_INFO("Applied zero-padding: " + std::to_string(padding_samples) + " samples");
+                SYNTHIZER_LOG_INFO(("Applied zero-padding: " + std::to_string(padding_samples) + " samples").c_str());
                 #endif
               }
               
@@ -381,7 +381,7 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                       // Basic validation only to avoid MSVC lambda compilation issues
                       float abs_sample = std::abs(final_sample);
                       if (abs_sample > 0.98f) {
-                        SYNTHIZER_LOG_WARNING("High sample level detected: " + std::to_string(abs_sample));
+                        SYNTHIZER_LOG_WARNING(("High sample level detected: " + std::to_string(abs_sample)).c_str());
                       }
                     }
                   }
@@ -398,12 +398,12 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 if (total_received < config::BLOCK_SIZE) {
                   std::stringstream msg;
                   msg << "Partial block processed: " << total_received << "/" << config::BLOCK_SIZE << " samples";
-                  SYNTHIZER_LOG_INFO(msg.str());
+                  SYNTHIZER_LOG_INFO(msg.str().c_str());
                 }
               } else {
-                SYNTHIZER_LOG_INFO("Skipping output - insufficient priming (" + 
+                SYNTHIZER_LOG_INFO(("Skipping output - insufficient priming (" + 
                                             std::to_string(this->speed_priming_blocks) + "/" + 
-                                            std::to_string(SOUND_TOUCH_SAFE_PRIMING_BLOCKS) + ")");
+                                            std::to_string(SOUND_TOUCH_SAFE_PRIMING_BLOCKS) + ")").c_str());
               }
             });
           },
@@ -607,7 +607,7 @@ inline void BufferGenerator::initSpeedProcessorIfNeeded(double speed_factor) con
     std::stringstream msg;
     msg << "Speed processor initialized: SR=" << config::SR << " Channels=" << this->getChannels() 
         << " Speed=" << speed_factor;
-    SYNTHIZER_LOG_INFO(msg.str());
+    SYNTHIZER_LOG_INFO(msg.str().c_str());
 
     // Configure SoundTouch settings based on quality mode
     switch (this->speed_quality_mode) {
@@ -687,8 +687,8 @@ inline void BufferGenerator::applyAntiAliasingFilter(std::vector<float>& samples
   
   #ifdef DEBUG_SYNTHIZER_SPEED
   if (pitch_factor > 1.3) {
-    SYNTHIZER_LOG_INFO("Applied anti-aliasing filter: pitch=" + std::to_string(pitch_factor) + 
-                                 ", cutoff=" + std::to_string(cutoff) + "Hz");
+    SYNTHIZER_LOG_INFO(("Applied anti-aliasing filter: pitch=" + std::to_string(pitch_factor) + 
+                                 ", cutoff=" + std::to_string(cutoff) + "Hz").c_str());
   }
   #endif
 }
@@ -812,7 +812,7 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
                 // Debug validation for extreme values
                 #ifdef DEBUG_SYNTHIZER_SPEED
                 if (raw_sample == -32768 || raw_sample == 32767) {
-                  SYNTHIZER_LOG_WARNING("Sample clipping detected: " + std::to_string(raw_sample));
+                  SYNTHIZER_LOG_WARNING(("Sample clipping detected: " + std::to_string(raw_sample)).c_str());
                 }
                 #endif
                 

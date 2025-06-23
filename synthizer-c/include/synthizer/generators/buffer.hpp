@@ -155,14 +155,14 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
     bool need_speed_stretch = (this->getSpeedMultiplier() != 1.0);
     
     if (need_pitch_stretch && need_speed_stretch) {
-      // Both pitch and speed need processing - process speed first, then pitch
+      // Both pitch and speed need processing - use SoundTouch
       this->generateTimeStretchSpeed(output, gd);
     } else if (need_pitch_stretch) {
-      // Only pitch needs processing
+      // Only pitch needs processing - use SoundTouch for pitch
       this->generateTimeStretchPitch(output, gd);
     } else if (need_speed_stretch) {
-      // Only speed needs processing
-      this->generateTimeStretchSpeed(output, gd);
+      // Only speed needs processing - use interpolation like pitch bend but without pitch change
+      this->generatePitchBend(output, gd);
     } else {
       // No processing needed
       this->generateNoPitchBend(output, gd);

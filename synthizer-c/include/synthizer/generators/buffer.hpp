@@ -25,6 +25,13 @@ using namespace soundtouch;
 
 namespace synthizer {
 
+// Speed processing quality modes
+enum class SpeedQualityMode {
+  LOW_LATENCY = 0,    // Fast response, basic quality
+  BALANCED = 1,       // Good balance of quality and latency  
+  HIGH_QUALITY = 2    // Maximum quality, higher latency
+};
+
 // SoundTouch priming blocks needed for stable output (ultra-conservative)
 constexpr int SOUND_TOUCH_SAFE_PRIMING_BLOCKS = 20;
 
@@ -59,6 +66,7 @@ private:
   void generateTimeStretchPitch(float *out, FadeDriver *gain_driver) const;
   void generateTimeStretchSpeed(float *out, FadeDriver *gain_driver) const;
   void initSpeedProcessorIfNeeded(double speed_factor) const;
+  void applyAntiAliasingFilter(std::vector<float>& samples, double pitch_factor, unsigned int channels) const;
 
   /*
    * Handle configuring properties, and set the non-property state variables up appropriately.
@@ -102,9 +110,11 @@ private:
   mutable std::vector<float> speed_input_accumulator;
   mutable std::vector<float> speed_output_buffer;
   mutable int speed_priming_blocks;
+  // Quality mode for speed processing
+  mutable SpeedQualityMode speed_quality_mode;
 };
 
-inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx), last_pitch_value(-1.0), crossfade_samples_remaining(0), last_speed_value(-1.0), last_combined_speed_value(-1.0), last_combined_pitch_value(-1.0), speed_crossfade_samples_remaining(0), speed_priming_blocks(0) {}
+inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx), last_pitch_value(-1.0), crossfade_samples_remaining(0), last_speed_value(-1.0), last_combined_speed_value(-1.0), last_combined_pitch_value(-1.0), speed_crossfade_samples_remaining(0), speed_priming_blocks(0), speed_quality_mode(SpeedQualityMode::BALANCED) {}
 
 inline int BufferGenerator::getObjectType() { return SYZ_OTYPE_BUFFER_GENERATOR; }
 
@@ -189,21 +199,35 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
       // Initialize SoundTouch processor with stable settings
       this->initSpeedProcessorIfNeeded(speed_factor);
       
-      // Update tempo and ensure pitch is reset to 1.0 (critical fix)
-      if (std::abs(speed_factor - this->last_speed_value) > 0.01 || this->last_pitch_value != 1.0) {
-        this->speed_processor->clear();
-        this->speed_processor->setTempo(speed_factor);
-        this->speed_processor->setPitch(1.0f);  // Force pitch reset to 1.0
-        this->last_speed_value = speed_factor;
-        this->last_pitch_value = 1.0;  // Track that pitch is now 1.0
-        this->speed_priming_blocks = 0;
+      // Update tempo and ensure pitch is reset to 1.0 (avoid unnecessary clears)
+      bool need_tempo_change = std::abs(speed_factor - this->last_speed_value) > 0.01;
+      bool need_pitch_reset = this->last_pitch_value != 1.0;
+      
+      if (need_tempo_change || need_pitch_reset) {
+        // Only clear if making significant changes that require buffer reset
+        if (need_pitch_reset || std::abs(speed_factor - this->last_speed_value) > 0.1) {
+          this->speed_processor->clear();
+          this->speed_priming_blocks = 0;
+        }
+        
+        if (need_tempo_change) {
+          this->speed_processor->setTempo(speed_factor);
+          this->last_speed_value = speed_factor;
+        }
+        
+        if (need_pitch_reset) {
+          this->speed_processor->setPitch(1.0f);
+          this->last_pitch_value = 1.0;
+        }
       }
       
       std::size_t will_read_frames = config::BLOCK_SIZE;
+      bool near_end = false;
       if (this->getPosInSamples() + will_read_frames > this->reader.getLengthInFrames(false) &&
           this->getLooping() == false) {
         will_read_frames = this->reader.getLengthInFrames(false) - this->getPosInSamples() - 1;
         will_read_frames = std::min<std::size_t>(will_read_frames, config::BLOCK_SIZE);
+        near_end = true; // Flag that we're near the end for zero-padding
       }
       
       auto mp = this->reader.getFrameSlice(this->scaled_position_in_frames / config::BUFFER_POS_MULTIPLIER,
@@ -225,6 +249,21 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                   this->speed_input_accumulator[input_start + i * channels + ch] = 
                     std::clamp(sample, -1.0f, 1.0f);
                 }
+              }
+              
+              // Add zero-padding if near end to maintain SoundTouch processing consistency
+              if (near_end && will_read_frames < config::BLOCK_SIZE) {
+                const std::size_t padding_samples = config::BLOCK_SIZE - will_read_frames;
+                const std::size_t current_size = this->speed_input_accumulator.size();
+                this->speed_input_accumulator.resize(current_size + padding_samples * channels, 0.0f);
+                
+                #ifdef DEBUG_SYNTHIZER_SPEED
+                static bool logged_padding = false;
+                if (!logged_padding) {
+                  printf("[SYNTHIZER DEBUG] Applied zero-padding: %zu samples\n", padding_samples);
+                  logged_padding = true;
+                }
+                #endif
               }
               
               // Defensive reset for clean starts
@@ -299,6 +338,21 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                       // Apply gain and add to output
                       float final_sample = processed_sample * gain;
                       output[(total_received + i) * channels + ch] += final_sample;
+                      
+                      // Runtime quality analysis
+                      #ifdef DEBUG_SYNTHIZER_SPEED
+                      static float peak_level = 0.0f;
+                      static int sample_count = 0;
+                      float abs_sample = std::abs(final_sample);
+                      if (abs_sample > peak_level) peak_level = abs_sample;
+                      if (++sample_count >= config::SR) { // Log every second
+                        if (peak_level > 0.95f) {
+                          printf("[SYNTHIZER DEBUG] High peak detected: %.3f\n", peak_level);
+                        }
+                        peak_level = 0.0f;
+                        sample_count = 0;
+                      }
+                      #endif
                     }
                   }
                   total_received += received_samples;
@@ -508,14 +562,34 @@ inline void BufferGenerator::initSpeedProcessorIfNeeded(double speed_factor) con
     this->speed_processor->setSampleRate(config::SR);
     this->speed_processor->setChannels(this->getChannels());
 
-    // ULTRA-CONSERVATIVE SoundTouch settings for maximum quality and stability
-    this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);        // Disable quick seek for quality
-    this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);        // Enable anti-aliasing filter
-    this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 82);         // Default sequence length (conservative)
-    this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 28);       // Default seek window (conservative)
-    this->speed_processor->setSetting(SETTING_OVERLAP_MS, 12);          // Default overlap (conservative)
+    // Configure SoundTouch settings based on quality mode
+    switch (this->speed_quality_mode) {
+      case SpeedQualityMode::LOW_LATENCY:
+        this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 1);      // Enable quick seek for speed
+        this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 0);      // Disable AA for lower latency
+        this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);       // Shorter sequences
+        this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);     // Smaller seek window
+        this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);         // Minimal overlap
+        break;
+        
+      case SpeedQualityMode::BALANCED:
+        this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);      // Disable quick seek for quality
+        this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);      // Enable anti-aliasing
+        this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 82);       // Default sequence length
+        this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 28);     // Default seek window
+        this->speed_processor->setSetting(SETTING_OVERLAP_MS, 12);        // Default overlap
+        break;
+        
+      case SpeedQualityMode::HIGH_QUALITY:
+        this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);      // Disable quick seek for quality
+        this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);      // Enable anti-aliasing
+        this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 100);      // Longer sequences for quality
+        this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 40);     // Larger seek window
+        this->speed_processor->setSetting(SETTING_OVERLAP_MS, 20);        // More overlap for smoothness
+        break;
+    }
     
-    // Additional stability settings
+    // Additional stability settings for all modes
     this->speed_processor->setSetting(SETTING_NOMINAL_INPUT_SEQUENCE, 82);
     this->speed_processor->setSetting(SETTING_NOMINAL_OUTPUT_SEQUENCE, 82);
 
@@ -533,6 +607,42 @@ inline void BufferGenerator::initSpeedProcessorIfNeeded(double speed_factor) con
            config::SR, this->getChannels(), speed_factor);
     #endif
   }
+}
+
+inline void BufferGenerator::applyAntiAliasingFilter(std::vector<float>& samples, double pitch_factor, unsigned int channels) const {
+  // Simple Butterworth low-pass filter to prevent aliasing when pitch > 1.3
+  if (pitch_factor <= 1.3) {
+    return; // No filtering needed
+  }
+  
+  // Calculate cutoff frequency to prevent aliasing
+  const double nyquist = config::SR * 0.5;
+  const double cutoff = std::min(nyquist * 0.9 / pitch_factor, nyquist * 0.8);
+  const double normalized_cutoff = cutoff / nyquist;
+  
+  // Simple first-order low-pass filter coefficients
+  const double alpha = normalized_cutoff;
+  const double one_minus_alpha = 1.0 - alpha;
+  
+  // Apply filter per channel
+  for (unsigned int ch = 0; ch < channels; ch++) {
+    double prev_sample = 0.0;
+    
+    for (std::size_t i = ch; i < samples.size(); i += channels) {
+      // Simple low-pass: y[n] = alpha * x[n] + (1-alpha) * y[n-1]
+      samples[i] = static_cast<float>(alpha * samples[i] + one_minus_alpha * prev_sample);
+      prev_sample = samples[i];
+    }
+  }
+  
+  #ifdef DEBUG_SYNTHIZER_SPEED
+  static bool logged_filter = false;
+  if (!logged_filter && pitch_factor > 1.3) {
+    printf("[SYNTHIZER DEBUG] Applied anti-aliasing filter: pitch=%.2f, cutoff=%.1fHz\n", 
+           pitch_factor, cutoff);
+    logged_filter = true;
+  }
+  #endif
 }
 
 inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver *gd) const {
@@ -592,6 +702,9 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
                 input_samples[i * channels + ch] = ptr[i * channels + ch] * (1.0f / 32768.0f);
               }
             }
+            
+            // Apply anti-aliasing filter if pitch is high enough to cause aliasing
+            this->applyAntiAliasingFilter(input_samples, pitch_factor, channels);
             
             this->combined_processor->putSamples(input_samples.data(), will_read_frames);
             std::vector<float> output_samples(config::BLOCK_SIZE * channels);

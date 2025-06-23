@@ -343,7 +343,7 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 this->speed_input_accumulator.resize(current_size + padding_samples * channels, 0.0f);
                 
                 #ifdef DEBUG_SYNTHIZER_SPEED
-                static bool logged_padding = false;
+                thread_local bool logged_padding = false;
                 if (!logged_padding) {
                   printf("[SYNTHIZER DEBUG] Applied zero-padding: %zu samples\n", padding_samples);
                   logged_padding = true;
@@ -429,9 +429,10 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                       output[(total_received + i) * channels + ch] += final_sample;
                       
                       // Runtime quality analysis with file logging
-                      static float peak_level = 0.0f;
-                      static int sample_count = 0;
-                      static double speed_context = 1.0;
+                      // Use non-static approach to avoid MSVC lambda issues
+                      thread_local float peak_level = 0.0f;
+                      thread_local int sample_count = 0;
+                      thread_local double speed_context = 1.0;
                       float abs_sample = std::abs(final_sample);
                       if (abs_sample > peak_level) peak_level = abs_sample;
                       
@@ -751,7 +752,7 @@ inline void BufferGenerator::applyAntiAliasingFilter(std::vector<float>& samples
   }
   
   #ifdef DEBUG_SYNTHIZER_SPEED
-  static bool logged_filter = false;
+  thread_local bool logged_filter = false;
   if (!logged_filter && pitch_factor > 1.3) {
     printf("[SYNTHIZER DEBUG] Applied anti-aliasing filter: pitch=%.2f, cutoff=%.1fHz\n", 
            pitch_factor, cutoff);
@@ -879,7 +880,7 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
                 // Debug validation for extreme values
                 #ifdef DEBUG_SYNTHIZER_SPEED
                 if (raw_sample == -32768 || raw_sample == 32767) {
-                  static int clip_count = 0;
+                  thread_local int clip_count = 0;
                   if (++clip_count < 10) {
                     printf("[SYNTHIZER DEBUG] Sample clipping detected: %d\n", raw_sample);
                   }
@@ -958,7 +959,7 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
                     if (std::isnan(processed_sample) || std::isinf(processed_sample)) {
                       processed_sample = 0.0f;
                       #ifdef DEBUG_SYNTHIZER_SPEED
-                      static int nan_count = 0;
+                      thread_local int nan_count = 0;
                       if (++nan_count < 5) {
                         printf("[SYNTHIZER DEBUG] NaN/Inf detected in SoundTouch output\n");
                       }

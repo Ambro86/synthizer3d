@@ -437,6 +437,13 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
       this->speed_processor->setSampleRate(config::SR);
       this->speed_processor->setChannels(channels);
       
+      // Configure SoundTouch for optimal quality
+      this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);
+      this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);
+      this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);
+      this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
+      this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);
+      
       // Use setTempo for pure speed control - this preserves pitch automatically
       this->speed_processor->setTempo(speed_factor);
       this->last_speed_value = speed_factor;
@@ -473,15 +480,19 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
             const std::size_t input_start = this->speed_input_accumulator.size();
             this->speed_input_accumulator.resize(input_start + will_read_frames * channels);
             
+            // Proper 16-bit to float conversion with symmetric scaling
+            const float scale = 1.0f / 32768.0f;
             for (std::size_t i = 0; i < will_read_frames; i++) {
               for (unsigned int ch = 0; ch < channels; ch++) {
+                float sample = ptr[i * channels + ch] * scale;
+                // Clamp to prevent any overflow issues
                 this->speed_input_accumulator[input_start + i * channels + ch] = 
-                  ptr[i * channels + ch] * (1.0f / 32768.0f);
+                  std::max(-1.0f, std::min(1.0f, sample));
               }
             }
             
-            // Process when we have enough samples (6144 samples minimum for better quality)
-            const std::size_t min_process_samples = 6144;
+            // Process when we have enough samples (4096 samples minimum for optimal SoundTouch performance)
+            const std::size_t min_process_samples = 4096;
             const std::size_t available_samples = this->speed_input_accumulator.size() / channels;
             
             if (available_samples >= min_process_samples) {
@@ -510,6 +521,11 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
                 received_samples = this->speed_processor->receiveSamples(
                   temp_output.data(), config::BLOCK_SIZE);
                 
+                // Handle output underrun - if no samples available, stop processing
+                if (received_samples == 0) {
+                  break;
+                }
+                
                 // Apply gain and output for received samples
                 for (std::size_t i = 0; i < received_samples && total_received + i < config::BLOCK_SIZE; i++) {
                   float gain = gain_cb(total_received + i);
@@ -519,6 +535,11 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
                 }
                 total_received += received_samples;
               } while (received_samples > 0 && total_received < config::BLOCK_SIZE);
+              
+              // If no output was generated, fill remaining with silence
+              if (total_received == 0) {
+                return; // Early return - let the caller handle silence
+              }
             }
           });
         },

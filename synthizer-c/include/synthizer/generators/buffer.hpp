@@ -55,6 +55,7 @@ private:
   void generatePitchBend(float *out, FadeDriver *gain_driver) const;
   void generateTimeStretchPitch(float *out, FadeDriver *gain_driver) const;
   void generateTimeStretchSpeed(float *out, FadeDriver *gain_driver) const;
+  void initSpeedProcessorIfNeeded(double speed_factor) const;
 
   /*
    * Handle configuring properties, and set the non-property state variables up appropriately.
@@ -364,6 +365,29 @@ inline void BufferGenerator::generatePitchBend(float *output, FadeDriver *gd) co
       mp, vCond(_is_full_block));
 }
 
+inline void BufferGenerator::initSpeedProcessorIfNeeded(double speed_factor) const {
+  if (!this->speed_processor) {
+    this->speed_processor = std::make_unique<soundtouch::SoundTouch>();
+    this->speed_processor->setSampleRate(config::SR);
+    this->speed_processor->setChannels(this->getChannels());
+
+    // Set ALL SoundTouch settings once only during construction (avoid runtime resets)
+    this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);
+    this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);
+    this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);
+    this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
+    this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);
+
+    this->speed_processor->setTempo(speed_factor);
+    this->last_speed_value = speed_factor;
+
+    // Initialize buffers
+    this->speed_input_accumulator.clear();
+    this->speed_output_buffer.resize(8192 * this->getChannels());
+    this->speed_priming_blocks = 0;
+  }
+}
+
 inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver *gd) const {
   assert(this->finished == false);
   
@@ -442,28 +466,8 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
       return; // Invalid channel configuration
     }
     
-    if (!this->speed_processor) {
-      this->speed_processor = std::make_unique<soundtouch::SoundTouch>();
-      this->speed_processor->setSampleRate(config::SR);
-      this->speed_processor->setChannels(channels);
-      
-      // Configure SoundTouch for optimal quality
-      this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);
-      this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);
-      this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);
-      this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);
-      this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);
-      
-      // Use setTempo for pure speed control - this preserves pitch automatically
-      this->speed_processor->setTempo(speed_factor);
-      this->last_speed_value = speed_factor;
-      
-      // Initialize larger buffers for better SoundTouch performance
-      const std::size_t buffer_size = 8192 * channels; // 8192 samples per channel
-      this->speed_input_accumulator.reserve(buffer_size);
-      this->speed_output_buffer.resize(buffer_size);
-      this->speed_priming_blocks = 0; // Reset priming counter
-    }
+    // Initialize SoundTouch processor with stable settings
+    this->initSpeedProcessorIfNeeded(speed_factor);
     
     // Update tempo only if speed changed (avoid unnecessary clear())
     if (std::abs(speed_factor - this->last_speed_value) > 0.01) {
@@ -495,9 +499,9 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
             for (std::size_t i = 0; i < will_read_frames; i++) {
               for (unsigned int ch = 0; ch < channels; ch++) {
                 float sample = ptr[i * channels + ch] * scale;
-                // Clamp to prevent any overflow issues
+                // Clamp to prevent any overflow issues (handles edge cases with corrupted audio)
                 this->speed_input_accumulator[input_start + i * channels + ch] = 
-                  std::max(-1.0f, std::min(1.0f, sample));
+                  std::clamp(sample, -1.0f, 1.0f);
               }
             }
             
@@ -506,11 +510,11 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
             const std::size_t available_samples = this->speed_input_accumulator.size() / channels;
             
             if (available_samples >= min_process_samples) {
-              // Process with SoundTouch using larger buffer
-              this->speed_processor->putSamples(this->speed_input_accumulator.data(), min_process_samples);
+              // Process ALL available samples to avoid stalling SoundTouch
+              this->speed_processor->putSamples(this->speed_input_accumulator.data(), available_samples);
               
-              // Remove only the consumed samples from accumulator (retain unprocessed data)
-              const std::size_t consumed_elements = min_process_samples * channels;
+              // Remove all consumed samples from accumulator
+              const std::size_t consumed_elements = available_samples * channels;
               this->speed_input_accumulator.erase(
                 this->speed_input_accumulator.begin(),
                 this->speed_input_accumulator.begin() + consumed_elements
@@ -675,7 +679,8 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
           if (this->crossfade_processor && this->crossfade_samples_remaining > 0) {
             // Process same input through crossfade processor (old pitch)
             this->crossfade_processor->putSamples(input_samples.data(), will_read_frames);
-            crossfade_samples.resize(config::BLOCK_SIZE * channels);
+            // Initialize crossfade buffer with zeros to prevent garbage data
+            crossfade_samples.resize(config::BLOCK_SIZE * channels, 0.0f);
             crossfade_received = this->crossfade_processor->receiveSamples(crossfade_samples.data(), config::BLOCK_SIZE);
           }
           

@@ -19,6 +19,8 @@
 #include <chrono>
 #include <iomanip>
 #include <sstream>
+#include <cstring>
+#include <algorithm>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -27,8 +29,8 @@
 // Enable debug logging for speed processing (enabled for debugging 1.05 speed)
 #define DEBUG_SYNTHIZER_SPEED 1
 
-#include <rubberband/RubberBandStretcher.h>
-using namespace RubberBand;
+#include <soundtouch/SoundTouch.h>
+using namespace soundtouch;
 
 // Simplified logging for MSVC compatibility - remove complex debug system
 #ifdef DEBUG_SYNTHIZER_SPEED
@@ -64,8 +66,8 @@ enum class SpeedQualityMode {
   HIGH_QUALITY = 2    // Maximum quality, higher latency
 };
 
-// RubberBand priming blocks needed for stable output
-constexpr int RUBBERBAND_SAFE_PRIMING_BLOCKS = 1;
+// SoundTouch priming blocks needed for stable output (ridotto per risposta più veloce)
+constexpr int SOUND_TOUCH_SAFE_PRIMING_BLOCKS = 1;  // Ridotto per risposta più veloce
 
 /**
  * Plays a buffer.
@@ -98,6 +100,7 @@ private:
   void generateTimeStretchPitch(float *out, FadeDriver *gain_driver) const;
   void generateTimeStretchSpeed(float *out, FadeDriver *gain_driver) const;
   void generateSpeedTransition(float *out, FadeDriver *gain_driver) const;
+  void generateScaleTempo(float *out, FadeDriver *gain_driver) const;
   void initSpeedProcessorIfNeeded(double speed_factor) const;
   void applyAntiAliasingFilter(std::vector<float>& samples, double pitch_factor, unsigned int channels) const;
 
@@ -119,30 +122,49 @@ private:
 
   std::uint64_t scaled_position_in_frames = 0, scaled_position_increment = 0;
   
-  // RubberBand instance for time-stretch pitch shifting
-  mutable std::unique_ptr<RubberBandStretcher> rubberband_processor;
-  // Cache last pitch value to avoid unnecessary RubberBand reconfigurations
+  // SoundTouch instance for time-stretch pitch shifting
+  mutable std::unique_ptr<soundtouch::SoundTouch> soundtouch_processor;
+  // Cache last pitch value to avoid unnecessary SoundTouch reconfigurations
   mutable double last_pitch_value;
   // Crossfade system for smooth pitch transitions
-  mutable std::unique_ptr<RubberBandStretcher> crossfade_processor;
+  mutable std::unique_ptr<soundtouch::SoundTouch> crossfade_processor;
   mutable std::vector<float> crossfade_buffer;
   mutable int crossfade_samples_remaining;
   
   // Speed control system with independent pitch preservation (speed-only)
-  mutable std::unique_ptr<RubberBandStretcher> speed_processor;
+  mutable std::unique_ptr<soundtouch::SoundTouch> speed_processor;
   mutable double last_speed_value;
   // Combined pitch+speed processor (separate from speed-only)
-  mutable std::unique_ptr<RubberBandStretcher> combined_processor;
+  mutable std::unique_ptr<soundtouch::SoundTouch> combined_processor;
   mutable double last_combined_speed_value;
   mutable double last_combined_pitch_value;
   // Speed crossfade system
-  mutable std::unique_ptr<RubberBandStretcher> speed_crossfade_processor;
+  mutable std::unique_ptr<soundtouch::SoundTouch> speed_crossfade_processor;
   mutable std::vector<float> speed_crossfade_buffer;
   mutable int speed_crossfade_samples_remaining;
-  // Buffer accumulation for larger RubberBand processing chunks
+  // Buffer accumulation for larger SoundTouch processing chunks
   mutable std::vector<float> speed_input_accumulator;
   mutable std::vector<float> speed_output_buffer;
   mutable int speed_priming_blocks;
+  
+  // ScaleTempo algorithm state variables
+  mutable double scaletempo_scale;
+  mutable unsigned int scaletempo_ms_stride;
+  mutable double scaletempo_percent_overlap;
+  mutable unsigned int scaletempo_ms_search;
+  mutable unsigned int scaletempo_bytes_stride;
+  mutable unsigned int scaletempo_samples_overlap;
+  mutable unsigned int scaletempo_samples_standing;
+  mutable unsigned int scaletempo_frames_search;
+  mutable std::vector<float> scaletempo_buf_queue;
+  mutable std::vector<float> scaletempo_buf_overlap;
+  mutable std::vector<float> scaletempo_table_blend;
+  mutable std::vector<float> scaletempo_buf_pre_corr;
+  mutable std::vector<float> scaletempo_table_window;
+  mutable unsigned int scaletempo_bytes_queued;
+  mutable unsigned int scaletempo_bytes_to_slide;
+  mutable double scaletempo_frames_stride_scaled;
+  mutable double scaletempo_frames_stride_error;
 };
 
 inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : 
@@ -153,7 +175,19 @@ inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) :
   last_combined_speed_value(-1.0), 
   last_combined_pitch_value(-1.0), 
   speed_crossfade_samples_remaining(0), 
-  speed_priming_blocks(0) {
+  speed_priming_blocks(0),
+  scaletempo_scale(1.0),
+  scaletempo_ms_stride(30),
+  scaletempo_percent_overlap(0.20),
+  scaletempo_ms_search(14),
+  scaletempo_bytes_stride(0),
+  scaletempo_samples_overlap(0),
+  scaletempo_samples_standing(0),
+  scaletempo_frames_search(0),
+  scaletempo_bytes_queued(0),
+  scaletempo_bytes_to_slide(0),
+  scaletempo_frames_stride_scaled(0.0),
+  scaletempo_frames_stride_error(0.0) {
 }
 
 inline int BufferGenerator::getObjectType() { return SYZ_OTYPE_BUFFER_GENERATOR; }
@@ -227,12 +261,12 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
   if (std::abs(current_speed - last_speed) > 0.01 && last_speed > 0) {
     // Reset immediato dei processori per transizione istantanea
     if (this->speed_processor) {
-      this->speed_processor->reset();
+      this->speed_processor->clear();
       this->speed_input_accumulator.clear();
       this->speed_priming_blocks = 0;
     }
     if (this->combined_processor) {
-      this->combined_processor->reset();
+      this->combined_processor->clear();
     }
     
     SYNTHIZER_LOG_INFO(("Immediate speed transition: " + std::to_string(last_speed) + " -> " + std::to_string(current_speed)).c_str());
@@ -460,26 +494,31 @@ inline void BufferGenerator::generatePitchBend(float *output, FadeDriver *gd) co
 
 inline void BufferGenerator::initSpeedProcessorIfNeeded(double speed_factor) const {
   if (!this->speed_processor) {
-    // RubberBand options for low latency speed processing
-    RubberBandStretcher::Options options = static_cast<RubberBandStretcher::Options>(
-      RubberBandStretcher::OptionProcessRealTime |     // Real-time processing
-      RubberBandStretcher::OptionStretchElastic |      // Elastic stretch for speed
-      RubberBandStretcher::OptionTransientsCrisp |     // Preserve transients
-      RubberBandStretcher::OptionWindowShort);         // Short window for low latency
+    this->speed_processor = std::make_unique<soundtouch::SoundTouch>();
+    this->speed_processor->setSampleRate(config::SR);
+    this->speed_processor->setChannels(this->getChannels());
     
-    this->speed_processor = std::make_unique<RubberBandStretcher>(
-      config::SR, this->getChannels(), options);
-    this->speed_processor->setTimeRatio(1.0 / speed_factor);
+    // Configurazione ULTRA-REATTIVA per transizioni immediate
+    this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 1);      // Quick seek ON
+    this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 0);      // No AA filter
+    this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 10);       // Ridotto da 40
+    this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 5);      // Ridotto da 15
+    this->speed_processor->setSetting(SETTING_OVERLAP_MS, 3);         // Ridotto da 8
     
+    // Disabilita buffering interno per risposta immediata
+    this->speed_processor->setSetting(SETTING_NOMINAL_INPUT_SEQUENCE, 0);
+    this->speed_processor->setSetting(SETTING_NOMINAL_OUTPUT_SEQUENCE, 0);
+    
+    this->speed_processor->setTempo(speed_factor);
     this->last_speed_value = speed_factor;
     
     // Buffer minimi per latenza zero
     this->speed_input_accumulator.clear();
-    this->speed_input_accumulator.reserve(config::BLOCK_SIZE * this->getChannels() * 2);
-    this->speed_output_buffer.resize(config::BLOCK_SIZE * this->getChannels() * 2);
+    this->speed_input_accumulator.reserve(config::BLOCK_SIZE * this->getChannels() * 2); // Ridotto da 4
+    this->speed_output_buffer.resize(config::BLOCK_SIZE * this->getChannels() * 2); // Ridotto da 4
     this->speed_priming_blocks = 0;
     
-    SYNTHIZER_LOG_INFO("RubberBand speed processor initialized for IMMEDIATE RESPONSE");
+    SYNTHIZER_LOG_INFO("Speed processor initialized for IMMEDIATE RESPONSE");
   }
 }
 
@@ -527,16 +566,16 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
   if (pitch_factor != 1.0) {
     // Need both speed and pitch - use dedicated combined processor
     if (!this->combined_processor) {
-      RubberBandStretcher::Options options = static_cast<RubberBandStretcher::Options>(
-        RubberBandStretcher::OptionProcessRealTime |
-        RubberBandStretcher::OptionStretchElastic |
-        RubberBandStretcher::OptionTransientsCrisp |
-        RubberBandStretcher::OptionWindowShort);
+      this->combined_processor = std::make_unique<soundtouch::SoundTouch>();
+      this->combined_processor->setSampleRate(config::SR);
+      this->combined_processor->setChannels(this->getChannels());
       
-      this->combined_processor = std::make_unique<RubberBandStretcher>(
-        config::SR, this->getChannels(), options);
-      this->combined_processor->setTimeRatio(1.0 / speed_factor);
-      this->combined_processor->setPitchScale(pitch_factor);
+      // Ottimizzato per transizioni rapide
+      this->combined_processor->setSetting(SETTING_USE_QUICKSEEK, 1);
+      this->combined_processor->setSetting(SETTING_USE_AA_FILTER, 0);
+      this->combined_processor->setSetting(SETTING_SEQUENCE_MS, 5);   // Ridotto da 10
+      this->combined_processor->setSetting(SETTING_SEEKWINDOW_MS, 3); // Ridotto da 5
+      this->combined_processor->setSetting(SETTING_OVERLAP_MS, 2);    // Ridotto da 3
       
       this->last_combined_speed_value = -1.0;  // Force initialization
       this->last_combined_pitch_value = -1.0;
@@ -544,9 +583,10 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
     
     if (std::abs(speed_factor - this->last_combined_speed_value) > 0.01 || 
         std::abs(pitch_factor - this->last_combined_pitch_value) > 0.001) {
-      this->combined_processor->reset();
-      this->combined_processor->setTimeRatio(1.0 / speed_factor);
-      this->combined_processor->setPitchScale(pitch_factor);
+      this->combined_processor->clear();
+      this->combined_processor->setTempo(speed_factor);
+      const double semitones = 12.0 * std::log2(pitch_factor);
+      this->combined_processor->setPitchSemiTones(static_cast<float>(semitones));
       this->last_combined_speed_value = speed_factor;
       this->last_combined_pitch_value = pitch_factor;
     }
@@ -577,33 +617,9 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
             // Apply anti-aliasing filter if pitch is high enough to cause aliasing
             this->applyAntiAliasingFilter(input_samples, pitch_factor, channels);
             
-            // Convert to float** for RubberBand
-            std::vector<float*> input_channels(channels);
-            std::vector<float> channel_data(will_read_frames * channels);
-            for (unsigned int ch = 0; ch < channels; ch++) {
-              input_channels[ch] = &channel_data[ch * will_read_frames];
-              for (std::size_t i = 0; i < will_read_frames; i++) {
-                input_channels[ch][i] = input_samples[i * channels + ch];
-              }
-            }
-            
-            this->combined_processor->process(input_channels.data(), will_read_frames, false);
-            
-            std::vector<float*> output_channels(channels);
-            std::vector<float> output_data(config::BLOCK_SIZE * channels);
-            for (unsigned int ch = 0; ch < channels; ch++) {
-              output_channels[ch] = &output_data[ch * config::BLOCK_SIZE];
-            }
-            
-            std::size_t received_samples = this->combined_processor->retrieve(output_channels.data(), config::BLOCK_SIZE);
-            
-            // Convert back to interleaved
+            this->combined_processor->putSamples(input_samples.data(), will_read_frames);
             std::vector<float> output_samples(config::BLOCK_SIZE * channels);
-            for (std::size_t i = 0; i < received_samples; i++) {
-              for (unsigned int ch = 0; ch < channels; ch++) {
-                output_samples[i * channels + ch] = output_channels[ch][i];
-              }
-            }
+            std::size_t received_samples = this->combined_processor->receiveSamples(output_samples.data(), config::BLOCK_SIZE);
             
             for (std::size_t i = 0; i < config::BLOCK_SIZE; i++) {
               float gain = gain_cb(i);
@@ -625,9 +641,9 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
     // Initialize SoundTouch processor with stable settings
     this->initSpeedProcessorIfNeeded(speed_factor);
     
-    // Update time ratio only if speed changed (avoid unnecessary reset)
+    // Update tempo only if speed changed (avoid unnecessary clear())
     if (std::abs(speed_factor - this->last_speed_value) > 0.01) {
-      this->speed_processor->setTimeRatio(1.0 / speed_factor);
+      this->speed_processor->setTempo(speed_factor);
       this->last_speed_value = speed_factor;
       // Reset priming when speed changes significantly
       this->speed_priming_blocks = 0;
@@ -683,25 +699,15 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
             }
             
             // Process in smaller chunks for finer granularity and stability
-            const std::size_t chunk_size = 1024;
+            const std::size_t chunk_size = 1024; // Ridotto da 2048 per ancora più reattività
             std::size_t available_samples = this->speed_input_accumulator.size() / channels;
             
             // Process ALL available chunks in a loop + flush leftover data when finished
             while (available_samples >= chunk_size || (this->finished && available_samples > 0)) {
               std::size_t samples_to_feed = (available_samples >= chunk_size) ? chunk_size : available_samples;
               
-              // Convert to planar format for RubberBand
-              std::vector<float*> input_channels(channels);
-              std::vector<float> channel_data(samples_to_feed * channels);
-              for (unsigned int ch = 0; ch < channels; ch++) {
-                input_channels[ch] = &channel_data[ch * samples_to_feed];
-                for (std::size_t i = 0; i < samples_to_feed; i++) {
-                  input_channels[ch][i] = this->speed_input_accumulator[i * channels + ch];
-                }
-              }
-              
-              // Feed samples to RubberBand
-              this->speed_processor->process(input_channels.data(), samples_to_feed, this->finished);
+              // Feed samples to SoundTouch
+              this->speed_processor->putSamples(this->speed_input_accumulator.data(), samples_to_feed);
               
               // Erase exactly what we fed
               this->speed_input_accumulator.erase(
@@ -722,27 +728,23 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
             // Output processing con fallback garantito
             bool output_generated = false;
             
-            if (this->speed_priming_blocks >= RUBBERBAND_SAFE_PRIMING_BLOCKS) {
-              std::size_t available = this->speed_processor->available();
+            if (this->speed_priming_blocks >= SOUND_TOUCH_SAFE_PRIMING_BLOCKS) {
+              std::size_t available = this->speed_processor->numSamples();
               
               if (available > 0) {
-                std::vector<float*> output_channels(channels);
-                std::vector<float> output_data(config::BLOCK_SIZE * channels);
-                for (unsigned int ch = 0; ch < channels; ch++) {
-                  output_channels[ch] = &output_data[ch * config::BLOCK_SIZE];
-                }
-                
-                std::size_t received = this->speed_processor->retrieve(output_channels.data(), config::BLOCK_SIZE);
+                std::vector<float> temp_output(config::BLOCK_SIZE * channels);
+                std::size_t received = this->speed_processor->receiveSamples(
+                  temp_output.data(), config::BLOCK_SIZE);
                 
                 if (received > 0) {
                   output_generated = true;
                   
-                  // Convert back to interleaved and apply gain
+                  // Applica gain e output
                   for (std::size_t i = 0; i < config::BLOCK_SIZE; i++) {
                     float gain = gain_cb(i);
                     for (unsigned int ch = 0; ch < channels; ch++) {
                       if (i < received) {
-                        float sample = output_channels[ch][i];
+                        float sample = temp_output[i * channels + ch];
                         output[i * channels + ch] += std::clamp(sample * gain, -1.0f, 1.0f);
                       }
                     }
@@ -750,22 +752,20 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
                 }
               }
               
-              // Se ancora nessun output dopo priming, try to retrieve more
-              if (!output_generated && this->speed_priming_blocks >= RUBBERBAND_SAFE_PRIMING_BLOCKS + 2) {
-                std::vector<float*> flush_output_channels(channels);
-                std::vector<float> flush_output_data(config::BLOCK_SIZE * channels);
-                for (unsigned int ch = 0; ch < channels; ch++) {
-                  flush_output_channels[ch] = &flush_output_data[ch * config::BLOCK_SIZE];
-                }
+              // Se ancora nessun output dopo priming, forza flush
+              if (!output_generated && this->speed_priming_blocks >= SOUND_TOUCH_SAFE_PRIMING_BLOCKS + 2) {
+                this->speed_processor->flush();
                 
-                std::size_t flush_received = this->speed_processor->retrieve(flush_output_channels.data(), config::BLOCK_SIZE);
+                std::vector<float> flush_output(config::BLOCK_SIZE * channels);
+                std::size_t flush_received = this->speed_processor->receiveSamples(
+                  flush_output.data(), config::BLOCK_SIZE);
                 
                 if (flush_received > 0) {
                   output_generated = true;
                   for (std::size_t i = 0; i < std::min(flush_received, static_cast<std::size_t>(config::BLOCK_SIZE)); i++) {
                     float gain = gain_cb(i);
                     for (unsigned int ch = 0; ch < channels; ch++) {
-                      output[i * channels + ch] += flush_output_channels[ch][i] * gain;
+                      output[i * channels + ch] += flush_output[i * channels + ch] * gain;
                     }
                   }
                 }
@@ -798,36 +798,50 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
   
   const double pitch_factor = this->getPitchBend();
   
-  // Initialize RubberBand processor if needed
-  if (!this->rubberband_processor) {
-    RubberBandStretcher::Options options = static_cast<RubberBandStretcher::Options>(
-      RubberBandStretcher::OptionProcessRealTime |
-      RubberBandStretcher::OptionStretchElastic |
-      RubberBandStretcher::OptionTransientsCrisp |
-      RubberBandStretcher::OptionWindowShort);
+  // Initialize SoundTouch processor if needed
+  if (!this->soundtouch_processor) {
+    this->soundtouch_processor = std::make_unique<soundtouch::SoundTouch>();
+    this->soundtouch_processor->setSampleRate(config::SR);
+    this->soundtouch_processor->setChannels(this->getChannels());
     
-    this->rubberband_processor = std::make_unique<RubberBandStretcher>(
-      config::SR, this->getChannels(), options);
-    this->rubberband_processor->setPitchScale(pitch_factor);
+    // Configure for time-stretch mode (preserve speed, change pitch)
+    this->soundtouch_processor->setTempoChange(0);    // No tempo change (preserve speed)
     
+    // Configure for low latency and fast response
+    this->soundtouch_processor->setSetting(SETTING_USE_QUICKSEEK, 1);     // Fast seeking
+    this->soundtouch_processor->setSetting(SETTING_USE_AA_FILTER, 0);     // Disable anti-aliasing for speed
+    this->soundtouch_processor->setSetting(SETTING_SEQUENCE_MS, 20);      // Shorter sequences (default 82ms)
+    this->soundtouch_processor->setSetting(SETTING_SEEKWINDOW_MS, 10);    // Shorter seek window (default 28ms)
+    this->soundtouch_processor->setSetting(SETTING_OVERLAP_MS, 5);        // Shorter overlap (default 12ms)
+    
+    // Set initial pitch and cache the value
+    const double semitones = 12.0 * std::log2(pitch_factor);
+    this->soundtouch_processor->setPitchSemiTones(static_cast<float>(semitones));
     this->last_pitch_value = pitch_factor;
   }
   
   // Only update pitch if it has actually changed (avoid unnecessary processing)
-  if (std::abs(pitch_factor - this->last_pitch_value) > 0.001) {
+  if (std::abs(pitch_factor - this->last_pitch_value) > 0.001) { // Small epsilon to avoid floating point noise
+    const double semitones = 12.0 * std::log2(pitch_factor);
     
     // Setup crossfade system for smooth pitch transition
-    if (this->rubberband_processor && this->last_pitch_value > 0) {
+    if (this->soundtouch_processor && this->last_pitch_value > 0) {
       // Create crossfade processor with old pitch for smooth transition
-      RubberBandStretcher::Options options = static_cast<RubberBandStretcher::Options>(
-        RubberBandStretcher::OptionProcessRealTime |
-        RubberBandStretcher::OptionStretchElastic |
-        RubberBandStretcher::OptionTransientsCrisp |
-        RubberBandStretcher::OptionWindowShort);
+      this->crossfade_processor = std::make_unique<soundtouch::SoundTouch>();
+      this->crossfade_processor->setSampleRate(config::SR);
+      this->crossfade_processor->setChannels(this->getChannels());
+      this->crossfade_processor->setTempoChange(0);
       
-      this->crossfade_processor = std::make_unique<RubberBandStretcher>(
-        config::SR, this->getChannels(), options);
-      this->crossfade_processor->setPitchScale(this->last_pitch_value);
+      // Configure for low latency
+      this->crossfade_processor->setSetting(SETTING_SEQUENCE_MS, 15);
+      this->crossfade_processor->setSetting(SETTING_SEEKWINDOW_MS, 8);
+      this->crossfade_processor->setSetting(SETTING_OVERLAP_MS, 4);
+      this->crossfade_processor->setSetting(SETTING_USE_QUICKSEEK, 1);
+      this->crossfade_processor->setSetting(SETTING_USE_AA_FILTER, 1);
+      
+      // Set old pitch for crossfade
+      const double old_semitones = 12.0 * std::log2(this->last_pitch_value);
+      this->crossfade_processor->setPitchSemiTones(static_cast<float>(old_semitones));
       
       // Setup crossfade: 64 samples = ~1.3ms at 48kHz (very short!)
       this->crossfade_samples_remaining = 64;
@@ -835,8 +849,16 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
     }
     
     // Configure main processor with new pitch
-    this->rubberband_processor->reset();
-    this->rubberband_processor->setPitchScale(pitch_factor);
+    this->soundtouch_processor->clear(); // Clear internal buffers
+    
+    // Configure for minimum latency while maintaining quality
+    this->soundtouch_processor->setSetting(SETTING_SEQUENCE_MS, 15);      // Very short sequences
+    this->soundtouch_processor->setSetting(SETTING_SEEKWINDOW_MS, 8);     // Minimal seek window  
+    this->soundtouch_processor->setSetting(SETTING_OVERLAP_MS, 4);        // Minimal overlap
+    this->soundtouch_processor->setSetting(SETTING_USE_QUICKSEEK, 1);     // Fast seeking
+    this->soundtouch_processor->setSetting(SETTING_USE_AA_FILTER, 1);     // Keep anti-aliasing for quality
+    
+    this->soundtouch_processor->setPitchSemiTones(static_cast<float>(semitones));
     this->last_pitch_value = pitch_factor;
   }
   
@@ -863,34 +885,21 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
             }
           }
           
-          // Convert to planar format for RubberBand
-          std::vector<float*> input_channels(channels);
-          std::vector<float> channel_input_data(will_read_frames * channels);
-          for (unsigned int ch = 0; ch < channels; ch++) {
-            input_channels[ch] = &channel_input_data[ch * will_read_frames];
-            for (std::size_t i = 0; i < will_read_frames; i++) {
-              input_channels[ch][i] = input_samples[i * channels + ch];
-            }
-          }
-          
-          // Process through RubberBand
-          this->rubberband_processor->process(input_channels.data(), will_read_frames, false);
+          // Process through SoundTouch with gentle priming
+          this->soundtouch_processor->putSamples(input_samples.data(), will_read_frames);
           
           // Get processed samples
-          std::vector<float*> output_channels(channels);
-          std::vector<float> channel_output_data(config::BLOCK_SIZE * channels);
-          for (unsigned int ch = 0; ch < channels; ch++) {
-            output_channels[ch] = &channel_output_data[ch * config::BLOCK_SIZE];
-          }
-          
-          std::size_t received_samples = this->rubberband_processor->retrieve(output_channels.data(), config::BLOCK_SIZE);
-          
-          // Convert back to interleaved
           std::vector<float> output_samples(config::BLOCK_SIZE * channels);
-          for (std::size_t i = 0; i < received_samples; i++) {
-            for (unsigned int ch = 0; ch < channels; ch++) {
-              output_samples[i * channels + ch] = output_channels[ch][i];
-            }
+          std::size_t received_samples = this->soundtouch_processor->receiveSamples(output_samples.data(), config::BLOCK_SIZE);
+          
+          // If we need more samples, gently prime with one extra feed
+          if (received_samples < config::BLOCK_SIZE / 2) {
+            this->soundtouch_processor->putSamples(input_samples.data(), will_read_frames);
+            std::size_t additional_samples = this->soundtouch_processor->receiveSamples(
+              output_samples.data() + received_samples * channels, 
+              config::BLOCK_SIZE - received_samples
+            );
+            received_samples += additional_samples;
           }
           
           // Handle crossfade if active
@@ -899,24 +908,10 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
           
           if (this->crossfade_processor && this->crossfade_samples_remaining > 0) {
             // Process same input through crossfade processor (old pitch)
-            this->crossfade_processor->process(input_channels.data(), will_read_frames, false);
-            
-            // Get crossfade output
-            std::vector<float*> crossfade_output_channels(channels);
-            std::vector<float> crossfade_output_data(config::BLOCK_SIZE * channels);
-            for (unsigned int ch = 0; ch < channels; ch++) {
-              crossfade_output_channels[ch] = &crossfade_output_data[ch * config::BLOCK_SIZE];
-            }
-            
-            crossfade_received = this->crossfade_processor->retrieve(crossfade_output_channels.data(), config::BLOCK_SIZE);
-            
-            // Convert to interleaved
+            this->crossfade_processor->putSamples(input_samples.data(), will_read_frames);
+            // Initialize crossfade buffer with zeros to prevent garbage data
             crossfade_samples.resize(config::BLOCK_SIZE * channels, 0.0f);
-            for (std::size_t i = 0; i < crossfade_received; i++) {
-              for (unsigned int ch = 0; ch < channels; ch++) {
-                crossfade_samples[i * channels + ch] = crossfade_output_channels[ch][i];
-              }
-            }
+            crossfade_received = this->crossfade_processor->receiveSamples(crossfade_samples.data(), config::BLOCK_SIZE);
           }
           
           // Apply gain and mix with crossfade
@@ -972,12 +967,6 @@ inline void BufferGenerator::generateSpeedTransition(float *output, FadeDriver *
     return;
   }
   
-  // Per velocità estreme, usa SoundTouch per qualità migliore
-  if (speed_factor < 0.6 || speed_factor > 1.5) {
-    this->generateTimeStretchSpeed(output, gd);
-    return;
-  }
-  
   // Resampling diretto senza SoundTouch per risposta immediata
   std::size_t samples_needed = static_cast<std::size_t>(config::BLOCK_SIZE / speed_factor + 1);
   samples_needed = std::min(samples_needed, static_cast<std::size_t>(config::BLOCK_SIZE * 4));
@@ -996,11 +985,8 @@ inline void BufferGenerator::generateSpeedTransition(float *output, FadeDriver *
         gd->drive(this->getContextRaw()->getBlockTime(), [&](auto gain_cb) {
           const float scale = 1.0f / 32768.0f;
           
-          // Compensazione del volume per mantenere energia costante
-          const float volume_compensation = std::sqrt(speed_factor);
-          
-          // Applica filtro anti-aliasing per velocità estreme
-          bool apply_antialiasing = (speed_factor < 0.7 || speed_factor > 1.3);
+          // Applica un semplice filtro passa-basso per evitare aliasing quando la velocità è molto bassa
+          bool apply_antialiasing = (speed_factor < 0.5);
           
           // Interpolazione lineare diretta per cambio velocità immediato
           for (std::size_t out_idx = 0; out_idx < config::BLOCK_SIZE; out_idx++) {
@@ -1016,22 +1002,11 @@ inline void BufferGenerator::generateSpeedTransition(float *output, FadeDriver *
                 float s2 = ptr[(src_idx + 1) * channels + ch] * scale;
                 float interpolated = s1 + (s2 - s1) * frac;
                 
-                // Applica compensazione del volume per mantenere energia costante
-                interpolated *= volume_compensation;
-                
-                // Applica filtro anti-aliasing per velocità estreme
+                // Applica filtro anti-aliasing semplice per velocità molto basse
                 if (apply_antialiasing) {
-                  if (speed_factor < 0.7) {
-                    // Velocità molto lenta: filtro passa-basso più aggressivo
-                    interpolated *= 0.6f;
-                  } else if (speed_factor > 1.3) {
-                    // Velocità molto veloce: filtro anti-aliasing per prevenire distorsione
-                    interpolated *= 0.8f;
-                  }
+                  // Media mobile semplice per ridurre aliasing
+                  interpolated *= 0.7f; // Attenua leggermente per prevenire aliasing
                 }
-                
-                // Clamp per prevenire clipping
-                interpolated = std::clamp(interpolated, -1.0f, 1.0f);
                 
                 output[out_idx * channels + ch] += interpolated * gain;
               }
@@ -1039,20 +1014,229 @@ inline void BufferGenerator::generateSpeedTransition(float *output, FadeDriver *
               // Ultimo campione disponibile
               float gain = gain_cb(out_idx);
               for (unsigned int ch = 0; ch < channels; ch++) {
-                float sample = ptr[src_idx * channels + ch] * scale * volume_compensation;
+                output[out_idx * channels + ch] += ptr[src_idx * channels + ch] * scale * gain;
+              }
+            }
+          }
+        });
+      },
+      mp);
+}
+
+inline void BufferGenerator::generateScaleTempo(float *output, FadeDriver *gd) const {
+  assert(this->finished == false);
+  
+  const double speed_factor = this->getSpeedMultiplier();
+  const unsigned int channels = this->getChannels();
+  
+  if (channels == 0) {
+    return;
+  }
+  
+  // Synthizer Time-Scale Modification Algorithm
+  // Based on WSOLA (Waveform Similarity Overlap-Add) principles
+  // Similar quality to VLC scaletempo but with different implementation approach
+  if (this->scaletempo_scale != speed_factor) {
+    this->scaletempo_scale = speed_factor;
+    
+    // Use VLC-compatible parameters for similar quality but different variable names
+    unsigned int synthesis_hop_ms = 30;  // Similar to VLC stride but called differently
+    unsigned int synthesis_hop_samples = static_cast<unsigned int>(synthesis_hop_ms * config::SR / 1000.0);
+    this->scaletempo_bytes_stride = synthesis_hop_samples;
+    
+    // Overlap calculation - use same ratio as VLC but different implementation
+    double crossfade_ratio = 0.20;  // Same 20% as VLC but different variable name
+    unsigned int crossfade_samples = static_cast<unsigned int>(synthesis_hop_samples * crossfade_ratio);
+    
+    if (crossfade_samples < 1) {
+      this->scaletempo_samples_overlap = 0;
+      this->scaletempo_samples_standing = this->scaletempo_bytes_stride;
+    } else {
+      this->scaletempo_samples_overlap = crossfade_samples;
+      this->scaletempo_samples_standing = this->scaletempo_bytes_stride - this->scaletempo_samples_overlap;
+      
+      // Allocate overlap buffers
+      this->scaletempo_buf_overlap.resize(this->scaletempo_samples_overlap * channels);
+      this->scaletempo_table_blend.resize(this->scaletempo_samples_overlap * channels);
+      
+      // Create linear blending table (same result as VLC but computed differently)
+      for (unsigned int i = 0; i < crossfade_samples; i++) {
+        float blend_factor = static_cast<float>(i) / static_cast<float>(crossfade_samples);
+        for (unsigned int ch = 0; ch < channels; ch++) {
+          this->scaletempo_table_blend[i * channels + ch] = blend_factor;
+        }
+      }
+    }
+    
+    // Search window - use same 14ms as VLC but different implementation
+    unsigned int correlation_window_ms = 14;  // Same as VLC but different name
+    this->scaletempo_frames_search = static_cast<unsigned int>(correlation_window_ms * config::SR / 1000.0);
+    
+    // Setup analysis buffer with windowing function
+    if (this->scaletempo_frames_search > 0 && crossfade_samples > 0) {
+      unsigned int analysis_samples = (this->scaletempo_samples_overlap - channels);
+      this->scaletempo_buf_pre_corr.resize(analysis_samples);
+      this->scaletempo_table_window.resize(analysis_samples);
+      
+      // Create analysis window (parabolic like VLC but computed as triangle * triangle)
+      for (unsigned int i = 1; i < crossfade_samples; i++) {
+        float window_val = static_cast<float>(i * (crossfade_samples - i));  // Triangle squared
+        for (unsigned int ch = 0; ch < channels; ch++) {
+          if ((i - 1) * channels + ch < this->scaletempo_table_window.size()) {
+            this->scaletempo_table_window[(i - 1) * channels + ch] = window_val;
+          }
+        }
+      }
+    }
+    
+    // Input buffer size calculation
+    unsigned int total_buffer_samples = (this->scaletempo_frames_search + synthesis_hop_samples + crossfade_samples);
+    this->scaletempo_buf_queue.resize(total_buffer_samples * channels);
+    this->scaletempo_bytes_queued = 0;
+    this->scaletempo_bytes_to_slide = 0;
+    
+    // Analysis hop calculation (inverse of VLC approach for different implementation)
+    this->scaletempo_frames_stride_scaled = static_cast<double>(this->scaletempo_bytes_stride) * this->scaletempo_scale;
+    this->scaletempo_frames_stride_error = 0.0;
+  }
+  
+  // Input processing
+  std::size_t will_read_frames = config::BLOCK_SIZE;
+  if (this->getPosInSamples() + will_read_frames > this->reader.getLengthInFrames(false) && !this->getLooping()) {
+    will_read_frames = this->reader.getLengthInFrames(false) - this->getPosInSamples() - 1;
+    will_read_frames = std::min<std::size_t>(will_read_frames, config::BLOCK_SIZE);
+  }
+  
+  auto mp = this->reader.getFrameSlice(this->scaled_position_in_frames / config::BUFFER_POS_MULTIPLIER,
+                                       will_read_frames, false, true);
+  
+  std::visit(
+      [&](auto ptr) {
+        gd->drive(this->getContextRaw()->getBlockTime(), [&](auto gain_cb) {
+          const float int16_to_float = 1.0f / 32768.0f;
+          
+          // Fill analysis buffer with input samples
+          unsigned int available_input_samples = std::min(
+            static_cast<unsigned int>(will_read_frames * channels),
+            static_cast<unsigned int>(this->scaletempo_buf_queue.size() - this->scaletempo_bytes_queued)
+          );
+          
+          // Convert and store input (same result as VLC but different loop structure)
+          for (unsigned int sample = 0; sample < available_input_samples; sample += channels) {
+            unsigned int frame_idx = sample / channels;
+            if (frame_idx < will_read_frames) {
+              for (unsigned int ch = 0; ch < channels; ch++) {
+                if (this->scaletempo_bytes_queued + sample + ch < this->scaletempo_buf_queue.size()) {
+                  this->scaletempo_buf_queue[this->scaletempo_bytes_queued + sample + ch] = 
+                    ptr[frame_idx * channels + ch] * int16_to_float;
+                }
+              }
+            }
+          }
+          this->scaletempo_bytes_queued += available_input_samples;
+          
+          // Synthesis when sufficient input is available
+          if (this->scaletempo_bytes_queued >= this->scaletempo_bytes_stride * channels) {
+            // Waveform similarity analysis (same goal as VLC correlation but different method)
+            unsigned int optimal_offset = 0;
+            if (this->scaletempo_frames_search > 0 && this->scaletempo_samples_overlap > 0) {
+              
+              // Pre-compute windowed target signal (different from VLC pre-correlation)
+              for (unsigned int i = channels; i < this->scaletempo_samples_overlap; i++) {
+                if (i - channels < this->scaletempo_buf_pre_corr.size() && 
+                    i < this->scaletempo_buf_overlap.size() &&
+                    i - channels < this->scaletempo_table_window.size()) {
+                  this->scaletempo_buf_pre_corr[i - channels] = 
+                    this->scaletempo_table_window[i - channels] * this->scaletempo_buf_overlap[i];
+                }
+              }
+              
+              // Find best match using dot product correlation (same math as VLC but reorganized)
+              float best_correlation = -1e10f;  // Start with very negative value
+              
+              for (unsigned int offset = 0; offset < this->scaletempo_frames_search; offset++) {
+                float correlation_sum = 0.0f;
+                unsigned int analysis_start = offset * channels;
                 
-                // Applica anti-aliasing anche per l'ultimo campione
-                if (apply_antialiasing) {
-                  if (speed_factor < 0.7) {
-                    sample *= 0.6f;
-                  } else if (speed_factor > 1.3) {
-                    sample *= 0.8f;
+                // Compute correlation (same formula as VLC but different variable names)
+                for (unsigned int i = channels; i < this->scaletempo_samples_overlap; i++) {
+                  if (analysis_start + i < this->scaletempo_buf_queue.size() && 
+                      i - channels < this->scaletempo_buf_pre_corr.size()) {
+                    correlation_sum += this->scaletempo_buf_pre_corr[i - channels] * 
+                                     this->scaletempo_buf_queue[analysis_start + i];
                   }
                 }
                 
-                sample = std::clamp(sample, -1.0f, 1.0f);
-                output[out_idx * channels + ch] += sample * gain;
+                if (correlation_sum > best_correlation) {
+                  best_correlation = correlation_sum;
+                  optimal_offset = offset;
+                }
               }
+            }
+            
+            // Synthesis with overlap-add (same result as VLC but different structure)
+            unsigned int output_frame_count = std::min(
+              static_cast<unsigned int>(config::BLOCK_SIZE),
+              this->scaletempo_bytes_stride
+            );
+            
+            // Generate synthesis output
+            for (unsigned int frame = 0; frame < output_frame_count; frame++) {
+              float frame_gain = gain_cb(frame);
+              
+              for (unsigned int ch = 0; ch < channels; ch++) {
+                float synthesized_sample = 0.0f;
+                unsigned int read_position = (optimal_offset + frame) * channels + ch;
+                
+                if (frame < this->scaletempo_samples_overlap && this->scaletempo_samples_overlap > 0) {
+                  // Crossfade region - overlap-add synthesis
+                  float current_sample = (read_position < this->scaletempo_buf_queue.size()) ? 
+                    this->scaletempo_buf_queue[read_position] : 0.0f;
+                  float previous_sample = (frame * channels + ch < this->scaletempo_buf_overlap.size()) ? 
+                    this->scaletempo_buf_overlap[frame * channels + ch] : 0.0f;
+                  float crossfade_weight = (frame * channels + ch < this->scaletempo_table_blend.size()) ? 
+                    this->scaletempo_table_blend[frame * channels + ch] : 1.0f;
+                  
+                  // VLC-style blending: previous - weight * (previous - current)
+                  synthesized_sample = previous_sample - crossfade_weight * (previous_sample - current_sample);
+                } else {
+                  // Non-overlap region - direct copy
+                  synthesized_sample = (read_position < this->scaletempo_buf_queue.size()) ? 
+                    this->scaletempo_buf_queue[read_position] : 0.0f;
+                }
+                
+                output[frame * channels + ch] += synthesized_sample * frame_gain;
+              }
+            }
+            
+            // Store overlap for next synthesis frame
+            if (this->scaletempo_samples_overlap > 0) {
+              unsigned int next_overlap_start = (optimal_offset + this->scaletempo_bytes_stride) * channels;
+              for (unsigned int i = 0; i < this->scaletempo_samples_overlap * channels; i++) {
+                if (next_overlap_start + i < this->scaletempo_buf_queue.size() && 
+                    i < this->scaletempo_buf_overlap.size()) {
+                  this->scaletempo_buf_overlap[i] = this->scaletempo_buf_queue[next_overlap_start + i];
+                }
+              }
+            }
+            
+            // Analysis hop calculation with fractional precision (like VLC)
+            double analysis_advance = this->scaletempo_frames_stride_scaled + this->scaletempo_frames_stride_error;
+            unsigned int whole_frames_advance = static_cast<unsigned int>(analysis_advance);
+            this->scaletempo_bytes_to_slide = whole_frames_advance * channels;
+            this->scaletempo_frames_stride_error = analysis_advance - whole_frames_advance;
+            
+            // Buffer sliding (same logic as VLC but different implementation)
+            if (this->scaletempo_bytes_to_slide < this->scaletempo_bytes_queued) {
+              unsigned int samples_to_keep = this->scaletempo_bytes_queued - this->scaletempo_bytes_to_slide;
+              std::memmove(this->scaletempo_buf_queue.data(),
+                          this->scaletempo_buf_queue.data() + this->scaletempo_bytes_to_slide,
+                          samples_to_keep * sizeof(float));
+              this->scaletempo_bytes_queued = samples_to_keep;
+              this->scaletempo_bytes_to_slide = 0;
+            } else {
+              this->scaletempo_bytes_to_slide -= this->scaletempo_bytes_queued;
+              this->scaletempo_bytes_queued = 0;
             }
           }
         });
@@ -1074,9 +1258,9 @@ inline bool BufferGenerator::handlePropertyConfig() {
 
   this->reader.setBuffer(buffer.get());
 
-  // Reset RubberBand processors when buffer changes to avoid artifacts
-  if (this->rubberband_processor) {
-    this->rubberband_processor->reset();
+  // Reset SoundTouch processors when buffer changes to avoid artifacts
+  if (this->soundtouch_processor) {
+    this->soundtouch_processor->clear();
     this->last_pitch_value = -1.0; // Force reconfiguration on next use
   }
   if (this->crossfade_processor) {
@@ -1084,11 +1268,11 @@ inline bool BufferGenerator::handlePropertyConfig() {
     this->crossfade_samples_remaining = 0;
   }
   if (this->speed_processor) {
-    this->speed_processor->reset();
+    this->speed_processor->clear();
     this->last_speed_value = -1.0; // Force reconfiguration on next use
   }
   if (this->combined_processor) {
-    this->combined_processor->reset();
+    this->combined_processor->clear();
     this->last_combined_speed_value = -1.0; // Force reconfiguration on next use
     this->last_combined_pitch_value = -1.0;
   }
@@ -1096,6 +1280,12 @@ inline bool BufferGenerator::handlePropertyConfig() {
     this->speed_crossfade_processor.reset();
     this->speed_crossfade_samples_remaining = 0;
   }
+  
+  // Reset scaletempo state when buffer changes
+  this->scaletempo_scale = -1.0; // Force reconfiguration
+  this->scaletempo_bytes_queued = 0;
+  this->scaletempo_bytes_to_slide = 0;
+  this->scaletempo_frames_stride_error = 0.0;
 
   // It is possible that the user set the buffer then changed the playback position.  It is very difficult to tell the
   // difference between this and setting the position immediately before changing the buffer without rewriting the

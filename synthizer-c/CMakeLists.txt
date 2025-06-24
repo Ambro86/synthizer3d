@@ -22,13 +22,12 @@ enable_testing()
 
 find_package(Threads REQUIRED)
 
-# --- VCPKG Packages: libvorbis, libogg, opus, opusfile, rubberband ---
+# --- VCPKG Packages: libvorbis, libogg, opus, opusfile, soundtouch ---
 find_package(Vorbis REQUIRED)
 find_package(Ogg REQUIRED)
 find_package(Opus REQUIRED)
 find_package(OpusFile REQUIRED)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(RUBBERBAND REQUIRED rubberband)
+find_package(SoundTouch REQUIRED)
 
 
 # Check if op_read_float is available
@@ -161,7 +160,7 @@ if(WIN32)
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/opus.lib"
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/opusfile.lib"
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/vorbisenc.lib"
-    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/rubberband.lib"
+    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/SoundTouch.lib"
   )
 elseif(UNIX AND NOT APPLE)
   # Linux-specific linking for static libraries with whole-archive
@@ -176,7 +175,7 @@ elseif(UNIX AND NOT APPLE)
       "$ENV{VCPKG_INSTALLED_PATH}/lib/libogg.a"
       "$ENV{VCPKG_INSTALLED_PATH}/lib/libvorbis.a"
       "$ENV{VCPKG_INSTALLED_PATH}/lib/libvorbisfile.a"
-      "$ENV{VCPKG_INSTALLED_PATH}/lib/librubberband.a"
+      "$ENV{VCPKG_INSTALLED_PATH}/lib/libSoundTouch.a"
       m  # Math library
       dl  # Dynamic loading library
     )
@@ -190,7 +189,7 @@ elseif(UNIX AND NOT APPLE)
       Ogg::ogg
       Vorbis::vorbis
       Vorbis::vorbisfile
-      ${RUBBERBAND_LIBRARIES}
+      SoundTouch::SoundTouch
       m  # Math library
       dl  # Dynamic loading library
     )
@@ -206,7 +205,7 @@ elseif(APPLE)
       "$ENV{VCPKG_INSTALLED_PATH}/lib/libogg.a"
       "$ENV{VCPKG_INSTALLED_PATH}/lib/libvorbis.a"
       "$ENV{VCPKG_INSTALLED_PATH}/lib/libvorbisfile.a"
-      "$ENV{VCPKG_INSTALLED_PATH}/lib/librubberband.a"
+      "$ENV{VCPKG_INSTALLED_PATH}/lib/libSoundTouch.a"
       m  # Math library
     )
   else()
@@ -217,7 +216,7 @@ elseif(APPLE)
       Vorbis::vorbis
       Vorbis::vorbisfile
       OpusFile::opusfile
-      ${RUBBERBAND_LIBRARIES}
+      SoundTouch::SoundTouch
       m  # Math library
     )
   endif()
@@ -225,7 +224,6 @@ endif()
 target_link_libraries(synthizer PRIVATE ${SYZ_LIBRARIES})
 
 target_include_directories(synthizer PRIVATE $<TARGET_PROPERTY:wdl_objlib,INTERFACE_INCLUDE_DIRECTORIES>)
-target_include_directories(synthizer PRIVATE ${RUBBERBAND_INCLUDE_DIRS})
 
 # Add vcpkg include directories - unified approach for all platforms
 if(DEFINED ENV{VCPKG_INSTALLED_PATH})

@@ -93,7 +93,7 @@ public:
 #include "synthizer/property_impl.hpp"
 
 private:
-  void generateNoPitchBend(float *out, FadeDriver *gain_driver);
+  void generateNoPitchBend(float *out, FadeDriver *gain_driver) const;
   void generatePitchBend(float *out, FadeDriver *gain_driver) const;
   void generateTimeStretchPitch(float *out, FadeDriver *gain_driver) const;
   void generateTimeStretchSpeed(float *out, FadeDriver *gain_driver) const;
@@ -320,7 +320,7 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
   this->setPlaybackPosition(this->getPosInSamples() / (double)config::SR, false);
 }
 
-inline void BufferGenerator::generateNoPitchBend(float *output, FadeDriver *gd) {
+inline void BufferGenerator::generateNoPitchBend(float *output, FadeDriver *gd) const {
   assert(this->finished == false);
 
   // Bump scaled_position_in_frames up to the next multiplier, if necessary.

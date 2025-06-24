@@ -143,15 +143,6 @@ private:
   mutable std::vector<float> speed_input_accumulator;
   mutable std::vector<float> speed_output_buffer;
   mutable int speed_priming_blocks;
-  // Quality mode for speed processing
-  mutable SpeedQualityMode speed_quality_mode;
-  
-  // Sistema di transizione veloce per cambio velocità
-  mutable bool speed_transition_active;
-  mutable double speed_transition_start;
-  mutable double speed_transition_target;
-  mutable std::size_t speed_transition_samples;
-  mutable std::size_t speed_transition_current;
 };
 
 inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : 
@@ -162,13 +153,7 @@ inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) :
   last_combined_speed_value(-1.0), 
   last_combined_pitch_value(-1.0), 
   speed_crossfade_samples_remaining(0), 
-  speed_priming_blocks(0), 
-  speed_quality_mode(SpeedQualityMode::LOW_LATENCY),  // Cambiato da BALANCED a LOW_LATENCY
-  speed_transition_active(false),
-  speed_transition_start(1.0),
-  speed_transition_target(1.0),
-  speed_transition_samples(0),
-  speed_transition_current(0) {
+  speed_priming_blocks(0) {
 }
 
 inline int BufferGenerator::getObjectType() { return SYZ_OTYPE_BUFFER_GENERATOR; }

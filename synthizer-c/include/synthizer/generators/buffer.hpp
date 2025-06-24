@@ -933,6 +933,12 @@ inline void BufferGenerator::generateSpeedTransition(float *output, FadeDriver *
     return;
   }
   
+  // Per velocità estreme, usa SoundTouch per qualità migliore
+  if (speed_factor < 0.6 || speed_factor > 1.5) {
+    this->generateTimeStretchSpeed(output, gd);
+    return;
+  }
+  
   // Resampling diretto senza SoundTouch per risposta immediata
   std::size_t samples_needed = static_cast<std::size_t>(config::BLOCK_SIZE / speed_factor + 1);
   samples_needed = std::min(samples_needed, static_cast<std::size_t>(config::BLOCK_SIZE * 4));
@@ -951,8 +957,11 @@ inline void BufferGenerator::generateSpeedTransition(float *output, FadeDriver *
         gd->drive(this->getContextRaw()->getBlockTime(), [&](auto gain_cb) {
           const float scale = 1.0f / 32768.0f;
           
-          // Applica un semplice filtro passa-basso per evitare aliasing quando la velocità è molto bassa
-          bool apply_antialiasing = (speed_factor < 0.5);
+          // Compensazione del volume per mantenere energia costante
+          const float volume_compensation = std::sqrt(speed_factor);
+          
+          // Applica filtro anti-aliasing per velocità estreme
+          bool apply_antialiasing = (speed_factor < 0.7 || speed_factor > 1.3);
           
           // Interpolazione lineare diretta per cambio velocità immediato
           for (std::size_t out_idx = 0; out_idx < config::BLOCK_SIZE; out_idx++) {
@@ -968,11 +977,22 @@ inline void BufferGenerator::generateSpeedTransition(float *output, FadeDriver *
                 float s2 = ptr[(src_idx + 1) * channels + ch] * scale;
                 float interpolated = s1 + (s2 - s1) * frac;
                 
-                // Applica filtro anti-aliasing semplice per velocità molto basse
+                // Applica compensazione del volume per mantenere energia costante
+                interpolated *= volume_compensation;
+                
+                // Applica filtro anti-aliasing per velocità estreme
                 if (apply_antialiasing) {
-                  // Media mobile semplice per ridurre aliasing
-                  interpolated *= 0.7f; // Attenua leggermente per prevenire aliasing
+                  if (speed_factor < 0.7) {
+                    // Velocità molto lenta: filtro passa-basso più aggressivo
+                    interpolated *= 0.6f;
+                  } else if (speed_factor > 1.3) {
+                    // Velocità molto veloce: filtro anti-aliasing per prevenire distorsione
+                    interpolated *= 0.8f;
+                  }
                 }
+                
+                // Clamp per prevenire clipping
+                interpolated = std::clamp(interpolated, -1.0f, 1.0f);
                 
                 output[out_idx * channels + ch] += interpolated * gain;
               }
@@ -980,7 +1000,19 @@ inline void BufferGenerator::generateSpeedTransition(float *output, FadeDriver *
               // Ultimo campione disponibile
               float gain = gain_cb(out_idx);
               for (unsigned int ch = 0; ch < channels; ch++) {
-                output[out_idx * channels + ch] += ptr[src_idx * channels + ch] * scale * gain;
+                float sample = ptr[src_idx * channels + ch] * scale * volume_compensation;
+                
+                // Applica anti-aliasing anche per l'ultimo campione
+                if (apply_antialiasing) {
+                  if (speed_factor < 0.7) {
+                    sample *= 0.6f;
+                  } else if (speed_factor > 1.3) {
+                    sample *= 0.8f;
+                  }
+                }
+                
+                sample = std::clamp(sample, -1.0f, 1.0f);
+                output[out_idx * channels + ch] += sample * gain;
               }
             }
           }

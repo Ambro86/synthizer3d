@@ -1,6 +1,7 @@
 import os
 import os.path
 import stat
+import sys
 from setuptools import Extension, setup
 from Cython.Build import cythonize
 from Cython.Compiler import Options
@@ -54,16 +55,23 @@ if 'CI_SDIST' not in os.environ:
     
     # Build Synthizer nativo tramite CMake/Ninja
     cmake = cmaker.CMaker()
+    
+    # Platform-specific CMake arguments
+    cmake_args = [
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DSYZ_STATIC_RUNTIME=OFF",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=TRUE",
+        "-DSYZ_INTEGRATING=ON",
+    ]
+    
+    # Add MSVC-specific arguments only on Windows
+    if sys.platform == "win32":
+        cmake_args.append("-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL")
+    
     cmake.configure(
         cmake_source_dir=vendored_dir,
         generator_name="Ninja",
-        clargs=[
-            "-DCMAKE_BUILD_TYPE=Release",
-            "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL",
-            "-DSYZ_STATIC_RUNTIME=OFF",
-            "-DCMAKE_POSITION_INDEPENDENT_CODE=TRUE",
-            "-DSYZ_INTEGRATING=ON",
-        ],
+        clargs=cmake_args,
     )
     cmake.make()
     # Trova la directory dove è installata la .lib

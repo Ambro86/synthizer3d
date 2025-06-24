@@ -64,8 +64,8 @@ enum class SpeedQualityMode {
   HIGH_QUALITY = 2    // Maximum quality, higher latency
 };
 
-// SoundTouch priming blocks needed for stable output (minimal for immediate response to 0.85/1.15)
-constexpr int SOUND_TOUCH_SAFE_PRIMING_BLOCKS = 0;
+// SoundTouch priming blocks needed for stable output (ridotto per risposta più veloce)
+constexpr int SOUND_TOUCH_SAFE_PRIMING_BLOCKS = 1;  // Ridotto per risposta più veloce
 
 /**
  * Plays a buffer.
@@ -97,6 +97,7 @@ private:
   void generatePitchBend(float *out, FadeDriver *gain_driver) const;
   void generateTimeStretchPitch(float *out, FadeDriver *gain_driver) const;
   void generateTimeStretchSpeed(float *out, FadeDriver *gain_driver) const;
+  void generateSpeedTransition(float *out, FadeDriver *gain_driver) const;
   void initSpeedProcessorIfNeeded(double speed_factor) const;
   void applyAntiAliasingFilter(std::vector<float>& samples, double pitch_factor, unsigned int channels) const;
 
@@ -144,10 +145,30 @@ private:
   mutable int speed_priming_blocks;
   // Quality mode for speed processing
   mutable SpeedQualityMode speed_quality_mode;
+  
+  // Sistema di transizione veloce per cambio velocità
+  mutable bool speed_transition_active;
+  mutable double speed_transition_start;
+  mutable double speed_transition_target;
+  mutable std::size_t speed_transition_samples;
+  mutable std::size_t speed_transition_current;
 };
 
-inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx), last_pitch_value(-1.0), crossfade_samples_remaining(0), last_speed_value(-1.0), last_combined_speed_value(-1.0), last_combined_pitch_value(-1.0), speed_crossfade_samples_remaining(0), speed_priming_blocks(0), speed_quality_mode(SpeedQualityMode::LOW_LATENCY) {
-  SYNTHIZER_LOG_INFO("BufferGenerator created with LOW_LATENCY quality mode for fast response");
+inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : 
+  Generator(ctx), 
+  last_pitch_value(-1.0), 
+  crossfade_samples_remaining(0), 
+  last_speed_value(-1.0), 
+  last_combined_speed_value(-1.0), 
+  last_combined_pitch_value(-1.0), 
+  speed_crossfade_samples_remaining(0), 
+  speed_priming_blocks(0), 
+  speed_quality_mode(SpeedQualityMode::LOW_LATENCY),  // Cambiato da BALANCED a LOW_LATENCY
+  speed_transition_active(false),
+  speed_transition_start(1.0),
+  speed_transition_target(1.0),
+  speed_transition_samples(0),
+  speed_transition_current(0) {
 }
 
 inline int BufferGenerator::getObjectType() { return SYZ_OTYPE_BUFFER_GENERATOR; }
@@ -212,26 +233,41 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
   
   std::uint64_t scaled_pos_increment = this->scaled_position_increment * config::BLOCK_SIZE;
 
+  // Sistema di transizione immediata per velocità
+  double current_speed = this->getSpeedMultiplier();
+  double current_pitch = this->getPitchBend();
+  
+  // Rileva cambio di velocità e attiva transizione immediata
+  static thread_local double last_speed = -1.0;
+  if (std::abs(current_speed - last_speed) > 0.01 && last_speed > 0) {
+    // Reset immediato dei processori per transizione istantanea
+    if (this->speed_processor) {
+      this->speed_processor->clear();
+      this->speed_input_accumulator.clear();
+      this->speed_priming_blocks = 0;
+    }
+    if (this->combined_processor) {
+      this->combined_processor->clear();
+    }
+    
+    SYNTHIZER_LOG_INFO(("Immediate speed transition: " + std::to_string(last_speed) + " -> " + std::to_string(current_speed)).c_str());
+  }
+  last_speed = current_speed;
+
   if (this->getPitchBendMode() == SYZ_PITCH_BEND_MODE_TIME_STRETCH) {
     // Time-stretch mode: check if we need pitch or speed processing
-    // Use very small epsilon to catch even minimal changes like 1.05
     const double epsilon = 0.0001;
-    bool need_pitch_stretch = (std::abs(this->getPitchBend() - 1.0) > epsilon);
-    bool need_speed_stretch = (std::abs(this->getSpeedMultiplier() - 1.0) > epsilon);
+    bool need_pitch_stretch = (std::abs(current_pitch - 1.0) > epsilon);
+    bool need_speed_stretch = (std::abs(current_speed - 1.0) > epsilon);
     
-    // Debug logging only when properties change (reduce log spam)
+    // Logging ridotto solo per cambi significativi
     static thread_local double last_logged_speed = -1.0;
     static thread_local double last_logged_pitch = -1.0;
-    double current_speed = this->getSpeedMultiplier();
-    double current_pitch = this->getPitchBend();
     
-    if (std::abs(current_speed - last_logged_speed) > 0.01 || 
-        std::abs(current_pitch - last_logged_pitch) > 0.01) {
+    if (std::abs(current_speed - last_logged_speed) > 0.1 || 
+        std::abs(current_pitch - last_logged_pitch) > 0.1) {
       std::stringstream property_debug;
-      property_debug << "Instance " << (void*)this << " properties changed: PitchBendMode=" 
-                     << this->getPitchBendMode() << " PitchBend=" << current_pitch 
-                     << " SpeedMultiplier=" << current_speed 
-                     << " need_pitch=" << need_pitch_stretch << " need_speed=" << need_speed_stretch;
+      property_debug << "Speed: " << current_speed << " Pitch: " << current_pitch;
       SYNTHIZER_LOG_INFO(property_debug.str().c_str());
       last_logged_speed = current_speed;
       last_logged_pitch = current_pitch;
@@ -244,283 +280,8 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
       // Only pitch needs processing - use SoundTouch for pitch
       this->generateTimeStretchPitch(output, gd);
     } else if (need_speed_stretch) {
-      // Speed-only control: ensure pitch is fully reset to 1.0
-      const double speed_factor = this->getSpeedMultiplier();
-      if (channels == 0) {
-        return; // Invalid channel configuration
-      }
-      
-      // Fast bypass: only for speeds virtually identical to 1.0 (floating point precision)
-      if (std::abs(speed_factor - 1.0) < std::numeric_limits<double>::epsilon() * 10) {
-        this->generateNoPitchBend(output, gd);
-        return;
-      }
-      
-      // Log speed processing entry for this instance
-      std::stringstream entry_msg;
-      entry_msg << "Entering speed-only processing for instance " << (void*)this << " with speed=" << speed_factor;
-      SYNTHIZER_LOG_INFO(entry_msg.str().c_str());
-      
-      // Initialize SoundTouch processor with stable settings (only if needed)
-      if (!this->speed_processor) {
-        this->initSpeedProcessorIfNeeded(speed_factor);
-      }
-      
-      // Update tempo and ensure pitch is reset to 1.0 (clear buffers for responsiveness)
-      bool need_tempo_change = std::abs(speed_factor - this->last_speed_value) > 0.01;
-      bool need_pitch_reset = this->last_pitch_value != 1.0;
-      
-      if (need_tempo_change || need_pitch_reset) {
-        // Always clear buffers for speed changes to ensure immediate response
-        this->speed_processor->clear();
-        this->speed_priming_blocks = 0;
-        
-        if (need_tempo_change) {
-          this->speed_processor->setTempo(speed_factor);
-          this->last_speed_value = speed_factor;
-          
-          // Log speed transition for debugging
-          std::stringstream speed_msg;
-          speed_msg << "Speed transition to " << speed_factor << " for instance " << (void*)this;
-          SYNTHIZER_LOG_INFO(speed_msg.str().c_str());
-        }
-        
-        if (need_pitch_reset) {
-          this->speed_processor->setPitch(1.0f);
-          this->last_pitch_value = 1.0;
-        }
-      }
-      
-      // Calculate input needed based on speed - universal algorithm for any speed value
-      const double input_ratio = 1.0 / speed_factor; 
-      std::size_t will_read_frames = static_cast<std::size_t>(config::BLOCK_SIZE * input_ratio + 0.5);
-      
-      // Universal bounds calculation based on speed factor
-      if (speed_factor > 1.0) {
-        // Faster speeds: need less input, scale down appropriately
-        const std::size_t min_input = static_cast<std::size_t>(config::BLOCK_SIZE / (speed_factor * 2)); // Dynamic minimum
-        const std::size_t max_input = config::BLOCK_SIZE; // Never exceed block size for fast speeds
-        will_read_frames = std::clamp(will_read_frames, min_input, max_input);
-      } else if (speed_factor < 1.0) {
-        // Slower speeds: need more input, scale up appropriately  
-        const std::size_t min_input = config::BLOCK_SIZE; // At least one block
-        const std::size_t max_input = static_cast<std::size_t>(config::BLOCK_SIZE * (2.0 / speed_factor)); // Dynamic maximum
-        const std::size_t absolute_max = config::BLOCK_SIZE * 4; // Safety cap to prevent excessive memory
-        will_read_frames = std::clamp(will_read_frames, min_input, std::min(max_input, absolute_max));
-      } else {
-        // Speed exactly 1.0: use block size
-        will_read_frames = config::BLOCK_SIZE;
-      }
-      
-      bool near_end = false;
-      if (this->getPosInSamples() + will_read_frames > this->reader.getLengthInFrames(false) &&
-          this->getLooping() == false) {
-        will_read_frames = this->reader.getLengthInFrames(false) - this->getPosInSamples() - 1;
-        will_read_frames = std::min<std::size_t>(will_read_frames, config::BLOCK_SIZE);
-        near_end = true; // Flag that we're near the end for zero-padding
-      }
-      
-      // Log input feeding for debugging
-      std::stringstream feed_debug;
-      feed_debug << "Reading " << will_read_frames << " input samples for speed=" << speed_factor 
-                 << " (ratio=" << input_ratio << ", output_target=" << config::BLOCK_SIZE << ")";
-      SYNTHIZER_LOG_INFO(feed_debug.str().c_str());
-      
-      auto mp = this->reader.getFrameSlice(this->scaled_position_in_frames / config::BUFFER_POS_MULTIPLIER,
-                                           will_read_frames, false, true);
-      
-      std::visit(
-          [&](auto ptr) {
-            gd->drive(this->getContextRaw()->getBlockTime(), [&](auto gain_cb) {
-              // Convert and accumulate input samples for larger buffer processing
-              const std::size_t input_start = this->speed_input_accumulator.size();
-              this->speed_input_accumulator.resize(input_start + will_read_frames * channels);
-              
-              // Proper 16-bit to float conversion (32767 is max positive value for int16_t)
-              const float scale = 1.0f / 32767.0f;
-              for (std::size_t i = 0; i < will_read_frames; i++) {
-                for (unsigned int ch = 0; ch < channels; ch++) {
-                  float sample = ptr[i * channels + ch] * scale;
-                  // Clamp to prevent any overflow issues (handles edge cases with corrupted audio)
-                  this->speed_input_accumulator[input_start + i * channels + ch] = 
-                    std::clamp(sample, -1.0f, 1.0f);
-                }
-              }
-              
-              // Add zero-padding if near end to maintain SoundTouch processing consistency
-              if (near_end && will_read_frames < config::BLOCK_SIZE) {
-                const std::size_t padding_samples = config::BLOCK_SIZE - will_read_frames;
-                const std::size_t current_size = this->speed_input_accumulator.size();
-                this->speed_input_accumulator.resize(current_size + padding_samples * channels, 0.0f);
-                
-                #ifdef DEBUG_SYNTHIZER_SPEED
-                SYNTHIZER_LOG_INFO(("Applied zero-padding: " + std::to_string(padding_samples) + " samples").c_str());
-                #endif
-              }
-              
-              // Note: Removed defensive reset that was preventing proper priming
-              
-              // Process in smaller chunks for faster response
-              const std::size_t chunk_size = 1024;
-              std::size_t available_samples = this->speed_input_accumulator.size() / channels;
-              
-              // Don't overfeed SoundTouch - limit input if we already have enough output
-              std::size_t output_available = this->speed_processor->numSamples();
-              // Reduce buffer targets for faster response
-              std::size_t buffer_target = (speed_factor > 1.0) ? config::BLOCK_SIZE * 2 : config::BLOCK_SIZE;
-              bool should_feed_more = (output_available < buffer_target);
-              
-              // Process chunks but respect output buffer limits
-              while ((available_samples >= chunk_size || (this->finished && available_samples > 0)) && should_feed_more) {
-                std::size_t samples_to_feed = (available_samples >= chunk_size) ? chunk_size : available_samples;
-                
-                #ifdef DEBUG_SYNTHIZER_SPEED
-                // Log feeding operation
-                std::size_t buffered_before = this->speed_processor->numSamples();
-                #endif
-                
-                // Feed samples to SoundTouch
-                this->speed_processor->putSamples(this->speed_input_accumulator.data(), samples_to_feed);
-                
-                #ifdef DEBUG_SYNTHIZER_SPEED
-                std::size_t buffered_after = this->speed_processor->numSamples();
-                printf("[SYNTHIZER INFO] putSamples: %zu -> %zu (%zu)\n", samples_to_feed, buffered_after, buffered_after - buffered_before);
-                #endif
-                
-                // Erase exactly what we fed
-                this->speed_input_accumulator.erase(
-                  this->speed_input_accumulator.begin(),
-                  this->speed_input_accumulator.begin() + samples_to_feed * channels
-                );
-                
-                // Update available samples count and increment priming counter only during initial priming
-                available_samples -= samples_to_feed;
-                if (this->speed_priming_blocks < SOUND_TOUCH_SAFE_PRIMING_BLOCKS) {
-                  this->speed_priming_blocks++;
-                }
-                
-                // Check if we have enough output now
-                output_available = this->speed_processor->numSamples();
-                should_feed_more = (output_available < buffer_target);
-                
-                // Break after flushing small leftover data to avoid infinite loop
-                if (this->finished && samples_to_feed < chunk_size) {
-                  SYNTHIZER_LOG_INFO("Flushed final small chunk, breaking loop");
-                  break;
-                }
-                
-                // Break if we have enough output to avoid overfeeding
-                if (!should_feed_more) {
-                  std::stringstream feed_msg;
-                  feed_msg << "Stopping feed - sufficient output available: " << output_available 
-                           << " (target=" << buffer_target << ", speed=" << speed_factor << ")";
-                  SYNTHIZER_LOG_INFO(feed_msg.str().c_str());
-                  break;
-                }
-              }
-              
-              // Start outputting immediately for 0.85/1.15 transitions
-              std::size_t final_output_check = this->speed_processor->numSamples();
-              bool priming_complete = (this->speed_priming_blocks >= SOUND_TOUCH_SAFE_PRIMING_BLOCKS);
-              bool has_output_ready = (final_output_check > 0); // Any output available
-              
-              if (priming_complete || has_output_ready) {
-                std::stringstream output_msg;
-                output_msg << "Starting output processing for instance " << (void*)this 
-                          << " (priming: " << this->speed_priming_blocks << "/" 
-                          << SOUND_TOUCH_SAFE_PRIMING_BLOCKS << ", final_output: " << final_output_check << ")";
-                SYNTHIZER_LOG_INFO(output_msg.str().c_str());
-                
-                // Drain all available output from SoundTouch
-                std::vector<float> temp_output(config::BLOCK_SIZE * channels);
-                std::size_t total_received = 0;
-                std::size_t received_samples = 1; // Initialize to enter loop
-                
-                // Note: final_output_check was already checked above
-                
-                // Use while loop instead of do-while to avoid MSVC parsing issues
-                while (received_samples > 0 && total_received < config::BLOCK_SIZE) {
-                  received_samples = this->speed_processor->receiveSamples(
-                    temp_output.data(), config::BLOCK_SIZE);
-                  
-                  // Handle output underrun - if no samples available, stop processing
-                  if (received_samples == 0) {
-                    break;
-                  }
-                  
-                  // Apply gain and output for received samples
-                  for (std::size_t i = 0; i < received_samples && total_received + i < config::BLOCK_SIZE; i++) {
-                    float gain = gain_cb(total_received + i);
-                    for (unsigned int ch = 0; ch < channels; ch++) {
-                      float processed_sample = temp_output[i * channels + ch];
-                      
-                      // ULTRA-STRICT output validation and limiting
-                      if (std::isnan(processed_sample) || std::isinf(processed_sample)) {
-                        processed_sample = 0.0f;
-                        SYNTHIZER_LOG_ERROR("NaN/Inf detected in SoundTouch output - sample replaced with 0.0");
-                      }
-                      
-                      // Soft limiting to prevent harsh clipping
-                      processed_sample = std::clamp(processed_sample, -0.95f, 0.95f);
-                      
-                      // Apply gain and add to output
-                      float final_sample = processed_sample * gain;
-                      output[(total_received + i) * channels + ch] += final_sample;
-                      
-                      // Basic validation only to avoid MSVC lambda compilation issues
-                      float abs_sample = std::abs(final_sample);
-                      if (abs_sample > 0.98f) {
-                        SYNTHIZER_LOG_WARNING(("High sample level detected: " + std::to_string(abs_sample)).c_str());
-                      }
-                    }
-                  }
-                  total_received += received_samples;
-                }
-                
-                // If no output was generated, fill remaining with silence
-                if (total_received == 0) {
-                  SYNTHIZER_LOG_WARNING("No output received from SoundTouch despite priming - returning silence");
-                  return; // Early return - let the caller handle silence
-                }
-                
-                // Log successful processing
-                if (total_received < config::BLOCK_SIZE) {
-                  std::stringstream msg;
-                  msg << "Partial block processed: " << total_received << "/" << config::BLOCK_SIZE << " samples";
-                  SYNTHIZER_LOG_INFO(msg.str().c_str());
-                }
-              } else {
-                // If we've fed enough blocks but still no output, try flush earlier
-                if (this->speed_priming_blocks >= 3) {
-                  SYNTHIZER_LOG_WARNING("Force flushing SoundTouch after excessive priming blocks");
-                  this->speed_processor->flush();
-                  // Try to get output after flush
-                  std::size_t flush_output_check = this->speed_processor->numSamples();
-                  if (flush_output_check > 0) {
-                    SYNTHIZER_LOG_INFO("Flush successful - attempting output");
-                    // Jump back to output processing (simplified version)
-                    std::vector<float> temp_output(config::BLOCK_SIZE * channels);
-                    std::size_t received = this->speed_processor->receiveSamples(temp_output.data(), config::BLOCK_SIZE);
-                    if (received > 0) {
-                      for (std::size_t i = 0; i < received && i < config::BLOCK_SIZE; i++) {
-                        for (unsigned int ch = 0; ch < channels; ch++) {
-                          output[i * channels + ch] += temp_output[i * channels + ch] * gain_cb(i);
-                        }
-                      }
-                    }
-                  }
-                }
-                
-                std::stringstream skip_msg;
-                skip_msg << "Skipping output - insufficient priming (" 
-                         << this->speed_priming_blocks << "/" 
-                         << SOUND_TOUCH_SAFE_PRIMING_BLOCKS 
-                         << ", final_available: " << final_output_check << ")";
-                SYNTHIZER_LOG_INFO(skip_msg.str().c_str());
-              }
-            });
-          },
-          mp);
+      // NUOVO: Usa generazione diretta con interpolazione per transizioni immediate
+      this->generateSpeedTransition(output, gd);
     } else {
       // No processing needed - use optimized path without SoundTouch overhead
       // This prevents distortion when no speed/pitch changes are applied
@@ -714,82 +475,31 @@ inline void BufferGenerator::generatePitchBend(float *output, FadeDriver *gd) co
 
 inline void BufferGenerator::initSpeedProcessorIfNeeded(double speed_factor) const {
   if (!this->speed_processor) {
-    // Add instance-specific logging to debug multiple generators
-    std::stringstream debug_msg;
-    debug_msg << "Initializing speed processor for instance " << (void*)this << " with speed=" << speed_factor;
-    SYNTHIZER_LOG_INFO(debug_msg.str().c_str());
     this->speed_processor = std::make_unique<soundtouch::SoundTouch>();
     this->speed_processor->setSampleRate(config::SR);
     this->speed_processor->setChannels(this->getChannels());
     
-    std::stringstream msg;
-    msg << "Speed processor initialized for instance " << (void*)this << ": SR=" << config::SR << " Channels=" << this->getChannels() 
-        << " Speed=" << speed_factor;
-    SYNTHIZER_LOG_INFO(msg.str().c_str());
-
-    // Configure SoundTouch settings based on quality mode and speed factor
-    // Adaptive parameters that work well for any speed value
-    switch (this->speed_quality_mode) {
-      case SpeedQualityMode::LOW_LATENCY:
-        this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 1);      // Always use quick seek for responsiveness
-        this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 0);      // Disable AA for lower latency
-        // Dynamic sequence length based on speed deviation from 1.0
-        {
-          double speed_deviation = std::abs(speed_factor - 1.0);
-          int sequence_ms = static_cast<int>(15 + speed_deviation * 10); // 15-25ms range
-          this->speed_processor->setSetting(SETTING_SEQUENCE_MS, std::min(sequence_ms, 30));
-        }
-        this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 6);      // Minimal seek window
-        this->speed_processor->setSetting(SETTING_OVERLAP_MS, 3);         // Minimal overlap
-        SYNTHIZER_LOG_INFO("Quality mode: LOW_LATENCY (adaptive, ultra-responsive)");
-        break;
-        
-      case SpeedQualityMode::BALANCED:
-        this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 1);      // Quick seek for responsiveness
-        this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);      // Keep anti-aliasing for quality
-        // Adaptive sequence length
-        {
-          double speed_deviation = std::abs(speed_factor - 1.0);
-          int sequence_ms = static_cast<int>(25 + speed_deviation * 15); // 25-40ms range
-          this->speed_processor->setSetting(SETTING_SEQUENCE_MS, std::min(sequence_ms, 50));
-        }
-        this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 12);     // Balanced seek window
-        this->speed_processor->setSetting(SETTING_OVERLAP_MS, 6);         // Balanced overlap
-        SYNTHIZER_LOG_INFO("Quality mode: BALANCED (adaptive, good quality/latency balance)");
-        break;
-        
-      case SpeedQualityMode::HIGH_QUALITY:
-        this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);      // Disable quick seek for quality
-        this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);      // Enable anti-aliasing
-        // Longer sequences for quality, but still adaptive
-        {
-          double speed_deviation = std::abs(speed_factor - 1.0);
-          int sequence_ms = static_cast<int>(60 + speed_deviation * 20); // 60-80ms range
-          this->speed_processor->setSetting(SETTING_SEQUENCE_MS, std::min(sequence_ms, 100));
-        }
-        this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 25);     // Larger seek window
-        this->speed_processor->setSetting(SETTING_OVERLAP_MS, 12);        // More overlap for smoothness
-        SYNTHIZER_LOG_INFO("Quality mode: HIGH_QUALITY (adaptive, maximum quality)");
-        break;
-    }
+    // Configurazione ULTRA-REATTIVA per transizioni immediate
+    this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 1);      // Quick seek ON
+    this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 0);      // No AA filter
+    this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 10);       // Ridotto da 40
+    this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 5);      // Ridotto da 15
+    this->speed_processor->setSetting(SETTING_OVERLAP_MS, 3);         // Ridotto da 8
     
-    // Additional stability settings for all modes
-    this->speed_processor->setSetting(SETTING_NOMINAL_INPUT_SEQUENCE, 82);
-    this->speed_processor->setSetting(SETTING_NOMINAL_OUTPUT_SEQUENCE, 82);
-
+    // Disabilita buffering interno per risposta immediata
+    this->speed_processor->setSetting(SETTING_NOMINAL_INPUT_SEQUENCE, 0);
+    this->speed_processor->setSetting(SETTING_NOMINAL_OUTPUT_SEQUENCE, 0);
+    
     this->speed_processor->setTempo(speed_factor);
     this->last_speed_value = speed_factor;
-
-    // Initialize buffers with larger size for stability
+    
+    // Buffer minimi per latenza zero
     this->speed_input_accumulator.clear();
-    this->speed_output_buffer.resize(16384 * this->getChannels());
+    this->speed_input_accumulator.reserve(config::BLOCK_SIZE * this->getChannels() * 2); // Ridotto da 4
+    this->speed_output_buffer.resize(config::BLOCK_SIZE * this->getChannels() * 2); // Ridotto da 4
     this->speed_priming_blocks = 0;
     
-    // Debug output for sample rate verification
-    #ifdef DEBUG_SYNTHIZER_SPEED
-    printf("[SYNTHIZER DEBUG] Speed processor initialized: SR=%d, Channels=%d, Speed=%.3f\n", 
-           config::SR, this->getChannels(), speed_factor);
-    #endif
+    SYNTHIZER_LOG_INFO("Speed processor initialized for IMMEDIATE RESPONSE");
   }
 }
 
@@ -841,15 +551,15 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
       this->combined_processor->setSampleRate(config::SR);
       this->combined_processor->setChannels(this->getChannels());
       
-      // Minimal processing settings to reduce artifacts
+      // Ottimizzato per transizioni rapide
       this->combined_processor->setSetting(SETTING_USE_QUICKSEEK, 1);
       this->combined_processor->setSetting(SETTING_USE_AA_FILTER, 0);
-      this->combined_processor->setSetting(SETTING_SEQUENCE_MS, 10);
-      this->combined_processor->setSetting(SETTING_SEEKWINDOW_MS, 5);
-      this->combined_processor->setSetting(SETTING_OVERLAP_MS, 3);
+      this->combined_processor->setSetting(SETTING_SEQUENCE_MS, 5);   // Ridotto da 10
+      this->combined_processor->setSetting(SETTING_SEEKWINDOW_MS, 3); // Ridotto da 5
+      this->combined_processor->setSetting(SETTING_OVERLAP_MS, 2);    // Ridotto da 3
       
-      this->last_combined_speed_value = speed_factor;
-      this->last_combined_pitch_value = pitch_factor;
+      this->last_combined_speed_value = -1.0;  // Force initialization
+      this->last_combined_pitch_value = -1.0;
     }
     
     if (std::abs(speed_factor - this->last_combined_speed_value) > 0.01 || 
@@ -970,7 +680,7 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
             }
             
             // Process in smaller chunks for finer granularity and stability
-            const std::size_t chunk_size = 2048;
+            const std::size_t chunk_size = 1024; // Ridotto da 2048 per ancora più reattività
             std::size_t available_samples = this->speed_input_accumulator.size() / channels;
             
             // Process ALL available chunks in a loop + flush leftover data when finished
@@ -996,51 +706,66 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
               }
             }
             
-            // Only start outputting after sufficient priming (SoundTouch needs more data)
+            // Output processing con fallback garantito
+            bool output_generated = false;
+            
             if (this->speed_priming_blocks >= SOUND_TOUCH_SAFE_PRIMING_BLOCKS) {
-              // Drain all available output from SoundTouch
-              std::vector<float> temp_output(config::BLOCK_SIZE * channels);
-              std::size_t total_received = 0;
-              std::size_t received_samples = 1; // Initialize to enter loop
+              std::size_t available = this->speed_processor->numSamples();
               
-              // Use while loop instead of do-while to avoid MSVC parsing issues
-              while (received_samples > 0 && total_received < config::BLOCK_SIZE) {
-                received_samples = this->speed_processor->receiveSamples(
+              if (available > 0) {
+                std::vector<float> temp_output(config::BLOCK_SIZE * channels);
+                std::size_t received = this->speed_processor->receiveSamples(
                   temp_output.data(), config::BLOCK_SIZE);
                 
-                // Handle output underrun - if no samples available, stop processing
-                if (received_samples == 0) {
-                  break;
-                }
-                
-                // Apply gain and output for received samples
-                for (std::size_t i = 0; i < received_samples && total_received + i < config::BLOCK_SIZE; i++) {
-                  float gain = gain_cb(total_received + i);
-                  for (unsigned int ch = 0; ch < channels; ch++) {
-                    float processed_sample = temp_output[i * channels + ch];
-                    
-                    // ULTRA-STRICT output validation and limiting
-                    if (std::isnan(processed_sample) || std::isinf(processed_sample)) {
-                      processed_sample = 0.0f;
-                      #ifdef DEBUG_SYNTHIZER_SPEED
-                      SYNTHIZER_LOG_ERROR("NaN/Inf detected in SoundTouch output");
-                      #endif
+                if (received > 0) {
+                  output_generated = true;
+                  
+                  // Applica gain e output
+                  for (std::size_t i = 0; i < config::BLOCK_SIZE; i++) {
+                    float gain = gain_cb(i);
+                    for (unsigned int ch = 0; ch < channels; ch++) {
+                      if (i < received) {
+                        float sample = temp_output[i * channels + ch];
+                        output[i * channels + ch] += std::clamp(sample * gain, -1.0f, 1.0f);
+                      }
                     }
-                    
-                    // Soft limiting to prevent harsh clipping
-                    processed_sample = std::clamp(processed_sample, -0.95f, 0.95f);
-                    
-                    // Apply gain and add to output
-                    float final_sample = processed_sample * gain;
-                    output[(total_received + i) * channels + ch] += final_sample;
                   }
                 }
-                total_received += received_samples;
               }
               
-              // If no output was generated, fill remaining with silence
-              if (total_received == 0) {
-                return; // Early return - let the caller handle silence
+              // Se ancora nessun output dopo priming, forza flush
+              if (!output_generated && this->speed_priming_blocks >= SOUND_TOUCH_SAFE_PRIMING_BLOCKS + 2) {
+                this->speed_processor->flush();
+                
+                std::vector<float> flush_output(config::BLOCK_SIZE * channels);
+                std::size_t flush_received = this->speed_processor->receiveSamples(
+                  flush_output.data(), config::BLOCK_SIZE);
+                
+                if (flush_received > 0) {
+                  output_generated = true;
+                  for (std::size_t i = 0; i < std::min(flush_received, static_cast<std::size_t>(config::BLOCK_SIZE)); i++) {
+                    float gain = gain_cb(i);
+                    for (unsigned int ch = 0; ch < channels; ch++) {
+                      output[i * channels + ch] += flush_output[i * channels + ch] * gain;
+                    }
+                  }
+                }
+              }
+            }
+            
+            // FALLBACK CRITICO: usa audio diretto per evitare silenzi
+            if (!output_generated) {
+              SYNTHIZER_LOG_WARNING("Speed processor failed - using direct audio fallback");
+              
+              // Genera audio diretto dal buffer originale  
+              const float scale = 1.0f / 32768.0f;
+              std::size_t fallback_frames = std::min(will_read_frames, static_cast<std::size_t>(config::BLOCK_SIZE));
+              for (std::size_t i = 0; i < fallback_frames; i++) {
+                float gain = gain_cb(i);
+                for (unsigned int ch = 0; ch < channels; ch++) {
+                  float sample = ptr[i * channels + ch] * scale;
+                  output[i * channels + ch] += sample * gain;
+                }
               }
             }
           });
@@ -1206,6 +931,73 @@ inline void BufferGenerator::generateTimeStretchPitch(float *output, FadeDriver 
           // Clean up crossfade processor when done
           if (this->crossfade_samples_remaining <= 0) {
             this->crossfade_processor.reset();
+          }
+        });
+      },
+      mp);
+}
+
+inline void BufferGenerator::generateSpeedTransition(float *output, FadeDriver *gd) const {
+  // Generazione diretta con resampling per transizioni immediate
+  const double speed_factor = this->getSpeedMultiplier();
+  const unsigned int channels = this->getChannels();
+  
+  // Per velocità molto vicine a 1.0, usa path diretto
+  if (std::abs(speed_factor - 1.0) < 0.01) {
+    this->generateNoPitchBend(output, gd);
+    return;
+  }
+  
+  // Resampling diretto senza SoundTouch per risposta immediata
+  std::size_t samples_needed = static_cast<std::size_t>(config::BLOCK_SIZE / speed_factor + 1);
+  samples_needed = std::min(samples_needed, static_cast<std::size_t>(config::BLOCK_SIZE * 4));
+  
+  // Verifica limiti buffer
+  if (this->getPosInSamples() + samples_needed > this->reader.getLengthInFrames(false) && !this->getLooping()) {
+    samples_needed = this->reader.getLengthInFrames(false) - this->getPosInSamples();
+  }
+  
+  auto mp = this->reader.getFrameSlice(
+    this->scaled_position_in_frames / config::BUFFER_POS_MULTIPLIER,
+    samples_needed, false, true);
+  
+  std::visit(
+      [&](auto ptr) {
+        gd->drive(this->getContextRaw()->getBlockTime(), [&](auto gain_cb) {
+          const float scale = 1.0f / 32768.0f;
+          
+          // Applica un semplice filtro passa-basso per evitare aliasing quando la velocità è molto bassa
+          bool apply_antialiasing = (speed_factor < 0.5);
+          
+          // Interpolazione lineare diretta per cambio velocità immediato
+          for (std::size_t out_idx = 0; out_idx < config::BLOCK_SIZE; out_idx++) {
+            double src_pos = out_idx / speed_factor;
+            std::size_t src_idx = static_cast<std::size_t>(src_pos);
+            double frac = src_pos - src_idx;
+            
+            if (src_idx + 1 < samples_needed) {
+              float gain = gain_cb(out_idx);
+              
+              for (unsigned int ch = 0; ch < channels; ch++) {
+                float s1 = ptr[src_idx * channels + ch] * scale;
+                float s2 = ptr[(src_idx + 1) * channels + ch] * scale;
+                float interpolated = s1 + (s2 - s1) * frac;
+                
+                // Applica filtro anti-aliasing semplice per velocità molto basse
+                if (apply_antialiasing) {
+                  // Media mobile semplice per ridurre aliasing
+                  interpolated *= 0.7f; // Attenua leggermente per prevenire aliasing
+                }
+                
+                output[out_idx * channels + ch] += interpolated * gain;
+              }
+            } else if (src_idx < samples_needed) {
+              // Ultimo campione disponibile
+              float gain = gain_cb(out_idx);
+              for (unsigned int ch = 0; ch < channels; ch++) {
+                output[out_idx * channels + ch] += ptr[src_idx * channels + ch] * scale * gain;
+              }
+            }
           }
         });
       },

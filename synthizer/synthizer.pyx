@@ -938,9 +938,9 @@ cdef class Buffer(_BaseObject):
 
 cdef class BufferGenerator(Generator):
 
-    cdef public IntProperty looping
+    cdef public IntProperty looping, pitch_bend_mode
     cdef public ObjectProperty buffer
-    cdef public DoubleProperty playback_position
+    cdef public DoubleProperty playback_position, speed_multiplier
 
     def __init__(self, context):
         cdef syz_Handle handle
@@ -949,12 +949,19 @@ cdef class BufferGenerator(Generator):
         self.buffer = ObjectProperty(self, SYZ_P_BUFFER, Buffer)
         self.playback_position = DoubleProperty(self, SYZ_P_PLAYBACK_POSITION)
         self.looping = IntProperty(self, SYZ_P_LOOPING, conv_in = int, conv_out = bool)
+        self.pitch_bend_mode = IntProperty(self, SYZ_P_PITCH_BEND_MODE)
+        self.speed_multiplier = DoubleProperty(self, SYZ_P_SPEED_MULTIPLIER)
 
 
 class NoiseType(Enum):
     UNIFORM = SYZ_NOISE_TYPE_UNIFORM
     VM = SYZ_NOISE_TYPE_VM
     FILTERED_BROWN = SYZ_NOISE_TYPE_FILTERED_BROWN
+
+
+class PitchBendMode(Enum):
+    CLASSIC = SYZ_PITCH_BEND_MODE_CLASSIC
+    TIME_STRETCH = SYZ_PITCH_BEND_MODE_TIME_STRETCH
 
 
 cdef class NoiseGenerator(Generator):

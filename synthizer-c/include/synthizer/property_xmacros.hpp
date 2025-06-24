@@ -66,6 +66,7 @@ extern "C" {
 
 #define GENERATOR_PROPERTIES                                                                                           \
   DOUBLE_P(SYZ_P_PITCH_BEND, pitch_bend, PitchBend, 0.0, 2.0, 1.0)                                                     \
+  DOUBLE_P(SYZ_P_SPEED_MULTIPLIER, speed_multiplier, SpeedMultiplier, 0.1, 4.0, 1.0)                                   \
   DOUBLE_P(SYZ_P_GAIN, gain, Gain, 0.0, P_DOUBLE_MAX, 1.0)
 
 #define BUFFER_GENERATOR_PROPERTIES                                                                                    \

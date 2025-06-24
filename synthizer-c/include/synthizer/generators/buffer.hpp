@@ -64,8 +64,8 @@ enum class SpeedQualityMode {
   HIGH_QUALITY = 2    // Maximum quality, higher latency
 };
 
-// SoundTouch priming blocks needed for stable output (practical value based on SoundTouch documentation)
-constexpr int SOUND_TOUCH_SAFE_PRIMING_BLOCKS = 2;
+// SoundTouch priming blocks needed for stable output (reduced for faster response)
+constexpr int SOUND_TOUCH_SAFE_PRIMING_BLOCKS = 1;
 
 /**
  * Plays a buffer.
@@ -146,8 +146,8 @@ private:
   mutable SpeedQualityMode speed_quality_mode;
 };
 
-inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx), last_pitch_value(-1.0), crossfade_samples_remaining(0), last_speed_value(-1.0), last_combined_speed_value(-1.0), last_combined_pitch_value(-1.0), speed_crossfade_samples_remaining(0), speed_priming_blocks(0), speed_quality_mode(SpeedQualityMode::BALANCED) {
-  SYNTHIZER_LOG_INFO("BufferGenerator created with BALANCED quality mode");
+inline BufferGenerator::BufferGenerator(std::shared_ptr<Context> ctx) : Generator(ctx), last_pitch_value(-1.0), crossfade_samples_remaining(0), last_speed_value(-1.0), last_combined_speed_value(-1.0), last_combined_pitch_value(-1.0), speed_crossfade_samples_remaining(0), speed_priming_blocks(0), speed_quality_mode(SpeedQualityMode::LOW_LATENCY) {
+  SYNTHIZER_LOG_INFO("BufferGenerator created with LOW_LATENCY quality mode for fast response");
 }
 
 inline int BufferGenerator::getObjectType() { return SYZ_OTYPE_BUFFER_GENERATOR; }
@@ -333,14 +333,14 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
               
               // Note: Removed defensive reset that was preventing proper priming
               
-              // Process in smaller chunks for finer granularity and stability
-              const std::size_t chunk_size = 2048;
+              // Process in smaller chunks for faster response
+              const std::size_t chunk_size = 1024;
               std::size_t available_samples = this->speed_input_accumulator.size() / channels;
               
               // Don't overfeed SoundTouch - limit input if we already have enough output
               std::size_t output_available = this->speed_processor->numSamples();
-              // For fast speeds, allow larger buffer to prevent underruns
-              std::size_t buffer_target = (speed_factor > 1.0) ? config::BLOCK_SIZE * 4 : config::BLOCK_SIZE * 2;
+              // Reduce buffer targets for faster response
+              std::size_t buffer_target = (speed_factor > 1.0) ? config::BLOCK_SIZE * 2 : config::BLOCK_SIZE;
               bool should_feed_more = (output_available < buffer_target);
               
               // Process chunks but respect output buffer limits
@@ -392,10 +392,10 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 }
               }
               
-              // Start outputting if we have sufficient priming OR if SoundTouch has output available
+              // Start outputting more aggressively for faster response
               std::size_t final_output_check = this->speed_processor->numSamples();
               bool priming_complete = (this->speed_priming_blocks >= SOUND_TOUCH_SAFE_PRIMING_BLOCKS);
-              bool has_output_ready = (final_output_check > 0);
+              bool has_output_ready = (final_output_check >= config::BLOCK_SIZE / 4); // Lower threshold
               
               if (priming_complete || has_output_ready) {
                 std::stringstream output_msg;
@@ -463,8 +463,8 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                   SYNTHIZER_LOG_INFO(msg.str().c_str());
                 }
               } else {
-                // If we've fed enough blocks but still no output, try flush
-                if (this->speed_priming_blocks >= 10) {
+                // If we've fed enough blocks but still no output, try flush earlier
+                if (this->speed_priming_blocks >= 3) {
                   SYNTHIZER_LOG_WARNING("Force flushing SoundTouch after excessive priming blocks");
                   this->speed_processor->flush();
                   // Try to get output after flush
@@ -711,12 +711,12 @@ inline void BufferGenerator::initSpeedProcessorIfNeeded(double speed_factor) con
         break;
         
       case SpeedQualityMode::BALANCED:
-        this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);      // Disable quick seek for quality
-        this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);      // Enable anti-aliasing
-        this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 82);       // Default sequence length
-        this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 28);     // Default seek window
-        this->speed_processor->setSetting(SETTING_OVERLAP_MS, 12);        // Default overlap
-        SYNTHIZER_LOG_INFO("Quality mode: BALANCED (QuickSeek=0, AA=1, Seq=82ms)");
+        this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 1);      // Enable quick seek for faster response
+        this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);      // Keep anti-aliasing
+        this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);       // Shorter sequences for faster response
+        this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);     // Smaller seek window
+        this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);         // Reduced overlap
+        SYNTHIZER_LOG_INFO("Quality mode: BALANCED (QuickSeek=1, AA=1, Seq=40ms)");
         break;
         
       case SpeedQualityMode::HIGH_QUALITY:

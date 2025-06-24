@@ -24,7 +24,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-// Enable debug logging for speed processing
+// Enable debug logging for speed processing (enabled for debugging 1.05 speed)
 #define DEBUG_SYNTHIZER_SPEED 1
 
 #include <soundtouch/SoundTouch.h>
@@ -64,8 +64,8 @@ enum class SpeedQualityMode {
   HIGH_QUALITY = 2    // Maximum quality, higher latency
 };
 
-// SoundTouch priming blocks needed for stable output (reduced for faster response)
-constexpr int SOUND_TOUCH_SAFE_PRIMING_BLOCKS = 1;
+// SoundTouch priming blocks needed for stable output (minimal for immediate response to 0.85/1.15)
+constexpr int SOUND_TOUCH_SAFE_PRIMING_BLOCKS = 0;
 
 /**
  * Plays a buffer.
@@ -214,16 +214,28 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
 
   if (this->getPitchBendMode() == SYZ_PITCH_BEND_MODE_TIME_STRETCH) {
     // Time-stretch mode: check if we need pitch or speed processing
-    bool need_pitch_stretch = (this->getPitchBend() != 1.0);
-    bool need_speed_stretch = (this->getSpeedMultiplier() != 1.0);
+    // Use very small epsilon to catch even minimal changes like 1.05
+    const double epsilon = 0.0001;
+    bool need_pitch_stretch = (std::abs(this->getPitchBend() - 1.0) > epsilon);
+    bool need_speed_stretch = (std::abs(this->getSpeedMultiplier() - 1.0) > epsilon);
     
-    // Debug logging to understand property values for each instance
-    std::stringstream property_debug;
-    property_debug << "Instance " << (void*)this << " properties: PitchBendMode=" 
-                   << this->getPitchBendMode() << " PitchBend=" << this->getPitchBend() 
-                   << " SpeedMultiplier=" << this->getSpeedMultiplier() 
-                   << " need_pitch=" << need_pitch_stretch << " need_speed=" << need_speed_stretch;
-    SYNTHIZER_LOG_INFO(property_debug.str().c_str());
+    // Debug logging only when properties change (reduce log spam)
+    static thread_local double last_logged_speed = -1.0;
+    static thread_local double last_logged_pitch = -1.0;
+    double current_speed = this->getSpeedMultiplier();
+    double current_pitch = this->getPitchBend();
+    
+    if (std::abs(current_speed - last_logged_speed) > 0.01 || 
+        std::abs(current_pitch - last_logged_pitch) > 0.01) {
+      std::stringstream property_debug;
+      property_debug << "Instance " << (void*)this << " properties changed: PitchBendMode=" 
+                     << this->getPitchBendMode() << " PitchBend=" << current_pitch 
+                     << " SpeedMultiplier=" << current_speed 
+                     << " need_pitch=" << need_pitch_stretch << " need_speed=" << need_speed_stretch;
+      SYNTHIZER_LOG_INFO(property_debug.str().c_str());
+      last_logged_speed = current_speed;
+      last_logged_pitch = current_pitch;
+    }
     
     if (need_pitch_stretch && need_speed_stretch) {
       // Both pitch and speed need processing - use SoundTouch
@@ -238,6 +250,12 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
         return; // Invalid channel configuration
       }
       
+      // Fast bypass: only for speeds virtually identical to 1.0 (floating point precision)
+      if (std::abs(speed_factor - 1.0) < std::numeric_limits<double>::epsilon() * 10) {
+        this->generateNoPitchBend(output, gd);
+        return;
+      }
+      
       // Log speed processing entry for this instance
       std::stringstream entry_msg;
       entry_msg << "Entering speed-only processing for instance " << (void*)this << " with speed=" << speed_factor;
@@ -248,20 +266,23 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
         this->initSpeedProcessorIfNeeded(speed_factor);
       }
       
-      // Update tempo and ensure pitch is reset to 1.0 (avoid unnecessary clears)
+      // Update tempo and ensure pitch is reset to 1.0 (clear buffers for responsiveness)
       bool need_tempo_change = std::abs(speed_factor - this->last_speed_value) > 0.01;
       bool need_pitch_reset = this->last_pitch_value != 1.0;
       
       if (need_tempo_change || need_pitch_reset) {
-        // Only clear if making significant changes that require buffer reset
-        if (need_pitch_reset || std::abs(speed_factor - this->last_speed_value) > 0.1) {
-          this->speed_processor->clear();
-          this->speed_priming_blocks = 0;
-        }
+        // Always clear buffers for speed changes to ensure immediate response
+        this->speed_processor->clear();
+        this->speed_priming_blocks = 0;
         
         if (need_tempo_change) {
           this->speed_processor->setTempo(speed_factor);
           this->last_speed_value = speed_factor;
+          
+          // Log speed transition for debugging
+          std::stringstream speed_msg;
+          speed_msg << "Speed transition to " << speed_factor << " for instance " << (void*)this;
+          SYNTHIZER_LOG_INFO(speed_msg.str().c_str());
         }
         
         if (need_pitch_reset) {
@@ -270,19 +291,25 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
         }
       }
       
-      // Calculate input needed based on speed - read more when speed < 1.0, less when speed > 1.0
-      const double input_ratio = 1.0 / speed_factor; // For 0.85 speed: 1/0.85 = 1.176, for 1.15: 1/1.15 = 0.87
-      std::size_t will_read_frames = static_cast<std::size_t>(config::BLOCK_SIZE * input_ratio + 0.5); // Round
+      // Calculate input needed based on speed - universal algorithm for any speed value
+      const double input_ratio = 1.0 / speed_factor; 
+      std::size_t will_read_frames = static_cast<std::size_t>(config::BLOCK_SIZE * input_ratio + 0.5);
       
-      // For speeds > 1.0, we need LESS input, for speeds < 1.0 we need MORE input
+      // Universal bounds calculation based on speed factor
       if (speed_factor > 1.0) {
-        // Fast speed: cap at BLOCK_SIZE, allow reading less
-        will_read_frames = std::min<std::size_t>(will_read_frames, config::BLOCK_SIZE);
-        will_read_frames = std::max<std::size_t>(will_read_frames, config::BLOCK_SIZE / 2); // Minimum half block
+        // Faster speeds: need less input, scale down appropriately
+        const std::size_t min_input = static_cast<std::size_t>(config::BLOCK_SIZE / (speed_factor * 2)); // Dynamic minimum
+        const std::size_t max_input = config::BLOCK_SIZE; // Never exceed block size for fast speeds
+        will_read_frames = std::clamp(will_read_frames, min_input, max_input);
+      } else if (speed_factor < 1.0) {
+        // Slower speeds: need more input, scale up appropriately  
+        const std::size_t min_input = config::BLOCK_SIZE; // At least one block
+        const std::size_t max_input = static_cast<std::size_t>(config::BLOCK_SIZE * (2.0 / speed_factor)); // Dynamic maximum
+        const std::size_t absolute_max = config::BLOCK_SIZE * 4; // Safety cap to prevent excessive memory
+        will_read_frames = std::clamp(will_read_frames, min_input, std::min(max_input, absolute_max));
       } else {
-        // Slow speed: allow reading more, cap at maximum
-        will_read_frames = std::max<std::size_t>(will_read_frames, config::BLOCK_SIZE); // At least BLOCK_SIZE
-        will_read_frames = std::min<std::size_t>(will_read_frames, config::BLOCK_SIZE * 2); // Cap at 2x BLOCK_SIZE
+        // Speed exactly 1.0: use block size
+        will_read_frames = config::BLOCK_SIZE;
       }
       
       bool near_end = false;
@@ -392,10 +419,10 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
                 }
               }
               
-              // Start outputting more aggressively for faster response
+              // Start outputting immediately for 0.85/1.15 transitions
               std::size_t final_output_check = this->speed_processor->numSamples();
               bool priming_complete = (this->speed_priming_blocks >= SOUND_TOUCH_SAFE_PRIMING_BLOCKS);
-              bool has_output_ready = (final_output_check >= config::BLOCK_SIZE / 4); // Lower threshold
+              bool has_output_ready = (final_output_check > 0); // Any output available
               
               if (priming_complete || has_output_ready) {
                 std::stringstream output_msg;
@@ -495,7 +522,8 @@ inline void BufferGenerator::generateBlock(float *output, FadeDriver *gd) {
           },
           mp);
     } else {
-      // No processing needed
+      // No processing needed - use optimized path without SoundTouch overhead
+      // This prevents distortion when no speed/pitch changes are applied
       this->generateNoPitchBend(output, gd);
     }
   } else {
@@ -699,33 +727,49 @@ inline void BufferGenerator::initSpeedProcessorIfNeeded(double speed_factor) con
         << " Speed=" << speed_factor;
     SYNTHIZER_LOG_INFO(msg.str().c_str());
 
-    // Configure SoundTouch settings based on quality mode
+    // Configure SoundTouch settings based on quality mode and speed factor
+    // Adaptive parameters that work well for any speed value
     switch (this->speed_quality_mode) {
       case SpeedQualityMode::LOW_LATENCY:
-        this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 1);      // Enable quick seek for speed
+        this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 1);      // Always use quick seek for responsiveness
         this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 0);      // Disable AA for lower latency
-        this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);       // Shorter sequences
-        this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);     // Smaller seek window
-        this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);         // Minimal overlap
-        SYNTHIZER_LOG_INFO("Quality mode: LOW_LATENCY (QuickSeek=1, AA=0, Seq=40ms)");
+        // Dynamic sequence length based on speed deviation from 1.0
+        {
+          double speed_deviation = std::abs(speed_factor - 1.0);
+          int sequence_ms = static_cast<int>(15 + speed_deviation * 10); // 15-25ms range
+          this->speed_processor->setSetting(SETTING_SEQUENCE_MS, std::min(sequence_ms, 30));
+        }
+        this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 6);      // Minimal seek window
+        this->speed_processor->setSetting(SETTING_OVERLAP_MS, 3);         // Minimal overlap
+        SYNTHIZER_LOG_INFO("Quality mode: LOW_LATENCY (adaptive, ultra-responsive)");
         break;
         
       case SpeedQualityMode::BALANCED:
-        this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 1);      // Enable quick seek for faster response
-        this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);      // Keep anti-aliasing
-        this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 40);       // Shorter sequences for faster response
-        this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 15);     // Smaller seek window
-        this->speed_processor->setSetting(SETTING_OVERLAP_MS, 8);         // Reduced overlap
-        SYNTHIZER_LOG_INFO("Quality mode: BALANCED (QuickSeek=1, AA=1, Seq=40ms)");
+        this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 1);      // Quick seek for responsiveness
+        this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);      // Keep anti-aliasing for quality
+        // Adaptive sequence length
+        {
+          double speed_deviation = std::abs(speed_factor - 1.0);
+          int sequence_ms = static_cast<int>(25 + speed_deviation * 15); // 25-40ms range
+          this->speed_processor->setSetting(SETTING_SEQUENCE_MS, std::min(sequence_ms, 50));
+        }
+        this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 12);     // Balanced seek window
+        this->speed_processor->setSetting(SETTING_OVERLAP_MS, 6);         // Balanced overlap
+        SYNTHIZER_LOG_INFO("Quality mode: BALANCED (adaptive, good quality/latency balance)");
         break;
         
       case SpeedQualityMode::HIGH_QUALITY:
         this->speed_processor->setSetting(SETTING_USE_QUICKSEEK, 0);      // Disable quick seek for quality
         this->speed_processor->setSetting(SETTING_USE_AA_FILTER, 1);      // Enable anti-aliasing
-        this->speed_processor->setSetting(SETTING_SEQUENCE_MS, 100);      // Longer sequences for quality
-        this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 40);     // Larger seek window
-        this->speed_processor->setSetting(SETTING_OVERLAP_MS, 20);        // More overlap for smoothness
-        SYNTHIZER_LOG_INFO("Quality mode: HIGH_QUALITY (QuickSeek=0, AA=1, Seq=100ms)");
+        // Longer sequences for quality, but still adaptive
+        {
+          double speed_deviation = std::abs(speed_factor - 1.0);
+          int sequence_ms = static_cast<int>(60 + speed_deviation * 20); // 60-80ms range
+          this->speed_processor->setSetting(SETTING_SEQUENCE_MS, std::min(sequence_ms, 100));
+        }
+        this->speed_processor->setSetting(SETTING_SEEKWINDOW_MS, 25);     // Larger seek window
+        this->speed_processor->setSetting(SETTING_OVERLAP_MS, 12);        // More overlap for smoothness
+        SYNTHIZER_LOG_INFO("Quality mode: HIGH_QUALITY (adaptive, maximum quality)");
         break;
     }
     

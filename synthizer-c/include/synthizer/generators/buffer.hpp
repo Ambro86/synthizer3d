@@ -743,12 +743,12 @@ inline void BufferGenerator::generateTimeStretchSpeed(float *output, FadeDriver 
               SYNTHIZER_LOG_WARNING("Speed processor failed - using direct audio fallback");
               
               // Genera audio diretto dal buffer originale  
-              const float scale = 1.0f / 32768.0f;
+              const float fallback_scale = 1.0f / 32768.0f;
               std::size_t fallback_frames = std::min(will_read_frames, static_cast<std::size_t>(config::BLOCK_SIZE));
               for (std::size_t i = 0; i < fallback_frames; i++) {
                 float gain = gain_cb(i);
                 for (unsigned int ch = 0; ch < channels; ch++) {
-                  float sample = ptr[i * channels + ch] * scale;
+                  float sample = ptr[i * channels + ch] * fallback_scale;
                   output[i * channels + ch] += sample * gain;
                 }
               }

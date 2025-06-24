@@ -9,7 +9,8 @@
       "Bash(git config:*)",
       "Bash(git push:*)",
       "Bash(sed:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(rg:*)"
     ],
     "deny": []
   }

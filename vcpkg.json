@@ -1,1 +1,19 @@
-{"name":"synthizer3d","version":"0.1.0","builtin-baseline":"8f63c9ed5897d7367a92a442a79f91721e0fd38f","dependencies":["libvorbis","libogg","opus","opusfile","soundtouch"]}
+{
+  "name": "synthizer3d",
+  "version": "0.1.0",
+  "builtin-baseline": "8f63c9ed5897d7367a92a442a79f91721e0fd38f",
+  "dependencies": [
+    "libvorbis",
+    "libogg", 
+    "opus",
+    "opusfile",
+    "soundtouch"
+  ],
+  "overrides": [
+    {
+      "name": "libogg",
+      "version": "1.3.5",
+      "port-version": 2
+    }
+  ]
+}

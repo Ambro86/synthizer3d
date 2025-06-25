@@ -54,16 +54,29 @@ if 'CI_SDIST' not in os.environ:
     
     # Build Synthizer nativo tramite CMake/Ninja
     cmake = cmaker.CMaker()
+    
+    cmake_args = [
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL",
+        "-DSYZ_STATIC_RUNTIME=OFF",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=TRUE",
+        "-DSYZ_INTEGRATING=ON",
+    ]
+    
+    # Add macOS-specific flags for consistent C++ runtime
+    import platform
+    if platform.system() == "Darwin":
+        cmake_args.extend([
+            "-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15",
+            "-DCMAKE_CXX_FLAGS=-stdlib=libc++",
+            "-DCMAKE_EXE_LINKER_FLAGS=-stdlib=libc++",
+            "-DCMAKE_SHARED_LINKER_FLAGS=-stdlib=libc++"
+        ])
+    
     cmake.configure(
         cmake_source_dir=vendored_dir,
         generator_name="Ninja",
-        clargs=[
-            "-DCMAKE_BUILD_TYPE=Release",
-            "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL",
-            "-DSYZ_STATIC_RUNTIME=OFF",
-            "-DCMAKE_POSITION_INDEPENDENT_CODE=TRUE",
-            "-DSYZ_INTEGRATING=ON",
-        ],
+        clargs=cmake_args,
     )
     cmake.make()
     # Trova la directory dove è installata la .lib
@@ -185,16 +198,22 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
                 else:
                     print(f"Warning: synthizer library not found at expected path: {synthizer_lib_path}")
             
-            # Add explicit C++ standard library linking and deployment target
-            link_args.extend(["-lc++", "-mmacosx-version-min=10.15"])
+            # Set deployment target and ensure C++ symbols are available
+            # Use explicit linking flags for better symbol resolution
+            link_args.extend([
+                "-mmacosx-version-min=10.15",  # Set deployment target
+                "-Wl,-undefined,dynamic_lookup"  # Allow undefined symbols to be resolved at runtime
+            ])
             
             extension_args["extra_link_args"].extend(link_args)
             
-            # Suppress warnings from third-party headers
+            # Suppress warnings from third-party headers and set deployment target
             if "extra_compile_args" not in extension_args:
                 extension_args["extra_compile_args"] = []
             extension_args["extra_compile_args"].extend([
-                "-Wno-unused-variable"  # Suppress warnings from third-party headers (vorbis)
+                "-Wno-unused-variable",  # Suppress warnings from third-party headers (vorbis)
+                "-mmacosx-version-min=10.15",  # Set deployment target for compilation
+                "-stdlib=libc++"  # Explicitly use libc++
             ])
             print(f"macOS: Using -force_load for ALL {len(existing_libs)} libraries with static C++ runtime")
         

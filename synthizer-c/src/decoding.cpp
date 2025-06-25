@@ -24,7 +24,7 @@ struct DecoderDef {
 };
 
 static auto decoders = makeStaticArray(DecoderDef{"libsndfile", decodeLibsndfile}, DecoderDef{"dr_wav", decodeWav},
-                                       DecoderDef{"dr_flac", decodeFlac}, DecoderDef{"dr_mp3", decodeMp3}, DecoderDef{"faad2", decodeAac}, DecoderDef{"ogg", decodeOgg}, DecoderDef{"opusfile", decodeOpusFile}, DecoderDef{"aif", decodeAif});
+                                       DecoderDef{"dr_flac", decodeFlac}, DecoderDef{"dr_mp3", decodeMp3}, DecoderDef{"ogg", decodeOgg}, DecoderDef{"opusfile", decodeOpusFile}, DecoderDef{"faad2", decodeAac}, DecoderDef{"aif", decodeAif});
 
 std::shared_ptr<AudioDecoder> getDecoderForStream(std::shared_ptr<ByteStream> stream) {
   auto lookahead_stream = getLookaheadByteStream(stream);

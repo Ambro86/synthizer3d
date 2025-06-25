@@ -262,14 +262,9 @@ jobs:
           $PYTHON_PATH/bin/python -m pip install --upgrade pip
           $PYTHON_PATH/bin/pip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build auditwheel twine
 
-      - name: Set vcpkg Cache Path  
-        run: |
-          echo "VCPKG_DEFAULT_BINARY_CACHE=${{ github.workspace }}/vcpkg_cache" >> $GITHUB_ENV
-          echo "VCPKG_BINARY_SOURCES=clear;files,${{ github.workspace }}/vcpkg_cache,readwrite" >> $GITHUB_ENV
+      - name: Set vcpkg Cache Path
+        run: echo "VCPKG_DEFAULT_BINARY_CACHE=${{ github.workspace }}/vcpkg_cache" >> $GITHUB_ENV
 
-      - name: Create vcpkg cache directory
-        run: mkdir -p ${{ github.workspace }}/vcpkg_cache
-        
       - name: Cache vcpkg binary cache
         uses: actions/cache@v4
         with:
@@ -278,9 +273,6 @@ jobs:
           restore-keys: |
             vcpkg-cache-${{ env.VCPKG_DEFAULT_TRIPLET }}-
             
-      - name: Create vcpkg_installed directory
-        run: mkdir -p ${{ github.workspace }}/vcpkg_installed
-        
       - name: Cache vcpkg packages
         uses: actions/cache@v4
         with:
@@ -403,7 +395,7 @@ jobs:
           # Flags per disabilitare errori di compilazione
           RUSTFLAGS: "-A warnings"
           CXXFLAGS: "-Wno-template-id-cdtor -Wno-cast-function-type -Wno-error"
-          CFLAGS: "-Wno-error -D_DEFAULT_SOURCE"
+          CFLAGS: "-Wno-error"
         run: |
           echo "🔨 Building Python wheel with vcpkg toolchain..."
           
@@ -466,17 +458,17 @@ jobs:
         run: |
           echo "🔍 Environment variables:"
           echo "VCPKG_ROOT: $VCPKG_ROOT"
-          echo "VCPKG_INSTALLED_PATH: $VCPKG_INSTALLED_PATH"
+          echo "EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}"
           echo "VCPKG_DEFAULT_TRIPLET: $VCPKG_DEFAULT_TRIPLET"
           
           echo "🔍 Checking if vcpkg installed directory exists..."
-          ls -la "$VCPKG_INSTALLED_PATH" || echo "Directory not found!"
+          ls -la ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/ || echo "Directory not found!"
           
           echo "🔍 Checking vcpkg installed libraries..."
-          if [ -d "$VCPKG_INSTALLED_PATH" ]; then
-            find "$VCPKG_INSTALLED_PATH" -name "*.so*" | head -20
+          if [ -d "${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/$VCPKG_DEFAULT_TRIPLET" ]; then
+            find ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/$VCPKG_DEFAULT_TRIPLET -name "*.so*" | head -20
             echo "🔍 Looking for audio libraries specifically..."
-            find "$VCPKG_INSTALLED_PATH" -name "*ogg*" -o -name "*vorbis*" -o -name "*opus*"
+            find ${{ env.EFFECTIVE_VCPKG_INSTALLED_DIR_BASE }}/$VCPKG_DEFAULT_TRIPLET -name "*ogg*" -o -name "*vorbis*" -o -name "*opus*"
           else
             echo "❌ vcpkg installed directory not found!"
             echo "Looking for vcpkg directories..."

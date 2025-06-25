@@ -36,7 +36,7 @@ if 'CI_SDIST' not in os.environ:
         if system == 'windows':
             vcpkg_triplet = 'x64-windows' if machine in ['amd64', 'x86_64'] else 'x86-windows'
         elif system == 'darwin':  # macOS
-            vcpkg_triplet = 'x64-osx'
+            vcpkg_triplet = 'arm64-osx' if machine in ['arm64', 'aarch64'] else 'x64-osx'
         elif system == 'linux':
             vcpkg_triplet = 'x64-linux'
         else:
@@ -73,7 +73,7 @@ if 'CI_SDIST' not in os.environ:
 extension_args = {
     "include_dirs": [os.path.join(vendored_dir, "include")],
     "library_dirs": [synthizer_lib_dir] if synthizer_lib_dir else [],
-    "libraries": ["synthizer"],
+    "libraries": [],  # We'll add synthizer via force_load/whole-archive for better symbol control
 }
 
 import platform
@@ -118,7 +118,7 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
     if system == "Windows":
         # Windows uses dynamic linking with individual libraries
         extension_args["libraries"].extend([
-            "ogg", "opus", "vorbis", "vorbisenc", "opusfile", "vorbisfile", "SoundTouch", "faad"
+            "synthizer", "ogg", "opus", "vorbis", "vorbisenc", "opusfile", "vorbisfile", "SoundTouch", "faad"
         ])
         print("Windows: Using dynamic library linking")
     else:
@@ -147,6 +147,16 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
             for lib in existing_libs:
                 # Apply --whole-archive to all audio libraries, not just opus
                 link_args.extend(["-Wl,--whole-archive", lib, "-Wl,--no-whole-archive"])
+            
+            # Also use --whole-archive for the synthizer library to ensure all symbols are included
+            if synthizer_lib_dir:
+                synthizer_lib_path = os.path.join(synthizer_lib_dir, "libsynthizer.a")
+                if os.path.exists(synthizer_lib_path):
+                    link_args.extend(["-Wl,--whole-archive", synthizer_lib_path, "-Wl,--no-whole-archive"])
+                    print(f"Linux: Added --whole-archive for synthizer library: {synthizer_lib_path}")
+                else:
+                    print(f"Warning: synthizer library not found at expected path: {synthizer_lib_path}")
+            
             extension_args["extra_link_args"].extend(link_args)
             extension_args["libraries"].extend(["m", "dl"])
             
@@ -165,6 +175,16 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
             for lib in existing_libs:
                 # Apply -force_load to all audio libraries, not just opus
                 link_args.extend(["-Wl,-force_load", lib])
+            
+            # Also force-load the synthizer library to ensure all symbols are included
+            if synthizer_lib_dir:
+                synthizer_lib_path = os.path.join(synthizer_lib_dir, "libsynthizer.a")
+                if os.path.exists(synthizer_lib_path):
+                    link_args.extend(["-Wl,-force_load", synthizer_lib_path])
+                    print(f"macOS: Added -force_load for synthizer library: {synthizer_lib_path}")
+                else:
+                    print(f"Warning: synthizer library not found at expected path: {synthizer_lib_path}")
+            
             extension_args["extra_link_args"].extend(link_args)
             
             # Suppress warnings from third-party headers

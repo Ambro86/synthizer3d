@@ -63,6 +63,16 @@ if 'CI_SDIST' not in os.environ:
         "-DSYZ_INTEGRATING=ON",
     ]
     
+    # Add macOS-specific flags for consistent C++ runtime
+    import platform
+    if platform.system() == "Darwin":
+        cmake_args.extend([
+            "-DCMAKE_OSX_DEPLOYMENT_TARGET=10.13",
+            "-DCMAKE_CXX_FLAGS=-stdlib=libc++",
+            "-DCMAKE_EXE_LINKER_FLAGS=-stdlib=libc++",
+            "-DCMAKE_SHARED_LINKER_FLAGS=-stdlib=libc++"
+        ])
+    
     
     cmake.configure(
         cmake_source_dir=vendored_dir,
@@ -170,18 +180,22 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
                 # Apply -force_load to all audio libraries, not just opus
                 link_args.extend(["-Wl,-force_load", lib])
             
-            # Use explicit linking flags for better symbol resolution
+            # Add deployment target and C++ library linking for macOS compatibility
             link_args.extend([
-                "-Wl,-undefined,dynamic_lookup"  # Allow undefined symbols to be resolved at runtime
+                "-mmacosx-version-min=10.13",  # Match the wheel target
+                "-stdlib=libc++",              # Explicitly use libc++
+                "-lc++"                        # Link C++ standard library
             ])
             
             extension_args["extra_link_args"].extend(link_args)
             
-            # Suppress warnings from third-party headers
+            # Suppress warnings and set compilation flags for macOS compatibility
             if "extra_compile_args" not in extension_args:
                 extension_args["extra_compile_args"] = []
             extension_args["extra_compile_args"].extend([
-                "-Wno-unused-variable"  # Suppress warnings from third-party headers (vorbis)
+                "-Wno-unused-variable",          # Suppress warnings from third-party headers (vorbis)
+                "-mmacosx-version-min=10.13",    # Match the wheel target
+                "-stdlib=libc++"                 # Explicitly use libc++
             ])
             print(f"macOS: Using -force_load for ALL {len(existing_libs)} libraries with static C++ runtime")
         

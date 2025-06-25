@@ -1,395 +1,799 @@
-2025-06-25T13:38:41.5404957Z Current runner version: '2.325.0'
-2025-06-25T13:38:41.5426988Z ##[group]Runner Image Provisioner
-2025-06-25T13:38:41.5427801Z Hosted Compute Agent
-2025-06-25T13:38:41.5428414Z Version: 20250620.352
-2025-06-25T13:38:41.5429022Z Commit: f262f3aba23b10ea191b2a62bdee1ca4c3d344da
-2025-06-25T13:38:41.5429624Z Build Date: 2025-06-20T19:27:17Z
-2025-06-25T13:38:41.5430178Z ##[endgroup]
-2025-06-25T13:38:41.5430636Z ##[group]Operating System
-2025-06-25T13:38:41.5431121Z Microsoft Windows Server 2022
-2025-06-25T13:38:41.5431659Z 10.0.20348
-2025-06-25T13:38:41.5432049Z Datacenter
-2025-06-25T13:38:41.5432449Z ##[endgroup]
-2025-06-25T13:38:41.5432826Z ##[group]Runner Image
-2025-06-25T13:38:41.5433294Z Image: windows-2022
-2025-06-25T13:38:41.5433699Z Version: 20250602.1.0
-2025-06-25T13:38:41.5434622Z Included Software: https://github.com/actions/runner-images/blob/win22/20250602.1/images/windows/Windows2022-Readme.md
-2025-06-25T13:38:41.5436499Z Image Release: https://github.com/actions/runner-images/releases/tag/win22%2F20250602.1
-2025-06-25T13:38:41.5438203Z ##[endgroup]
-2025-06-25T13:38:41.5442499Z ##[group]GITHUB_TOKEN Permissions
-2025-06-25T13:38:41.5444972Z Actions: write
-2025-06-25T13:38:41.5445750Z Attestations: write
-2025-06-25T13:38:41.5446525Z Checks: write
-2025-06-25T13:38:41.5447206Z Contents: write
-2025-06-25T13:38:41.5447986Z Deployments: write
-2025-06-25T13:38:41.5448710Z Discussions: write
-2025-06-25T13:38:41.5449374Z Issues: write
-2025-06-25T13:38:41.5450116Z Metadata: read
-2025-06-25T13:38:41.5450816Z Models: read
-2025-06-25T13:38:41.5451522Z Packages: write
-2025-06-25T13:38:41.5452271Z Pages: write
-2025-06-25T13:38:41.5453014Z PullRequests: write
-2025-06-25T13:38:41.5453778Z RepositoryProjects: write
-2025-06-25T13:38:41.5454686Z SecurityEvents: write
-2025-06-25T13:38:41.5455536Z Statuses: write
-2025-06-25T13:38:41.5456255Z ##[endgroup]
-2025-06-25T13:38:41.5458930Z Secret source: Actions
-2025-06-25T13:38:41.5459947Z Prepare workflow directory
-2025-06-25T13:38:41.5805320Z Prepare all required actions
-2025-06-25T13:38:41.5840882Z Getting action download info
-2025-06-25T13:38:41.8159820Z ##[group]Download immutable action package 'actions/setup-python@v5'
-2025-06-25T13:38:41.8161343Z Version: 5.6.0
-2025-06-25T13:38:41.8162441Z Digest: sha256:0b35a0c11c97499e4e0576589036d450b9f5f9da74b7774225b3614b57324404
-2025-06-25T13:38:41.8163724Z Source commit SHA: a26af69be951a213d495a4c3e4e4022e16d87065
-2025-06-25T13:38:41.8164577Z ##[endgroup]
-2025-06-25T13:38:42.1924209Z ##[group]Download immutable action package 'actions/download-artifact@v4'
-2025-06-25T13:38:42.1924959Z Version: 4.3.0
-2025-06-25T13:38:42.1925639Z Digest: sha256:552a5b9ad918f62ec0c2e8f42f3c694d4ebd1b4036b18c39b14168fcdfc0e4f2
-2025-06-25T13:38:42.1926504Z Source commit SHA: d3f86a106a0bac45b974a628896c90dbdf5c8093
-2025-06-25T13:38:42.1927117Z ##[endgroup]
-2025-06-25T13:38:42.4580792Z Complete job name: Test Wheels on windows-latest (x64) Python 3.11
-2025-06-25T13:38:42.6636434Z ##[group]Run actions/setup-python@v5
-2025-06-25T13:38:42.6637489Z with:
-2025-06-25T13:38:42.6637850Z   python-version: 3.11
-2025-06-25T13:38:42.6638232Z   architecture: x64
-2025-06-25T13:38:42.6638590Z   check-latest: false
-2025-06-25T13:38:42.6639110Z   token: ***
-2025-06-25T13:38:42.6639458Z   update-environment: true
-2025-06-25T13:38:42.6639874Z   allow-prereleases: false
-2025-06-25T13:38:42.6640259Z   freethreaded: false
-2025-06-25T13:38:42.6640815Z ##[endgroup]
-2025-06-25T13:38:42.9487378Z ##[group]Installed versions
-2025-06-25T13:38:42.9714151Z Successfully set up CPython (3.11.9)
-2025-06-25T13:38:42.9715942Z ##[endgroup]
-2025-06-25T13:38:43.0101911Z ##[group]Run actions/download-artifact@v4
-2025-06-25T13:38:43.0103062Z with:
-2025-06-25T13:38:43.0103691Z   path: ~/artifacts
-2025-06-25T13:38:43.0104469Z   merge-multiple: false
-2025-06-25T13:38:43.0105285Z   repository: Ambro86/synthizer3d
-2025-06-25T13:38:43.0106165Z   run-id: 15877708838
-2025-06-25T13:38:43.0106867Z env:
-2025-06-25T13:38:43.0107764Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:38:43.0110836Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
-2025-06-25T13:38:43.0112456Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:38:43.0113938Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:38:43.0115451Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:38:43.0116686Z ##[endgroup]
-2025-06-25T13:38:43.3772637Z Found 30 artifact(s)
-2025-06-25T13:38:43.3774256Z No input name, artifact-ids or pattern filtered specified, downloading all artifacts
-2025-06-25T13:38:43.3775462Z An extra directory with the artifact name will be created for each download
-2025-06-25T13:38:43.3776419Z Preparing to download the following artifacts:
-2025-06-25T13:38:43.3777909Z - python-wheels-macos-x64-3.12 (ID: 3401530386, Size: 2230053, Expected Digest: sha256:833be6cf9e750935c5f579187cfe974452352b163b3bc8f9b6770b5692fd6e8d)
-2025-06-25T13:38:43.3780109Z - python-wheels-macos-arm64-3.9 (ID: 3401529592, Size: 2135534, Expected Digest: sha256:91d7773cf4935f5ae39b8972635ca6dbd6c6330f3e073ef38f67f6eb4a1ce3ee)
-2025-06-25T13:38:43.3782307Z - python-wheels-macos-arm64-3.10 (ID: 3401524779, Size: 2132976, Expected Digest: sha256:760ab958311d4ea4f000600ac08fe2a9b6c47cc006bffbbf9f96adf8bdf0133a)
-2025-06-25T13:38:43.3784432Z - python-wheels-macos-x64-3.11 (ID: 3401524476, Size: 2237797, Expected Digest: sha256:2f05e963475149f0416c62c8a9b6072c96d5f511498baa86551e179ffd0c0417)
-2025-06-25T13:38:43.3786706Z - python-wheels-win-x86-3.10 (ID: 3401514316, Size: 1745351, Expected Digest: sha256:6b4bc2db8561114825c5e1c5bf9bf1fc529d00a5def09dcf98703029d3fed01a)
-2025-06-25T13:38:43.3788832Z - python-wheels-win-x64-3.13 (ID: 3401513999, Size: 1931456, Expected Digest: sha256:7d691d434e72d2a53f2848f99d899827b693a2df3ef21695f101e1bde195a304)
-2025-06-25T13:38:43.3791040Z - python-wheels-win-x86-3.12 (ID: 3401511926, Size: 1741870, Expected Digest: sha256:e29fa4f80fb0eb058d819648607f2a4eed96d968727c3fbe49af2e8ab52e0cb2)
-2025-06-25T13:38:43.3793373Z - python-wheels-macos-arm64-3.12 (ID: 3401510011, Size: 2131303, Expected Digest: sha256:8f002f97accb5fea40e53e49c32fb6f245c70151071a0291ac9c72a326c5206a)
-2025-06-25T13:38:43.3795621Z - python-wheels-win-x86-3.11 (ID: 3401507400, Size: 1744914, Expected Digest: sha256:15146f6eec1a327a501c02b1735f6d6e501bb4c736f5f69256ccaec904fd6bd1)
-2025-06-25T13:38:43.3798015Z - python-wheels-macos-arm64-3.11 (ID: 3401499986, Size: 2137882, Expected Digest: sha256:4fa12ccf1c8805ecd6668db79828409d8b26bcda04b968e8c2161cd46864fd8d)
-2025-06-25T13:38:43.3800400Z - python-wheels-macos-arm64-3.8 (ID: 3401496550, Size: 2150660, Expected Digest: sha256:3eb1d1cae49de98b357bb92b5c74b70f1d73dad8dc5aa9a18c5a932afd2112ca)
-2025-06-25T13:38:43.3802692Z - python-wheels-win-x86-3.13 (ID: 3401493344, Size: 1741468, Expected Digest: sha256:824d8ce84adb5e7942356f67f9f833b3166fd2a774727eed1dcfadeab79c9e66)
-2025-06-25T13:38:43.3804921Z - python-wheels-win-x64-3.10 (ID: 3401490090, Size: 1930717, Expected Digest: sha256:cc4c73a80d1499d19a48665cbac1eabe2419cd234073cd4f793cca73bedcbeca)
-2025-06-25T13:38:43.3807168Z - python-wheels-win-x64-3.8 (ID: 3401488199, Size: 1972317, Expected Digest: sha256:b551cc062d55c8e67654d20822c4cdec5ce6afd3808ba257cbeb76e8a6dd19b3)
-2025-06-25T13:38:43.3809318Z - python-wheels-win-x86-3.8 (ID: 3401486710, Size: 1771116, Expected Digest: sha256:55caff46a61ffdecef4b02dc9f8d97407dd5441e9e212d55a9a326accec027f8)
-2025-06-25T13:38:43.3814751Z - python-wheels-macos-x64-3.8 (ID: 3401486193, Size: 2045661, Expected Digest: sha256:ca32429168fde7f64db2ac78cc771333bdb8c726584ecf53152850c0bc8c29f4)
-2025-06-25T13:38:43.3816998Z - python-wheels-macos-x64-3.10 (ID: 3401486128, Size: 2035988, Expected Digest: sha256:4ff44b4985cb2cb27ab248f3ec3de29f6fca4c50e18734f89388bfe210c3a786)
-2025-06-25T13:38:43.3818341Z - python-wheels-win-x64-3.11 (ID: 3401485027, Size: 1931502, Expected Digest: sha256:778b1a2f0844ef3c3d2018583d009edc5ef46ff390d776440e295e3bd5ce6fa1)
-2025-06-25T13:38:43.3820322Z - python-wheels-win-x64-3.12 (ID: 3401484131, Size: 1931511, Expected Digest: sha256:f45c6018e4b9857b1e6589de403ba47da9b909828466535f2c2b60a2e3b56319)
-2025-06-25T13:38:43.3821565Z - python-wheels-win-x86-3.9 (ID: 3401483794, Size: 1767227, Expected Digest: sha256:b6f51ade04cb004caf59bfd1a0db594daa1b9f2c1cc27a5bb62dd7a8f91dd828)
-2025-06-25T13:38:43.3822740Z - python-wheels-win-x64-3.9 (ID: 3401483680, Size: 1961086, Expected Digest: sha256:9e305f83f700e4b5953615bec2e8b2230a1c3cb8039f290ccd47d88a7438e844)
-2025-06-25T13:38:43.3823980Z - python-wheels-macos-x64-3.9 (ID: 3401479434, Size: 2036730, Expected Digest: sha256:d636db8ebfc1c3205e5f8d39007dfaa3ebb01120ae3a23c2984aa1e18c7ae9c1)
-2025-06-25T13:38:43.3825218Z - python-wheels-macos-x64-3.13 (ID: 3401478683, Size: 2227989, Expected Digest: sha256:cde7e6cdff2fbe840580cf3157f3a9b009ecee109b6bc416e90b1a76ba89445a)
-2025-06-25T13:38:43.3826456Z - python-wheels-linux-x86_64-3.13 (ID: 3401469463, Size: 2585137, Expected Digest: sha256:faeb5a7aa183e6e287d247c3e4c11f62911dd11ec1c08c5b00eedd59433fea24)
-2025-06-25T13:38:43.3828268Z - python-wheels-linux-x86_64-3.9 (ID: 3401469416, Size: 2566224, Expected Digest: sha256:16744dd38821a87da59df9fc8a71633abca6bfd8bdf010fc12f9866dfed5efce)
-2025-06-25T13:38:43.3829607Z - python-wheels-linux-x86_64-3.12 (ID: 3401468463, Size: 2584288, Expected Digest: sha256:c6e6aac636dc706dcb8bb354f1b677a2d09da555f35458eb5359a0072f5b6221)
-2025-06-25T13:38:43.3830857Z - python-wheels-linux-x86_64-3.11 (ID: 3401468209, Size: 2557104, Expected Digest: sha256:1b9bcf20b9aa276ffa97718929f2d0c7d46f399ff60c2035f23b7f79bd072c67)
-2025-06-25T13:38:43.3832071Z - python-wheels-linux-x86_64-3.10 (ID: 3401468142, Size: 2565038, Expected Digest: sha256:21d6ad8ab80f2aa8742cd5e0e91222f828f35f22a9d010ff9f0b1b832756b73a)
-2025-06-25T13:38:43.3833248Z - python-wheels-macos-arm64-3.13 (ID: 3401467760, Size: 2129102, Expected Digest: sha256:5511cd10713f334ced9d87c2bec04acc815a616d82723ce531c3d8de20d5d7c3)
-2025-06-25T13:38:43.3834439Z - python-wheels-linux-x86_64-3.8 (ID: 3401467493, Size: 2573565, Expected Digest: sha256:6cd40c5074803ee61826e43b665b16b2be3c7aa666050bc8914e565e9ba60633)
-2025-06-25T13:38:43.5232802Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-d28e2d42-5fa0-51f2-a9fc-00a0ac85f561/artifacts/e8c094ddb053ea9432191c725c600659cd24f5d5018fad1835fe5d2d7f61da56.zip
-2025-06-25T13:38:43.5235488Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.9
-2025-06-25T13:38:43.5379831Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-48914b95-fc5b-5853-b08e-527df9fd04e5/artifacts/d416f507f4b84ada6433b27e7071685a653ebb8b689f7ddcd83052068a0ae1f7.zip
-2025-06-25T13:38:43.5382886Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.10
-2025-06-25T13:38:43.5395169Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-232ebc07-7a35-531c-9112-3ad232743834/artifacts/78d92ab587ddab82418bd3504039845b7b5dfc1f3a57e796a34f0e8433d3b8a1.zip
-2025-06-25T13:38:43.5398152Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.10
-2025-06-25T13:38:43.5410338Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-7c8f35ca-1c94-5148-8463-cca50f0291e5/artifacts/25fda339dfa4367e9cadb9d9caa712faaa6758316a4e9a2950aa97fcf91812a0.zip
-2025-06-25T13:38:43.5413462Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.12
-2025-06-25T13:38:43.5452046Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-cccc7477-48bb-536e-924c-53a1d2912a4d/artifacts/082a60fe63bc013a5e7a1cbb0b2503644290895eb960e30ee671597f387ca7c7.zip
-2025-06-25T13:38:43.5455333Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.9
-2025-06-25T13:38:43.5473216Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-e76740f7-a8a3-54e9-87ac-6088296fe1df/artifacts/269874e9c8cc77ef486bb30772e665036af760c87a1b1c11fe833a3e043169f9.zip
-2025-06-25T13:38:43.5475221Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.11
-2025-06-25T13:38:43.5495076Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-e687c53a-913c-5d83-a04a-33150885b50d/artifacts/f7d28dd2f860c8fe68cb143bfcefdcee3297b1072229f2c584237a0e53b65039.zip
-2025-06-25T13:38:43.5498113Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.12
-2025-06-25T13:38:43.5510745Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-1a63440c-8529-5333-83c1-99e1ee06fdf7/artifacts/f1f803d05f733f77c3bcb91b154288dfe6cfc1b7f4fabc84bf62124909e88391.zip
-2025-06-25T13:38:43.5513843Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.13
-2025-06-25T13:38:43.5529059Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-c66aeabb-32ed-51e1-b411-06e262ac81a6/artifacts/74370f4b97bad93f11c175a3092a352c167270d2859fbeef54fe5353d896327c.zip
-2025-06-25T13:38:43.5532157Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.13
-2025-06-25T13:38:43.5552442Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-8f54ebf0-cfa8-5442-a9bd-26189153d385/artifacts/dfa6b5beaeab1e7b2ee456197e66ba9cd0cde258794525efb775f9d01d77a09f.zip
-2025-06-25T13:38:43.5555613Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.8
-2025-06-25T13:38:43.5589859Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-ab8f8ddf-c0f4-53de-81a2-c450f0481aed/artifacts/14390bd3dddb5a2d0d284a37dd89495d8e579902e22dc4e6d685367f5f0c6496.zip
-2025-06-25T13:38:43.5592285Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.11
-2025-06-25T13:38:43.5603381Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-57da8525-ce2a-5252-92ce-e45f3e70809e/artifacts/04379e136a390c45c61d9a4fed0ad4432e228d970138f83118e8caa0c1293f0f.zip
-2025-06-25T13:38:43.5606679Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.8
-2025-06-25T13:38:43.5623317Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-665c2d62-9274-57a9-b2bd-0c83ab33e8cf/artifacts/076f86604ef4623e5fc88e988957a8873314a83dee92c78f30b60b1d5fa074e8.zip
-2025-06-25T13:38:43.5627045Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.10
-2025-06-25T13:38:43.5652077Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-00053de5-5470-5e87-852e-908d4ebd0189/artifacts/62660b82998e9015cbb4dd51ae923d23c03cf6d0a8b8a946738a9130c152e896.zip
-2025-06-25T13:38:43.5654603Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.9
-2025-06-25T13:38:43.5678103Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-884febf7-7c46-5819-a1e8-b29e3530c94d/artifacts/20e12f440e70d8187b2fecdfc18730d2544a76a03618c3ae525fe3d9f279b41c.zip
-2025-06-25T13:38:43.5681666Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.13
-2025-06-25T13:38:43.5697743Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-970733a6-2fde-5a7b-9b2a-e97c4afbc227/artifacts/8d7800607f765346785b6986bfbf37b0cb74b38e474e5db09d71f25eb87a47b1.zip
-2025-06-25T13:38:43.5700129Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.8
-2025-06-25T13:38:43.5804337Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-936fde06-0c42-51aa-9683-fe0fdc22e515/artifacts/62d5436a0f007eedc494602cb3e0ed08ac8a2473f6dd4ec97c533d48e93baae6.zip
-2025-06-25T13:38:43.5807159Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.11
-2025-06-25T13:38:43.5852116Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-1c537e26-6ff4-502e-902c-06860c9a64fb/artifacts/4f517375a8dc5376634f89d15763f668d9ccbab3c4b0b1fe9f7970414eeacc3f.zip
-2025-06-25T13:38:43.5855216Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.9
-2025-06-25T13:38:43.5873304Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-3009c5c6-12aa-5cf2-860b-e2be7f2a2edf/artifacts/276564872c8256f59e4154f85436e9053a3dba120ea8cb7fdf9346f93aad610b.zip
-2025-06-25T13:38:43.5875418Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.9
-2025-06-25T13:38:43.5919318Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-8dd4b8ae-99f3-5fed-b545-934cc51dd23b/artifacts/ab89cd80986f81ebdfcccea52395976a9a6747c96328e0f2e131ebdf2bc1795d.zip
-2025-06-25T13:38:43.5921834Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.12
-2025-06-25T13:38:43.6123212Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-5b4141f7-6371-5ce1-ad5b-66b94506cc17/artifacts/6b196856d28affda31df5568c6a99396679e38a732c490d2ad26c324b5c6b296.zip
-2025-06-25T13:38:43.6125780Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.13
-2025-06-25T13:38:43.6138976Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-25bb3d23-58ec-5985-aa74-be9d293087bc/artifacts/048b880cfb4f3e87d3ba44a145ea6584ed71477b70aa2a87ed7fb588cebfdd3e.zip
-2025-06-25T13:38:43.6140999Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.10
-2025-06-25T13:38:43.6366320Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-1724b341-cc7d-54fd-9a93-9c99c2125d25/artifacts/2df465c311bc88371cd6ce0b95327f403d72a00facf7bedc80423a68dcf2f5dc.zip
-2025-06-25T13:38:43.6371854Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.8
-2025-06-25T13:38:43.6380698Z (node:5968) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
-2025-06-25T13:38:43.6382397Z (Use `node --trace-deprecation ...` to show where the warning was created)
-2025-06-25T13:38:43.6403416Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-48546b20-0d3b-59c4-aad2-5e92307b47e2/artifacts/f3a73c498c77b281b0074cd03aa17857b12ed1cb1f76ba2b002478b5c72e465e.zip
-2025-06-25T13:38:43.6405225Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.12
-2025-06-25T13:38:43.6419553Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-d63d56c4-d145-501d-9a5b-c6679eb1f603/artifacts/536ee8a18e9f042e0a29d71ccd62dd1f518c097da2d85b46167484953bb64d70.zip
-2025-06-25T13:38:43.6421351Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.13
-2025-06-25T13:38:43.6436886Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-1ebe312e-801b-5a4b-ba55-31d01bfd680c/artifacts/5f2da9a5cf9da68f0af93bc855115e496fc32ad44ab66a168cd48611159e4dd6.zip
-2025-06-25T13:38:43.6438698Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.11
-2025-06-25T13:38:43.6452386Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-a73417de-d297-567c-8e35-613a4d04290e/artifacts/84bcec2021028823bab61cbfb1f1b7d8cbc2b4cd89e36487ba17bbc1cb488e66.zip
-2025-06-25T13:38:43.6454211Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.12
-2025-06-25T13:38:43.6538158Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-02e87b45-8c41-5eca-aa46-d8be23d5569d/artifacts/c3df8263dadde41d27720c6338f16785f0bdba5cd5fb732bbb05ca0a475f7f85.zip
-2025-06-25T13:38:43.6541059Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.8
-2025-06-25T13:38:43.6662064Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-47d8d8eb-8551-5bdd-8898-195c0629c882/artifacts/4e32060ebb035c2d4f15b177febdcd3ed0cc246b4678968d33bc45ab5ddfd0a1.zip
-2025-06-25T13:38:43.6664104Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.11
-2025-06-25T13:38:43.6676621Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-27df42f3-bb5b-5c17-8b02-8bec654cdc68/artifacts/cf59fa52b1948a2a5bacba85a4eef0372cd96fd66e28e1b3d6bcd9ffb0351a29.zip
-2025-06-25T13:38:43.6678846Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.10
-2025-06-25T13:38:44.5153244Z SHA256 digest of downloaded artifact is 6b4bc2db8561114825c5e1c5bf9bf1fc529d00a5def09dcf98703029d3fed01a
-2025-06-25T13:38:44.5155773Z Artifact download completed successfully.
-2025-06-25T13:38:44.5183451Z SHA256 digest of downloaded artifact is e29fa4f80fb0eb058d819648607f2a4eed96d968727c3fbe49af2e8ab52e0cb2
-2025-06-25T13:38:44.5184242Z Artifact download completed successfully.
-2025-06-25T13:38:44.5241540Z SHA256 digest of downloaded artifact is 824d8ce84adb5e7942356f67f9f833b3166fd2a774727eed1dcfadeab79c9e66
-2025-06-25T13:38:44.5243181Z Artifact download completed successfully.
-2025-06-25T13:38:44.5328480Z SHA256 digest of downloaded artifact is 15146f6eec1a327a501c02b1735f6d6e501bb4c736f5f69256ccaec904fd6bd1
-2025-06-25T13:38:44.5329399Z Artifact download completed successfully.
-2025-06-25T13:38:44.5349583Z SHA256 digest of downloaded artifact is b6f51ade04cb004caf59bfd1a0db594daa1b9f2c1cc27a5bb62dd7a8f91dd828
-2025-06-25T13:38:44.5350455Z Artifact download completed successfully.
-2025-06-25T13:38:44.5575542Z SHA256 digest of downloaded artifact is 55caff46a61ffdecef4b02dc9f8d97407dd5441e9e212d55a9a326accec027f8
-2025-06-25T13:38:44.5581771Z Artifact download completed successfully.
-2025-06-25T13:38:44.5791480Z SHA256 digest of downloaded artifact is cc4c73a80d1499d19a48665cbac1eabe2419cd234073cd4f793cca73bedcbeca
-2025-06-25T13:38:44.5792950Z Artifact download completed successfully.
-2025-06-25T13:38:44.5860683Z SHA256 digest of downloaded artifact is 7d691d434e72d2a53f2848f99d899827b693a2df3ef21695f101e1bde195a304
-2025-06-25T13:38:44.5861465Z Artifact download completed successfully.
-2025-06-25T13:38:44.5909337Z SHA256 digest of downloaded artifact is f45c6018e4b9857b1e6589de403ba47da9b909828466535f2c2b60a2e3b56319
-2025-06-25T13:38:44.5911224Z Artifact download completed successfully.
-2025-06-25T13:38:44.5955447Z SHA256 digest of downloaded artifact is b551cc062d55c8e67654d20822c4cdec5ce6afd3808ba257cbeb76e8a6dd19b3
-2025-06-25T13:38:44.5956239Z Artifact download completed successfully.
-2025-06-25T13:38:44.5960908Z SHA256 digest of downloaded artifact is 9e305f83f700e4b5953615bec2e8b2230a1c3cb8039f290ccd47d88a7438e844
-2025-06-25T13:38:44.5962128Z Artifact download completed successfully.
-2025-06-25T13:38:44.6045154Z SHA256 digest of downloaded artifact is 778b1a2f0844ef3c3d2018583d009edc5ef46ff390d776440e295e3bd5ce6fa1
-2025-06-25T13:38:44.6046419Z Artifact download completed successfully.
-2025-06-25T13:38:44.6095842Z SHA256 digest of downloaded artifact is 4ff44b4985cb2cb27ab248f3ec3de29f6fca4c50e18734f89388bfe210c3a786
-2025-06-25T13:38:44.6097019Z Artifact download completed successfully.
-2025-06-25T13:38:44.6158950Z SHA256 digest of downloaded artifact is d636db8ebfc1c3205e5f8d39007dfaa3ebb01120ae3a23c2984aa1e18c7ae9c1
-2025-06-25T13:38:44.6160079Z Artifact download completed successfully.
-2025-06-25T13:38:44.6200922Z SHA256 digest of downloaded artifact is ca32429168fde7f64db2ac78cc771333bdb8c726584ecf53152850c0bc8c29f4
-2025-06-25T13:38:44.6202331Z Artifact download completed successfully.
-2025-06-25T13:38:44.6269221Z SHA256 digest of downloaded artifact is 91d7773cf4935f5ae39b8972635ca6dbd6c6330f3e073ef38f67f6eb4a1ce3ee
-2025-06-25T13:38:44.6270553Z Artifact download completed successfully.
-2025-06-25T13:38:44.6286614Z SHA256 digest of downloaded artifact is 4fa12ccf1c8805ecd6668db79828409d8b26bcda04b968e8c2161cd46864fd8d
-2025-06-25T13:38:44.6287862Z Artifact download completed successfully.
-2025-06-25T13:38:44.6308606Z SHA256 digest of downloaded artifact is 5511cd10713f334ced9d87c2bec04acc815a616d82723ce531c3d8de20d5d7c3
-2025-06-25T13:38:44.6309862Z Artifact download completed successfully.
-2025-06-25T13:38:44.6349007Z SHA256 digest of downloaded artifact is 3eb1d1cae49de98b357bb92b5c74b70f1d73dad8dc5aa9a18c5a932afd2112ca
-2025-06-25T13:38:44.6350140Z Artifact download completed successfully.
-2025-06-25T13:38:44.6417485Z SHA256 digest of downloaded artifact is 8f002f97accb5fea40e53e49c32fb6f245c70151071a0291ac9c72a326c5206a
-2025-06-25T13:38:44.6418771Z Artifact download completed successfully.
-2025-06-25T13:38:44.6438241Z SHA256 digest of downloaded artifact is 833be6cf9e750935c5f579187cfe974452352b163b3bc8f9b6770b5692fd6e8d
-2025-06-25T13:38:44.6439124Z Artifact download completed successfully.
-2025-06-25T13:38:44.6445032Z SHA256 digest of downloaded artifact is 760ab958311d4ea4f000600ac08fe2a9b6c47cc006bffbbf9f96adf8bdf0133a
-2025-06-25T13:38:44.6446010Z Artifact download completed successfully.
-2025-06-25T13:38:44.6461371Z SHA256 digest of downloaded artifact is 2f05e963475149f0416c62c8a9b6072c96d5f511498baa86551e179ffd0c0417
-2025-06-25T13:38:44.6462541Z Artifact download completed successfully.
-2025-06-25T13:38:44.6509621Z SHA256 digest of downloaded artifact is cde7e6cdff2fbe840580cf3157f3a9b009ecee109b6bc416e90b1a76ba89445a
-2025-06-25T13:38:44.6510987Z Artifact download completed successfully.
-2025-06-25T13:38:44.6663967Z SHA256 digest of downloaded artifact is 16744dd38821a87da59df9fc8a71633abca6bfd8bdf010fc12f9866dfed5efce
-2025-06-25T13:38:44.6665221Z Artifact download completed successfully.
-2025-06-25T13:38:44.6711069Z SHA256 digest of downloaded artifact is 21d6ad8ab80f2aa8742cd5e0e91222f828f35f22a9d010ff9f0b1b832756b73a
-2025-06-25T13:38:44.6712692Z Artifact download completed successfully.
-2025-06-25T13:38:44.6715464Z SHA256 digest of downloaded artifact is 6cd40c5074803ee61826e43b665b16b2be3c7aa666050bc8914e565e9ba60633
-2025-06-25T13:38:44.6716509Z Artifact download completed successfully.
-2025-06-25T13:38:44.6717491Z SHA256 digest of downloaded artifact is faeb5a7aa183e6e287d247c3e4c11f62911dd11ec1c08c5b00eedd59433fea24
-2025-06-25T13:38:44.6718650Z Artifact download completed successfully.
-2025-06-25T13:38:44.6720337Z SHA256 digest of downloaded artifact is 1b9bcf20b9aa276ffa97718929f2d0c7d46f399ff60c2035f23b7f79bd072c67
-2025-06-25T13:38:44.6721360Z Artifact download completed successfully.
-2025-06-25T13:38:44.6722394Z SHA256 digest of downloaded artifact is c6e6aac636dc706dcb8bb354f1b677a2d09da555f35458eb5359a0072f5b6221
-2025-06-25T13:38:44.6723534Z Artifact download completed successfully.
-2025-06-25T13:38:44.6724247Z Total of 30 artifact(s) downloaded
-2025-06-25T13:38:44.6733566Z Download artifact has finished successfully
-2025-06-25T13:38:44.7048613Z ##[group]Run echo "📂 Available artifacts:"
-2025-06-25T13:38:44.7049205Z [36;1mecho "📂 Available artifacts:"[0m
-2025-06-25T13:38:44.7049627Z [36;1mls -la ~/artifacts/[0m
-2025-06-25T13:38:44.7050058Z [36;1mfind ~/artifacts -name "*.whl" | head -10[0m
-2025-06-25T13:38:44.7303508Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
-2025-06-25T13:38:44.7304181Z env:
-2025-06-25T13:38:44.7304680Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:38:44.7305437Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
-2025-06-25T13:38:44.7306228Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:38:44.7306957Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:38:44.7307622Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:38:44.7308190Z ##[endgroup]
-2025-06-25T13:38:45.1696172Z 📂 Available artifacts:
-2025-06-25T13:38:45.2268359Z total 20
-2025-06-25T13:38:45.2268905Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 .
-2025-06-25T13:38:45.2270042Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 ..
-2025-06-25T13:38:45.2271091Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-linux-x86_64-3.10
-2025-06-25T13:38:45.2272486Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-linux-x86_64-3.11
-2025-06-25T13:38:45.2273379Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-linux-x86_64-3.12
-2025-06-25T13:38:45.2274585Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-linux-x86_64-3.13
-2025-06-25T13:38:45.2275573Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-linux-x86_64-3.8
-2025-06-25T13:38:45.2276438Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-linux-x86_64-3.9
-2025-06-25T13:38:45.2277479Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-arm64-3.10
-2025-06-25T13:38:45.2278381Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-arm64-3.11
-2025-06-25T13:38:45.2279257Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-arm64-3.12
-2025-06-25T13:38:45.2280242Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-arm64-3.13
-2025-06-25T13:38:45.2281107Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-arm64-3.8
-2025-06-25T13:38:45.2281986Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-arm64-3.9
-2025-06-25T13:38:45.2282853Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-x64-3.10
-2025-06-25T13:38:45.2283710Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-x64-3.11
-2025-06-25T13:38:45.2284545Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-x64-3.12
-2025-06-25T13:38:45.2285388Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-x64-3.13
-2025-06-25T13:38:45.2286434Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-x64-3.8
-2025-06-25T13:38:45.2287052Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-x64-3.9
-2025-06-25T13:38:45.2287661Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x64-3.10
-2025-06-25T13:38:45.2288269Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x64-3.11
-2025-06-25T13:38:45.2288878Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x64-3.12
-2025-06-25T13:38:45.2289536Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x64-3.13
-2025-06-25T13:38:45.2290589Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x64-3.8
-2025-06-25T13:38:45.2291653Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x64-3.9
-2025-06-25T13:38:45.2292709Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x86-3.10
-2025-06-25T13:38:45.2293815Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x86-3.11
-2025-06-25T13:38:45.2294901Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x86-3.12
-2025-06-25T13:38:45.2298088Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x86-3.13
-2025-06-25T13:38:45.2299205Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x86-3.8
-2025-06-25T13:38:45.2300273Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x86-3.9
-2025-06-25T13:38:45.2876365Z /c/Users/runneradmin/artifacts/python-wheels-linux-x86_64-3.10/synthizer3d-0.14.0-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
-2025-06-25T13:38:45.2879462Z /c/Users/runneradmin/artifacts/python-wheels-linux-x86_64-3.11/synthizer3d-0.14.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
-2025-06-25T13:38:45.2881481Z /c/Users/runneradmin/artifacts/python-wheels-linux-x86_64-3.12/synthizer3d-0.14.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
-2025-06-25T13:38:45.2883965Z /c/Users/runneradmin/artifacts/python-wheels-linux-x86_64-3.13/synthizer3d-0.14.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
-2025-06-25T13:38:45.2886863Z /c/Users/runneradmin/artifacts/python-wheels-linux-x86_64-3.8/synthizer3d-0.14.0-cp38-cp38-manylinux_2_28_x86_64.whl
-2025-06-25T13:38:45.2889512Z /c/Users/runneradmin/artifacts/python-wheels-linux-x86_64-3.9/synthizer3d-0.14.0-cp39-cp39-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
-2025-06-25T13:38:45.2891348Z /c/Users/runneradmin/artifacts/python-wheels-macos-arm64-3.10/synthizer3d-0.14.0-cp310-cp310-macosx_10_13_universal2.whl
-2025-06-25T13:38:45.2893150Z /c/Users/runneradmin/artifacts/python-wheels-macos-arm64-3.11/synthizer3d-0.14.0-cp311-cp311-macosx_10_13_universal2.whl
-2025-06-25T13:38:45.2894899Z /c/Users/runneradmin/artifacts/python-wheels-macos-arm64-3.12/synthizer3d-0.14.0-cp312-cp312-macosx_10_13_universal2.whl
-2025-06-25T13:38:45.2896643Z /c/Users/runneradmin/artifacts/python-wheels-macos-arm64-3.13/synthizer3d-0.14.0-cp313-cp313-macosx_10_13_universal2.whl
-2025-06-25T13:38:45.3025825Z ##[group]Run echo "🔍 Looking for wheels compatible with this platform..."
-2025-06-25T13:38:45.3026624Z [36;1mecho "🔍 Looking for wheels compatible with this platform..."[0m
-2025-06-25T13:38:45.3027106Z [36;1m[0m
-2025-06-25T13:38:45.3027471Z [36;1m# Determine platform and architecture patterns[0m
-2025-06-25T13:38:45.3027952Z [36;1mcase "windows-latest" in[0m
-2025-06-25T13:38:45.3028314Z [36;1m  ubuntu-*)[0m
-2025-06-25T13:38:45.3028641Z [36;1m    PLATFORM_PATTERN="linux"[0m
-2025-06-25T13:38:45.3029017Z [36;1m    ARCH_PATTERN="x86_64"[0m
-2025-06-25T13:38:45.3029373Z [36;1m    ;;[0m
-2025-06-25T13:38:45.3029662Z [36;1m  windows-*)[0m
-2025-06-25T13:38:45.3045429Z [36;1m    PLATFORM_PATTERN="win"[0m
-2025-06-25T13:38:45.3046039Z [36;1m    if [ "x64" = "x86" ]; then[0m
-2025-06-25T13:38:45.3046784Z [36;1m      ARCH_PATTERN="32"[0m
-2025-06-25T13:38:45.3047346Z [36;1m    else[0m
-2025-06-25T13:38:45.3047663Z [36;1m      ARCH_PATTERN="amd64"[0m
-2025-06-25T13:38:45.3048818Z [36;1m    fi[0m
-2025-06-25T13:38:45.3049110Z [36;1m    ;;[0m
-2025-06-25T13:38:45.3049404Z [36;1m  macos-13)[0m
-2025-06-25T13:38:45.3049730Z [36;1m    PLATFORM_PATTERN="macosx"[0m
-2025-06-25T13:38:45.3050102Z [36;1m    ARCH_PATTERN="x64"[0m
-2025-06-25T13:38:45.3050441Z [36;1m    ;;[0m
-2025-06-25T13:38:45.3050733Z [36;1m  macos-latest)[0m
-2025-06-25T13:38:45.3051068Z [36;1m    PLATFORM_PATTERN="macosx"[0m
-2025-06-25T13:38:45.3051442Z [36;1m    ARCH_PATTERN="arm64"[0m
-2025-06-25T13:38:45.3051777Z [36;1m    ;;[0m
-2025-06-25T13:38:45.3052051Z [36;1mesac[0m
-2025-06-25T13:38:45.3052321Z [36;1m[0m
-2025-06-25T13:38:45.3052691Z [36;1m# Find Python version pattern (e.g., "3.11" -> "cp311")[0m
-2025-06-25T13:38:45.3053152Z [36;1mPY_VERSION=$(echo "3.11" | sed 's/\.//')[0m
-2025-06-25T13:38:45.3053554Z [36;1mPY_PATTERN="cp${PY_VERSION}"[0m
-2025-06-25T13:38:45.3053907Z [36;1m[0m
-2025-06-25T13:38:45.3054321Z [36;1mecho "🔎 Searching for: *${PY_PATTERN}*${PLATFORM_PATTERN}* (arch: x64)"[0m
-2025-06-25T13:38:45.3054790Z [36;1m[0m
-2025-06-25T13:38:45.3055271Z [36;1m# Find matching wheel - try with architecture pattern first, then fallback to platform only[0m
-2025-06-25T13:38:45.3056118Z [36;1mWHEEL_FILE=$(find ~/artifacts -name "*.whl" | grep -i "${PY_PATTERN}" | grep -i "${PLATFORM_PATTERN}" | grep -i "${ARCH_PATTERN}" | head -1)[0m
-2025-06-25T13:38:45.3056746Z [36;1m[0m
-2025-06-25T13:38:45.3057136Z [36;1m# If no exact arch match, try just platform (for universal wheels)[0m
-2025-06-25T13:38:45.3057600Z [36;1mif [ -z "$WHEEL_FILE" ]; then[0m
-2025-06-25T13:38:45.3058187Z [36;1m  WHEEL_FILE=$(find ~/artifacts -name "*.whl" | grep -i "${PY_PATTERN}" | grep -i "${PLATFORM_PATTERN}" | head -1)[0m
-2025-06-25T13:38:45.3058749Z [36;1mfi[0m
-2025-06-25T13:38:45.3059013Z [36;1m[0m
-2025-06-25T13:38:45.3059279Z [36;1mif [ -z "$WHEEL_FILE" ]; then[0m
-2025-06-25T13:38:45.3059772Z [36;1m  echo "⚠️  No compatible wheel found for Python 3.11 on windows-latest"[0m
-2025-06-25T13:38:45.3060260Z [36;1m  echo "Available wheels:"[0m
-2025-06-25T13:38:45.3060665Z [36;1m  find ~/artifacts -name "*.whl" | head -5[0m
-2025-06-25T13:38:45.3061103Z [36;1m  exit 0  # Skip test but don't fail the job[0m
-2025-06-25T13:38:45.3061477Z [36;1mfi[0m
-2025-06-25T13:38:45.3061747Z [36;1m[0m
-2025-06-25T13:38:45.3062084Z [36;1mecho "✅ Found wheel: $(basename "$WHEEL_FILE")"[0m
-2025-06-25T13:38:45.3062504Z [36;1mecho "📦 Installing wheel..."[0m
-2025-06-25T13:38:45.3062874Z [36;1mpip install "$WHEEL_FILE"[0m
-2025-06-25T13:38:45.3063215Z [36;1m[0m
-2025-06-25T13:38:45.3063492Z [36;1mecho "🧪 Testing import..."[0m
-2025-06-25T13:38:45.3063878Z [36;1mpython -c "[0m
-2025-06-25T13:38:45.3064168Z [36;1mtry:[0m
-2025-06-25T13:38:45.3064458Z [36;1m    import synthizer[0m
-2025-06-25T13:38:45.3064884Z [36;1m    print('✅ SUCCESS: synthizer imported successfully')[0m
-2025-06-25T13:38:45.3065297Z [36;1m    [0m
-2025-06-25T13:38:45.3066965Z [36;1m    # Basic functionality test[0m
-2025-06-25T13:38:45.3067408Z [36;1m    synthizer.initialize()[0m
-2025-06-25T13:38:45.3067794Z [36;1m    ctx = synthizer.Context()[0m
-2025-06-25T13:38:45.3068266Z [36;1m    print('✅ SUCCESS: Basic synthizer functionality works')[0m
-2025-06-25T13:38:45.3068718Z [36;1m    synthizer.shutdown()[0m
-2025-06-25T13:38:45.3069063Z [36;1m    [0m
-2025-06-25T13:38:45.3069371Z [36;1mexcept Exception as e:[0m
-2025-06-25T13:38:45.3069749Z [36;1m    print(f'❌ FAILED: {e}')[0m
-2025-06-25T13:38:45.3070130Z [36;1m    import traceback[0m
-2025-06-25T13:38:45.3070483Z [36;1m    traceback.print_exc()[0m
-2025-06-25T13:38:45.3070831Z [36;1m    exit(1)[0m
-2025-06-25T13:38:45.3071121Z [36;1m"[0m
-2025-06-25T13:38:45.3071383Z [36;1m[0m
-2025-06-25T13:38:45.3071703Z [36;1mecho "🎉 Wheel test completed successfully!"[0m
-2025-06-25T13:38:45.3083440Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
-2025-06-25T13:38:45.3084064Z env:
-2025-06-25T13:38:45.3084458Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:38:45.3085023Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
-2025-06-25T13:38:45.3085591Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:38:45.3086124Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:38:45.3086646Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:38:45.3087078Z ##[endgroup]
-2025-06-25T13:38:45.3347604Z 🔍 Looking for wheels compatible with this platform...
-2025-06-25T13:38:45.3865661Z 🔎 Searching for: *cp311*win* (arch: x64)
-2025-06-25T13:38:45.4973524Z ✅ Found wheel: synthizer3d-0.14.0-cp311-cp311-win_amd64.whl
-2025-06-25T13:38:45.4974648Z 📦 Installing wheel...
-2025-06-25T13:38:49.7410594Z Processing c:\users\runneradmin\artifacts\python-wheels-win-x64-3.11\synthizer3d-0.14.0-cp311-cp311-win_amd64.whl
-2025-06-25T13:38:49.7931623Z Installing collected packages: synthizer3d
-2025-06-25T13:38:49.8661854Z Successfully installed synthizer3d-0.14.0
-2025-06-25T13:38:50.0418786Z 🧪 Testing import...
-2025-06-25T13:38:50.1265518Z Traceback (most recent call last):
-2025-06-25T13:38:50.1272526Z   File "<string>", line 4, in <module>
-2025-06-25T13:38:50.1273567Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\encodings\cp1252.py", line 19, in encode
-2025-06-25T13:38:50.1309415Z     return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-2025-06-25T13:38:50.1310426Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2025-06-25T13:38:50.1311479Z UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>
-2025-06-25T13:38:50.1312291Z 
-2025-06-25T13:38:50.1312782Z During handling of the above exception, another exception occurred:
-2025-06-25T13:38:50.1313402Z 
-2025-06-25T13:38:50.1313691Z Traceback (most recent call last):
-2025-06-25T13:38:50.1314346Z   File "<string>", line 13, in <module>
-2025-06-25T13:38:50.1315273Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\encodings\cp1252.py", line 19, in encode
-2025-06-25T13:38:50.1316261Z     return codecs.charmap_encode(input,self.errors,encoding_table)[0]
-2025-06-25T13:38:50.1317004Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2025-06-25T13:38:50.1317960Z UnicodeEncodeError: 'charmap' codec can't encode character '\u274c' in position 0: character maps to <undefined>
-2025-06-25T13:38:50.1404886Z ##[error]Process completed with exit code 1.
-2025-06-25T13:38:50.1473880Z Cleaning up orphan processes
+2025-06-25T13:46:21.5896180Z Current runner version: '2.325.0'
+2025-06-25T13:46:21.5933960Z ##[group]Operating System
+2025-06-25T13:46:21.5935030Z macOS
+2025-06-25T13:46:21.5935530Z 13.7.6
+2025-06-25T13:46:21.5936020Z 22H625
+2025-06-25T13:46:21.5936560Z ##[endgroup]
+2025-06-25T13:46:21.5937120Z ##[group]Runner Image
+2025-06-25T13:46:21.5937890Z Image: macos-13
+2025-06-25T13:46:21.5938440Z Version: 20250623.1267
+2025-06-25T13:46:21.5939870Z Included Software: https://github.com/actions/runner-images/blob/macos-13/20250623.1267/images/macos/macos-13-Readme.md
+2025-06-25T13:46:21.5942180Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-13%2F20250623.1267
+2025-06-25T13:46:21.5943400Z ##[endgroup]
+2025-06-25T13:46:21.5944000Z ##[group]Runner Image Provisioner
+2025-06-25T13:46:21.5944960Z 2.0.437.1+b8a73daf41ec39b19236c1d542c9f2348c5b7c2d
+2025-06-25T13:46:21.5945880Z ##[endgroup]
+2025-06-25T13:46:21.5949340Z ##[group]GITHUB_TOKEN Permissions
+2025-06-25T13:46:21.5952140Z Actions: write
+2025-06-25T13:46:21.5953060Z Attestations: write
+2025-06-25T13:46:21.5953640Z Checks: write
+2025-06-25T13:46:21.5954280Z Contents: write
+2025-06-25T13:46:21.5954830Z Deployments: write
+2025-06-25T13:46:21.5955370Z Discussions: write
+2025-06-25T13:46:21.5956040Z Issues: write
+2025-06-25T13:46:21.5956560Z Metadata: read
+2025-06-25T13:46:21.5957700Z Models: read
+2025-06-25T13:46:21.5958290Z Packages: write
+2025-06-25T13:46:21.5958800Z Pages: write
+2025-06-25T13:46:21.5959320Z PullRequests: write
+2025-06-25T13:46:21.5960230Z RepositoryProjects: write
+2025-06-25T13:46:21.5960830Z SecurityEvents: write
+2025-06-25T13:46:21.5961370Z Statuses: write
+2025-06-25T13:46:21.5962090Z ##[endgroup]
+2025-06-25T13:46:21.5964830Z Secret source: Actions
+2025-06-25T13:46:21.5965680Z Prepare workflow directory
+2025-06-25T13:46:21.6731300Z Prepare all required actions
+2025-06-25T13:46:21.6776560Z Getting action download info
+2025-06-25T13:46:22.1134800Z ##[group]Download immutable action package 'actions/checkout@v4'
+2025-06-25T13:46:22.1136190Z Version: 4.2.2
+2025-06-25T13:46:22.1137500Z Digest: sha256:ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1
+2025-06-25T13:46:22.1139160Z Source commit SHA: 11bd71901bbe5b1630ceea73d27597364c9af683
+2025-06-25T13:46:22.1140050Z ##[endgroup]
+2025-06-25T13:46:22.4478290Z ##[group]Download immutable action package 'actions/setup-python@v5'
+2025-06-25T13:46:22.4559000Z Version: 5.6.0
+2025-06-25T13:46:22.4561150Z Digest: sha256:0b35a0c11c97499e4e0576589036d450b9f5f9da74b7774225b3614b57324404
+2025-06-25T13:46:22.4566080Z Source commit SHA: a26af69be951a213d495a4c3e4e4022e16d87065
+2025-06-25T13:46:22.4567160Z ##[endgroup]
+2025-06-25T13:46:23.4738960Z ##[group]Download immutable action package 'actions/cache@v4'
+2025-06-25T13:46:23.4740950Z Version: 4.2.3
+2025-06-25T13:46:23.4742400Z Digest: sha256:c8a3bb963e1f1826d8fcc8d1354f0dd29d8ac1db1d4f6f20247055ae11b81ed9
+2025-06-25T13:46:23.4744900Z Source commit SHA: 5a3ec84eff668545956fd18022155c47e93e2684
+2025-06-25T13:46:23.4746710Z ##[endgroup]
+2025-06-25T13:46:23.5938500Z Download action repository 'lukka/run-vcpkg@v11' (SHA:7d259227a1fb6471a0253dd5ab7419835228f7d7)
+2025-06-25T13:46:24.6552980Z ##[group]Download immutable action package 'actions/upload-artifact@v4'
+2025-06-25T13:46:24.6554170Z Version: 4.6.2
+2025-06-25T13:46:24.6554960Z Digest: sha256:290722aa3281d5caf23d0acdc3dbeb3424786a1a01a9cc97e72f147225e37c38
+2025-06-25T13:46:24.6556020Z Source commit SHA: ea165f8d65b6e75b540449e92b4886f43607fa02
+2025-06-25T13:46:24.6556750Z ##[endgroup]
+2025-06-25T13:46:24.9443730Z Complete job name: Build macOS (x64) Python 3.11
+2025-06-25T13:46:25.0101220Z ##[group]Run actions/checkout@v4
+2025-06-25T13:46:25.0102350Z with:
+2025-06-25T13:46:25.0102850Z   submodules: recursive
+2025-06-25T13:46:25.0103410Z   repository: Ambro86/synthizer3d
+2025-06-25T13:46:25.0104310Z   token: ***
+2025-06-25T13:46:25.0104780Z   ssh-strict: true
+2025-06-25T13:46:25.0105740Z   ssh-user: git
+2025-06-25T13:46:25.0106260Z   persist-credentials: true
+2025-06-25T13:46:25.0106810Z   clean: true
+2025-06-25T13:46:25.0108210Z   sparse-checkout-cone-mode: true
+2025-06-25T13:46:25.0108820Z   fetch-depth: 1
+2025-06-25T13:46:25.0109300Z   fetch-tags: false
+2025-06-25T13:46:25.0109790Z   show-progress: true
+2025-06-25T13:46:25.0110280Z   lfs: false
+2025-06-25T13:46:25.0110760Z   set-safe-directory: true
+2025-06-25T13:46:25.0111710Z env:
+2025-06-25T13:46:25.0112160Z   PYVERSION: 3.11
+2025-06-25T13:46:25.0113470Z   TARGET_ARCH: x64
+2025-06-25T13:46:25.0114150Z   VCPKG_DEFAULT_TRIPLET: x64-osx
+2025-06-25T13:46:25.0114720Z ##[endgroup]
+2025-06-25T13:46:25.3864750Z Syncing repository: Ambro86/synthizer3d
+2025-06-25T13:46:25.3866680Z ##[group]Getting Git version info
+2025-06-25T13:46:25.3867420Z Working directory is '/Users/runner/work/synthizer3d/synthizer3d'
+2025-06-25T13:46:25.3868490Z [command]/usr/local/bin/git version
+2025-06-25T13:46:25.4219140Z git version 2.50.0
+2025-06-25T13:46:25.4259740Z ##[endgroup]
+2025-06-25T13:46:25.4281830Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/bf67d86e-e3a0-49eb-82f7-589131a11f9f/.gitconfig'
+2025-06-25T13:46:25.4295860Z Temporarily overriding HOME='/Users/runner/work/_temp/bf67d86e-e3a0-49eb-82f7-589131a11f9f' before making global git config changes
+2025-06-25T13:46:25.4297380Z Adding repository directory to the temporary git global config as a safe directory
+2025-06-25T13:46:25.4301580Z [command]/usr/local/bin/git config --global --add safe.directory /Users/runner/work/synthizer3d/synthizer3d
+2025-06-25T13:46:25.4427190Z Deleting the contents of '/Users/runner/work/synthizer3d/synthizer3d'
+2025-06-25T13:46:25.4432650Z ##[group]Initializing the repository
+2025-06-25T13:46:25.4441790Z [command]/usr/local/bin/git init /Users/runner/work/synthizer3d/synthizer3d
+2025-06-25T13:46:25.4710820Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-06-25T13:46:25.4712650Z hint: is subject to change. To configure the initial branch name to use in all
+2025-06-25T13:46:25.4714430Z hint: of your new repositories, which will suppress this warning, call:
+2025-06-25T13:46:25.4715890Z hint:
+2025-06-25T13:46:25.4716540Z hint: 	git config --global init.defaultBranch <name>
+2025-06-25T13:46:25.4717460Z hint:
+2025-06-25T13:46:25.4718120Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-06-25T13:46:25.4719190Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-06-25T13:46:25.4720080Z hint:
+2025-06-25T13:46:25.4720480Z hint: 	git branch -m <name>
+2025-06-25T13:46:25.4720960Z hint:
+2025-06-25T13:46:25.4721620Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-06-25T13:46:25.4722780Z Initialized empty Git repository in /Users/runner/work/synthizer3d/synthizer3d/.git/
+2025-06-25T13:46:25.4729830Z [command]/usr/local/bin/git remote add origin https://github.com/Ambro86/synthizer3d
+2025-06-25T13:46:25.4827690Z ##[endgroup]
+2025-06-25T13:46:25.4828470Z ##[group]Disabling automatic garbage collection
+2025-06-25T13:46:25.4834380Z [command]/usr/local/bin/git config --local gc.auto 0
+2025-06-25T13:46:25.4920960Z ##[endgroup]
+2025-06-25T13:46:25.4921850Z ##[group]Setting up auth
+2025-06-25T13:46:25.4931310Z [command]/usr/local/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-06-25T13:46:25.5003650Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-06-25T13:46:25.6098870Z [command]/usr/local/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-06-25T13:46:25.6186120Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-06-25T13:46:25.7478610Z [command]/usr/local/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-06-25T13:46:25.7483900Z ##[endgroup]
+2025-06-25T13:46:25.7486140Z ##[group]Fetching the repository
+2025-06-25T13:46:25.7487700Z [command]/usr/local/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +aa8cb33037c09c09c07f2445f39b2e93865dbdc1:refs/remotes/origin/master
+2025-06-25T13:46:27.3194240Z From https://github.com/Ambro86/synthizer3d
+2025-06-25T13:46:27.3196010Z  * [new ref]         aa8cb33037c09c09c07f2445f39b2e93865dbdc1 -> origin/master
+2025-06-25T13:46:27.3285190Z ##[endgroup]
+2025-06-25T13:46:27.3286720Z ##[group]Determining the checkout info
+2025-06-25T13:46:27.3288890Z ##[endgroup]
+2025-06-25T13:46:27.3292120Z [command]/usr/local/bin/git sparse-checkout disable
+2025-06-25T13:46:27.3382770Z [command]/usr/local/bin/git config --local --unset-all extensions.worktreeConfig
+2025-06-25T13:46:27.3453870Z ##[group]Checking out the ref
+2025-06-25T13:46:27.3459300Z [command]/usr/local/bin/git checkout --progress --force -B master refs/remotes/origin/master
+2025-06-25T13:46:28.3790220Z Reset branch 'master'
+2025-06-25T13:46:28.3823960Z branch 'master' set up to track 'origin/master'.
+2025-06-25T13:46:28.3853880Z ##[endgroup]
+2025-06-25T13:46:28.3859250Z ##[group]Setting up auth for fetching submodules
+2025-06-25T13:46:28.3880510Z [command]/usr/local/bin/git config --global http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-06-25T13:46:28.3921710Z [command]/usr/local/bin/git config --global --unset-all url.https://github.com/.insteadOf
+2025-06-25T13:46:28.4018070Z [command]/usr/local/bin/git config --global --add url.https://github.com/.insteadOf git@github.com:
+2025-06-25T13:46:28.4202840Z [command]/usr/local/bin/git config --global --add url.https://github.com/.insteadOf org-58132298@github.com:
+2025-06-25T13:46:28.4327590Z ##[endgroup]
+2025-06-25T13:46:28.4360300Z ##[group]Fetching submodules
+2025-06-25T13:46:28.4376490Z [command]/usr/local/bin/git submodule sync --recursive
+2025-06-25T13:46:28.5515970Z [command]/usr/local/bin/git -c protocol.version=2 submodule update --init --force --depth=1 --recursive
+2025-06-25T13:46:28.7734310Z [command]/usr/local/bin/git submodule foreach --recursive git config --local gc.auto 0
+2025-06-25T13:46:28.8388120Z ##[endgroup]
+2025-06-25T13:46:28.8388790Z ##[group]Persisting credentials for submodules
+2025-06-25T13:46:28.8395750Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'url\.https\:\/\/github\.com\/\.insteadOf' && git config --local --unset-all 'url.https://github.com/.insteadOf' || :"
+2025-06-25T13:46:28.9434490Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local 'http.https://github.com/.extraheader' 'AUTHORIZATION: basic ***' && git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2025-06-25T13:46:29.0375400Z [command]/usr/local/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'git@github.com:'
+2025-06-25T13:46:29.1357000Z [command]/usr/local/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'org-58132298@github.com:'
+2025-06-25T13:46:29.2257790Z ##[endgroup]
+2025-06-25T13:46:29.2353430Z [command]/usr/local/bin/git log -1 --format=%H
+2025-06-25T13:46:29.2428250Z aa8cb33037c09c09c07f2445f39b2e93865dbdc1
+2025-06-25T13:46:29.2764690Z ##[group]Run actions/setup-python@v5
+2025-06-25T13:46:29.2765150Z with:
+2025-06-25T13:46:29.2765470Z   python-version: 3.11
+2025-06-25T13:46:29.2765820Z   architecture: x64
+2025-06-25T13:46:29.2766180Z   check-latest: false
+2025-06-25T13:46:29.2766710Z   token: ***
+2025-06-25T13:46:29.2767030Z   update-environment: true
+2025-06-25T13:46:29.2767450Z   allow-prereleases: false
+2025-06-25T13:46:29.2767840Z   freethreaded: false
+2025-06-25T13:46:29.2768200Z env:
+2025-06-25T13:46:29.2768470Z   PYVERSION: 3.11
+2025-06-25T13:46:29.2768950Z   TARGET_ARCH: x64
+2025-06-25T13:46:29.2769300Z   VCPKG_DEFAULT_TRIPLET: x64-osx
+2025-06-25T13:46:29.2769730Z ##[endgroup]
+2025-06-25T13:46:29.5573770Z ##[group]Installed versions
+2025-06-25T13:46:29.5603130Z Successfully set up CPython (3.11.9)
+2025-06-25T13:46:29.5604750Z ##[endgroup]
+2025-06-25T13:46:29.5726620Z ##[group]Run python -m pip install --upgrade pip
+2025-06-25T13:46:29.5727380Z [36;1mpython -m pip install --upgrade pip[0m
+2025-06-25T13:46:29.5855300Z shell: /bin/bash -e {0}
+2025-06-25T13:46:29.5855740Z env:
+2025-06-25T13:46:29.5856050Z   PYVERSION: 3.11
+2025-06-25T13:46:29.5856430Z   TARGET_ARCH: x64
+2025-06-25T13:46:29.5856790Z   VCPKG_DEFAULT_TRIPLET: x64-osx
+2025-06-25T13:46:29.5857450Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:46:29.5858510Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+2025-06-25T13:46:29.5859420Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:46:29.5860250Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:46:29.5861050Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:46:29.5861690Z ##[endgroup]
+2025-06-25T13:46:31.7269040Z Requirement already satisfied: pip in /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages (25.1.1)
+2025-06-25T13:46:31.9779270Z ##[group]Run python synthizer-c/vendor.py synthizer-vendored
+2025-06-25T13:46:31.9780120Z [36;1mpython synthizer-c/vendor.py synthizer-vendored[0m
+2025-06-25T13:46:31.9910960Z shell: /bin/bash -e {0}
+2025-06-25T13:46:31.9911340Z env:
+2025-06-25T13:46:31.9911670Z   PYVERSION: 3.11
+2025-06-25T13:46:31.9912000Z   TARGET_ARCH: x64
+2025-06-25T13:46:31.9912380Z   VCPKG_DEFAULT_TRIPLET: x64-osx
+2025-06-25T13:46:31.9912980Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:46:31.9913900Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+2025-06-25T13:46:31.9920630Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:46:31.9925180Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:46:31.9926000Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:46:31.9927570Z ##[endgroup]
+2025-06-25T13:46:33.9156680Z ##[group]Run actions/cache@v4
+2025-06-25T13:46:33.9157160Z with:
+2025-06-25T13:46:33.9157490Z   path: ~/Library/Caches/pip
+2025-06-25T13:46:33.9158220Z   key: macOS-x64-pip-3.11-75890a6a760ecee0ac49798298a7d7858145f44ee491fbb76ccadceff52d7140
+2025-06-25T13:46:33.9159040Z   restore-keys: macOS-x64-pip-3.11-
+
+2025-06-25T13:46:33.9159530Z   enableCrossOsArchive: false
+2025-06-25T13:46:33.9159940Z   fail-on-cache-miss: false
+2025-06-25T13:46:33.9160360Z   lookup-only: false
+2025-06-25T13:46:33.9160710Z   save-always: false
+2025-06-25T13:46:33.9161050Z env:
+2025-06-25T13:46:33.9161350Z   PYVERSION: 3.11
+2025-06-25T13:46:33.9161700Z   TARGET_ARCH: x64
+2025-06-25T13:46:33.9162050Z   VCPKG_DEFAULT_TRIPLET: x64-osx
+2025-06-25T13:46:33.9162680Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:46:33.9163550Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+2025-06-25T13:46:33.9164550Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:46:33.9165320Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:46:33.9166110Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:46:33.9166720Z ##[endgroup]
+2025-06-25T13:46:34.3330890Z Cache hit for: macOS-x64-pip-3.11-75890a6a760ecee0ac49798298a7d7858145f44ee491fbb76ccadceff52d7140
+2025-06-25T13:46:35.6496060Z Received 56897852 of 61092156 (93.1%), 54.2 MBs/sec
+2025-06-25T13:46:35.7376730Z Received 61092156 of 61092156 (100.0%), 55.7 MBs/sec
+2025-06-25T13:46:35.7485930Z Cache Size: ~58 MB (61092156 B)
+2025-06-25T13:46:35.7521410Z [command]/usr/local/bin/gtar -xf /Users/runner/work/_temp/52b1dc96-0b39-4717-85af-94336dffdaf7/cache.tzst -P -C /Users/runner/work/synthizer3d/synthizer3d --delay-directory-restore --use-compress-program unzstd
+2025-06-25T13:46:35.9916480Z Cache restored successfully
+2025-06-25T13:46:36.0596110Z Cache restored from key: macOS-x64-pip-3.11-75890a6a760ecee0ac49798298a7d7858145f44ee491fbb76ccadceff52d7140
+2025-06-25T13:46:36.0735960Z ##[group]Run lukka/run-vcpkg@v11
+2025-06-25T13:46:36.0736570Z with:
+2025-06-25T13:46:36.0736950Z   vcpkgJsonGlob: vcpkg.json
+2025-06-25T13:46:36.0737460Z   runVcpkgInstall: true
+2025-06-25T13:46:36.0738170Z   vcpkgDirectory: /Users/runner/work/synthizer3d/synthizer3d/vcpkg
+2025-06-25T13:46:36.0739100Z   vcpkgGitURL: https://github.com/microsoft/vcpkg.git
+2025-06-25T13:46:36.0739760Z   doNotUpdateVcpkg: false
+2025-06-25T13:46:36.0740270Z   doNotCache: true
+2025-06-25T13:46:36.0740740Z   vcpkgJsonIgnores: ['**/vcpkg/**']
+2025-06-25T13:46:36.0741430Z   vcpkgConfigurationJsonGlob: **/vcpkg-configuration.json
+2025-06-25T13:46:36.0743020Z   runVcpkgFormatString: [`install`, `--recurse`, `--clean-after-build`, `--x-install-root`, `$[env.VCPKG_INSTALLED_DIR]`, `--triplet`, `$[env.VCPKG_DEFAULT_TRIPLET]`]
+2025-06-25T13:46:36.0744460Z   useShell: true
+2025-06-25T13:46:36.0745610Z   logCollectionRegExps: \s*"(.+CMakeOutput\.log)"\.\s*;\s*"(.+CMakeError\.log)"\.\s*;\s*(.+out\.log)\s*;\s+(.+err\.log)\s*;\s*(.+vcpkg.+\.log)\s*
+2025-06-25T13:46:36.0746770Z env:
+2025-06-25T13:46:36.0747130Z   PYVERSION: 3.11
+2025-06-25T13:46:36.0747570Z   TARGET_ARCH: x64
+2025-06-25T13:46:36.0748030Z   VCPKG_DEFAULT_TRIPLET: x64-osx
+2025-06-25T13:46:36.0748760Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:46:36.0749830Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+2025-06-25T13:46:36.0750890Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:46:36.0751840Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:46:36.0752770Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:46:36.0753520Z ##[endgroup]
+2025-06-25T13:46:36.4001760Z ##[group]Prepare output directories
+2025-06-25T13:46:36.4032520Z The vpckg root directory: '/Users/runner/work/synthizer3d/synthizer3d/vcpkg'
+2025-06-25T13:46:36.4234250Z ##[endgroup]
+2025-06-25T13:46:36.4268780Z ⏱ elapsed: 0.003 seconds
+2025-06-25T13:46:36.4434640Z Running command '/usr/local/bin/git' with args 'submodule,status,/Users/runner/work/synthizer3d/synthizer3d/vcpkg' in current directory '/Users/runner/work/synthizer3d/synthizer3d'.
+2025-06-25T13:46:36.6156560Z error: pathspec '/Users/runner/work/synthizer3d/synthizer3d/vcpkg' did not match any file(s) known to git
+2025-06-25T13:46:36.6901720Z ##[group]Searching for vcpkg.json with glob expression 'vcpkg.json'
+2025-06-25T13:46:36.6906290Z Found vcpkg.json at 'vcpkg.json'.
+2025-06-25T13:46:36.6916080Z ##[endgroup]
+2025-06-25T13:46:36.6917730Z ⏱ elapsed: 0.007 seconds
+2025-06-25T13:46:36.6920090Z ##[group]The vcpkgCommitId is not provided, searching for a vcpkg-configuration.json using **/vcpkg-configuration.json
+2025-06-25T13:46:36.6924110Z Searching for 'vcpkg-configuration.json' using: '**/vcpkg-configuration.json'
+2025-06-25T13:46:36.6926700Z The file 'vcpkg-configuration.json' was not found with glob expression '**/vcpkg-configuration.json'.
+2025-06-25T13:46:36.6930430Z A vcpkg-configuration.json is not found.
+2025-06-25T13:46:36.6939210Z ##[endgroup]
+2025-06-25T13:46:36.6940790Z ⏱ elapsed: 0.049 seconds
+2025-06-25T13:46:36.6943130Z Found baseline '8f63c9ed5897d7367a92a442a79f91721e0fd38f', this is the Git commit id going to be used to fetch vcpkg from the repository
+2025-06-25T13:46:36.6972850Z ##[group]Setup to run on GitHub Action runners
+2025-06-25T13:46:36.6977130Z Set the workflow environment variable 'VCPKG_BINARY_SOURCES' to value 'clear;x-gha,readwrite'
+2025-06-25T13:46:36.6983860Z Set the workflow environment variable 'ACTIONS_CACHE_URL' to value 'https://acghubeus2.actions.githubusercontent.com/bwbzopuV3oKlbowlUKWdOnf6KF0vjv7EYqCB3ZHqukKhTVgy74/'
+2025-06-25T13:46:36.7056680Z Set the workflow environment variable 'ACTIONS_RUNTIME_TOKEN' to value '***'
+2025-06-25T13:46:36.7058560Z ##[endgroup]
+2025-06-25T13:46:36.7059410Z ⏱ elapsed: 0.001 seconds
+2025-06-25T13:46:36.7062320Z ##[group]Retrieving the vcpkg Git commit id at: '/Users/runner/work/synthizer3d/synthizer3d/vcpkg'
+2025-06-25T13:46:36.7065270Z Fetching the Git commit id at '/Users/runner/work/synthizer3d/synthizer3d/vcpkg' ...
+2025-06-25T13:46:36.7068040Z Running command '/usr/local/bin/git' with args 'rev-parse,HEAD' in current directory '/Users/runner/work/synthizer3d/synthizer3d/vcpkg'.
+2025-06-25T13:46:36.7069940Z aa8cb33037c09c09c07f2445f39b2e93865dbdc1
+2025-06-25T13:46:36.7071640Z ##[endgroup]
+2025-06-25T13:46:36.7072290Z ⏱ elapsed: 0.021 seconds
+2025-06-25T13:46:36.7073200Z ##[group]Check whether vcpkg repository is up to date
+2025-06-25T13:46:36.7074750Z Checking whether vcpkg's repository is updated to commit id 'aa8cb33037c09c09c07f2445f39b2e93865dbdc1' ...
+2025-06-25T13:46:36.7076620Z Current commit id of vcpkg: 'aa8cb33037c09c09c07f2445f39b2e93865dbdc1'.
+2025-06-25T13:46:36.7077520Z Is vcpkg repository updated? No
+2025-06-25T13:46:36.7078390Z ##[endgroup]
+2025-06-25T13:46:36.7078970Z ⏱ elapsed: 0.000 seconds
+2025-06-25T13:46:36.7079710Z ##[group]Download vcpkg source code repository
+2025-06-25T13:46:36.7081100Z Cloning vcpkg in '/Users/runner/work/synthizer3d/synthizer3d/vcpkg'...
+2025-06-25T13:46:36.7084610Z Running command '/usr/local/bin/git' with args 'clone,https://github.com/microsoft/vcpkg.git,-n,.' in current directory '/Users/runner/work/synthizer3d/synthizer3d/vcpkg'.
+2025-06-25T13:46:36.7086440Z Cloning into '.'...
+2025-06-25T13:46:52.4474700Z Running command '/usr/local/bin/git' with args 'checkout,--force,8f63c9ed5897d7367a92a442a79f91721e0fd38f' in current directory '/Users/runner/work/synthizer3d/synthizer3d/vcpkg'.
+2025-06-25T13:46:56.6037580Z HEAD is now at 8f63c9ed58 [tree-sitter-c] update to 0.24.1 (#45715)
+2025-06-25T13:46:56.6178330Z Clone vcpkg in '/Users/runner/work/synthizer3d/synthizer3d/vcpkg'.
+2025-06-25T13:46:56.6243070Z ##[endgroup]
+2025-06-25T13:46:56.6278980Z ⏱ elapsed: 20.006 seconds
+2025-06-25T13:46:56.6331390Z ##[group]Build vcpkg executable
+2025-06-25T13:46:56.6531660Z Running command 'chmod' with args '+x,/Users/runner/work/synthizer3d/synthizer3d/vcpkg/bootstrap-vcpkg.sh' in current directory 'undefined'.
+2025-06-25T13:46:56.6631130Z Running command '/bin/sh' with args '-c,/Users/runner/work/synthizer3d/synthizer3d/vcpkg/bootstrap-vcpkg.sh' in current directory '/Users/runner/work/synthizer3d/synthizer3d/vcpkg'.
+2025-06-25T13:46:56.6948400Z Downloading vcpkg-macos...
+2025-06-25T13:46:57.5791710Z vcpkg package management program version 2025-05-19-ece4c0f6b8fae9e94513d544c7aa753dd2c82337
+2025-06-25T13:46:57.5795730Z 
+2025-06-25T13:46:57.5893120Z See LICENSE.txt for license information.
+2025-06-25T13:46:57.5917200Z Telemetry
+2025-06-25T13:46:57.5945940Z ---------
+2025-06-25T13:46:57.6046420Z vcpkg collects usage data in order to help us improve your experience.
+2025-06-25T13:46:57.6069850Z The data collected by Microsoft is anonymous.
+2025-06-25T13:46:57.6101520Z You can opt-out of telemetry by re-running the bootstrap-vcpkg script with -disableMetrics,
+2025-06-25T13:46:57.6581530Z passing --disable-metrics to vcpkg on the command line,
+2025-06-25T13:46:57.6614280Z or by setting the VCPKG_DISABLE_METRICS environment variable.
+2025-06-25T13:46:57.6645820Z 
+2025-06-25T13:46:57.6673460Z Read more about vcpkg telemetry at docs/about/privacy.md
+2025-06-25T13:46:57.6885110Z Fetching the Git commit id at '/Users/runner/work/synthizer3d/synthizer3d/vcpkg' ...
+2025-06-25T13:46:57.6905030Z Running command '/usr/local/bin/git' with args 'rev-parse,HEAD' in current directory '/Users/runner/work/synthizer3d/synthizer3d/vcpkg'.
+2025-06-25T13:46:57.6933740Z 8f63c9ed5897d7367a92a442a79f91721e0fd38f
+2025-06-25T13:46:57.7029510Z Stored last built vcpkg commit id '8f63c9ed5897d7367a92a442a79f91721e0fd38f' in file '/Users/runner/work/synthizer3d/synthizer3d/vcpkg/vcpkgLastBuiltCommitId'.
+2025-06-25T13:46:57.7042570Z ##[endgroup]
+2025-06-25T13:46:57.7048380Z ⏱ elapsed: 0.997 seconds
+2025-06-25T13:46:57.7070520Z ##[group]Add to PATH vcpkg at '/Users/runner/work/synthizer3d/synthizer3d/vcpkg'
+2025-06-25T13:46:57.7076800Z ##[endgroup]
+2025-06-25T13:46:57.7124700Z ⏱ elapsed: 0.000 seconds
+2025-06-25T13:46:57.7157360Z ##[group]Install/Update ports using vcpkg.json
+2025-06-25T13:46:57.7184410Z Running 'vcpkg install,--recurse,--clean-after-build,--x-install-root,/Users/runner/work/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed,--triplet,x64-osx' in directory '/Users/runner/work/synthizer3d/synthizer3d' ...
+2025-06-25T13:46:57.7195930Z Running command '/Users/runner/work/synthizer3d/synthizer3d/vcpkg/vcpkg' with args 'install,--recurse,--clean-after-build,--x-install-root,/Users/runner/work/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed,--triplet,x64-osx' in current directory '/Users/runner/work/synthizer3d/synthizer3d'.
+2025-06-25T13:46:58.0979670Z Detecting compiler hash for triplet x64-osx...
+2025-06-25T13:47:06.2356020Z Compiler found: /Applications/Xcode_15.2.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++
+2025-06-25T13:47:06.2486070Z The following packages will be built and installed:
+2025-06-25T13:47:06.2486830Z     faad2:x64-osx@2.11.1
+2025-06-25T13:47:06.2487400Z     libogg:x64-osx@1.3.5#2
+2025-06-25T13:47:06.2487990Z     libvorbis:x64-osx@1.3.7#4
+2025-06-25T13:47:06.2488810Z     opus:x64-osx@1.5.2
+2025-06-25T13:47:06.2489690Z     opusfile:x64-osx@0.12+20221121#1
+2025-06-25T13:47:06.2490610Z     soundtouch:x64-osx@2.3.3
+2025-06-25T13:47:06.2491550Z   * vcpkg-cmake:x64-osx@2024-04-23
+2025-06-25T13:47:06.2492450Z   * vcpkg-cmake-config:x64-osx@2024-05-23
+2025-06-25T13:47:06.2493580Z Additional packages (*) will be modified to complete this operation.
+2025-06-25T13:47:06.2497040Z $VCPKG_BINARY_SOURCES: warning: The 'x-gha' binary caching backend has been removed. Consider using a NuGet-based binary caching provider instead, see extended documentation at https://learn.microsoft.com/vcpkg/users/binarycaching?WT.mc_id=vcpkg_inproduct_cli.
+2025-06-25T13:47:06.2499570Z   on expression: clear;x-gha,readwrite
+2025-06-25T13:47:06.2500350Z                                       ^
+2025-06-25T13:47:06.2501170Z Installing 1/8 vcpkg-cmake:x64-osx@2024-04-23...
+2025-06-25T13:47:06.2501990Z Building vcpkg-cmake:x64-osx@2024-04-23...
+2025-06-25T13:47:06.2856740Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-osx/share/vcpkg-cmake/vcpkg_cmake_configure.cmake
+2025-06-25T13:47:06.2866200Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-osx/share/vcpkg-cmake/vcpkg_cmake_build.cmake
+2025-06-25T13:47:06.2869810Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-osx/share/vcpkg-cmake/vcpkg_cmake_install.cmake
+2025-06-25T13:47:06.2875520Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-osx/share/vcpkg-cmake/vcpkg-port-config.cmake
+2025-06-25T13:47:06.2883360Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-osx/share/vcpkg-cmake/copyright
+2025-06-25T13:47:06.2924660Z -- Performing post-build validation
+2025-06-25T13:47:06.3004300Z Elapsed time to handle vcpkg-cmake:x64-osx: 50.8 ms
+2025-06-25T13:47:06.3005960Z vcpkg-cmake:x64-osx package ABI: 40a914f9f2ce407f0c6effd8372fdaf561b2d183abbde65dc9ead58fe558cf9a
+2025-06-25T13:47:06.3007050Z Installing 2/8 faad2:x64-osx@2.11.1...
+2025-06-25T13:47:06.3007690Z Building faad2:x64-osx@2.11.1...
+2025-06-25T13:47:06.3460920Z Downloading https://github.com/knik0/faad2/archive/2.11.1.tar.gz -> knik0-faad2-2.11.1.tar.gz
+2025-06-25T13:47:07.1462090Z Successfully downloaded knik0-faad2-2.11.1.tar.gz
+2025-06-25T13:47:07.1496800Z -- Extracting source /Users/runner/work/synthizer3d/synthizer3d/vcpkg/downloads/knik0-faad2-2.11.1.tar.gz
+2025-06-25T13:47:07.2158730Z -- Applying patch fix-install.patch
+2025-06-25T13:47:07.2240550Z -- Using source at /Users/runner/work/synthizer3d/synthizer3d/vcpkg/buildtrees/faad2/src/2.11.1-55f3ec09c2.clean
+2025-06-25T13:47:07.2293990Z -- Found external ninja('1.13.0').
+2025-06-25T13:47:07.2351880Z -- Configuring x64-osx
+2025-06-25T13:47:08.7246580Z -- Building x64-osx-dbg
+2025-06-25T13:47:13.7129980Z -- Building x64-osx-rel
+2025-06-25T13:47:24.5830870Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/faad2_x64-osx/lib/pkgconfig/faad2.pc
+2025-06-25T13:47:24.6028620Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/faad2_x64-osx/debug/lib/pkgconfig/faad2.pc
+2025-06-25T13:47:24.6131300Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/faad2_x64-osx/share/faad2/copyright
+2025-06-25T13:47:27.0163430Z -- Adjusted RPATH of '/Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/faad2_x64-osx/tools/faad2/faad' to '@loader_path/../../lib'
+2025-06-25T13:47:27.0189340Z -- Performing post-build validation
+2025-06-25T13:47:27.0692090Z Elapsed time to handle faad2:x64-osx: 21 s
+2025-06-25T13:47:27.0693620Z faad2:x64-osx package ABI: d5dd2559b702fe29e18067a4595a055017a884a27ffde05a097c764a8a4bb966
+2025-06-25T13:47:27.0694860Z Installing 3/8 vcpkg-cmake-config:x64-osx@2024-05-23...
+2025-06-25T13:47:27.0695770Z Building vcpkg-cmake-config:x64-osx@2024-05-23...
+2025-06-25T13:47:27.1099430Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake-config_x64-osx/share/vcpkg-cmake-config/vcpkg_cmake_config_fixup.cmake
+2025-06-25T13:47:27.1116110Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake-config_x64-osx/share/vcpkg-cmake-config/vcpkg-port-config.cmake
+2025-06-25T13:47:27.1126060Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake-config_x64-osx/share/vcpkg-cmake-config/copyright
+2025-06-25T13:47:27.1161750Z -- Skipping post-build validation due to VCPKG_POLICY_EMPTY_PACKAGE
+2025-06-25T13:47:27.1227660Z Elapsed time to handle vcpkg-cmake-config:x64-osx: 52.3 ms
+2025-06-25T13:47:27.1247380Z vcpkg-cmake-config:x64-osx package ABI: d2c96fec92e0c3a0078788407dd660b8ad7f4bc34e553c17b04dd5f1d2b57ca7
+2025-06-25T13:47:27.1267150Z Installing 4/8 libogg:x64-osx@1.3.5#2...
+2025-06-25T13:47:27.1281140Z Building libogg:x64-osx@1.3.5#2...
+2025-06-25T13:47:27.1712000Z Downloading https://gitlab.xiph.org/xiph/ogg/-/archive/v1.3.5/ogg-v1.3.5.tar.gz -> xiph-ogg-v1.3.5.tar.gz
+2025-06-25T13:47:27.7288880Z Successfully downloaded xiph-ogg-v1.3.5.tar.gz
+2025-06-25T13:47:27.7304910Z -- Extracting source /Users/runner/work/synthizer3d/synthizer3d/vcpkg/downloads/xiph-ogg-v1.3.5.tar.gz
+2025-06-25T13:47:27.7856510Z -- Using source at /Users/runner/work/synthizer3d/synthizer3d/vcpkg/buildtrees/libogg/src/v1.3.5-1a4243fef9.clean
+2025-06-25T13:47:27.7908450Z -- Found external ninja('1.13.0').
+2025-06-25T13:47:27.7945160Z -- Configuring x64-osx
+2025-06-25T13:47:34.4441310Z -- Building x64-osx-dbg
+2025-06-25T13:47:34.8010490Z -- Building x64-osx-rel
+2025-06-25T13:47:35.2760040Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libogg_x64-osx/lib/pkgconfig/ogg.pc
+2025-06-25T13:47:35.2896500Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libogg_x64-osx/debug/lib/pkgconfig/ogg.pc
+2025-06-25T13:47:35.2926980Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libogg_x64-osx/share/libogg/copyright
+2025-06-25T13:47:35.2955040Z -- Performing post-build validation
+2025-06-25T13:47:35.3015080Z Elapsed time to handle libogg:x64-osx: 8.2 s
+2025-06-25T13:47:35.3062650Z libogg:x64-osx package ABI: 260b7dc3ef8b7f97be5cfb7f8ed82db426481bbca21a1bf0982fbc3a54862276
+2025-06-25T13:47:35.3097780Z Installing 5/8 libvorbis:x64-osx@1.3.7#4...
+2025-06-25T13:47:35.3104040Z Building libvorbis:x64-osx@1.3.7#4...
+2025-06-25T13:47:35.3596790Z Downloading https://github.com/xiph/vorbis/archive/v1.3.7.tar.gz -> xiph-vorbis-v1.3.7.tar.gz
+2025-06-25T13:47:36.2637250Z Successfully downloaded xiph-vorbis-v1.3.7.tar.gz
+2025-06-25T13:47:36.2692960Z -- Extracting source /Users/runner/work/synthizer3d/synthizer3d/vcpkg/downloads/xiph-vorbis-v1.3.7.tar.gz
+2025-06-25T13:47:36.4062380Z -- Applying patch 0001-Dont-export-vorbisenc-functions.patch
+2025-06-25T13:47:36.4166330Z -- Applying patch 0002-Fixup-pkgconfig-libs.patch
+2025-06-25T13:47:36.4239070Z -- Applying patch 0003-def-mingw-compat.patch
+2025-06-25T13:47:36.4309720Z -- Applying patch 0004-ogg-find-dependency.patch
+2025-06-25T13:47:36.4381950Z -- Using source at /Users/runner/work/synthizer3d/synthizer3d/vcpkg/buildtrees/libvorbis/src/v1.3.7-c32164610e.clean
+2025-06-25T13:47:36.4425260Z -- Found external ninja('1.13.0').
+2025-06-25T13:47:36.4464160Z -- Configuring x64-osx
+2025-06-25T13:47:38.2522690Z -- Building x64-osx-dbg
+2025-06-25T13:47:39.5758440Z -- Building x64-osx-rel
+2025-06-25T13:47:43.2725330Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-osx/lib/pkgconfig/vorbis.pc
+2025-06-25T13:47:43.2741230Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-osx/lib/pkgconfig/vorbisenc.pc
+2025-06-25T13:47:43.2744300Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-osx/lib/pkgconfig/vorbisfile.pc
+2025-06-25T13:47:43.2931050Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-osx/debug/lib/pkgconfig/vorbis.pc
+2025-06-25T13:47:43.2943060Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-osx/debug/lib/pkgconfig/vorbisenc.pc
+2025-06-25T13:47:43.2954530Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-osx/debug/lib/pkgconfig/vorbisfile.pc
+2025-06-25T13:47:43.3156870Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-osx/share/libvorbis/usage
+2025-06-25T13:47:43.3167990Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-osx/share/libvorbis/copyright
+2025-06-25T13:47:43.3676210Z -- Performing post-build validation
+2025-06-25T13:47:43.4389570Z Elapsed time to handle libvorbis:x64-osx: 8.1 s
+2025-06-25T13:47:43.4401090Z libvorbis:x64-osx package ABI: 37e47a95b29fe65315372e4f0dfc5414473789e14ed4c50d841857dbcc282368
+2025-06-25T13:47:43.4403150Z Installing 6/8 opus:x64-osx@1.5.2...
+2025-06-25T13:47:43.4404810Z Building opus:x64-osx@1.5.2...
+2025-06-25T13:47:43.4914090Z Downloading https://github.com/xiph/opus/archive/v1.5.2.tar.gz -> xiph-opus-v1.5.2.tar.gz
+2025-06-25T13:47:44.4502630Z Successfully downloaded xiph-opus-v1.5.2.tar.gz
+2025-06-25T13:47:44.4630110Z -- Extracting source /Users/runner/work/synthizer3d/synthizer3d/vcpkg/downloads/xiph-opus-v1.5.2.tar.gz
+2025-06-25T13:47:44.6946230Z -- Applying patch fix-pkgconfig-version.patch
+2025-06-25T13:47:44.7020240Z -- Using source at /Users/runner/work/synthizer3d/synthizer3d/vcpkg/buildtrees/opus/src/v1.5.2-81ed242155.clean
+2025-06-25T13:47:44.7083650Z -- Found external ninja('1.13.0').
+2025-06-25T13:47:44.7125790Z -- Configuring x64-osx
+2025-06-25T13:47:53.6162490Z -- Building x64-osx-dbg
+2025-06-25T13:47:57.7300300Z -- Building x64-osx-rel
+2025-06-25T13:48:04.5838080Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/opus_x64-osx/lib/pkgconfig/opus.pc
+2025-06-25T13:48:04.6022340Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/opus_x64-osx/debug/lib/pkgconfig/opus.pc
+2025-06-25T13:48:04.6072770Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/opus_x64-osx/share/opus/copyright
+2025-06-25T13:48:04.6157780Z -- Performing post-build validation
+2025-06-25T13:48:04.7469460Z Elapsed time to handle opus:x64-osx: 21 s
+2025-06-25T13:48:04.8471710Z opus:x64-osx package ABI: 7a8274ec54d6a99d540e0d972e8c43b3bff1a0a148640dad01f8349370812e14
+2025-06-25T13:48:04.8768130Z Installing 7/8 opusfile:x64-osx@0.12+20221121#1...
+2025-06-25T13:48:04.8813040Z Building opusfile:x64-osx@0.12+20221121#1...
+2025-06-25T13:48:04.8846840Z Downloading https://github.com/xiph/opusfile/archive/9d718345ce03b2fad5d7d28e0bcd1cc69ab2b166.tar.gz -> xiph-opusfile-9d718345ce03b2fad5d7d28e0bcd1cc69ab2b166.tar.gz
+2025-06-25T13:48:05.4693590Z Successfully downloaded xiph-opusfile-9d718345ce03b2fad5d7d28e0bcd1cc69ab2b166.tar.gz
+2025-06-25T13:48:05.4760190Z -- Extracting source /Users/runner/work/synthizer3d/synthizer3d/vcpkg/downloads/xiph-opusfile-9d718345ce03b2fad5d7d28e0bcd1cc69ab2b166.tar.gz
+2025-06-25T13:48:05.5079320Z -- Using source at /Users/runner/work/synthizer3d/synthizer3d/vcpkg/buildtrees/opusfile/src/c69ab2b166-6cc7de23ec.clean
+2025-06-25T13:48:05.5139470Z -- Found external ninja('1.13.0').
+2025-06-25T13:48:05.5179010Z -- Configuring x64-osx
+2025-06-25T13:48:06.8186930Z -- Building x64-osx-dbg
+2025-06-25T13:48:07.1686260Z -- Building x64-osx-rel
+2025-06-25T13:48:08.1207370Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/opusfile_x64-osx/lib/pkgconfig/opusfile.pc
+2025-06-25T13:48:08.1272300Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/opusfile_x64-osx/debug/lib/pkgconfig/opusfile.pc
+2025-06-25T13:48:08.1364540Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/opusfile_x64-osx/share/opusfile/copyright
+2025-06-25T13:48:08.1369920Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/opusfile_x64-osx/share/opusfile/usage
+2025-06-25T13:48:08.1606930Z -- Performing post-build validation
+2025-06-25T13:48:08.1800840Z Elapsed time to handle opusfile:x64-osx: 3.5 s
+2025-06-25T13:48:08.1802140Z opusfile:x64-osx package ABI: 6a0c71126cd34b0fd907abc223389dfb684dab3cd56495e65138eb8663c2fa77
+2025-06-25T13:48:08.1803240Z Installing 8/8 soundtouch:x64-osx@2.3.3...
+2025-06-25T13:48:08.1803880Z Building soundtouch:x64-osx@2.3.3...
+2025-06-25T13:48:08.2209320Z Downloading https://codeberg.org/soundtouch/soundtouch/archive/2.3.3.tar.gz -> soundtouch-soundtouch-2.3.3.tar.gz
+2025-06-25T13:48:09.2541650Z Successfully downloaded soundtouch-soundtouch-2.3.3.tar.gz
+2025-06-25T13:48:09.2569210Z -- Extracting source /Users/runner/work/synthizer3d/synthizer3d/vcpkg/downloads/soundtouch-soundtouch-2.3.3.tar.gz
+2025-06-25T13:48:09.3168520Z -- Using source at /Users/runner/work/synthizer3d/synthizer3d/vcpkg/buildtrees/soundtouch/src/2.3.3-309213044d.clean
+2025-06-25T13:48:09.3228000Z -- Found external ninja('1.13.0').
+2025-06-25T13:48:09.3265980Z -- Configuring x64-osx
+2025-06-25T13:48:11.2642250Z -- Building x64-osx-dbg
+2025-06-25T13:48:15.7370160Z -- Building x64-osx-rel
+2025-06-25T13:48:20.4925680Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/soundtouch_x64-osx/lib/pkgconfig/soundtouch.pc
+2025-06-25T13:48:20.5003720Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/soundtouch_x64-osx/debug/lib/pkgconfig/soundtouch.pc
+2025-06-25T13:48:20.5075940Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/soundtouch_x64-osx/share/soundtouch/copyright
+2025-06-25T13:48:20.5211610Z -- Performing post-build validation
+2025-06-25T13:48:20.5575160Z Elapsed time to handle soundtouch:x64-osx: 12 s
+2025-06-25T13:48:20.5576680Z soundtouch:x64-osx package ABI: 5719adb20a7bd8f2412229059530167d03c5898cef42f061425d93818705f68f
+2025-06-25T13:48:20.5597800Z faad2 provides pkg-config modules:
+2025-06-25T13:48:20.5600940Z 
+2025-06-25T13:48:20.5603150Z   # Freeware Advanced Audio (AAC) Decoder
+2025-06-25T13:48:20.5604410Z   faad2
+2025-06-25T13:48:20.5605780Z 
+2025-06-25T13:48:20.5608350Z libogg provides CMake targets:
+2025-06-25T13:48:20.5608690Z 
+2025-06-25T13:48:20.5609740Z   # this is heuristically generated, and may not be correct
+2025-06-25T13:48:20.5610560Z   find_package(Ogg CONFIG REQUIRED)
+2025-06-25T13:48:20.5611410Z   target_link_libraries(main PRIVATE Ogg::ogg)
+2025-06-25T13:48:20.5612120Z 
+2025-06-25T13:48:20.5613600Z libogg provides pkg-config modules:
+2025-06-25T13:48:20.5613980Z 
+2025-06-25T13:48:20.5614960Z   # ogg is a library for manipulating ogg bitstreams
+2025-06-25T13:48:20.5615520Z   ogg
+2025-06-25T13:48:20.5616160Z 
+2025-06-25T13:48:20.5617130Z The package libvorbis provides CMake targets:
+2025-06-25T13:48:20.5618260Z 
+2025-06-25T13:48:20.5619690Z     # Vorbis reference encoder and decoder, low-level API
+2025-06-25T13:48:20.5623410Z     find_package(Vorbis CONFIG REQUIRED)
+2025-06-25T13:48:20.5625160Z     target_link_libraries(main PRIVATE Vorbis::vorbis)
+2025-06-25T13:48:20.5627540Z 
+2025-06-25T13:48:20.5628620Z     # Audio stream decoding and basic manipulation, high-level API
+2025-06-25T13:48:20.5630350Z     find_package(Vorbis CONFIG REQUIRED)
+2025-06-25T13:48:20.5631300Z     target_link_libraries(main PRIVATE Vorbis::vorbisfile)
+2025-06-25T13:48:20.5631770Z 
+2025-06-25T13:48:20.5633090Z     # Convenience API for setting up an encoding environment
+2025-06-25T13:48:20.5633950Z     find_package(Vorbis CONFIG REQUIRED)
+2025-06-25T13:48:20.5634850Z     target_link_libraries(main PRIVATE Vorbis::vorbisenc)
+2025-06-25T13:48:20.5635310Z 
+2025-06-25T13:48:20.5635640Z opus provides CMake targets:
+2025-06-25T13:48:20.5635940Z 
+2025-06-25T13:48:20.5636490Z   # this is heuristically generated, and may not be correct
+2025-06-25T13:48:20.5637300Z   find_package(Opus CONFIG REQUIRED)
+2025-06-25T13:48:20.5638120Z   target_link_libraries(main PRIVATE Opus::opus)
+2025-06-25T13:48:20.5638540Z 
+2025-06-25T13:48:20.5638880Z opus provides pkg-config modules:
+2025-06-25T13:48:20.5639220Z 
+2025-06-25T13:48:20.5639650Z   # Opus IETF audio codec ( build)
+2025-06-25T13:48:20.5640110Z   opus
+2025-06-25T13:48:20.5640290Z 
+2025-06-25T13:48:20.5640720Z The package opusfile provides CMake targets:
+2025-06-25T13:48:20.5641120Z 
+2025-06-25T13:48:20.5641520Z     find_package(OpusFile CONFIG REQUIRED)
+2025-06-25T13:48:20.5642440Z     target_link_libraries(main PRIVATE OpusFile::opusfile)
+2025-06-25T13:48:20.5642890Z 
+2025-06-25T13:48:20.5643200Z     # To use the opusurl API
+2025-06-25T13:48:20.5644020Z     target_link_libraries(main PRIVATE OpusFile::opusurl)
+2025-06-25T13:48:20.5644480Z 
+2025-06-25T13:48:20.5644820Z soundtouch provides CMake targets:
+2025-06-25T13:48:20.5645170Z 
+2025-06-25T13:48:20.5645710Z   # this is heuristically generated, and may not be correct
+2025-06-25T13:48:20.5646580Z   find_package(SoundTouch CONFIG REQUIRED)
+2025-06-25T13:48:20.5647540Z   target_link_libraries(main PRIVATE SoundTouch::SoundTouch)
+2025-06-25T13:48:20.5648240Z 
+2025-06-25T13:48:20.5648650Z soundtouch provides pkg-config modules:
+2025-06-25T13:48:20.5649040Z 
+2025-06-25T13:48:20.5650540Z   # SoundTouch is an open-source audio processing library for changing the Tempo, Pitch and Playback Rates of audio streams or files
+2025-06-25T13:48:20.5651730Z   soundtouch
+2025-06-25T13:48:20.5651930Z 
+2025-06-25T13:48:20.5652600Z All requested installations completed successfully in: 1.2 min
+2025-06-25T13:48:20.5654100Z ##[endgroup]
+2025-06-25T13:48:20.5654820Z ⏱ elapsed: 82.958 seconds
+2025-06-25T13:48:20.5655510Z ##[group]Set output environment variables
+2025-06-25T13:48:20.5657260Z Set the workflow environment variable 'RUNVCPKG_VCPKG_ROOT' to value '/Users/runner/work/synthizer3d/synthizer3d/vcpkg'
+2025-06-25T13:48:20.5659730Z Set the workflow environment variable 'VCPKG_ROOT' to value '/Users/runner/work/synthizer3d/synthizer3d/vcpkg'
+2025-06-25T13:48:20.5662160Z Set the step output variable 'RUNVCPKG_VCPKG_ROOT_OUT' to value '/Users/runner/work/synthizer3d/synthizer3d/vcpkg''
+2025-06-25T13:48:20.5663950Z Set the workflow environment variable 'VCPKG_DEFAULT_TRIPLET' to value 'x64-osx'
+2025-06-25T13:48:20.5665790Z Set the step output variable 'RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT' to value 'x64-osx''
+2025-06-25T13:48:20.5666860Z ##[endgroup]
+2025-06-25T13:48:20.5667400Z ⏱ elapsed: 0.001 seconds
+2025-06-25T13:48:20.5670290Z run-vcpkg action execution succeeded
+2025-06-25T13:48:20.5767200Z ##[group]Run echo "VCPKG_ROOT (vcpkg tool directory) is $VCPKG_ROOT"
+2025-06-25T13:48:20.5768070Z [36;1mecho "VCPKG_ROOT (vcpkg tool directory) is $VCPKG_ROOT"[0m
+2025-06-25T13:48:20.5768930Z [36;1mecho "VCPKG_DEFAULT_TRIPLET is $VCPKG_DEFAULT_TRIPLET"[0m
+2025-06-25T13:48:20.5769590Z [36;1mecho "GITHUB_WORKSPACE is $GITHUB_WORKSPACE"[0m
+2025-06-25T13:48:20.5770080Z [36;1m[0m
+2025-06-25T13:48:20.5770370Z [36;1mif [ -z "$VCPKG_ROOT" ]; then[0m
+2025-06-25T13:48:20.5771310Z [36;1m  echo "Error: VCPKG_ROOT is not set."[0m
+2025-06-25T13:48:20.5771770Z [36;1m  exit 1[0m
+2025-06-25T13:48:20.5772180Z [36;1mfi[0m
+2025-06-25T13:48:20.5772510Z [36;1m[0m
+2025-06-25T13:48:20.5773380Z [36;1m# Se vcpkg.json esiste in $GITHUB_WORKSPACE (CWD), vcpkg installerà in $GITHUB_WORKSPACE/vcpkg_installed/$VCPKG_DEFAULT_TRIPLET[0m
+2025-06-25T13:48:20.5774570Z [36;1m"$VCPKG_ROOT/vcpkg" install --triplet "$VCPKG_DEFAULT_TRIPLET"[0m
+2025-06-25T13:48:20.5775270Z [36;1mecho "Finished vcpkg install command."[0m
+2025-06-25T13:48:20.5775740Z [36;1m[0m
+2025-06-25T13:48:20.5776240Z [36;1m# Percorso di installazione atteso per la modalità manifest di vcpkg[0m
+2025-06-25T13:48:20.5777250Z [36;1mVCPKG_MANIFEST_INSTALL_PATH="$GITHUB_WORKSPACE/vcpkg_installed/$VCPKG_DEFAULT_TRIPLET"[0m
+2025-06-25T13:48:20.5778140Z [36;1m[0m
+2025-06-25T13:48:20.5778630Z [36;1mecho "Target CMAKE_PREFIX_PATH will be: $VCPKG_MANIFEST_INSTALL_PATH"[0m
+2025-06-25T13:48:20.5779360Z [36;1mif [ ! -d "$VCPKG_MANIFEST_INSTALL_PATH" ]; then[0m
+2025-06-25T13:48:20.5780200Z [36;1m  echo "WARNING: Directory $VCPKG_MANIFEST_INSTALL_PATH does NOT exist after vcpkg install."[0m
+2025-06-25T13:48:20.5781220Z [36;1m  echo "This suggests vcpkg did not install to the expected manifest location."[0m
+2025-06-25T13:48:20.5782150Z [36;1m  echo "Listing contents of $GITHUB_WORKSPACE/vcpkg_installed for debugging:"[0m
+2025-06-25T13:48:20.5783310Z [36;1m  ls -la "$GITHUB_WORKSPACE/vcpkg_installed" || echo "$GITHUB_WORKSPACE/vcpkg_installed does not exist or is empty."[0m
+2025-06-25T13:48:20.5784510Z [36;1m  # Verifica anche il percorso classico per completezza di debug[0m
+2025-06-25T13:48:20.5785320Z [36;1m  CLASSIC_INSTALL_PATH="$VCPKG_ROOT/installed/$VCPKG_DEFAULT_TRIPLET"[0m
+2025-06-25T13:48:20.5786230Z [36;1m  echo "Checking classic mode install path for debugging: $CLASSIC_INSTALL_PATH"[0m
+2025-06-25T13:48:20.5786970Z [36;1m  if [ -d "$CLASSIC_INSTALL_PATH" ]; then[0m
+2025-06-25T13:48:20.5787890Z [36;1m       echo "WARNING: Classic mode path $CLASSIC_INSTALL_PATH EXISTS. This is unexpected if manifest mode is active."[0m
+2025-06-25T13:48:20.5788760Z [36;1m  else[0m
+2025-06-25T13:48:20.5789250Z [36;1m       echo "Classic mode path $CLASSIC_INSTALL_PATH also does NOT exist."[0m
+2025-06-25T13:48:20.5789860Z [36;1m  fi[0m
+2025-06-25T13:48:20.5790130Z [36;1melse[0m
+2025-06-25T13:48:20.5790780Z [36;1m  echo "Confirmed: Target directory for CMAKE_PREFIX_PATH exists: $VCPKG_MANIFEST_INSTALL_PATH"[0m
+2025-06-25T13:48:20.5791560Z [36;1mfi[0m
+2025-06-25T13:48:20.5791820Z [36;1m[0m
+2025-06-25T13:48:20.5792300Z [36;1mecho "CMAKE_PREFIX_PATH=$VCPKG_MANIFEST_INSTALL_PATH" >> "$GITHUB_ENV"[0m
+2025-06-25T13:48:20.5793430Z [36;1mecho "DYLD_LIBRARY_PATH=$VCPKG_MANIFEST_INSTALL_PATH/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" >> "$GITHUB_ENV"[0m
+2025-06-25T13:48:20.5794530Z [36;1mecho "CMAKE_PREFIX_PATH set to $VCPKG_MANIFEST_INSTALL_PATH"[0m
+2025-06-25T13:48:20.5795350Z [36;1mecho "DYLD_LIBRARY_PATH extended with $VCPKG_MANIFEST_INSTALL_PATH/lib"[0m
+2025-06-25T13:48:20.5987200Z shell: /bin/bash -e {0}
+2025-06-25T13:48:20.5987600Z env:
+2025-06-25T13:48:20.5988040Z   PYVERSION: 3.11
+2025-06-25T13:48:20.5988380Z   TARGET_ARCH: x64
+2025-06-25T13:48:20.5988750Z   VCPKG_DEFAULT_TRIPLET: x64-osx
+2025-06-25T13:48:20.5989400Z   pythonLocation: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:48:20.5990350Z   PKG_CONFIG_PATH: /Users/runner/hostedtoolcache/Python/3.11.9/x64/lib/pkgconfig
+2025-06-25T13:48:20.5991970Z   Python_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:48:20.5992840Z   Python2_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:48:20.5993690Z   Python3_ROOT_DIR: /Users/runner/hostedtoolcache/Python/3.11.9/x64
+2025-06-25T13:48:20.5994980Z   VCPKG_DEFAULT_BINARY_CACHE: /Users/runner/work/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_cache
+2025-06-25T13:48:20.5996130Z   VCPKG_BINARY_SOURCES: clear;x-gha,readwrite
+2025-06-25T13:48:20.5997650Z   ACTIONS_CACHE_URL: https://acghubeus2.actions.githubusercontent.com/bwbzopuV3oKlbowlUKWdOnf6KF0vjv7EYqCB3ZHqukKhTVgy74/
+2025-06-25T13:48:20.6055510Z   ACTIONS_RUNTIME_TOKEN: ***
+2025-06-25T13:48:20.6056200Z   RUNVCPKG_VCPKG_ROOT: /Users/runner/work/synthizer3d/synthizer3d/vcpkg
+2025-06-25T13:48:20.6057080Z   VCPKG_ROOT: /Users/runner/work/synthizer3d/synthizer3d/vcpkg
+2025-06-25T13:48:20.6057830Z ##[endgroup]
+2025-06-25T13:48:20.6301770Z VCPKG_ROOT (vcpkg tool directory) is /Users/runner/work/synthizer3d/synthizer3d/vcpkg
+2025-06-25T13:48:20.6302960Z VCPKG_DEFAULT_TRIPLET is x64-osx
+2025-06-25T13:48:20.6303940Z GITHUB_WORKSPACE is /Users/runner/work/synthizer3d/synthizer3d
+2025-06-25T13:48:20.7449720Z Detecting compiler hash for triplet x64-osx...
+2025-06-25T13:48:23.0543440Z Compiler found: /Applications/Xcode_15.2.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++
+2025-06-25T13:48:23.0664610Z The following packages will be built and installed:
+2025-06-25T13:48:23.0665600Z     faad2:x64-osx@2.11.1
+2025-06-25T13:48:23.0666130Z     libogg:x64-osx@1.3.5#2
+2025-06-25T13:48:23.0666690Z     libvorbis:x64-osx@1.3.7#4
+2025-06-25T13:48:23.0667230Z     opus:x64-osx@1.5.2
+2025-06-25T13:48:23.0667810Z     opusfile:x64-osx@0.12+20221121#1
+2025-06-25T13:48:23.0668380Z     soundtouch:x64-osx@2.3.3
+2025-06-25T13:48:23.0668990Z   * vcpkg-cmake:x64-osx@2024-04-23
+2025-06-25T13:48:23.0669660Z   * vcpkg-cmake-config:x64-osx@2024-05-23
+2025-06-25T13:48:23.0670620Z Additional packages (*) will be modified to complete this operation.
+2025-06-25T13:48:23.0673810Z $VCPKG_BINARY_SOURCES: warning: The 'x-gha' binary caching backend has been removed. Consider using a NuGet-based binary caching provider instead, see extended documentation at https://learn.microsoft.com/vcpkg/users/binarycaching?WT.mc_id=vcpkg_inproduct_cli.
+2025-06-25T13:48:23.0676130Z   on expression: clear;x-gha,readwrite
+2025-06-25T13:48:23.0676790Z                                       ^
+2025-06-25T13:48:23.0677530Z Installing 1/8 vcpkg-cmake:x64-osx@2024-04-23...
+2025-06-25T13:48:23.0678260Z Building vcpkg-cmake:x64-osx@2024-04-23...
+2025-06-25T13:48:23.1007680Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-osx/share/vcpkg-cmake/vcpkg_cmake_configure.cmake
+2025-06-25T13:48:23.1013820Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-osx/share/vcpkg-cmake/vcpkg_cmake_build.cmake
+2025-06-25T13:48:23.1017690Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-osx/share/vcpkg-cmake/vcpkg_cmake_install.cmake
+2025-06-25T13:48:23.1024110Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-osx/share/vcpkg-cmake/vcpkg-port-config.cmake
+2025-06-25T13:48:23.1029260Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-osx/share/vcpkg-cmake/copyright
+2025-06-25T13:48:23.1067720Z -- Performing post-build validation
+2025-06-25T13:48:23.1128670Z Elapsed time to handle vcpkg-cmake:x64-osx: 46.3 ms
+2025-06-25T13:48:23.1131000Z vcpkg-cmake:x64-osx package ABI: 40a914f9f2ce407f0c6effd8372fdaf561b2d183abbde65dc9ead58fe558cf9a
+2025-06-25T13:48:23.1132090Z Installing 2/8 faad2:x64-osx@2.11.1...
+2025-06-25T13:48:23.1132740Z Building faad2:x64-osx@2.11.1...
+2025-06-25T13:48:23.1532600Z Downloading https://github.com/knik0/faad2/archive/2.11.1.tar.gz -> knik0-faad2-2.11.1.tar.gz
+2025-06-25T13:48:24.0725080Z Successfully downloaded knik0-faad2-2.11.1.tar.gz
+2025-06-25T13:48:24.3979820Z -- Extracting source /Users/runner/work/synthizer3d/synthizer3d/vcpkg/downloads/knik0-faad2-2.11.1.tar.gz
+2025-06-25T13:48:24.4578200Z -- Applying patch fix-install.patch
+2025-06-25T13:48:24.4664030Z -- Using source at /Users/runner/work/synthizer3d/synthizer3d/vcpkg/buildtrees/faad2/src/2.11.1-55f3ec09c2.clean
+2025-06-25T13:48:24.4709260Z -- Found external ninja('1.13.0').
+2025-06-25T13:48:24.4750010Z -- Configuring x64-osx
+2025-06-25T13:48:25.7008500Z -- Building x64-osx-dbg
+2025-06-25T13:48:30.9812290Z -- Building x64-osx-rel
+2025-06-25T13:48:41.9016660Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/faad2_x64-osx/lib/pkgconfig/faad2.pc
+2025-06-25T13:48:41.9089310Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/faad2_x64-osx/debug/lib/pkgconfig/faad2.pc
+2025-06-25T13:48:41.9182870Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/faad2_x64-osx/share/faad2/copyright
+2025-06-25T13:48:41.9876050Z -- Adjusted RPATH of '/Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/faad2_x64-osx/tools/faad2/faad' to '@loader_path/../../lib'
+2025-06-25T13:48:42.0014900Z -- Performing post-build validation
+2025-06-25T13:48:42.0037580Z Elapsed time to handle faad2:x64-osx: 19 s
+2025-06-25T13:48:42.0073380Z faad2:x64-osx package ABI: d5dd2559b702fe29e18067a4595a055017a884a27ffde05a097c764a8a4bb966
+2025-06-25T13:48:42.0563780Z Installing 3/8 vcpkg-cmake-config:x64-osx@2024-05-23...
+2025-06-25T13:48:42.0583740Z Building vcpkg-cmake-config:x64-osx@2024-05-23...
+2025-06-25T13:48:42.0648110Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake-config_x64-osx/share/vcpkg-cmake-config/vcpkg_cmake_config_fixup.cmake
+2025-06-25T13:48:42.0652890Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake-config_x64-osx/share/vcpkg-cmake-config/vcpkg-port-config.cmake
+2025-06-25T13:48:42.0656020Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake-config_x64-osx/share/vcpkg-cmake-config/copyright
+2025-06-25T13:48:42.0657990Z -- Skipping post-build validation due to VCPKG_POLICY_EMPTY_PACKAGE
+2025-06-25T13:48:42.0659200Z Elapsed time to handle vcpkg-cmake-config:x64-osx: 54.1 ms
+2025-06-25T13:48:42.0660900Z vcpkg-cmake-config:x64-osx package ABI: d2c96fec92e0c3a0078788407dd660b8ad7f4bc34e553c17b04dd5f1d2b57ca7
+2025-06-25T13:48:42.0662170Z Installing 4/8 libogg:x64-osx@1.3.5#2...
+2025-06-25T13:48:42.0662960Z Building libogg:x64-osx@1.3.5#2...
+2025-06-25T13:48:42.1065660Z Downloading https://gitlab.xiph.org/xiph/ogg/-/archive/v1.3.5/ogg-v1.3.5.tar.gz -> xiph-ogg-v1.3.5.tar.gz
+2025-06-25T13:48:42.6548780Z Successfully downloaded xiph-ogg-v1.3.5.tar.gz
+2025-06-25T13:48:42.9627250Z -- Extracting source /Users/runner/work/synthizer3d/synthizer3d/vcpkg/downloads/xiph-ogg-v1.3.5.tar.gz
+2025-06-25T13:48:43.0185320Z -- Using source at /Users/runner/work/synthizer3d/synthizer3d/vcpkg/buildtrees/libogg/src/v1.3.5-1a4243fef9.clean
+2025-06-25T13:48:43.0241910Z -- Found external ninja('1.13.0').
+2025-06-25T13:48:43.0281250Z -- Configuring x64-osx
+2025-06-25T13:48:49.4849930Z -- Building x64-osx-dbg
+2025-06-25T13:48:49.7519740Z -- Building x64-osx-rel
+2025-06-25T13:48:50.2323940Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libogg_x64-osx/lib/pkgconfig/ogg.pc
+2025-06-25T13:48:50.2391520Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libogg_x64-osx/debug/lib/pkgconfig/ogg.pc
+2025-06-25T13:48:50.2450810Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libogg_x64-osx/share/libogg/copyright
+2025-06-25T13:48:50.2570030Z -- Performing post-build validation
+2025-06-25T13:48:50.2659960Z Elapsed time to handle libogg:x64-osx: 8.2 s
+2025-06-25T13:48:50.2661350Z libogg:x64-osx package ABI: 260b7dc3ef8b7f97be5cfb7f8ed82db426481bbca21a1bf0982fbc3a54862276
+2025-06-25T13:48:50.2662440Z Installing 5/8 libvorbis:x64-osx@1.3.7#4...
+2025-06-25T13:48:50.2663770Z Building libvorbis:x64-osx@1.3.7#4...
+2025-06-25T13:48:50.3130030Z Downloading https://github.com/xiph/vorbis/archive/v1.3.7.tar.gz -> xiph-vorbis-v1.3.7.tar.gz
+2025-06-25T13:48:51.1956290Z Successfully downloaded xiph-vorbis-v1.3.7.tar.gz
+2025-06-25T13:48:51.5292300Z -- Extracting source /Users/runner/work/synthizer3d/synthizer3d/vcpkg/downloads/xiph-vorbis-v1.3.7.tar.gz
+2025-06-25T13:48:51.6891340Z -- Applying patch 0001-Dont-export-vorbisenc-functions.patch
+2025-06-25T13:48:51.6975250Z -- Applying patch 0002-Fixup-pkgconfig-libs.patch
+2025-06-25T13:48:51.7059310Z -- Applying patch 0003-def-mingw-compat.patch
+2025-06-25T13:48:51.7153470Z -- Applying patch 0004-ogg-find-dependency.patch
+2025-06-25T13:48:51.7238990Z -- Using source at /Users/runner/work/synthizer3d/synthizer3d/vcpkg/buildtrees/libvorbis/src/v1.3.7-c32164610e.clean
+2025-06-25T13:48:51.7290630Z -- Found external ninja('1.13.0').
+2025-06-25T13:48:51.7327900Z -- Configuring x64-osx
+2025-06-25T13:48:54.3559850Z -- Building x64-osx-dbg
+2025-06-25T13:48:56.1962780Z -- Building x64-osx-rel
+2025-06-25T13:48:59.4589810Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-osx/lib/pkgconfig/vorbis.pc
+2025-06-25T13:48:59.4600910Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-osx/lib/pkgconfig/vorbisenc.pc
+2025-06-25T13:48:59.4613310Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-osx/lib/pkgconfig/vorbisfile.pc
+2025-06-25T13:48:59.4772670Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-osx/debug/lib/pkgconfig/vorbis.pc
+2025-06-25T13:48:59.4782200Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-osx/debug/lib/pkgconfig/vorbisenc.pc
+2025-06-25T13:48:59.4791670Z -- Fixing pkgconfig file: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-osx/debug/lib/pkgconfig/vorbisfile.pc
+2025-06-25T13:48:59.4948070Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-osx/share/libvorbis/usage
+2025-06-25T13:48:59.4956870Z -- Installing: /Users/runner/work/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x64-osx/share/libvorbis/copyright
+2025-06-25T13:48:59.5360660Z -- Performing post-build validation
+2025-06-25T13:48:59.5476650Z Elapsed time to handle libvorbis:x64-osx: 9.3 s
+2025-06-25T13:48:59.5478010Z libvorbis:x64-osx package ABI: 37e47a95b29fe65315372e4f0dfc5414473789e14ed4c50d841857dbcc282368
+2025-06-25T13:48:59.5479080Z Installing 6/8 opus:x64-osx@1.5.2...
+2025-06-25T13:48:59.5479700Z Building opus:x64-osx@1.5.2...
+2025-06-25T13:48:59.5951140Z Downloading https://github.com/xiph/opus/archive/v1.5.2.tar.gz -> xiph-opus-v1.5.2.tar.gz
+2025-06-25T13:49:02.0443420Z warning: Problem : HTTP error. Will retry in 1 second. 3 retries left.
+2025-06-25T13:49:05.3429590Z warning: Problem : HTTP error. Will retry in 2 seconds. 2 retries left.
+2025-06-25T13:49:09.7320490Z warning: Problem : HTTP error. Will retry in 4 seconds. 1 retry left.
+2025-06-25T13:49:16.1213710Z error: curl: (22) The requested URL returned error: 503
+2025-06-25T13:49:16.1215610Z note: If you are using a proxy, please ensure your proxy settings are correct.
+2025-06-25T13:49:16.1217280Z Possible causes are:
+2025-06-25T13:49:16.1218660Z 1. You are actually using an HTTP proxy, but setting HTTPS_PROXY variable to `https//address:port`.
+2025-06-25T13:49:16.1221750Z This is not correct, because `https://` prefix claims the proxy is an HTTPS proxy, while your proxy (v2ray, shadowsocksr, etc...) is an HTTP proxy.
+2025-06-25T13:49:16.1223830Z Try setting `http://address:port` to both HTTP_PROXY and HTTPS_PROXY instead.
+2025-06-25T13:49:16.1226420Z 2. If you are using Windows, vcpkg will automatically use your Windows IE Proxy Settings set by your proxy software. See: https://github.com/microsoft/vcpkg-tool/pull/77
+2025-06-25T13:49:16.1228570Z The value set by your proxy might be wrong, or have same `https://` prefix issue.
+2025-06-25T13:49:16.1230640Z 3. Your proxy's remote server is our of service.
+2025-06-25T13:49:16.1235670Z If you believe this is not a temporary download server failure and vcpkg needs to be changed to download this file from a different location, please submit an issue to https://github.com/Microsoft/vcpkg/issues
+2025-06-25T13:49:16.4406050Z CMake Error at scripts/cmake/vcpkg_download_distfile.cmake:136 (message):
+2025-06-25T13:49:16.4436630Z ##[error]  Download failed, halting portfile.
+2025-06-25T13:49:16.4452140Z Call Stack (most recent call first):
+2025-06-25T13:49:16.4453380Z   scripts/cmake/vcpkg_from_github.cmake:120 (vcpkg_download_distfile)
+2025-06-25T13:49:16.4455480Z   buildtrees/versioning_/versions/opus/368f8193c8c240a844cd342a3a485a0fa62e5774/portfile.cmake:1 (vcpkg_from_github)
+2025-06-25T13:49:16.4456970Z   scripts/ports.cmake:206 (include)
+2025-06-25T13:49:16.4457340Z 
+2025-06-25T13:49:16.4457350Z 
+2025-06-25T13:49:16.4457980Z error: building opus:x64-osx failed with: BUILD_FAILED
+2025-06-25T13:49:16.4459900Z See https://learn.microsoft.com/vcpkg/troubleshoot/build-failures?WT.mc_id=vcpkg_inproduct_cli for more information.
+2025-06-25T13:49:16.4461530Z Elapsed time to handle opus:x64-osx: 17 s
+2025-06-25T13:49:16.4651760Z Please ensure you're using the latest port files with `git pull` and `vcpkg update`.
+2025-06-25T13:49:16.4653500Z Then check for known issues at:
+2025-06-25T13:49:16.4655310Z   https://github.com/microsoft/vcpkg/issues?q=is%3Aissue+is%3Aopen+in%3Atitle+opus
+2025-06-25T13:49:16.4656940Z You can submit a new issue at:
+2025-06-25T13:49:16.4661250Z   https://github.com/microsoft/vcpkg/issues/new?title=[opus]+Build+error+on+x64-osx&body=Copy%20issue%20body%20from%20collapsed%20section%20%22issue_body.md%22%20in%20the%20ci%20log%20output
+2025-06-25T13:49:16.4664310Z ##[group]issue_body.md
+2025-06-25T13:49:16.4665080Z Package: opus:x64-osx@1.5.2
+2025-06-25T13:49:16.4665430Z 
+2025-06-25T13:49:16.4665750Z **Host Environment**
+2025-06-25T13:49:16.4666040Z 
+2025-06-25T13:49:16.4666260Z - Host: x64-osx
+2025-06-25T13:49:16.4667320Z - Compiler: AppleClang 15.0.0.15000100
+2025-06-25T13:49:16.4668980Z -    vcpkg-tool version: 2025-05-19-ece4c0f6b8fae9e94513d544c7aa753dd2c82337
+2025-06-25T13:49:16.4670610Z     vcpkg-scripts version: 8f63c9ed58 2025-05-26 (4 weeks ago)
+2025-06-25T13:49:16.4671450Z 
+2025-06-25T13:49:16.4671790Z **To Reproduce**
+2025-06-25T13:49:16.4672190Z 
+2025-06-25T13:49:16.4672560Z `vcpkg install `
+2025-06-25T13:49:16.4672920Z 
+2025-06-25T13:49:16.4673340Z **Failure logs**
+2025-06-25T13:49:16.4673720Z 
+2025-06-25T13:49:16.4673930Z ```
+2025-06-25T13:49:16.4675400Z Downloading https://github.com/xiph/opus/archive/v1.5.2.tar.gz -> xiph-opus-v1.5.2.tar.gz
+2025-06-25T13:49:16.4678370Z warning: Problem : HTTP error. Will retry in 1 second. 3 retries left.
+2025-06-25T13:49:16.4679850Z warning: Problem : HTTP error. Will retry in 2 seconds. 2 retries left.
+2025-06-25T13:49:16.4681670Z warning: Problem : HTTP error. Will retry in 4 seconds. 1 retry left.
+2025-06-25T13:49:16.4682950Z error: curl: (22) The requested URL returned error: 503
+2025-06-25T13:49:16.4684390Z note: If you are using a proxy, please ensure your proxy settings are correct.
+2025-06-25T13:49:16.4685380Z Possible causes are:
+2025-06-25T13:49:16.4686780Z 1. You are actually using an HTTP proxy, but setting HTTPS_PROXY variable to `https//address:port`.
+2025-06-25T13:49:16.4690300Z This is not correct, because `https://` prefix claims the proxy is an HTTPS proxy, while your proxy (v2ray, shadowsocksr, etc...) is an HTTP proxy.
+2025-06-25T13:49:16.4692770Z Try setting `http://address:port` to both HTTP_PROXY and HTTPS_PROXY instead.
+2025-06-25T13:49:16.4696050Z 2. If you are using Windows, vcpkg will automatically use your Windows IE Proxy Settings set by your proxy software. See: https://github.com/microsoft/vcpkg-tool/pull/77
+2025-06-25T13:49:16.4698500Z The value set by your proxy might be wrong, or have same `https://` prefix issue.
+2025-06-25T13:49:16.4700030Z 3. Your proxy's remote server is our of service.
+2025-06-25T13:49:16.4704490Z If you believe this is not a temporary download server failure and vcpkg needs to be changed to download this file from a different location, please submit an issue to https://github.com/Microsoft/vcpkg/issues
+2025-06-25T13:49:16.4707190Z CMake Error at scripts/cmake/vcpkg_download_distfile.cmake:136 (message):
+2025-06-25T13:49:16.4709080Z ##[error]  Download failed, halting portfile.
+2025-06-25T13:49:16.4710920Z Call Stack (most recent call first):
+2025-06-25T13:49:16.4712730Z   scripts/cmake/vcpkg_from_github.cmake:120 (vcpkg_download_distfile)
+2025-06-25T13:49:16.4714820Z   buildtrees/versioning_/versions/opus/368f8193c8c240a844cd342a3a485a0fa62e5774/portfile.cmake:1 (vcpkg_from_github)
+2025-06-25T13:49:16.4716330Z   scripts/ports.cmake:206 (include)
+2025-06-25T13:49:16.4716710Z 
+2025-06-25T13:49:16.4716720Z 
+2025-06-25T13:49:16.4716730Z 
+2025-06-25T13:49:16.4716880Z ```
+2025-06-25T13:49:16.4717100Z 
+2025-06-25T13:49:16.4717390Z **Additional context**
+2025-06-25T13:49:16.4717700Z 
+2025-06-25T13:49:16.4718140Z <details><summary>vcpkg.json</summary>
+2025-06-25T13:49:16.4718540Z 
+2025-06-25T13:49:16.4718730Z ```
+2025-06-25T13:49:16.4719320Z {
+2025-06-25T13:49:16.4719930Z   "name": "synthizer3d",
+2025-06-25T13:49:16.4720540Z   "version": "0.1.0",
+2025-06-25T13:49:16.4721510Z   "builtin-baseline": "8f63c9ed5897d7367a92a442a79f91721e0fd38f",
+2025-06-25T13:49:16.4722330Z   "dependencies": [
+2025-06-25T13:49:16.4722850Z     "libvorbis",
+2025-06-25T13:49:16.4723310Z     "libogg",
+2025-06-25T13:49:16.4723680Z     "opus",
+2025-06-25T13:49:16.4724120Z     "opusfile",
+2025-06-25T13:49:16.4724640Z     "soundtouch",
+2025-06-25T13:49:16.4725020Z     "faad2"
+2025-06-25T13:49:16.4725360Z   ],
+2025-06-25T13:49:16.4725960Z   "overrides": [
+2025-06-25T13:49:16.4726350Z     {
+2025-06-25T13:49:16.4726870Z       "name": "libogg",
+2025-06-25T13:49:16.4727490Z       "version": "1.3.5",
+2025-06-25T13:49:16.4728370Z       "port-version": 2
+2025-06-25T13:49:16.4729040Z     }
+2025-06-25T13:49:16.4729510Z   ]
+2025-06-25T13:49:16.4729920Z }
+2025-06-25T13:49:16.4730190Z 
+2025-06-25T13:49:16.4730350Z ```
+2025-06-25T13:49:16.4730710Z </details>
+2025-06-25T13:49:16.4731520Z ##[endgroup]
+2025-06-25T13:49:16.4731820Z 
+2025-06-25T13:49:16.7564990Z ##[error]Process completed with exit code 1.
+2025-06-25T13:49:16.7755800Z Post job cleanup.
+2025-06-25T13:49:16.9399790Z [command]/usr/local/bin/git version
+2025-06-25T13:49:16.9509200Z git version 2.50.0
+2025-06-25T13:49:16.9564200Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/04ae5ff0-a3e4-45c3-bdee-beade1c04ee2/.gitconfig'
+2025-06-25T13:49:16.9589150Z Temporarily overriding HOME='/Users/runner/work/_temp/04ae5ff0-a3e4-45c3-bdee-beade1c04ee2' before making global git config changes
+2025-06-25T13:49:16.9592240Z Adding repository directory to the temporary git global config as a safe directory
+2025-06-25T13:49:16.9609450Z [command]/usr/local/bin/git config --global --add safe.directory /Users/runner/work/synthizer3d/synthizer3d
+2025-06-25T13:49:16.9737300Z [command]/usr/local/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-06-25T13:49:16.9865870Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-06-25T13:49:17.1297970Z [command]/usr/local/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-06-25T13:49:17.1384700Z http.https://github.com/.extraheader
+2025-06-25T13:49:17.1407150Z [command]/usr/local/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-06-25T13:49:17.1520290Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-06-25T13:49:17.3159250Z Cleaning up orphan processes

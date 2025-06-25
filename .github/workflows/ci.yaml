@@ -68,19 +68,30 @@ jobs:
         
       - name: Retry vcpkg install on failure
         if: failure()
-        timeout-minutes: 45
+        timeout-minutes: 60
         shell: pwsh
         run: |
           Write-Host "🔄 Retrying vcpkg install due to network issues..."
           Start-Sleep 30
           
-          for ($i = 1; $i -le 3; $i++) {
-            Write-Host "📦 Attempt $i of 3..."
-            if (& "$env:VCPKG_ROOT/vcpkg.exe" install --triplet=$env:VCPKG_DEFAULT_TRIPLET --feature-flags=versions) {
+          # Clear any partially downloaded files
+          if (Test-Path "$env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE") {
+            Write-Host "🧹 Cleaning partial vcpkg installation..."
+            Remove-Item "$env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE" -Recurse -Force -ErrorAction SilentlyContinue
+          }
+          
+          for ($i = 1; $i -le 5; $i++) {
+            Write-Host "📦 Attempt $i of 5..."
+            # Add random delay to avoid thundering herd
+            $delay = Get-Random -Minimum 30 -Maximum 60
+            Write-Host "⏱️ Waiting $delay seconds before attempt..."
+            Start-Sleep $delay
+            
+            if (& "$env:VCPKG_ROOT/vcpkg.exe" install --triplet=$env:VCPKG_DEFAULT_TRIPLET --feature-flags=versions --clean-after-build) {
               Write-Host "✅ vcpkg install succeeded on attempt $i"
               break
             } else {
-              if ($i -lt 3) {
+              if ($i -lt 5) {
                 Write-Host "❌ Attempt $i failed, waiting $($i * 60) seconds..."
                 Start-Sleep ($i * 60)
               } else {
@@ -574,18 +585,29 @@ jobs:
         
       - name: Retry vcpkg install on failure  
         if: failure()
-        timeout-minutes: 45
+        timeout-minutes: 60
         run: |
           echo "🔄 Retrying vcpkg install due to network issues..."
           sleep 30
           
-          for i in {1..3}; do
-            echo "📦 Attempt $i of 3..."
-            if "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions; then
+          # Clear any partially downloaded files
+          if [ -d "$GITHUB_WORKSPACE/vcpkg_installed" ]; then
+            echo "🧹 Cleaning partial vcpkg installation..."
+            rm -rf "$GITHUB_WORKSPACE/vcpkg_installed"
+          fi
+          
+          for i in {1..5}; do
+            echo "📦 Attempt $i of 5..."
+            # Add random delay to avoid thundering herd
+            DELAY=$((RANDOM % 30 + 30))
+            echo "⏱️ Waiting $DELAY seconds before attempt..."
+            sleep $DELAY
+            
+            if "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions --clean-after-build; then
               echo "✅ vcpkg install succeeded on attempt $i"
               break
             else
-              if [ $i -lt 3 ]; then
+              if [ $i -lt 5 ]; then
                 echo "❌ Attempt $i failed, waiting $(($i * 60)) seconds..."
                 sleep $(($i * 60))
               else
@@ -751,18 +773,29 @@ jobs:
         
       - name: Retry vcpkg install on failure
         if: failure()
-        timeout-minutes: 45
+        timeout-minutes: 60
         run: |
           echo "🔄 Retrying vcpkg install due to network issues..."
           sleep 30
           
-          for i in {1..3}; do
-            echo "📦 Attempt $i of 3..."
-            if "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions; then
+          # Clear any partially downloaded files
+          if [ -d "$GITHUB_WORKSPACE/vcpkg_installed" ]; then
+            echo "🧹 Cleaning partial vcpkg installation..."
+            rm -rf "$GITHUB_WORKSPACE/vcpkg_installed"
+          fi
+          
+          for i in {1..5}; do
+            echo "📦 Attempt $i of 5..."
+            # Add random delay to avoid thundering herd
+            DELAY=$((RANDOM % 30 + 30))
+            echo "⏱️ Waiting $DELAY seconds before attempt..."
+            sleep $DELAY
+            
+            if "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions --clean-after-build; then
               echo "✅ vcpkg install succeeded on attempt $i"
               break
             else
-              if [ $i -lt 3 ]; then
+              if [ $i -lt 5 ]; then
                 echo "❌ Attempt $i failed, waiting $(($i * 60)) seconds..."
                 sleep $(($i * 60))
               else

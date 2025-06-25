@@ -185,6 +185,9 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
                 else:
                     print(f"Warning: synthizer library not found at expected path: {synthizer_lib_path}")
             
+            # Add explicit C++ standard library linking and deployment target
+            link_args.extend(["-lc++", "-mmacosx-version-min=10.15"])
+            
             extension_args["extra_link_args"].extend(link_args)
             
             # Suppress warnings from third-party headers
@@ -193,7 +196,7 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
             extension_args["extra_compile_args"].extend([
                 "-Wno-unused-variable"  # Suppress warnings from third-party headers (vorbis)
             ])
-            print(f"macOS: Using -force_load for ALL {len(existing_libs)} libraries with modern APIs")
+            print(f"macOS: Using -force_load for ALL {len(existing_libs)} libraries with static C++ runtime")
         
         print(f"Static libraries found: {[os.path.basename(lib) for lib in existing_libs]}")
         print(f"Link args: {extension_args['extra_link_args']}")

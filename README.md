@@ -29,10 +29,11 @@ Synthizer is a library for game/VR audio applications, designed to handle everyt
 > - **OGG**  🆕
 > - **OPUS** 🆕
 > - **AIF** 🆕
+> - **AAC** 🆕
 >
 > <br>
 >
-> **AIF, OGG and OPUS support are newly added!**  
+> **AIF, AAC, OGG and OPUS support are newly added!**  
 > You can now load, spatialize, and play audio from these formats in your 3D environments.  
 > This enhancement makes Synthizer3D even more versatile for interactive, gaming, and streaming audio applications.
 

@@ -937,6 +937,7 @@ jobs:
           path: ~/artifacts
 
       - name: Display downloaded artifacts structure
+        shell: bash
         run: |
           echo "📂 Available artifacts:"
           ls -la ~/artifacts/

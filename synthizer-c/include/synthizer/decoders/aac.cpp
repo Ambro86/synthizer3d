@@ -30,20 +30,22 @@ AacDecoder::~AacDecoder() {
 }
 
 bool AacDecoder::fillBuffer() {
-    // Se ci sono ancora dati non elaborati nel buffer, non fare nulla
     if (buffer_pos < buffer_size) {
-        return true;
+        // Move remaining data to the start of the buffer
+        size_t remaining = buffer_size - buffer_pos;
+        std::memmove(buffer.data(), buffer.data() + buffer_pos, remaining);
+        buffer_size = remaining;
+        buffer_pos = 0;
+    } else {
+        buffer_size = 0;
+        buffer_pos = 0;
     }
-    
-    // Se il buffer è completamente consumato, leggi nuovi dati
-    size_t bytes_read = stream->read(buffer.size(), reinterpret_cast<char*>(buffer.data()));
-    buffer_size = bytes_read;
-    buffer_pos = 0;
-    
-    // Debug: verifica se stiamo leggendo sempre gli stessi dati
-    static size_t total_bytes_read = 0;
-    total_bytes_read += bytes_read;
-    
+
+    // Read new data into the remaining space
+    size_t bytes_to_read = buffer.size() - buffer_size;
+    size_t bytes_read = stream->read(bytes_to_read, reinterpret_cast<char*>(buffer.data() + buffer_size));
+    buffer_size += bytes_read;
+
     return buffer_size > 0;
 }
 
@@ -106,10 +108,8 @@ unsigned long long AacDecoder::writeSamplesInterleaved(unsigned long long num_fr
 
 unsigned long long AacDecoder::decodeFramesDirect(unsigned long long num_frames, float *samples) {
     unsigned long long frames_decoded = 0;
-    size_t consecutive_failures = 0;
-    const size_t MAX_FAILURES = 10;
     
-    while (frames_decoded < num_frames && consecutive_failures < MAX_FAILURES) {
+    while (frames_decoded < num_frames) {
         if (!fillBuffer()) {
             break;
         }
@@ -126,20 +126,18 @@ unsigned long long AacDecoder::decodeFramesDirect(unsigned long long num_frames,
                                              buffer_size - buffer_pos);
         
         if (frame_info.error != 0) {
-            consecutive_failures++;
-            // Avanza di almeno 1 byte anche in caso di errore
-            buffer_pos = std::min(buffer_pos + 1, buffer_size);
-            continue;
+            break;
         }
         
-        // Avanza sempre nel buffer
+        // Avanza nel buffer
         if (frame_info.bytesconsumed > 0) {
             buffer_pos += frame_info.bytesconsumed;
-            consecutive_failures = 0; // Reset counter su successo
         } else {
             // Se non viene consumato nessun byte, avanza di almeno 1 per evitare loop infiniti
-            buffer_pos = std::min(buffer_pos + 1, buffer_size);
-            consecutive_failures++;
+            buffer_pos++;
+            if (buffer_pos >= buffer_size) {
+                break;
+            }
         }
         
         if (frame_info.samples == 0) {

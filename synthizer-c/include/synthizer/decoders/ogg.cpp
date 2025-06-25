@@ -42,6 +42,7 @@ int seek_cb(void *datasource, ogg_int64_t offset, int whence) {
 }
 
 int close_cb(void *datasource) {
+    (void)datasource; // Evita warning C4100 (unused parameter)
     // Niente da fare, il ByteStream è gestito da std::shared_ptr
     return 0;
 }

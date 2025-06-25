@@ -70,7 +70,7 @@ public:
             ogg_int64_t current_pos = ov_pcm_tell(&vf);
             if (ov_pcm_seek(&vf, 0) == 0) {
                 // Vai alla fine per determinare la lunghezza
-                long bitstream;
+                int bitstream;
                 float **pcm;
                 long samples_read;
                 while ((samples_read = ov_read_float(&vf, &pcm, 4096, &bitstream)) > 0) {

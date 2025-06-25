@@ -28,8 +28,25 @@ find_package(Ogg REQUIRED)
 find_package(Opus REQUIRED)
 find_package(OpusFile REQUIRED)
 find_package(SoundTouch REQUIRED)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(FAAD2 REQUIRED faad2)
+
+# FAAD2 configuration - cross-platform approach
+if(WIN32)
+  # On Windows, use direct library linking via vcpkg
+  set(FAAD2_FOUND TRUE)
+  set(FAAD2_LIBRARIES faad2)
+  set(FAAD2_INCLUDE_DIRS "")
+else()
+  # On Unix/Linux, use pkg-config if available
+  find_package(PkgConfig)
+  if(PKG_CONFIG_FOUND)
+    pkg_check_modules(FAAD2 REQUIRED faad2)
+  else()
+    # Fallback for systems without pkg-config
+    find_library(FAAD2_LIBRARIES NAMES faad2 faad REQUIRED)
+    find_path(FAAD2_INCLUDE_DIRS NAMES neaacdec.h REQUIRED)
+    set(FAAD2_FOUND TRUE)
+  endif()
+endif()
 
 
 # Check if op_read_float is available
@@ -232,7 +249,9 @@ endif()
 target_link_libraries(synthizer PRIVATE ${SYZ_LIBRARIES})
 
 target_include_directories(synthizer PRIVATE $<TARGET_PROPERTY:wdl_objlib,INTERFACE_INCLUDE_DIRECTORIES>)
-target_include_directories(synthizer PRIVATE ${FAAD2_INCLUDE_DIRS})
+if(NOT WIN32 AND FAAD2_INCLUDE_DIRS)
+  target_include_directories(synthizer PRIVATE ${FAAD2_INCLUDE_DIRS})
+endif()
 
 # Add vcpkg include directories - unified approach for all platforms
 if(DEFINED ENV{VCPKG_INSTALLED_PATH})

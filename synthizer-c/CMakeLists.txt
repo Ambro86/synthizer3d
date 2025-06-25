@@ -181,7 +181,7 @@ if(WIN32)
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/opusfile.lib"
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/vorbisenc.lib"
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/SoundTouch.lib"
-    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/faad2.lib"
+    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/faad.lib"
   )
 elseif(UNIX AND NOT APPLE)
   # Linux-specific linking for static libraries with whole-archive

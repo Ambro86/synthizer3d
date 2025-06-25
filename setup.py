@@ -118,7 +118,7 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
     if system == "Windows":
         # Windows uses dynamic linking with individual libraries
         extension_args["libraries"].extend([
-            "ogg", "opus", "vorbis", "vorbisenc", "opusfile", "vorbisfile", "SoundTouch", "faad2"
+            "ogg", "opus", "vorbis", "vorbisenc", "opusfile", "vorbisfile", "SoundTouch", "faad"
         ])
         print("Windows: Using dynamic library linking")
     else:

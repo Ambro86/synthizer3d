@@ -52,13 +52,13 @@ bool AacDecoder::initializeDecoder() {
     NeAACDecSetConfiguration(this->decoder, config);
     
     unsigned long samplerate;
-    unsigned char channels;
+    unsigned char local_channels;
     
     long init_result = NeAACDecInit(this->decoder, 
                                    buffer.data() + buffer_pos, 
                                    buffer_size - buffer_pos,
                                    &samplerate, 
-                                   &channels);
+                                   &local_channels);
     
     if (init_result < 0) {
         return false;
@@ -67,7 +67,7 @@ bool AacDecoder::initializeDecoder() {
     buffer_pos += init_result;
     
     this->sr = samplerate;
-    this->channels = channels;
+    this->channels = local_channels;
     this->initialized = true;
     
     if (this->channels == 0 || this->channels > config::MAX_CHANNELS) {
@@ -174,7 +174,7 @@ AudioFormat AacDecoder::getFormat() {
     return AudioFormat::Aac;
 }
 
-void AacDecoder::seekPcm(unsigned long long pos) {
+void AacDecoder::seekPcm(unsigned long long /* pos */) {
     throw Error("Seeking not supported for AAC files");
 }
 

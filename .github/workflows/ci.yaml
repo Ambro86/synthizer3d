@@ -1001,16 +1001,16 @@ jobs:
           python -c "
           try:
               import synthizer
-              print('✅ SUCCESS: synthizer imported successfully')
+              print('SUCCESS: synthizer imported successfully')
               
               # Basic functionality test
               synthizer.initialize()
               ctx = synthizer.Context()
-              print('✅ SUCCESS: Basic synthizer functionality works')
+              print('SUCCESS: Basic synthizer functionality works')
               synthizer.shutdown()
               
           except Exception as e:
-              print(f'❌ FAILED: {e}')
+              print(f'FAILED: {e}')
               import traceback
               traceback.print_exc()
               exit(1)

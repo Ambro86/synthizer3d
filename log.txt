@@ -1,254 +1,395 @@
-2025-06-25T13:23:39.6998999Z Current runner version: '2.325.0'
-2025-06-25T13:23:39.7021411Z ##[group]Runner Image Provisioner
-2025-06-25T13:23:39.7022197Z Hosted Compute Agent
-2025-06-25T13:23:39.7022661Z Version: 20250620.352
-2025-06-25T13:23:39.7023198Z Commit: f262f3aba23b10ea191b2a62bdee1ca4c3d344da
-2025-06-25T13:23:39.7023769Z Build Date: 2025-06-20T19:27:17Z
-2025-06-25T13:23:39.7024289Z ##[endgroup]
-2025-06-25T13:23:39.7024764Z ##[group]Operating System
-2025-06-25T13:23:39.7025273Z Microsoft Windows Server 2022
-2025-06-25T13:23:39.7025803Z 10.0.20348
-2025-06-25T13:23:39.7026193Z Datacenter
-2025-06-25T13:23:39.7026601Z ##[endgroup]
-2025-06-25T13:23:39.7027008Z ##[group]Runner Image
-2025-06-25T13:23:39.7027479Z Image: windows-2022
-2025-06-25T13:23:39.7027938Z Version: 20250602.1.0
-2025-06-25T13:23:39.7028963Z Included Software: https://github.com/actions/runner-images/blob/win22/20250602.1/images/windows/Windows2022-Readme.md
-2025-06-25T13:23:39.7030629Z Image Release: https://github.com/actions/runner-images/releases/tag/win22%2F20250602.1
-2025-06-25T13:23:39.7031610Z ##[endgroup]
-2025-06-25T13:23:39.7033908Z ##[group]GITHUB_TOKEN Permissions
-2025-06-25T13:23:39.7035878Z Actions: write
-2025-06-25T13:23:39.7036332Z Attestations: write
-2025-06-25T13:23:39.7036784Z Checks: write
-2025-06-25T13:23:39.7037180Z Contents: write
-2025-06-25T13:23:39.7037646Z Deployments: write
-2025-06-25T13:23:39.7038078Z Discussions: write
-2025-06-25T13:23:39.7038563Z Issues: write
-2025-06-25T13:23:39.7038986Z Metadata: read
-2025-06-25T13:23:39.7039462Z Models: read
-2025-06-25T13:23:39.7039893Z Packages: write
-2025-06-25T13:23:39.7040301Z Pages: write
-2025-06-25T13:23:39.7040776Z PullRequests: write
-2025-06-25T13:23:39.7041196Z RepositoryProjects: write
-2025-06-25T13:23:39.7041717Z SecurityEvents: write
-2025-06-25T13:23:39.7042228Z Statuses: write
-2025-06-25T13:23:39.7042614Z ##[endgroup]
-2025-06-25T13:23:39.7044557Z Secret source: Actions
-2025-06-25T13:23:39.7045406Z Prepare workflow directory
-2025-06-25T13:23:39.7358024Z Prepare all required actions
-2025-06-25T13:23:39.7394067Z Getting action download info
-2025-06-25T13:23:40.0172072Z ##[group]Download immutable action package 'actions/setup-python@v5'
-2025-06-25T13:23:40.0173222Z Version: 5.6.0
-2025-06-25T13:23:40.0174300Z Digest: sha256:0b35a0c11c97499e4e0576589036d450b9f5f9da74b7774225b3614b57324404
-2025-06-25T13:23:40.0175558Z Source commit SHA: a26af69be951a213d495a4c3e4e4022e16d87065
-2025-06-25T13:23:40.0176338Z ##[endgroup]
-2025-06-25T13:23:40.5046927Z ##[group]Download immutable action package 'actions/download-artifact@v4'
-2025-06-25T13:23:40.5047759Z Version: 4.3.0
-2025-06-25T13:23:40.5048425Z Digest: sha256:552a5b9ad918f62ec0c2e8f42f3c694d4ebd1b4036b18c39b14168fcdfc0e4f2
-2025-06-25T13:23:40.5049344Z Source commit SHA: d3f86a106a0bac45b974a628896c90dbdf5c8093
-2025-06-25T13:23:40.5049958Z ##[endgroup]
-2025-06-25T13:23:41.2247706Z Complete job name: Test Wheels on windows-latest (x64) Python 3.11
-2025-06-25T13:23:41.3624259Z ##[group]Run actions/setup-python@v5
-2025-06-25T13:23:41.3625776Z with:
-2025-06-25T13:23:41.3626432Z   python-version: 3.11
-2025-06-25T13:23:41.3627187Z   architecture: x64
-2025-06-25T13:23:41.3627891Z   check-latest: false
-2025-06-25T13:23:41.3628882Z   token: ***
-2025-06-25T13:23:41.3629568Z   update-environment: true
-2025-06-25T13:23:41.3630394Z   allow-prereleases: false
-2025-06-25T13:23:41.3631190Z   freethreaded: false
-2025-06-25T13:23:41.3632119Z ##[endgroup]
-2025-06-25T13:23:41.6147982Z ##[group]Installed versions
-2025-06-25T13:23:41.6418318Z Successfully set up CPython (3.11.9)
-2025-06-25T13:23:41.6420523Z ##[endgroup]
-2025-06-25T13:23:41.6800710Z ##[group]Run actions/download-artifact@v4
-2025-06-25T13:23:41.6801702Z with:
-2025-06-25T13:23:41.6802251Z   path: ~/artifacts
-2025-06-25T13:23:41.6802884Z   merge-multiple: false
-2025-06-25T13:23:41.6803578Z   repository: Ambro86/synthizer3d
-2025-06-25T13:23:41.6804342Z   run-id: 15877325757
-2025-06-25T13:23:41.6804945Z env:
-2025-06-25T13:23:41.6805734Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:23:41.6808790Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
-2025-06-25T13:23:41.6810214Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:23:41.6811478Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:23:41.6812770Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:23:41.6813802Z ##[endgroup]
-2025-06-25T13:23:42.1415755Z Found 30 artifact(s)
-2025-06-25T13:23:42.1418495Z No input name, artifact-ids or pattern filtered specified, downloading all artifacts
-2025-06-25T13:23:42.1421251Z An extra directory with the artifact name will be created for each download
-2025-06-25T13:23:42.1423447Z Preparing to download the following artifacts:
-2025-06-25T13:23:42.1426837Z - python-wheels-macos-x64-3.10 (ID: 3401397940, Size: 2035965, Expected Digest: sha256:7c8da0dbbda30f422dcc2a987f739c073b273517b7a025d7b80b8672dd20fcc5)
-2025-06-25T13:23:42.1432123Z - python-wheels-macos-arm64-3.10 (ID: 3401388483, Size: 2132944, Expected Digest: sha256:529b3a9cf769d5f4c02b5c0fc827fd94f577df86f1eae9f965e79dffd32f92c5)
-2025-06-25T13:23:42.1437378Z - python-wheels-macos-x64-3.9 (ID: 3401376153, Size: 2036729, Expected Digest: sha256:0a084f06bc4454a18c09f4ab193cf3ba9a6023cc701263b117f19f172cc043a9)
-2025-06-25T13:23:42.1442430Z - python-wheels-win-x64-3.12 (ID: 3401371174, Size: 1931494, Expected Digest: sha256:36186bcf38a04705f50135341ecee5609455052bc4bfb8de6286cde7764b04ac)
-2025-06-25T13:23:42.1447499Z - python-wheels-macos-x64-3.12 (ID: 3401369848, Size: 2230476, Expected Digest: sha256:e75d3b3e3ce21bf713b2bbaf9aab49ebbd6ba41188dca0d9c86c708653429317)
-2025-06-25T13:23:42.1452686Z - python-wheels-macos-arm64-3.13 (ID: 3401368727, Size: 2128998, Expected Digest: sha256:4af02691b7cbe46a39b9d06b0cd0ed3cdaa2ab9d37f6b35cb6f46ff2d0fe906b)
-2025-06-25T13:23:42.1457852Z - python-wheels-macos-x64-3.13 (ID: 3401363646, Size: 2227311, Expected Digest: sha256:80f1ef4addd6053f1996aa77ba12b5401fc9adfa820bbab8235e3ac69b4b4961)
-2025-06-25T13:23:42.1462957Z - python-wheels-macos-x64-3.8 (ID: 3401362195, Size: 2045656, Expected Digest: sha256:8f2dae42178e0aad8a22b664946630bb80a87fee25874e44c2b3f6203815c126)
-2025-06-25T13:23:42.1467922Z - python-wheels-win-x64-3.13 (ID: 3401357174, Size: 1931398, Expected Digest: sha256:c3989d8fc90469dd563dfde34568faec5384d3669f1c4c72fe3093434aae4190)
-2025-06-25T13:23:42.1472829Z - python-wheels-win-x86-3.10 (ID: 3401357033, Size: 1745361, Expected Digest: sha256:6345b07f20cff84ea158da0f3ab4308fa1385d3e7118c73b1835e8b21b41a7db)
-2025-06-25T13:23:42.1480341Z - python-wheels-linux-x86_64-3.8 (ID: 3401354028, Size: 2573565, Expected Digest: sha256:15b319d3e8052bec8e6c153b3f6774b2c3adde4bc8662aa21a2751f34c43f01b)
-2025-06-25T13:23:42.1486753Z - python-wheels-linux-x86_64-3.9 (ID: 3401353130, Size: 2566225, Expected Digest: sha256:b4f3161ebf14e325fb7a77c3e56b4144b2b0f5be58dc4d12db3534be285284c1)
-2025-06-25T13:23:42.1491914Z - python-wheels-win-x64-3.8 (ID: 3401350993, Size: 1972316, Expected Digest: sha256:1550386eafba7119a1fc472ad131d1e473e896213a91b12a49fad2d4cda08eaf)
-2025-06-25T13:23:42.1496917Z - python-wheels-win-x86-3.12 (ID: 3401349091, Size: 1741821, Expected Digest: sha256:bd4d2c68e87109faa25aba3f16885d59d44f59e129f2381755a3f45511a57d4e)
-2025-06-25T13:23:42.1501846Z - python-wheels-win-x86-3.9 (ID: 3401348186, Size: 1767158, Expected Digest: sha256:878093b29fb329a08673e77a7bad9e4e0e8f5a113e6ec85d2e2dbe3bcf951c80)
-2025-06-25T13:23:42.1508120Z - python-wheels-macos-x64-3.11 (ID: 3401347000, Size: 2237715, Expected Digest: sha256:4032da8c3335de536f3565f310b02e2866d0ede97d98f02eff1764490c850011)
-2025-06-25T13:23:42.1511889Z - python-wheels-win-x64-3.9 (ID: 3401344672, Size: 1961154, Expected Digest: sha256:e9df7e1f64c099a0482af641a729cb4207d5ff23a1794d1208816a931f34983a)
-2025-06-25T13:23:42.1515496Z - python-wheels-win-x86-3.8 (ID: 3401344469, Size: 1771087, Expected Digest: sha256:df212ae44b554fc9e1dcceba7945c4967d58151008bee3ef45395dde13dfc7f9)
-2025-06-25T13:23:42.1520671Z - python-wheels-win-x86-3.13 (ID: 3401343925, Size: 1741425, Expected Digest: sha256:7f943aa17d405ebb559530df0bde5fbd55f65bf4e3a0aa6467acf87fcb3c48ad)
-2025-06-25T13:23:42.1529947Z - python-wheels-win-x86-3.11 (ID: 3401342770, Size: 1744907, Expected Digest: sha256:258464af9b6ad6b713882e90cc9737e7cd3b1eb8572d9732771309df492497c8)
-2025-06-25T13:23:42.1536862Z - python-wheels-win-x64-3.10 (ID: 3401342521, Size: 1930735, Expected Digest: sha256:916c30707e874a450dcb32d90bbbfbba317e487bb5eb233cd359d44c47b2839b)
-2025-06-25T13:23:42.1549774Z - python-wheels-win-x64-3.11 (ID: 3401342456, Size: 1931545, Expected Digest: sha256:67c530f436507b4ddafac5f4dd34a4dcb77b7b677721cb4443d8199088d4396e)
-2025-06-25T13:23:42.1553174Z - python-wheels-linux-x86_64-3.13 (ID: 3401328564, Size: 2585142, Expected Digest: sha256:e5c73cccb69258376fd9cb3cd15306a732d3f9b542ae575a83724b935dbff07a)
-2025-06-25T13:23:42.1556129Z - python-wheels-linux-x86_64-3.11 (ID: 3401328501, Size: 2557103, Expected Digest: sha256:4238e5572feb160fa8e9aaf3217d73233175e82a51d12d5647b7efa45835ab56)
-2025-06-25T13:23:42.1559110Z - python-wheels-macos-arm64-3.12 (ID: 3401328185, Size: 2131264, Expected Digest: sha256:cc5e7e3a0c3240d3e683efe6d4c9f0bf89f73044cbe79a8a04d73b3c7dc61ef3)
-2025-06-25T13:23:42.1569780Z - python-wheels-linux-x86_64-3.12 (ID: 3401328162, Size: 2584287, Expected Digest: sha256:a4bdf8af4f1df6b11dc6606c165eb1d5037db2f4faa03d58d14071477838d8c8)
-2025-06-25T13:23:42.1583136Z - python-wheels-linux-x86_64-3.10 (ID: 3401327668, Size: 2565041, Expected Digest: sha256:01872fecd3fbe541bcd15d2ce6d8612155c95055396f7bb7b2ee161c0aa0cd13)
-2025-06-25T13:23:42.1593431Z - python-wheels-macos-arm64-3.8 (ID: 3401327563, Size: 2149387, Expected Digest: sha256:983a08c3d52f443bad4e2aaafc6716436d290c6d545dffc24bc1a7ccbe7dec76)
-2025-06-25T13:23:42.1598741Z - python-wheels-macos-arm64-3.11 (ID: 3401326130, Size: 2137943, Expected Digest: sha256:235cb74cb0e9c4e32f0d63b67a742b9ec9aa4dba01701801ab6d283ed02e4074)
-2025-06-25T13:23:42.1604059Z - python-wheels-macos-arm64-3.9 (ID: 3401322817, Size: 2135489, Expected Digest: sha256:bc2df0872e9ce8c597ee2f5862f49371ac1a778a06ec2f396034a381175cfa14)
-2025-06-25T13:23:42.3267523Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-fae7549b-90eb-52cd-8383-f44f56e05934/artifacts/076f86604ef4623e5fc88e988957a8873314a83dee92c78f30b60b1d5fa074e8.zip
-2025-06-25T13:23:42.3271498Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.10
-2025-06-25T13:23:42.3779048Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-e98e6f58-bb86-5635-b24f-7ad1720859e6/artifacts/048b880cfb4f3e87d3ba44a145ea6584ed71477b70aa2a87ed7fb588cebfdd3e.zip
-2025-06-25T13:23:42.3783058Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.10
-2025-06-25T13:23:42.3886242Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-ab4a471a-d4df-50ea-9b78-160f6f0100a6/artifacts/dfa6b5beaeab1e7b2ee456197e66ba9cd0cde258794525efb775f9d01d77a09f.zip
-2025-06-25T13:23:42.3890255Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.8
-2025-06-25T13:23:42.3901876Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-5894a0c7-26f0-5437-b215-c322e45eb189/artifacts/276564872c8256f59e4154f85436e9053a3dba120ea8cb7fdf9346f93aad610b.zip
-2025-06-25T13:23:42.3906498Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.9
-2025-06-25T13:23:42.3915497Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-00a5ca51-192d-5f6b-87b8-83bef64ebde4/artifacts/536ee8a18e9f042e0a29d71ccd62dd1f518c097da2d85b46167484953bb64d70.zip
-2025-06-25T13:23:42.3920304Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.13
-2025-06-25T13:23:42.3941940Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-87abc368-8007-57d7-a16f-0f5d67a30af5/artifacts/14390bd3dddb5a2d0d284a37dd89495d8e579902e22dc4e6d685367f5f0c6496.zip
-2025-06-25T13:23:42.3946512Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.11
-2025-06-25T13:23:42.3956507Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-11f5d49f-35f1-5ad7-8c06-7500ffb36008/artifacts/25fda339dfa4367e9cadb9d9caa712faaa6758316a4e9a2950aa97fcf91812a0.zip
-2025-06-25T13:23:42.3961124Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.12
-2025-06-25T13:23:42.3984008Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-365c903b-47d8-5839-89c7-80fce238015f/artifacts/78d92ab587ddab82418bd3504039845b7b5dfc1f3a57e796a34f0e8433d3b8a1.zip
-2025-06-25T13:23:42.3989053Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.10
-2025-06-25T13:23:42.4018002Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-776a881b-07b4-5cc5-9788-92518c21fce9/artifacts/d416f507f4b84ada6433b27e7071685a653ebb8b689f7ddcd83052068a0ae1f7.zip
-2025-06-25T13:23:42.4022809Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.10
-2025-06-25T13:23:42.4032570Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-134a89c6-5b1c-5d72-8fb9-b410427b5cc4/artifacts/2df465c311bc88371cd6ce0b95327f403d72a00facf7bedc80423a68dcf2f5dc.zip
-2025-06-25T13:23:42.4037548Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.8
-2025-06-25T13:23:42.4115804Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-da6ee191-7f70-52b9-9002-06d0d5f649dc/artifacts/f7d28dd2f860c8fe68cb143bfcefdcee3297b1072229f2c584237a0e53b65039.zip
-2025-06-25T13:23:42.4121365Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.12
-2025-06-25T13:23:42.4142883Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-0a77cd4b-0ecd-5750-9df7-87cd4f0d0bb8/artifacts/cf59fa52b1948a2a5bacba85a4eef0372cd96fd66e28e1b3d6bcd9ffb0351a29.zip
-2025-06-25T13:23:42.4148656Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.10
-2025-06-25T13:23:42.4220568Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-4abcb0a7-ae0a-54c7-9416-87163a13af3e/artifacts/8d7800607f765346785b6986bfbf37b0cb74b38e474e5db09d71f25eb87a47b1.zip
-2025-06-25T13:23:42.4226440Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.8
-2025-06-25T13:23:42.4236433Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-0911c107-9fff-5424-94d9-4d89e1db75e3/artifacts/62660b82998e9015cbb4dd51ae923d23c03cf6d0a8b8a946738a9130c152e896.zip
-2025-06-25T13:23:42.4241353Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.9
-2025-06-25T13:23:42.4254826Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-573523b2-14cb-5487-8af1-6d2f5e951cda/artifacts/62d5436a0f007eedc494602cb3e0ed08ac8a2473f6dd4ec97c533d48e93baae6.zip
-2025-06-25T13:23:42.4259680Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.11
-2025-06-25T13:23:42.4270904Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-e36deaba-cb03-558d-81dc-54db8434fb41/artifacts/e8c094ddb053ea9432191c725c600659cd24f5d5018fad1835fe5d2d7f61da56.zip
-2025-06-25T13:23:42.4281712Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.9
-2025-06-25T13:23:42.4382753Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-87e76ae0-47e4-5214-8836-71207764dd46/artifacts/6b196856d28affda31df5568c6a99396679e38a732c490d2ad26c324b5c6b296.zip
-2025-06-25T13:23:42.4390704Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.13
-2025-06-25T13:23:42.4416622Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-ab293900-cd3f-568d-a9e8-46604aaea694/artifacts/4e32060ebb035c2d4f15b177febdcd3ed0cc246b4678968d33bc45ab5ddfd0a1.zip
-2025-06-25T13:23:42.4424616Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.11
-2025-06-25T13:23:42.4459453Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-5114b0fa-7f50-5e98-b7f1-573e2b74dd3b/artifacts/ab89cd80986f81ebdfcccea52395976a9a6747c96328e0f2e131ebdf2bc1795d.zip
-2025-06-25T13:23:42.4464145Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.12
-2025-06-25T13:23:42.4477384Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-3a5e8874-b1b2-5c30-a517-ddb10508781b/artifacts/c3df8263dadde41d27720c6338f16785f0bdba5cd5fb732bbb05ca0a475f7f85.zip
-2025-06-25T13:23:42.4482759Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.8
-2025-06-25T13:23:42.4493459Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-0ecccbb0-fade-5c15-a5d3-e5e734f78964/artifacts/74370f4b97bad93f11c175a3092a352c167270d2859fbeef54fe5353d896327c.zip
-2025-06-25T13:23:42.4499516Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.13
-2025-06-25T13:23:42.4510815Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-1fcd9992-c126-50b6-b0e6-234b07d24b10/artifacts/5f2da9a5cf9da68f0af93bc855115e496fc32ad44ab66a168cd48611159e4dd6.zip
-2025-06-25T13:23:42.4515948Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.11
-2025-06-25T13:23:42.4526072Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-322f876d-acad-5b4d-884d-0b88922caef5/artifacts/269874e9c8cc77ef486bb30772e665036af760c87a1b1c11fe833a3e043169f9.zip
-2025-06-25T13:23:42.4530852Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.11
-2025-06-25T13:23:42.4605443Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-a14d4c52-6ee1-515c-9f91-7ea51fddd0e4/artifacts/f1f803d05f733f77c3bcb91b154288dfe6cfc1b7f4fabc84bf62124909e88391.zip
-2025-06-25T13:23:42.4615251Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.13
-2025-06-25T13:23:42.4632129Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-d5079d84-e414-58cd-87e6-2c5e4fc85f75/artifacts/84bcec2021028823bab61cbfb1f1b7d8cbc2b4cd89e36487ba17bbc1cb488e66.zip
-2025-06-25T13:23:42.4640659Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.12
-2025-06-25T13:23:42.4657106Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-5607d8f3-0b6d-521c-a204-21f71baa348f/artifacts/082a60fe63bc013a5e7a1cbb0b2503644290895eb960e30ee671597f387ca7c7.zip
-2025-06-25T13:23:42.4664805Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.9
-2025-06-25T13:23:42.4674607Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-db0ee494-cd8b-55b6-b374-70ad6a60b017/artifacts/04379e136a390c45c61d9a4fed0ad4432e228d970138f83118e8caa0c1293f0f.zip
-2025-06-25T13:23:42.4680274Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.8
-2025-06-25T13:23:42.4691540Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-96caf4c4-f2fc-5d50-8ebc-803dfd7b1f78/artifacts/4f517375a8dc5376634f89d15763f668d9ccbab3c4b0b1fe9f7970414eeacc3f.zip
-2025-06-25T13:23:42.4696340Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.9
-2025-06-25T13:23:42.4758712Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-01800e46-0ab7-50ef-bd71-8043db5a20ce/artifacts/20e12f440e70d8187b2fecdfc18730d2544a76a03618c3ae525fe3d9f279b41c.zip
-2025-06-25T13:23:42.4764204Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.13
-2025-06-25T13:23:42.4829952Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/f19ba470-909a-4200-be59-737e4738807d/workflow-job-run-c565d1c4-72c3-56a5-9765-fd90bc872d9c/artifacts/f3a73c498c77b281b0074cd03aa17857b12ed1cb1f76ba2b002478b5c72e465e.zip
-2025-06-25T13:23:42.4834925Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.12
-2025-06-25T13:23:42.5172671Z (node:7580) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
-2025-06-25T13:23:42.5176315Z (Use `node --trace-deprecation ...` to show where the warning was created)
-2025-06-25T13:23:43.3145746Z SHA256 digest of downloaded artifact is 6345b07f20cff84ea158da0f3ab4308fa1385d3e7118c73b1835e8b21b41a7db
-2025-06-25T13:23:43.3147274Z Artifact download completed successfully.
-2025-06-25T13:23:43.3512822Z SHA256 digest of downloaded artifact is bd4d2c68e87109faa25aba3f16885d59d44f59e129f2381755a3f45511a57d4e
-2025-06-25T13:23:43.3514171Z Artifact download completed successfully.
-2025-06-25T13:23:43.3734268Z SHA256 digest of downloaded artifact is 258464af9b6ad6b713882e90cc9737e7cd3b1eb8572d9732771309df492497c8
-2025-06-25T13:23:43.3735888Z Artifact download completed successfully.
-2025-06-25T13:23:43.3916992Z SHA256 digest of downloaded artifact is 7f943aa17d405ebb559530df0bde5fbd55f65bf4e3a0aa6467acf87fcb3c48ad
-2025-06-25T13:23:43.3918031Z Artifact download completed successfully.
-2025-06-25T13:23:43.4035853Z SHA256 digest of downloaded artifact is 916c30707e874a450dcb32d90bbbfbba317e487bb5eb233cd359d44c47b2839b
-2025-06-25T13:23:43.4037025Z Artifact download completed successfully.
-2025-06-25T13:23:43.4192301Z SHA256 digest of downloaded artifact is 7c8da0dbbda30f422dcc2a987f739c073b273517b7a025d7b80b8672dd20fcc5
-2025-06-25T13:23:43.4269758Z Artifact download completed successfully.
-2025-06-25T13:23:43.4271567Z SHA256 digest of downloaded artifact is df212ae44b554fc9e1dcceba7945c4967d58151008bee3ef45395dde13dfc7f9
-2025-06-25T13:23:43.4272748Z Artifact download completed successfully.
-2025-06-25T13:23:43.4552310Z SHA256 digest of downloaded artifact is 983a08c3d52f443bad4e2aaafc6716436d290c6d545dffc24bc1a7ccbe7dec76
-2025-06-25T13:23:43.4553423Z Artifact download completed successfully.
-2025-06-25T13:23:43.4605180Z SHA256 digest of downloaded artifact is 36186bcf38a04705f50135341ecee5609455052bc4bfb8de6286cde7764b04ac
-2025-06-25T13:23:43.4607286Z Artifact download completed successfully.
-2025-06-25T13:23:43.4640637Z SHA256 digest of downloaded artifact is 67c530f436507b4ddafac5f4dd34a4dcb77b7b677721cb4443d8199088d4396e
-2025-06-25T13:23:43.4691814Z Artifact download completed successfully.
-2025-06-25T13:23:43.4693782Z SHA256 digest of downloaded artifact is bc2df0872e9ce8c597ee2f5862f49371ac1a778a06ec2f396034a381175cfa14
-2025-06-25T13:23:43.4694819Z Artifact download completed successfully.
-2025-06-25T13:23:43.4780600Z SHA256 digest of downloaded artifact is 8f2dae42178e0aad8a22b664946630bb80a87fee25874e44c2b3f6203815c126
-2025-06-25T13:23:43.4782151Z Artifact download completed successfully.
-2025-06-25T13:23:43.4887928Z SHA256 digest of downloaded artifact is c3989d8fc90469dd563dfde34568faec5384d3669f1c4c72fe3093434aae4190
-2025-06-25T13:23:43.4926149Z Artifact download completed successfully.
-2025-06-25T13:23:43.4927080Z SHA256 digest of downloaded artifact is 878093b29fb329a08673e77a7bad9e4e0e8f5a113e6ec85d2e2dbe3bcf951c80
-2025-06-25T13:23:43.4945156Z Artifact download completed successfully.
-2025-06-25T13:23:43.4947206Z SHA256 digest of downloaded artifact is 1550386eafba7119a1fc472ad131d1e473e896213a91b12a49fad2d4cda08eaf
-2025-06-25T13:23:43.4948381Z Artifact download completed successfully.
-2025-06-25T13:23:43.4949236Z SHA256 digest of downloaded artifact is 80f1ef4addd6053f1996aa77ba12b5401fc9adfa820bbab8235e3ac69b4b4961
-2025-06-25T13:23:43.4950624Z Artifact download completed successfully.
-2025-06-25T13:23:43.5119844Z SHA256 digest of downloaded artifact is 0a084f06bc4454a18c09f4ab193cf3ba9a6023cc701263b117f19f172cc043a9
-2025-06-25T13:23:43.5120878Z Artifact download completed successfully.
-2025-06-25T13:23:43.5134253Z SHA256 digest of downloaded artifact is 235cb74cb0e9c4e32f0d63b67a742b9ec9aa4dba01701801ab6d283ed02e4074
-2025-06-25T13:23:43.5137984Z Artifact download completed successfully.
-2025-06-25T13:23:43.5153887Z SHA256 digest of downloaded artifact is 529b3a9cf769d5f4c02b5c0fc827fd94f577df86f1eae9f965e79dffd32f92c5
-2025-06-25T13:23:43.5155425Z Artifact download completed successfully.
-2025-06-25T13:23:43.5157459Z SHA256 digest of downloaded artifact is e75d3b3e3ce21bf713b2bbaf9aab49ebbd6ba41188dca0d9c86c708653429317
-2025-06-25T13:23:43.5158501Z Artifact download completed successfully.
-2025-06-25T13:23:43.5214612Z SHA256 digest of downloaded artifact is e9df7e1f64c099a0482af641a729cb4207d5ff23a1794d1208816a931f34983a
-2025-06-25T13:23:43.5215604Z Artifact download completed successfully.
-2025-06-25T13:23:43.5234364Z SHA256 digest of downloaded artifact is 4af02691b7cbe46a39b9d06b0cd0ed3cdaa2ab9d37f6b35cb6f46ff2d0fe906b
-2025-06-25T13:23:43.5250179Z Artifact download completed successfully.
-2025-06-25T13:23:43.5251183Z SHA256 digest of downloaded artifact is 4032da8c3335de536f3565f310b02e2866d0ede97d98f02eff1764490c850011
-2025-06-25T13:23:43.5252025Z Artifact download completed successfully.
-2025-06-25T13:23:43.5253662Z SHA256 digest of downloaded artifact is cc5e7e3a0c3240d3e683efe6d4c9f0bf89f73044cbe79a8a04d73b3c7dc61ef3
-2025-06-25T13:23:43.5254759Z Artifact download completed successfully.
-2025-06-25T13:23:43.5290623Z SHA256 digest of downloaded artifact is 01872fecd3fbe541bcd15d2ce6d8612155c95055396f7bb7b2ee161c0aa0cd13
-2025-06-25T13:23:43.5292203Z Artifact download completed successfully.
-2025-06-25T13:23:43.5332301Z SHA256 digest of downloaded artifact is 15b319d3e8052bec8e6c153b3f6774b2c3adde4bc8662aa21a2751f34c43f01b
-2025-06-25T13:23:43.5333203Z Artifact download completed successfully.
-2025-06-25T13:23:43.5334971Z SHA256 digest of downloaded artifact is 4238e5572feb160fa8e9aaf3217d73233175e82a51d12d5647b7efa45835ab56
-2025-06-25T13:23:43.5336505Z Artifact download completed successfully.
-2025-06-25T13:23:43.5359693Z SHA256 digest of downloaded artifact is b4f3161ebf14e325fb7a77c3e56b4144b2b0f5be58dc4d12db3534be285284c1
-2025-06-25T13:23:43.5360589Z Artifact download completed successfully.
-2025-06-25T13:23:43.5407179Z SHA256 digest of downloaded artifact is a4bdf8af4f1df6b11dc6606c165eb1d5037db2f4faa03d58d14071477838d8c8
-2025-06-25T13:23:43.5408288Z Artifact download completed successfully.
-2025-06-25T13:23:43.5431823Z SHA256 digest of downloaded artifact is e5c73cccb69258376fd9cb3cd15306a732d3f9b542ae575a83724b935dbff07a
-2025-06-25T13:23:43.5433149Z Artifact download completed successfully.
-2025-06-25T13:23:43.5433767Z Total of 30 artifact(s) downloaded
-2025-06-25T13:23:43.5442400Z Download artifact has finished successfully
-2025-06-25T13:23:43.5772101Z ##[group]Run echo "📂 Available artifacts:"
-2025-06-25T13:23:43.5773197Z [36;1mecho "📂 Available artifacts:"[0m
-2025-06-25T13:23:43.5773780Z [36;1mls -la ~/artifacts/[0m
-2025-06-25T13:23:43.5774510Z [36;1mfind ~/artifacts -name "*.whl" | head -10[0m
-2025-06-25T13:23:43.5867826Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
-2025-06-25T13:23:43.5868459Z env:
-2025-06-25T13:23:43.5869004Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:23:43.5869735Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
-2025-06-25T13:23:43.5870464Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:23:43.5871154Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:23:43.5871875Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
-2025-06-25T13:23:43.5872486Z ##[endgroup]
-2025-06-25T13:23:47.6721668Z 📂 Available artifacts:
-2025-06-25T13:23:48.5440340Z [31;1mGet-ChildItem: [0mD:\a\_temp\1a86b3b5-5f12-4587-b631-be26671af95e.ps1:3[0m
-2025-06-25T13:23:48.5441190Z [31;1m[0m[36;1mLine |[0m
-2025-06-25T13:23:48.5441734Z [31;1m[0m[36;1m[36;1m   3 | [0m ls [36;1m-la[0m ~/artifacts/[0m
-2025-06-25T13:23:48.5442682Z [31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m     | [31;1m    ~~~[0m
-2025-06-25T13:23:48.5443815Z [31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m[31;1m[31;1m[36;1m     | [31;1mA parameter cannot be found that matches parameter name 'la'.[0m
-2025-06-25T13:23:48.6205572Z ##[error]Process completed with exit code 1.
-2025-06-25T13:23:48.6285114Z Cleaning up orphan processes
+2025-06-25T13:38:41.5404957Z Current runner version: '2.325.0'
+2025-06-25T13:38:41.5426988Z ##[group]Runner Image Provisioner
+2025-06-25T13:38:41.5427801Z Hosted Compute Agent
+2025-06-25T13:38:41.5428414Z Version: 20250620.352
+2025-06-25T13:38:41.5429022Z Commit: f262f3aba23b10ea191b2a62bdee1ca4c3d344da
+2025-06-25T13:38:41.5429624Z Build Date: 2025-06-20T19:27:17Z
+2025-06-25T13:38:41.5430178Z ##[endgroup]
+2025-06-25T13:38:41.5430636Z ##[group]Operating System
+2025-06-25T13:38:41.5431121Z Microsoft Windows Server 2022
+2025-06-25T13:38:41.5431659Z 10.0.20348
+2025-06-25T13:38:41.5432049Z Datacenter
+2025-06-25T13:38:41.5432449Z ##[endgroup]
+2025-06-25T13:38:41.5432826Z ##[group]Runner Image
+2025-06-25T13:38:41.5433294Z Image: windows-2022
+2025-06-25T13:38:41.5433699Z Version: 20250602.1.0
+2025-06-25T13:38:41.5434622Z Included Software: https://github.com/actions/runner-images/blob/win22/20250602.1/images/windows/Windows2022-Readme.md
+2025-06-25T13:38:41.5436499Z Image Release: https://github.com/actions/runner-images/releases/tag/win22%2F20250602.1
+2025-06-25T13:38:41.5438203Z ##[endgroup]
+2025-06-25T13:38:41.5442499Z ##[group]GITHUB_TOKEN Permissions
+2025-06-25T13:38:41.5444972Z Actions: write
+2025-06-25T13:38:41.5445750Z Attestations: write
+2025-06-25T13:38:41.5446525Z Checks: write
+2025-06-25T13:38:41.5447206Z Contents: write
+2025-06-25T13:38:41.5447986Z Deployments: write
+2025-06-25T13:38:41.5448710Z Discussions: write
+2025-06-25T13:38:41.5449374Z Issues: write
+2025-06-25T13:38:41.5450116Z Metadata: read
+2025-06-25T13:38:41.5450816Z Models: read
+2025-06-25T13:38:41.5451522Z Packages: write
+2025-06-25T13:38:41.5452271Z Pages: write
+2025-06-25T13:38:41.5453014Z PullRequests: write
+2025-06-25T13:38:41.5453778Z RepositoryProjects: write
+2025-06-25T13:38:41.5454686Z SecurityEvents: write
+2025-06-25T13:38:41.5455536Z Statuses: write
+2025-06-25T13:38:41.5456255Z ##[endgroup]
+2025-06-25T13:38:41.5458930Z Secret source: Actions
+2025-06-25T13:38:41.5459947Z Prepare workflow directory
+2025-06-25T13:38:41.5805320Z Prepare all required actions
+2025-06-25T13:38:41.5840882Z Getting action download info
+2025-06-25T13:38:41.8159820Z ##[group]Download immutable action package 'actions/setup-python@v5'
+2025-06-25T13:38:41.8161343Z Version: 5.6.0
+2025-06-25T13:38:41.8162441Z Digest: sha256:0b35a0c11c97499e4e0576589036d450b9f5f9da74b7774225b3614b57324404
+2025-06-25T13:38:41.8163724Z Source commit SHA: a26af69be951a213d495a4c3e4e4022e16d87065
+2025-06-25T13:38:41.8164577Z ##[endgroup]
+2025-06-25T13:38:42.1924209Z ##[group]Download immutable action package 'actions/download-artifact@v4'
+2025-06-25T13:38:42.1924959Z Version: 4.3.0
+2025-06-25T13:38:42.1925639Z Digest: sha256:552a5b9ad918f62ec0c2e8f42f3c694d4ebd1b4036b18c39b14168fcdfc0e4f2
+2025-06-25T13:38:42.1926504Z Source commit SHA: d3f86a106a0bac45b974a628896c90dbdf5c8093
+2025-06-25T13:38:42.1927117Z ##[endgroup]
+2025-06-25T13:38:42.4580792Z Complete job name: Test Wheels on windows-latest (x64) Python 3.11
+2025-06-25T13:38:42.6636434Z ##[group]Run actions/setup-python@v5
+2025-06-25T13:38:42.6637489Z with:
+2025-06-25T13:38:42.6637850Z   python-version: 3.11
+2025-06-25T13:38:42.6638232Z   architecture: x64
+2025-06-25T13:38:42.6638590Z   check-latest: false
+2025-06-25T13:38:42.6639110Z   token: ***
+2025-06-25T13:38:42.6639458Z   update-environment: true
+2025-06-25T13:38:42.6639874Z   allow-prereleases: false
+2025-06-25T13:38:42.6640259Z   freethreaded: false
+2025-06-25T13:38:42.6640815Z ##[endgroup]
+2025-06-25T13:38:42.9487378Z ##[group]Installed versions
+2025-06-25T13:38:42.9714151Z Successfully set up CPython (3.11.9)
+2025-06-25T13:38:42.9715942Z ##[endgroup]
+2025-06-25T13:38:43.0101911Z ##[group]Run actions/download-artifact@v4
+2025-06-25T13:38:43.0103062Z with:
+2025-06-25T13:38:43.0103691Z   path: ~/artifacts
+2025-06-25T13:38:43.0104469Z   merge-multiple: false
+2025-06-25T13:38:43.0105285Z   repository: Ambro86/synthizer3d
+2025-06-25T13:38:43.0106165Z   run-id: 15877708838
+2025-06-25T13:38:43.0106867Z env:
+2025-06-25T13:38:43.0107764Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2025-06-25T13:38:43.0110836Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+2025-06-25T13:38:43.0112456Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2025-06-25T13:38:43.0113938Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2025-06-25T13:38:43.0115451Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2025-06-25T13:38:43.0116686Z ##[endgroup]
+2025-06-25T13:38:43.3772637Z Found 30 artifact(s)
+2025-06-25T13:38:43.3774256Z No input name, artifact-ids or pattern filtered specified, downloading all artifacts
+2025-06-25T13:38:43.3775462Z An extra directory with the artifact name will be created for each download
+2025-06-25T13:38:43.3776419Z Preparing to download the following artifacts:
+2025-06-25T13:38:43.3777909Z - python-wheels-macos-x64-3.12 (ID: 3401530386, Size: 2230053, Expected Digest: sha256:833be6cf9e750935c5f579187cfe974452352b163b3bc8f9b6770b5692fd6e8d)
+2025-06-25T13:38:43.3780109Z - python-wheels-macos-arm64-3.9 (ID: 3401529592, Size: 2135534, Expected Digest: sha256:91d7773cf4935f5ae39b8972635ca6dbd6c6330f3e073ef38f67f6eb4a1ce3ee)
+2025-06-25T13:38:43.3782307Z - python-wheels-macos-arm64-3.10 (ID: 3401524779, Size: 2132976, Expected Digest: sha256:760ab958311d4ea4f000600ac08fe2a9b6c47cc006bffbbf9f96adf8bdf0133a)
+2025-06-25T13:38:43.3784432Z - python-wheels-macos-x64-3.11 (ID: 3401524476, Size: 2237797, Expected Digest: sha256:2f05e963475149f0416c62c8a9b6072c96d5f511498baa86551e179ffd0c0417)
+2025-06-25T13:38:43.3786706Z - python-wheels-win-x86-3.10 (ID: 3401514316, Size: 1745351, Expected Digest: sha256:6b4bc2db8561114825c5e1c5bf9bf1fc529d00a5def09dcf98703029d3fed01a)
+2025-06-25T13:38:43.3788832Z - python-wheels-win-x64-3.13 (ID: 3401513999, Size: 1931456, Expected Digest: sha256:7d691d434e72d2a53f2848f99d899827b693a2df3ef21695f101e1bde195a304)
+2025-06-25T13:38:43.3791040Z - python-wheels-win-x86-3.12 (ID: 3401511926, Size: 1741870, Expected Digest: sha256:e29fa4f80fb0eb058d819648607f2a4eed96d968727c3fbe49af2e8ab52e0cb2)
+2025-06-25T13:38:43.3793373Z - python-wheels-macos-arm64-3.12 (ID: 3401510011, Size: 2131303, Expected Digest: sha256:8f002f97accb5fea40e53e49c32fb6f245c70151071a0291ac9c72a326c5206a)
+2025-06-25T13:38:43.3795621Z - python-wheels-win-x86-3.11 (ID: 3401507400, Size: 1744914, Expected Digest: sha256:15146f6eec1a327a501c02b1735f6d6e501bb4c736f5f69256ccaec904fd6bd1)
+2025-06-25T13:38:43.3798015Z - python-wheels-macos-arm64-3.11 (ID: 3401499986, Size: 2137882, Expected Digest: sha256:4fa12ccf1c8805ecd6668db79828409d8b26bcda04b968e8c2161cd46864fd8d)
+2025-06-25T13:38:43.3800400Z - python-wheels-macos-arm64-3.8 (ID: 3401496550, Size: 2150660, Expected Digest: sha256:3eb1d1cae49de98b357bb92b5c74b70f1d73dad8dc5aa9a18c5a932afd2112ca)
+2025-06-25T13:38:43.3802692Z - python-wheels-win-x86-3.13 (ID: 3401493344, Size: 1741468, Expected Digest: sha256:824d8ce84adb5e7942356f67f9f833b3166fd2a774727eed1dcfadeab79c9e66)
+2025-06-25T13:38:43.3804921Z - python-wheels-win-x64-3.10 (ID: 3401490090, Size: 1930717, Expected Digest: sha256:cc4c73a80d1499d19a48665cbac1eabe2419cd234073cd4f793cca73bedcbeca)
+2025-06-25T13:38:43.3807168Z - python-wheels-win-x64-3.8 (ID: 3401488199, Size: 1972317, Expected Digest: sha256:b551cc062d55c8e67654d20822c4cdec5ce6afd3808ba257cbeb76e8a6dd19b3)
+2025-06-25T13:38:43.3809318Z - python-wheels-win-x86-3.8 (ID: 3401486710, Size: 1771116, Expected Digest: sha256:55caff46a61ffdecef4b02dc9f8d97407dd5441e9e212d55a9a326accec027f8)
+2025-06-25T13:38:43.3814751Z - python-wheels-macos-x64-3.8 (ID: 3401486193, Size: 2045661, Expected Digest: sha256:ca32429168fde7f64db2ac78cc771333bdb8c726584ecf53152850c0bc8c29f4)
+2025-06-25T13:38:43.3816998Z - python-wheels-macos-x64-3.10 (ID: 3401486128, Size: 2035988, Expected Digest: sha256:4ff44b4985cb2cb27ab248f3ec3de29f6fca4c50e18734f89388bfe210c3a786)
+2025-06-25T13:38:43.3818341Z - python-wheels-win-x64-3.11 (ID: 3401485027, Size: 1931502, Expected Digest: sha256:778b1a2f0844ef3c3d2018583d009edc5ef46ff390d776440e295e3bd5ce6fa1)
+2025-06-25T13:38:43.3820322Z - python-wheels-win-x64-3.12 (ID: 3401484131, Size: 1931511, Expected Digest: sha256:f45c6018e4b9857b1e6589de403ba47da9b909828466535f2c2b60a2e3b56319)
+2025-06-25T13:38:43.3821565Z - python-wheels-win-x86-3.9 (ID: 3401483794, Size: 1767227, Expected Digest: sha256:b6f51ade04cb004caf59bfd1a0db594daa1b9f2c1cc27a5bb62dd7a8f91dd828)
+2025-06-25T13:38:43.3822740Z - python-wheels-win-x64-3.9 (ID: 3401483680, Size: 1961086, Expected Digest: sha256:9e305f83f700e4b5953615bec2e8b2230a1c3cb8039f290ccd47d88a7438e844)
+2025-06-25T13:38:43.3823980Z - python-wheels-macos-x64-3.9 (ID: 3401479434, Size: 2036730, Expected Digest: sha256:d636db8ebfc1c3205e5f8d39007dfaa3ebb01120ae3a23c2984aa1e18c7ae9c1)
+2025-06-25T13:38:43.3825218Z - python-wheels-macos-x64-3.13 (ID: 3401478683, Size: 2227989, Expected Digest: sha256:cde7e6cdff2fbe840580cf3157f3a9b009ecee109b6bc416e90b1a76ba89445a)
+2025-06-25T13:38:43.3826456Z - python-wheels-linux-x86_64-3.13 (ID: 3401469463, Size: 2585137, Expected Digest: sha256:faeb5a7aa183e6e287d247c3e4c11f62911dd11ec1c08c5b00eedd59433fea24)
+2025-06-25T13:38:43.3828268Z - python-wheels-linux-x86_64-3.9 (ID: 3401469416, Size: 2566224, Expected Digest: sha256:16744dd38821a87da59df9fc8a71633abca6bfd8bdf010fc12f9866dfed5efce)
+2025-06-25T13:38:43.3829607Z - python-wheels-linux-x86_64-3.12 (ID: 3401468463, Size: 2584288, Expected Digest: sha256:c6e6aac636dc706dcb8bb354f1b677a2d09da555f35458eb5359a0072f5b6221)
+2025-06-25T13:38:43.3830857Z - python-wheels-linux-x86_64-3.11 (ID: 3401468209, Size: 2557104, Expected Digest: sha256:1b9bcf20b9aa276ffa97718929f2d0c7d46f399ff60c2035f23b7f79bd072c67)
+2025-06-25T13:38:43.3832071Z - python-wheels-linux-x86_64-3.10 (ID: 3401468142, Size: 2565038, Expected Digest: sha256:21d6ad8ab80f2aa8742cd5e0e91222f828f35f22a9d010ff9f0b1b832756b73a)
+2025-06-25T13:38:43.3833248Z - python-wheels-macos-arm64-3.13 (ID: 3401467760, Size: 2129102, Expected Digest: sha256:5511cd10713f334ced9d87c2bec04acc815a616d82723ce531c3d8de20d5d7c3)
+2025-06-25T13:38:43.3834439Z - python-wheels-linux-x86_64-3.8 (ID: 3401467493, Size: 2573565, Expected Digest: sha256:6cd40c5074803ee61826e43b665b16b2be3c7aa666050bc8914e565e9ba60633)
+2025-06-25T13:38:43.5232802Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-d28e2d42-5fa0-51f2-a9fc-00a0ac85f561/artifacts/e8c094ddb053ea9432191c725c600659cd24f5d5018fad1835fe5d2d7f61da56.zip
+2025-06-25T13:38:43.5235488Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.9
+2025-06-25T13:38:43.5379831Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-48914b95-fc5b-5853-b08e-527df9fd04e5/artifacts/d416f507f4b84ada6433b27e7071685a653ebb8b689f7ddcd83052068a0ae1f7.zip
+2025-06-25T13:38:43.5382886Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.10
+2025-06-25T13:38:43.5395169Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-232ebc07-7a35-531c-9112-3ad232743834/artifacts/78d92ab587ddab82418bd3504039845b7b5dfc1f3a57e796a34f0e8433d3b8a1.zip
+2025-06-25T13:38:43.5398152Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.10
+2025-06-25T13:38:43.5410338Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-7c8f35ca-1c94-5148-8463-cca50f0291e5/artifacts/25fda339dfa4367e9cadb9d9caa712faaa6758316a4e9a2950aa97fcf91812a0.zip
+2025-06-25T13:38:43.5413462Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.12
+2025-06-25T13:38:43.5452046Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-cccc7477-48bb-536e-924c-53a1d2912a4d/artifacts/082a60fe63bc013a5e7a1cbb0b2503644290895eb960e30ee671597f387ca7c7.zip
+2025-06-25T13:38:43.5455333Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.9
+2025-06-25T13:38:43.5473216Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-e76740f7-a8a3-54e9-87ac-6088296fe1df/artifacts/269874e9c8cc77ef486bb30772e665036af760c87a1b1c11fe833a3e043169f9.zip
+2025-06-25T13:38:43.5475221Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.11
+2025-06-25T13:38:43.5495076Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-e687c53a-913c-5d83-a04a-33150885b50d/artifacts/f7d28dd2f860c8fe68cb143bfcefdcee3297b1072229f2c584237a0e53b65039.zip
+2025-06-25T13:38:43.5498113Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.12
+2025-06-25T13:38:43.5510745Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-1a63440c-8529-5333-83c1-99e1ee06fdf7/artifacts/f1f803d05f733f77c3bcb91b154288dfe6cfc1b7f4fabc84bf62124909e88391.zip
+2025-06-25T13:38:43.5513843Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.13
+2025-06-25T13:38:43.5529059Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-c66aeabb-32ed-51e1-b411-06e262ac81a6/artifacts/74370f4b97bad93f11c175a3092a352c167270d2859fbeef54fe5353d896327c.zip
+2025-06-25T13:38:43.5532157Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.13
+2025-06-25T13:38:43.5552442Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-8f54ebf0-cfa8-5442-a9bd-26189153d385/artifacts/dfa6b5beaeab1e7b2ee456197e66ba9cd0cde258794525efb775f9d01d77a09f.zip
+2025-06-25T13:38:43.5555613Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.8
+2025-06-25T13:38:43.5589859Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-ab8f8ddf-c0f4-53de-81a2-c450f0481aed/artifacts/14390bd3dddb5a2d0d284a37dd89495d8e579902e22dc4e6d685367f5f0c6496.zip
+2025-06-25T13:38:43.5592285Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.11
+2025-06-25T13:38:43.5603381Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-57da8525-ce2a-5252-92ce-e45f3e70809e/artifacts/04379e136a390c45c61d9a4fed0ad4432e228d970138f83118e8caa0c1293f0f.zip
+2025-06-25T13:38:43.5606679Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.8
+2025-06-25T13:38:43.5623317Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-665c2d62-9274-57a9-b2bd-0c83ab33e8cf/artifacts/076f86604ef4623e5fc88e988957a8873314a83dee92c78f30b60b1d5fa074e8.zip
+2025-06-25T13:38:43.5627045Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.10
+2025-06-25T13:38:43.5652077Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-00053de5-5470-5e87-852e-908d4ebd0189/artifacts/62660b82998e9015cbb4dd51ae923d23c03cf6d0a8b8a946738a9130c152e896.zip
+2025-06-25T13:38:43.5654603Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.9
+2025-06-25T13:38:43.5678103Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-884febf7-7c46-5819-a1e8-b29e3530c94d/artifacts/20e12f440e70d8187b2fecdfc18730d2544a76a03618c3ae525fe3d9f279b41c.zip
+2025-06-25T13:38:43.5681666Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.13
+2025-06-25T13:38:43.5697743Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-970733a6-2fde-5a7b-9b2a-e97c4afbc227/artifacts/8d7800607f765346785b6986bfbf37b0cb74b38e474e5db09d71f25eb87a47b1.zip
+2025-06-25T13:38:43.5700129Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.8
+2025-06-25T13:38:43.5804337Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-936fde06-0c42-51aa-9683-fe0fdc22e515/artifacts/62d5436a0f007eedc494602cb3e0ed08ac8a2473f6dd4ec97c533d48e93baae6.zip
+2025-06-25T13:38:43.5807159Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.11
+2025-06-25T13:38:43.5852116Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-1c537e26-6ff4-502e-902c-06860c9a64fb/artifacts/4f517375a8dc5376634f89d15763f668d9ccbab3c4b0b1fe9f7970414eeacc3f.zip
+2025-06-25T13:38:43.5855216Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.9
+2025-06-25T13:38:43.5873304Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-3009c5c6-12aa-5cf2-860b-e2be7f2a2edf/artifacts/276564872c8256f59e4154f85436e9053a3dba120ea8cb7fdf9346f93aad610b.zip
+2025-06-25T13:38:43.5875418Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.9
+2025-06-25T13:38:43.5919318Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-8dd4b8ae-99f3-5fed-b545-934cc51dd23b/artifacts/ab89cd80986f81ebdfcccea52395976a9a6747c96328e0f2e131ebdf2bc1795d.zip
+2025-06-25T13:38:43.5921834Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.12
+2025-06-25T13:38:43.6123212Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-5b4141f7-6371-5ce1-ad5b-66b94506cc17/artifacts/6b196856d28affda31df5568c6a99396679e38a732c490d2ad26c324b5c6b296.zip
+2025-06-25T13:38:43.6125780Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.13
+2025-06-25T13:38:43.6138976Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-25bb3d23-58ec-5985-aa74-be9d293087bc/artifacts/048b880cfb4f3e87d3ba44a145ea6584ed71477b70aa2a87ed7fb588cebfdd3e.zip
+2025-06-25T13:38:43.6140999Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.10
+2025-06-25T13:38:43.6366320Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-1724b341-cc7d-54fd-9a93-9c99c2125d25/artifacts/2df465c311bc88371cd6ce0b95327f403d72a00facf7bedc80423a68dcf2f5dc.zip
+2025-06-25T13:38:43.6371854Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.8
+2025-06-25T13:38:43.6380698Z (node:5968) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2025-06-25T13:38:43.6382397Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-06-25T13:38:43.6403416Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-48546b20-0d3b-59c4-aad2-5e92307b47e2/artifacts/f3a73c498c77b281b0074cd03aa17857b12ed1cb1f76ba2b002478b5c72e465e.zip
+2025-06-25T13:38:43.6405225Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.12
+2025-06-25T13:38:43.6419553Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-d63d56c4-d145-501d-9a5b-c6679eb1f603/artifacts/536ee8a18e9f042e0a29d71ccd62dd1f518c097da2d85b46167484953bb64d70.zip
+2025-06-25T13:38:43.6421351Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-x64-3.13
+2025-06-25T13:38:43.6436886Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-1ebe312e-801b-5a4b-ba55-31d01bfd680c/artifacts/5f2da9a5cf9da68f0af93bc855115e496fc32ad44ab66a168cd48611159e4dd6.zip
+2025-06-25T13:38:43.6438698Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x64-3.11
+2025-06-25T13:38:43.6452386Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-a73417de-d297-567c-8e35-613a4d04290e/artifacts/84bcec2021028823bab61cbfb1f1b7d8cbc2b4cd89e36487ba17bbc1cb488e66.zip
+2025-06-25T13:38:43.6454211Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.12
+2025-06-25T13:38:43.6538158Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-02e87b45-8c41-5eca-aa46-d8be23d5569d/artifacts/c3df8263dadde41d27720c6338f16785f0bdba5cd5fb732bbb05ca0a475f7f85.zip
+2025-06-25T13:38:43.6541059Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-win-x86-3.8
+2025-06-25T13:38:43.6662064Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-47d8d8eb-8551-5bdd-8898-195c0629c882/artifacts/4e32060ebb035c2d4f15b177febdcd3ed0cc246b4678968d33bc45ab5ddfd0a1.zip
+2025-06-25T13:38:43.6664104Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-linux-x86_64-3.11
+2025-06-25T13:38:43.6676621Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/6aa85adc-e32e-4cdd-a76c-6667e4e9514a/workflow-job-run-27df42f3-bb5b-5c17-8b02-8bec654cdc68/artifacts/cf59fa52b1948a2a5bacba85a4eef0372cd96fd66e28e1b3d6bcd9ffb0351a29.zip
+2025-06-25T13:38:43.6678846Z Starting download of artifact to: C:\Users\runneradmin\artifacts\python-wheels-macos-arm64-3.10
+2025-06-25T13:38:44.5153244Z SHA256 digest of downloaded artifact is 6b4bc2db8561114825c5e1c5bf9bf1fc529d00a5def09dcf98703029d3fed01a
+2025-06-25T13:38:44.5155773Z Artifact download completed successfully.
+2025-06-25T13:38:44.5183451Z SHA256 digest of downloaded artifact is e29fa4f80fb0eb058d819648607f2a4eed96d968727c3fbe49af2e8ab52e0cb2
+2025-06-25T13:38:44.5184242Z Artifact download completed successfully.
+2025-06-25T13:38:44.5241540Z SHA256 digest of downloaded artifact is 824d8ce84adb5e7942356f67f9f833b3166fd2a774727eed1dcfadeab79c9e66
+2025-06-25T13:38:44.5243181Z Artifact download completed successfully.
+2025-06-25T13:38:44.5328480Z SHA256 digest of downloaded artifact is 15146f6eec1a327a501c02b1735f6d6e501bb4c736f5f69256ccaec904fd6bd1
+2025-06-25T13:38:44.5329399Z Artifact download completed successfully.
+2025-06-25T13:38:44.5349583Z SHA256 digest of downloaded artifact is b6f51ade04cb004caf59bfd1a0db594daa1b9f2c1cc27a5bb62dd7a8f91dd828
+2025-06-25T13:38:44.5350455Z Artifact download completed successfully.
+2025-06-25T13:38:44.5575542Z SHA256 digest of downloaded artifact is 55caff46a61ffdecef4b02dc9f8d97407dd5441e9e212d55a9a326accec027f8
+2025-06-25T13:38:44.5581771Z Artifact download completed successfully.
+2025-06-25T13:38:44.5791480Z SHA256 digest of downloaded artifact is cc4c73a80d1499d19a48665cbac1eabe2419cd234073cd4f793cca73bedcbeca
+2025-06-25T13:38:44.5792950Z Artifact download completed successfully.
+2025-06-25T13:38:44.5860683Z SHA256 digest of downloaded artifact is 7d691d434e72d2a53f2848f99d899827b693a2df3ef21695f101e1bde195a304
+2025-06-25T13:38:44.5861465Z Artifact download completed successfully.
+2025-06-25T13:38:44.5909337Z SHA256 digest of downloaded artifact is f45c6018e4b9857b1e6589de403ba47da9b909828466535f2c2b60a2e3b56319
+2025-06-25T13:38:44.5911224Z Artifact download completed successfully.
+2025-06-25T13:38:44.5955447Z SHA256 digest of downloaded artifact is b551cc062d55c8e67654d20822c4cdec5ce6afd3808ba257cbeb76e8a6dd19b3
+2025-06-25T13:38:44.5956239Z Artifact download completed successfully.
+2025-06-25T13:38:44.5960908Z SHA256 digest of downloaded artifact is 9e305f83f700e4b5953615bec2e8b2230a1c3cb8039f290ccd47d88a7438e844
+2025-06-25T13:38:44.5962128Z Artifact download completed successfully.
+2025-06-25T13:38:44.6045154Z SHA256 digest of downloaded artifact is 778b1a2f0844ef3c3d2018583d009edc5ef46ff390d776440e295e3bd5ce6fa1
+2025-06-25T13:38:44.6046419Z Artifact download completed successfully.
+2025-06-25T13:38:44.6095842Z SHA256 digest of downloaded artifact is 4ff44b4985cb2cb27ab248f3ec3de29f6fca4c50e18734f89388bfe210c3a786
+2025-06-25T13:38:44.6097019Z Artifact download completed successfully.
+2025-06-25T13:38:44.6158950Z SHA256 digest of downloaded artifact is d636db8ebfc1c3205e5f8d39007dfaa3ebb01120ae3a23c2984aa1e18c7ae9c1
+2025-06-25T13:38:44.6160079Z Artifact download completed successfully.
+2025-06-25T13:38:44.6200922Z SHA256 digest of downloaded artifact is ca32429168fde7f64db2ac78cc771333bdb8c726584ecf53152850c0bc8c29f4
+2025-06-25T13:38:44.6202331Z Artifact download completed successfully.
+2025-06-25T13:38:44.6269221Z SHA256 digest of downloaded artifact is 91d7773cf4935f5ae39b8972635ca6dbd6c6330f3e073ef38f67f6eb4a1ce3ee
+2025-06-25T13:38:44.6270553Z Artifact download completed successfully.
+2025-06-25T13:38:44.6286614Z SHA256 digest of downloaded artifact is 4fa12ccf1c8805ecd6668db79828409d8b26bcda04b968e8c2161cd46864fd8d
+2025-06-25T13:38:44.6287862Z Artifact download completed successfully.
+2025-06-25T13:38:44.6308606Z SHA256 digest of downloaded artifact is 5511cd10713f334ced9d87c2bec04acc815a616d82723ce531c3d8de20d5d7c3
+2025-06-25T13:38:44.6309862Z Artifact download completed successfully.
+2025-06-25T13:38:44.6349007Z SHA256 digest of downloaded artifact is 3eb1d1cae49de98b357bb92b5c74b70f1d73dad8dc5aa9a18c5a932afd2112ca
+2025-06-25T13:38:44.6350140Z Artifact download completed successfully.
+2025-06-25T13:38:44.6417485Z SHA256 digest of downloaded artifact is 8f002f97accb5fea40e53e49c32fb6f245c70151071a0291ac9c72a326c5206a
+2025-06-25T13:38:44.6418771Z Artifact download completed successfully.
+2025-06-25T13:38:44.6438241Z SHA256 digest of downloaded artifact is 833be6cf9e750935c5f579187cfe974452352b163b3bc8f9b6770b5692fd6e8d
+2025-06-25T13:38:44.6439124Z Artifact download completed successfully.
+2025-06-25T13:38:44.6445032Z SHA256 digest of downloaded artifact is 760ab958311d4ea4f000600ac08fe2a9b6c47cc006bffbbf9f96adf8bdf0133a
+2025-06-25T13:38:44.6446010Z Artifact download completed successfully.
+2025-06-25T13:38:44.6461371Z SHA256 digest of downloaded artifact is 2f05e963475149f0416c62c8a9b6072c96d5f511498baa86551e179ffd0c0417
+2025-06-25T13:38:44.6462541Z Artifact download completed successfully.
+2025-06-25T13:38:44.6509621Z SHA256 digest of downloaded artifact is cde7e6cdff2fbe840580cf3157f3a9b009ecee109b6bc416e90b1a76ba89445a
+2025-06-25T13:38:44.6510987Z Artifact download completed successfully.
+2025-06-25T13:38:44.6663967Z SHA256 digest of downloaded artifact is 16744dd38821a87da59df9fc8a71633abca6bfd8bdf010fc12f9866dfed5efce
+2025-06-25T13:38:44.6665221Z Artifact download completed successfully.
+2025-06-25T13:38:44.6711069Z SHA256 digest of downloaded artifact is 21d6ad8ab80f2aa8742cd5e0e91222f828f35f22a9d010ff9f0b1b832756b73a
+2025-06-25T13:38:44.6712692Z Artifact download completed successfully.
+2025-06-25T13:38:44.6715464Z SHA256 digest of downloaded artifact is 6cd40c5074803ee61826e43b665b16b2be3c7aa666050bc8914e565e9ba60633
+2025-06-25T13:38:44.6716509Z Artifact download completed successfully.
+2025-06-25T13:38:44.6717491Z SHA256 digest of downloaded artifact is faeb5a7aa183e6e287d247c3e4c11f62911dd11ec1c08c5b00eedd59433fea24
+2025-06-25T13:38:44.6718650Z Artifact download completed successfully.
+2025-06-25T13:38:44.6720337Z SHA256 digest of downloaded artifact is 1b9bcf20b9aa276ffa97718929f2d0c7d46f399ff60c2035f23b7f79bd072c67
+2025-06-25T13:38:44.6721360Z Artifact download completed successfully.
+2025-06-25T13:38:44.6722394Z SHA256 digest of downloaded artifact is c6e6aac636dc706dcb8bb354f1b677a2d09da555f35458eb5359a0072f5b6221
+2025-06-25T13:38:44.6723534Z Artifact download completed successfully.
+2025-06-25T13:38:44.6724247Z Total of 30 artifact(s) downloaded
+2025-06-25T13:38:44.6733566Z Download artifact has finished successfully
+2025-06-25T13:38:44.7048613Z ##[group]Run echo "📂 Available artifacts:"
+2025-06-25T13:38:44.7049205Z [36;1mecho "📂 Available artifacts:"[0m
+2025-06-25T13:38:44.7049627Z [36;1mls -la ~/artifacts/[0m
+2025-06-25T13:38:44.7050058Z [36;1mfind ~/artifacts -name "*.whl" | head -10[0m
+2025-06-25T13:38:44.7303508Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+2025-06-25T13:38:44.7304181Z env:
+2025-06-25T13:38:44.7304680Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2025-06-25T13:38:44.7305437Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+2025-06-25T13:38:44.7306228Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2025-06-25T13:38:44.7306957Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2025-06-25T13:38:44.7307622Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2025-06-25T13:38:44.7308190Z ##[endgroup]
+2025-06-25T13:38:45.1696172Z 📂 Available artifacts:
+2025-06-25T13:38:45.2268359Z total 20
+2025-06-25T13:38:45.2268905Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 .
+2025-06-25T13:38:45.2270042Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 ..
+2025-06-25T13:38:45.2271091Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-linux-x86_64-3.10
+2025-06-25T13:38:45.2272486Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-linux-x86_64-3.11
+2025-06-25T13:38:45.2273379Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-linux-x86_64-3.12
+2025-06-25T13:38:45.2274585Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-linux-x86_64-3.13
+2025-06-25T13:38:45.2275573Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-linux-x86_64-3.8
+2025-06-25T13:38:45.2276438Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-linux-x86_64-3.9
+2025-06-25T13:38:45.2277479Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-arm64-3.10
+2025-06-25T13:38:45.2278381Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-arm64-3.11
+2025-06-25T13:38:45.2279257Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-arm64-3.12
+2025-06-25T13:38:45.2280242Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-arm64-3.13
+2025-06-25T13:38:45.2281107Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-arm64-3.8
+2025-06-25T13:38:45.2281986Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-arm64-3.9
+2025-06-25T13:38:45.2282853Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-x64-3.10
+2025-06-25T13:38:45.2283710Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-x64-3.11
+2025-06-25T13:38:45.2284545Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-x64-3.12
+2025-06-25T13:38:45.2285388Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-x64-3.13
+2025-06-25T13:38:45.2286434Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-x64-3.8
+2025-06-25T13:38:45.2287052Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-macos-x64-3.9
+2025-06-25T13:38:45.2287661Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x64-3.10
+2025-06-25T13:38:45.2288269Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x64-3.11
+2025-06-25T13:38:45.2288878Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x64-3.12
+2025-06-25T13:38:45.2289536Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x64-3.13
+2025-06-25T13:38:45.2290589Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x64-3.8
+2025-06-25T13:38:45.2291653Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x64-3.9
+2025-06-25T13:38:45.2292709Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x86-3.10
+2025-06-25T13:38:45.2293815Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x86-3.11
+2025-06-25T13:38:45.2294901Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x86-3.12
+2025-06-25T13:38:45.2298088Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x86-3.13
+2025-06-25T13:38:45.2299205Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x86-3.8
+2025-06-25T13:38:45.2300273Z drwxr-xr-x 1 runneradmin 197121 0 Jun 25 13:38 python-wheels-win-x86-3.9
+2025-06-25T13:38:45.2876365Z /c/Users/runneradmin/artifacts/python-wheels-linux-x86_64-3.10/synthizer3d-0.14.0-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+2025-06-25T13:38:45.2879462Z /c/Users/runneradmin/artifacts/python-wheels-linux-x86_64-3.11/synthizer3d-0.14.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+2025-06-25T13:38:45.2881481Z /c/Users/runneradmin/artifacts/python-wheels-linux-x86_64-3.12/synthizer3d-0.14.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+2025-06-25T13:38:45.2883965Z /c/Users/runneradmin/artifacts/python-wheels-linux-x86_64-3.13/synthizer3d-0.14.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+2025-06-25T13:38:45.2886863Z /c/Users/runneradmin/artifacts/python-wheels-linux-x86_64-3.8/synthizer3d-0.14.0-cp38-cp38-manylinux_2_28_x86_64.whl
+2025-06-25T13:38:45.2889512Z /c/Users/runneradmin/artifacts/python-wheels-linux-x86_64-3.9/synthizer3d-0.14.0-cp39-cp39-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+2025-06-25T13:38:45.2891348Z /c/Users/runneradmin/artifacts/python-wheels-macos-arm64-3.10/synthizer3d-0.14.0-cp310-cp310-macosx_10_13_universal2.whl
+2025-06-25T13:38:45.2893150Z /c/Users/runneradmin/artifacts/python-wheels-macos-arm64-3.11/synthizer3d-0.14.0-cp311-cp311-macosx_10_13_universal2.whl
+2025-06-25T13:38:45.2894899Z /c/Users/runneradmin/artifacts/python-wheels-macos-arm64-3.12/synthizer3d-0.14.0-cp312-cp312-macosx_10_13_universal2.whl
+2025-06-25T13:38:45.2896643Z /c/Users/runneradmin/artifacts/python-wheels-macos-arm64-3.13/synthizer3d-0.14.0-cp313-cp313-macosx_10_13_universal2.whl
+2025-06-25T13:38:45.3025825Z ##[group]Run echo "🔍 Looking for wheels compatible with this platform..."
+2025-06-25T13:38:45.3026624Z [36;1mecho "🔍 Looking for wheels compatible with this platform..."[0m
+2025-06-25T13:38:45.3027106Z [36;1m[0m
+2025-06-25T13:38:45.3027471Z [36;1m# Determine platform and architecture patterns[0m
+2025-06-25T13:38:45.3027952Z [36;1mcase "windows-latest" in[0m
+2025-06-25T13:38:45.3028314Z [36;1m  ubuntu-*)[0m
+2025-06-25T13:38:45.3028641Z [36;1m    PLATFORM_PATTERN="linux"[0m
+2025-06-25T13:38:45.3029017Z [36;1m    ARCH_PATTERN="x86_64"[0m
+2025-06-25T13:38:45.3029373Z [36;1m    ;;[0m
+2025-06-25T13:38:45.3029662Z [36;1m  windows-*)[0m
+2025-06-25T13:38:45.3045429Z [36;1m    PLATFORM_PATTERN="win"[0m
+2025-06-25T13:38:45.3046039Z [36;1m    if [ "x64" = "x86" ]; then[0m
+2025-06-25T13:38:45.3046784Z [36;1m      ARCH_PATTERN="32"[0m
+2025-06-25T13:38:45.3047346Z [36;1m    else[0m
+2025-06-25T13:38:45.3047663Z [36;1m      ARCH_PATTERN="amd64"[0m
+2025-06-25T13:38:45.3048818Z [36;1m    fi[0m
+2025-06-25T13:38:45.3049110Z [36;1m    ;;[0m
+2025-06-25T13:38:45.3049404Z [36;1m  macos-13)[0m
+2025-06-25T13:38:45.3049730Z [36;1m    PLATFORM_PATTERN="macosx"[0m
+2025-06-25T13:38:45.3050102Z [36;1m    ARCH_PATTERN="x64"[0m
+2025-06-25T13:38:45.3050441Z [36;1m    ;;[0m
+2025-06-25T13:38:45.3050733Z [36;1m  macos-latest)[0m
+2025-06-25T13:38:45.3051068Z [36;1m    PLATFORM_PATTERN="macosx"[0m
+2025-06-25T13:38:45.3051442Z [36;1m    ARCH_PATTERN="arm64"[0m
+2025-06-25T13:38:45.3051777Z [36;1m    ;;[0m
+2025-06-25T13:38:45.3052051Z [36;1mesac[0m
+2025-06-25T13:38:45.3052321Z [36;1m[0m
+2025-06-25T13:38:45.3052691Z [36;1m# Find Python version pattern (e.g., "3.11" -> "cp311")[0m
+2025-06-25T13:38:45.3053152Z [36;1mPY_VERSION=$(echo "3.11" | sed 's/\.//')[0m
+2025-06-25T13:38:45.3053554Z [36;1mPY_PATTERN="cp${PY_VERSION}"[0m
+2025-06-25T13:38:45.3053907Z [36;1m[0m
+2025-06-25T13:38:45.3054321Z [36;1mecho "🔎 Searching for: *${PY_PATTERN}*${PLATFORM_PATTERN}* (arch: x64)"[0m
+2025-06-25T13:38:45.3054790Z [36;1m[0m
+2025-06-25T13:38:45.3055271Z [36;1m# Find matching wheel - try with architecture pattern first, then fallback to platform only[0m
+2025-06-25T13:38:45.3056118Z [36;1mWHEEL_FILE=$(find ~/artifacts -name "*.whl" | grep -i "${PY_PATTERN}" | grep -i "${PLATFORM_PATTERN}" | grep -i "${ARCH_PATTERN}" | head -1)[0m
+2025-06-25T13:38:45.3056746Z [36;1m[0m
+2025-06-25T13:38:45.3057136Z [36;1m# If no exact arch match, try just platform (for universal wheels)[0m
+2025-06-25T13:38:45.3057600Z [36;1mif [ -z "$WHEEL_FILE" ]; then[0m
+2025-06-25T13:38:45.3058187Z [36;1m  WHEEL_FILE=$(find ~/artifacts -name "*.whl" | grep -i "${PY_PATTERN}" | grep -i "${PLATFORM_PATTERN}" | head -1)[0m
+2025-06-25T13:38:45.3058749Z [36;1mfi[0m
+2025-06-25T13:38:45.3059013Z [36;1m[0m
+2025-06-25T13:38:45.3059279Z [36;1mif [ -z "$WHEEL_FILE" ]; then[0m
+2025-06-25T13:38:45.3059772Z [36;1m  echo "⚠️  No compatible wheel found for Python 3.11 on windows-latest"[0m
+2025-06-25T13:38:45.3060260Z [36;1m  echo "Available wheels:"[0m
+2025-06-25T13:38:45.3060665Z [36;1m  find ~/artifacts -name "*.whl" | head -5[0m
+2025-06-25T13:38:45.3061103Z [36;1m  exit 0  # Skip test but don't fail the job[0m
+2025-06-25T13:38:45.3061477Z [36;1mfi[0m
+2025-06-25T13:38:45.3061747Z [36;1m[0m
+2025-06-25T13:38:45.3062084Z [36;1mecho "✅ Found wheel: $(basename "$WHEEL_FILE")"[0m
+2025-06-25T13:38:45.3062504Z [36;1mecho "📦 Installing wheel..."[0m
+2025-06-25T13:38:45.3062874Z [36;1mpip install "$WHEEL_FILE"[0m
+2025-06-25T13:38:45.3063215Z [36;1m[0m
+2025-06-25T13:38:45.3063492Z [36;1mecho "🧪 Testing import..."[0m
+2025-06-25T13:38:45.3063878Z [36;1mpython -c "[0m
+2025-06-25T13:38:45.3064168Z [36;1mtry:[0m
+2025-06-25T13:38:45.3064458Z [36;1m    import synthizer[0m
+2025-06-25T13:38:45.3064884Z [36;1m    print('✅ SUCCESS: synthizer imported successfully')[0m
+2025-06-25T13:38:45.3065297Z [36;1m    [0m
+2025-06-25T13:38:45.3066965Z [36;1m    # Basic functionality test[0m
+2025-06-25T13:38:45.3067408Z [36;1m    synthizer.initialize()[0m
+2025-06-25T13:38:45.3067794Z [36;1m    ctx = synthizer.Context()[0m
+2025-06-25T13:38:45.3068266Z [36;1m    print('✅ SUCCESS: Basic synthizer functionality works')[0m
+2025-06-25T13:38:45.3068718Z [36;1m    synthizer.shutdown()[0m
+2025-06-25T13:38:45.3069063Z [36;1m    [0m
+2025-06-25T13:38:45.3069371Z [36;1mexcept Exception as e:[0m
+2025-06-25T13:38:45.3069749Z [36;1m    print(f'❌ FAILED: {e}')[0m
+2025-06-25T13:38:45.3070130Z [36;1m    import traceback[0m
+2025-06-25T13:38:45.3070483Z [36;1m    traceback.print_exc()[0m
+2025-06-25T13:38:45.3070831Z [36;1m    exit(1)[0m
+2025-06-25T13:38:45.3071121Z [36;1m"[0m
+2025-06-25T13:38:45.3071383Z [36;1m[0m
+2025-06-25T13:38:45.3071703Z [36;1mecho "🎉 Wheel test completed successfully!"[0m
+2025-06-25T13:38:45.3083440Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+2025-06-25T13:38:45.3084064Z env:
+2025-06-25T13:38:45.3084458Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2025-06-25T13:38:45.3085023Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+2025-06-25T13:38:45.3085591Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2025-06-25T13:38:45.3086124Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2025-06-25T13:38:45.3086646Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+2025-06-25T13:38:45.3087078Z ##[endgroup]
+2025-06-25T13:38:45.3347604Z 🔍 Looking for wheels compatible with this platform...
+2025-06-25T13:38:45.3865661Z 🔎 Searching for: *cp311*win* (arch: x64)
+2025-06-25T13:38:45.4973524Z ✅ Found wheel: synthizer3d-0.14.0-cp311-cp311-win_amd64.whl
+2025-06-25T13:38:45.4974648Z 📦 Installing wheel...
+2025-06-25T13:38:49.7410594Z Processing c:\users\runneradmin\artifacts\python-wheels-win-x64-3.11\synthizer3d-0.14.0-cp311-cp311-win_amd64.whl
+2025-06-25T13:38:49.7931623Z Installing collected packages: synthizer3d
+2025-06-25T13:38:49.8661854Z Successfully installed synthizer3d-0.14.0
+2025-06-25T13:38:50.0418786Z 🧪 Testing import...
+2025-06-25T13:38:50.1265518Z Traceback (most recent call last):
+2025-06-25T13:38:50.1272526Z   File "<string>", line 4, in <module>
+2025-06-25T13:38:50.1273567Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\encodings\cp1252.py", line 19, in encode
+2025-06-25T13:38:50.1309415Z     return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+2025-06-25T13:38:50.1310426Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-25T13:38:50.1311479Z UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>
+2025-06-25T13:38:50.1312291Z 
+2025-06-25T13:38:50.1312782Z During handling of the above exception, another exception occurred:
+2025-06-25T13:38:50.1313402Z 
+2025-06-25T13:38:50.1313691Z Traceback (most recent call last):
+2025-06-25T13:38:50.1314346Z   File "<string>", line 13, in <module>
+2025-06-25T13:38:50.1315273Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\encodings\cp1252.py", line 19, in encode
+2025-06-25T13:38:50.1316261Z     return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+2025-06-25T13:38:50.1317004Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-25T13:38:50.1317960Z UnicodeEncodeError: 'charmap' codec can't encode character '\u274c' in position 0: character maps to <undefined>
+2025-06-25T13:38:50.1404886Z ##[error]Process completed with exit code 1.
+2025-06-25T13:38:50.1473880Z Cleaning up orphan processes

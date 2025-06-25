@@ -30,10 +30,12 @@ AacDecoder::~AacDecoder() {
 }
 
 bool AacDecoder::fillBuffer() {
+    // Se ci sono ancora dati non elaborati nel buffer, non fare nulla
     if (buffer_pos < buffer_size) {
         return true;
     }
     
+    // Se il buffer è completamente consumato, leggi nuovi dati
     buffer_size = stream->read(buffer.size(), reinterpret_cast<char*>(buffer.data()));
     buffer_pos = 0;
     
@@ -115,8 +117,15 @@ unsigned long long AacDecoder::decodeFramesDirect(unsigned long long num_frames,
             break;
         }
         
-        if (frame_info.samples == 0) {
+        // Avanza sempre nel buffer, anche se il frame è vuoto
+        if (frame_info.bytesconsumed > 0) {
             buffer_pos += frame_info.bytesconsumed;
+        } else {
+            // Se non viene consumato nessun byte, avanza di almeno 1 per evitare loop infiniti
+            buffer_pos += 1;
+        }
+        
+        if (frame_info.samples == 0) {
             continue;
         }
         
@@ -128,7 +137,6 @@ unsigned long long AacDecoder::decodeFramesDirect(unsigned long long num_frames,
                    frames_to_copy * this->channels * sizeof(float));
         
         frames_decoded += frames_to_copy;
-        buffer_pos += frame_info.bytesconsumed;
     }
     
     return frames_decoded;

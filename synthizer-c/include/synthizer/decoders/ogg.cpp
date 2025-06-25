@@ -16,12 +16,8 @@ namespace synthizer {
 namespace ogg_detail {
 
 size_t read_cb(void *ptr, size_t size, size_t nmemb, void *datasource) {
-    if (size == 0 || nmemb == 0) return 0;
-    
     ByteStream *stream = static_cast<ByteStream *>(datasource);
-    size_t total_bytes = size * nmemb;
-    size_t bytes_read = stream->read(total_bytes, static_cast<char *>(ptr));
-    return bytes_read / size; // Restituisce numero di elementi, non bytes
+    return stream->read(size * nmemb, static_cast<char *>(ptr));
 }
 
 int seek_cb(void *datasource, ogg_int64_t offset, int whence) {
@@ -67,28 +63,7 @@ public:
         auto info = ov_info(&vf, -1);
         channels = info->channels;
         sr = info->rate;
-        ogg_int64_t total_frames = ov_pcm_total(&vf, -1);
-        if (total_frames < 0) {
-            // File senza informazioni sulla lunghezza, determina la lunghezza manualmente
-            frame_count = 0;
-            ogg_int64_t current_pos = ov_pcm_tell(&vf);
-            if (ov_pcm_seek(&vf, 0) == 0) {
-                // Vai alla fine per determinare la lunghezza
-                int bitstream;
-                float **pcm;
-                long samples_read;
-                while ((samples_read = ov_read_float(&vf, &pcm, 4096, &bitstream)) > 0) {
-                    frame_count += samples_read;
-                }
-                // Ritorna alla posizione originale
-                ov_pcm_seek(&vf, current_pos);
-            }
-            if (frame_count == 0) {
-                throw Error("Cannot determine OGG file length");
-            }
-        } else {
-            frame_count = static_cast<unsigned long long>(total_frames);
-        }
+        frame_count = ov_pcm_total(&vf, -1);
     }
 
     ~OggDecoder() override {

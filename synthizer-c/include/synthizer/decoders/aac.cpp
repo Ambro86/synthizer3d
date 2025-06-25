@@ -36,8 +36,13 @@ bool AacDecoder::fillBuffer() {
     }
     
     // Se il buffer è completamente consumato, leggi nuovi dati
-    buffer_size = stream->read(buffer.size(), reinterpret_cast<char*>(buffer.data()));
+    size_t bytes_read = stream->read(buffer.size(), reinterpret_cast<char*>(buffer.data()));
+    buffer_size = bytes_read;
     buffer_pos = 0;
+    
+    // Debug: verifica se stiamo leggendo sempre gli stessi dati
+    static size_t total_bytes_read = 0;
+    total_bytes_read += bytes_read;
     
     return buffer_size > 0;
 }
@@ -101,9 +106,16 @@ unsigned long long AacDecoder::writeSamplesInterleaved(unsigned long long num_fr
 
 unsigned long long AacDecoder::decodeFramesDirect(unsigned long long num_frames, float *samples) {
     unsigned long long frames_decoded = 0;
+    size_t consecutive_failures = 0;
+    const size_t MAX_FAILURES = 10;
     
-    while (frames_decoded < num_frames) {
+    while (frames_decoded < num_frames && consecutive_failures < MAX_FAILURES) {
         if (!fillBuffer()) {
+            break;
+        }
+        
+        // Se non ci sono dati disponibili nel buffer, esci
+        if (buffer_pos >= buffer_size) {
             break;
         }
         
@@ -114,15 +126,20 @@ unsigned long long AacDecoder::decodeFramesDirect(unsigned long long num_frames,
                                              buffer_size - buffer_pos);
         
         if (frame_info.error != 0) {
-            break;
+            consecutive_failures++;
+            // Avanza di almeno 1 byte anche in caso di errore
+            buffer_pos = std::min(buffer_pos + 1, buffer_size);
+            continue;
         }
         
-        // Avanza sempre nel buffer, anche se il frame è vuoto
+        // Avanza sempre nel buffer
         if (frame_info.bytesconsumed > 0) {
             buffer_pos += frame_info.bytesconsumed;
+            consecutive_failures = 0; // Reset counter su successo
         } else {
             // Se non viene consumato nessun byte, avanza di almeno 1 per evitare loop infiniti
-            buffer_pos += 1;
+            buffer_pos = std::min(buffer_pos + 1, buffer_size);
+            consecutive_failures++;
         }
         
         if (frame_info.samples == 0) {

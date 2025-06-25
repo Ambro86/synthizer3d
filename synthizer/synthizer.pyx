@@ -21,6 +21,8 @@ cdef extern from "Python.h":
     
 import sys
 if sys.version_info < (3, 9):
+    with nogil:
+        pass  # Dummy statement to suppress warning
     PyEval_InitThreads()
 cdef extern from "string.h":
     void *memcpy(void *dest, const void *src, size_t count)

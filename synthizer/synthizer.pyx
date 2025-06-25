@@ -16,11 +16,11 @@ from weakref import ref
 # We want the ability to acquire and release the GIL, which means making sure it's initialized.
 # In Python 3.7+, the GIL is always initialized, so PyEval_InitThreads() is deprecated.
 # We only call it for older Python versions.
-cdef extern from "Python.h":
-    int PyEval_InitThreads()
-    
 import sys
 if sys.version_info < (3, 9):
+    from libc.stdint cimport uintptr_t
+    cdef extern from "Python.h":
+        int PyEval_InitThreads()
     PyEval_InitThreads()
 cdef extern from "string.h":
     void *memcpy(void *dest, const void *src, size_t count)

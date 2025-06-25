@@ -5,7 +5,7 @@ from setuptools import Extension, setup
 from Cython.Build import cythonize
 from Cython.Compiler import Options
 
-VERSION = "0.14.1"
+VERSION = "0.14.2"
 
 def handle_remove_readonly(func, path, exc):
     # Utility per rimuovere file read-only su Windows

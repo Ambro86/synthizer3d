@@ -4,17 +4,10 @@
   "builtin-baseline": "8f63c9ed5897d7367a92a442a79f91721e0fd38f",
   "dependencies": [
     "libvorbis",
-    "libogg", 
+    "libogg",
     "opus",
     "opusfile",
     "soundtouch",
     "faad2"
-  ],
-  "overrides": [
-    {
-      "name": "libogg",
-      "version": "1.3.5",
-      "port-version": 2
-    }
   ]
 }

@@ -16,8 +16,12 @@ namespace synthizer {
 namespace ogg_detail {
 
 size_t read_cb(void *ptr, size_t size, size_t nmemb, void *datasource) {
+    if (size == 0 || nmemb == 0) return 0;
+    
     ByteStream *stream = static_cast<ByteStream *>(datasource);
-    return stream->read(size * nmemb, static_cast<char *>(ptr));
+    size_t total_bytes = size * nmemb;
+    size_t bytes_read = stream->read(total_bytes, static_cast<char *>(ptr));
+    return bytes_read / size; // Restituisce numero di elementi, non bytes
 }
 
 int seek_cb(void *datasource, ogg_int64_t offset, int whence) {

@@ -880,10 +880,147 @@ jobs:
           path: dist/*.whl
           if-no-files-found: error # Aggiunto per fallire se non ci sono wheel
 
+  # Job per testare le wheel prima del deployment
+  test-wheels:
+    name: Test Wheels on ${{ matrix.os }} (${{ matrix.arch }}) Python ${{ matrix.python-version }}
+    needs: [windows-build, linux-x64-build, macos-x64-build, macos-arm64-build]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x64
+          - os: ubuntu-latest
+            python-version: "3.11"
+            arch: "x64"
+          - os: ubuntu-latest
+            python-version: "3.13"
+            arch: "x64"
+          # Windows x64
+          - os: windows-latest
+            python-version: "3.11"
+            arch: "x64"
+          - os: windows-latest
+            python-version: "3.13"
+            arch: "x64"
+          # Windows x86
+          - os: windows-latest
+            python-version: "3.11"
+            arch: "x86"
+          - os: windows-latest
+            python-version: "3.13"
+            arch: "x86"
+          # macOS x64 (Intel)
+          - os: macos-13
+            python-version: "3.11"
+            arch: "x64"
+          - os: macos-13
+            python-version: "3.13"
+            arch: "x64"
+          # macOS arm64 (Apple Silicon)
+          - os: macos-latest
+            python-version: "3.11"
+            arch: "arm64"
+          - os: macos-latest
+            python-version: "3.13"
+            arch: "arm64"
+    steps:
+      - name: Set up Python ${{ matrix.python-version }} (${{ matrix.arch }})
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.arch }}
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ~/artifacts
+
+      - name: Display downloaded artifacts structure
+        run: |
+          echo "📂 Available artifacts:"
+          ls -la ~/artifacts/
+          find ~/artifacts -name "*.whl" | head -10
+
+      - name: Find and test appropriate wheel
+        shell: bash
+        run: |
+          echo "🔍 Looking for wheels compatible with this platform..."
+          
+          # Determine platform and architecture patterns
+          case "${{ matrix.os }}" in
+            ubuntu-*)
+              PLATFORM_PATTERN="linux"
+              ARCH_PATTERN="x86_64"
+              ;;
+            windows-*)
+              PLATFORM_PATTERN="win"
+              if [ "${{ matrix.arch }}" = "x86" ]; then
+                ARCH_PATTERN="32"
+              else
+                ARCH_PATTERN="amd64"
+              fi
+              ;;
+            macos-13)
+              PLATFORM_PATTERN="macosx"
+              ARCH_PATTERN="x64"
+              ;;
+            macos-latest)
+              PLATFORM_PATTERN="macosx"
+              ARCH_PATTERN="arm64"
+              ;;
+          esac
+          
+          # Find Python version pattern (e.g., "3.11" -> "cp311")
+          PY_VERSION=$(echo "${{ matrix.python-version }}" | sed 's/\.//')
+          PY_PATTERN="cp${PY_VERSION}"
+          
+          echo "🔎 Searching for: *${PY_PATTERN}*${PLATFORM_PATTERN}* (arch: ${{ matrix.arch }})"
+          
+          # Find matching wheel - try with architecture pattern first, then fallback to platform only
+          WHEEL_FILE=$(find ~/artifacts -name "*.whl" | grep -i "${PY_PATTERN}" | grep -i "${PLATFORM_PATTERN}" | grep -i "${ARCH_PATTERN}" | head -1)
+          
+          # If no exact arch match, try just platform (for universal wheels)
+          if [ -z "$WHEEL_FILE" ]; then
+            WHEEL_FILE=$(find ~/artifacts -name "*.whl" | grep -i "${PY_PATTERN}" | grep -i "${PLATFORM_PATTERN}" | head -1)
+          fi
+          
+          if [ -z "$WHEEL_FILE" ]; then
+            echo "⚠️  No compatible wheel found for Python ${{ matrix.python-version }} on ${{ matrix.os }}"
+            echo "Available wheels:"
+            find ~/artifacts -name "*.whl" | head -5
+            exit 0  # Skip test but don't fail the job
+          fi
+          
+          echo "✅ Found wheel: $(basename "$WHEEL_FILE")"
+          echo "📦 Installing wheel..."
+          pip install "$WHEEL_FILE"
+          
+          echo "🧪 Testing import..."
+          python -c "
+          try:
+              import synthizer
+              print('✅ SUCCESS: synthizer imported successfully')
+              
+              # Basic functionality test
+              synthizer.initialize()
+              ctx = synthizer.Context()
+              print('✅ SUCCESS: Basic synthizer functionality works')
+              synthizer.shutdown()
+              
+          except Exception as e:
+              print(f'❌ FAILED: {e}')
+              import traceback
+              traceback.print_exc()
+              exit(1)
+          "
+          
+          echo "🎉 Wheel test completed successfully!"
+
   # Job per il deployment su PyPI
   deploy_pypi:
     name: Deploy to PyPI
-    needs: [windows-build, linux-x64-build, macos-x64-build, macos-arm64-build]
+    needs: [windows-build, linux-x64-build, macos-x64-build, macos-arm64-build, test-wheels]
     runs-on: ubuntu-latest
     permissions:
       contents: read

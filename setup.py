@@ -63,15 +63,6 @@ if 'CI_SDIST' not in os.environ:
         "-DSYZ_INTEGRATING=ON",
     ]
     
-    # Add macOS-specific flags for consistent C++ runtime
-    import platform
-    if platform.system() == "Darwin":
-        cmake_args.extend([
-            "-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15",
-            "-DCMAKE_CXX_FLAGS=-stdlib=libc++",
-            "-DCMAKE_EXE_LINKER_FLAGS=-stdlib=libc++",
-            "-DCMAKE_SHARED_LINKER_FLAGS=-stdlib=libc++"
-        ])
     
     cmake.configure(
         cmake_source_dir=vendored_dir,
@@ -86,7 +77,7 @@ if 'CI_SDIST' not in os.environ:
 extension_args = {
     "include_dirs": [os.path.join(vendored_dir, "include")],
     "library_dirs": [synthizer_lib_dir] if synthizer_lib_dir else [],
-    "libraries": [],  # We'll add synthizer via force_load/whole-archive for better symbol control
+    "libraries": ["synthizer"],  # Linux and Windows use normal linking
 }
 
 import platform
@@ -131,7 +122,7 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
     if system == "Windows":
         # Windows uses dynamic linking with individual libraries
         extension_args["libraries"].extend([
-            "synthizer", "ogg", "opus", "vorbis", "vorbisenc", "opusfile", "vorbisfile", "SoundTouch", "faad"
+            "ogg", "opus", "vorbis", "vorbisenc", "opusfile", "vorbisfile", "SoundTouch", "faad"
         ])
         print("Windows: Using dynamic library linking")
     else:
@@ -160,16 +151,6 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
             for lib in existing_libs:
                 # Apply --whole-archive to all audio libraries, not just opus
                 link_args.extend(["-Wl,--whole-archive", lib, "-Wl,--no-whole-archive"])
-            
-            # Also use --whole-archive for the synthizer library to ensure all symbols are included
-            if synthizer_lib_dir:
-                synthizer_lib_path = os.path.join(synthizer_lib_dir, "libsynthizer.a")
-                if os.path.exists(synthizer_lib_path):
-                    link_args.extend(["-Wl,--whole-archive", synthizer_lib_path, "-Wl,--no-whole-archive"])
-                    print(f"Linux: Added --whole-archive for synthizer library: {synthizer_lib_path}")
-                else:
-                    print(f"Warning: synthizer library not found at expected path: {synthizer_lib_path}")
-            
             extension_args["extra_link_args"].extend(link_args)
             extension_args["libraries"].extend(["m", "dl"])
             
@@ -189,31 +170,18 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
                 # Apply -force_load to all audio libraries, not just opus
                 link_args.extend(["-Wl,-force_load", lib])
             
-            # Also force-load the synthizer library to ensure all symbols are included
-            if synthizer_lib_dir:
-                synthizer_lib_path = os.path.join(synthizer_lib_dir, "libsynthizer.a")
-                if os.path.exists(synthizer_lib_path):
-                    link_args.extend(["-Wl,-force_load", synthizer_lib_path])
-                    print(f"macOS: Added -force_load for synthizer library: {synthizer_lib_path}")
-                else:
-                    print(f"Warning: synthizer library not found at expected path: {synthizer_lib_path}")
-            
-            # Set deployment target and ensure C++ symbols are available
             # Use explicit linking flags for better symbol resolution
             link_args.extend([
-                "-mmacosx-version-min=10.15",  # Set deployment target
                 "-Wl,-undefined,dynamic_lookup"  # Allow undefined symbols to be resolved at runtime
             ])
             
             extension_args["extra_link_args"].extend(link_args)
             
-            # Suppress warnings from third-party headers and set deployment target
+            # Suppress warnings from third-party headers
             if "extra_compile_args" not in extension_args:
                 extension_args["extra_compile_args"] = []
             extension_args["extra_compile_args"].extend([
-                "-Wno-unused-variable",  # Suppress warnings from third-party headers (vorbis)
-                "-mmacosx-version-min=10.15",  # Set deployment target for compilation
-                "-stdlib=libc++"  # Explicitly use libc++
+                "-Wno-unused-variable"  # Suppress warnings from third-party headers (vorbis)
             ])
             print(f"macOS: Using -force_load for ALL {len(existing_libs)} libraries with static C++ runtime")
         

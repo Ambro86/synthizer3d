@@ -69,25 +69,26 @@ jobs:
       - name: Retry vcpkg install on failure
         if: failure()
         timeout-minutes: 45
+        shell: pwsh
         run: |
-          echo "🔄 Retrying vcpkg install due to network issues..."
-          sleep 30
+          Write-Host "🔄 Retrying vcpkg install due to network issues..."
+          Start-Sleep 30
           
-          for i in {1..3}; do
-            echo "📦 Attempt $i of 3..."
-            if "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions; then
-              echo "✅ vcpkg install succeeded on attempt $i"
+          for ($i = 1; $i -le 3; $i++) {
+            Write-Host "📦 Attempt $i of 3..."
+            if (& "$env:VCPKG_ROOT/vcpkg.exe" install --triplet=$env:VCPKG_DEFAULT_TRIPLET --feature-flags=versions) {
+              Write-Host "✅ vcpkg install succeeded on attempt $i"
               break
-            else
-              if [ $i -lt 3 ]; then
-                echo "❌ Attempt $i failed, waiting $(($i * 60)) seconds..."
-                sleep $(($i * 60))
-              else
-                echo "❌ All retry attempts failed"
+            } else {
+              if ($i -lt 3) {
+                Write-Host "❌ Attempt $i failed, waiting $($i * 60) seconds..."
+                Start-Sleep ($i * 60)
+              } else {
+                Write-Host "❌ All retry attempts failed"
                 exit 1
-              fi
-            fi
-          done
+              }
+            }
+          }
 
       - name: Install dependencies and set CMAKE_PREFIX_PATH (Windows)
         shell: pwsh

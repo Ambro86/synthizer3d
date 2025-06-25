@@ -4,3 +4,4 @@ dist/
 synthizer-vendored/
 vcpkg_installed/
 vcpkg
+Builder/

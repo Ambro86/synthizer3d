@@ -16,14 +16,19 @@ namespace synthizer {
 namespace ogg_detail {
 
 size_t read_cb(void *ptr, size_t size, size_t nmemb, void *datasource) {
+    if (size == 0 || nmemb == 0) return 0;
+
     ByteStream *stream = static_cast<ByteStream *>(datasource);
-    return stream->read(size * nmemb, static_cast<char *>(ptr));
+    size_t total_bytes = size * nmemb;
+    size_t bytes_read = stream->read(total_bytes, static_cast<char *>(ptr));
+    return bytes_read / size;  // ✅ restituisce numero di elementi
 }
 
 int seek_cb(void *datasource, ogg_int64_t offset, int whence) {
     ByteStream *stream = static_cast<ByteStream *>(datasource);
     if (!stream->supportsSeek())
         return -1;
+
     if (whence == SEEK_SET)
         stream->seek(static_cast<int>(offset));
     else if (whence == SEEK_CUR)
@@ -32,11 +37,11 @@ int seek_cb(void *datasource, ogg_int64_t offset, int whence) {
         stream->seek(stream->getLength() + static_cast<int>(offset));
     else
         return -1;
+
     return 0;
 }
 
 int close_cb(void *datasource) {
-    (void)datasource; // Evita warning C4100 (unused parameter)
     // Niente da fare, il ByteStream è gestito da std::shared_ptr
     return 0;
 }
@@ -63,7 +68,27 @@ public:
         auto info = ov_info(&vf, -1);
         channels = info->channels;
         sr = info->rate;
-        frame_count = ov_pcm_total(&vf, -1);
+        ogg_int64_t total_frames = ov_pcm_total(&vf, -1);
+
+        if (total_frames < 0) {
+            // Fallback: calcola manualmente la lunghezza
+            frame_count = 0;
+            ogg_int64_t current_pos = ov_pcm_tell(&vf);
+            if (ov_pcm_seek(&vf, 0) == 0) {
+                int bitstream;
+                float **pcm;
+                long samples_read;
+                while ((samples_read = ov_read_float(&vf, &pcm, 4096, &bitstream)) > 0) {
+                    frame_count += samples_read;
+                }
+                ov_pcm_seek(&vf, current_pos);  // Torna alla posizione originale
+            }
+            if (frame_count == 0) {
+                throw Error("Cannot determine OGG file length");
+            }
+        } else {
+            frame_count = static_cast<unsigned long long>(total_frames);
+        }
     }
 
     ~OggDecoder() override {
@@ -83,11 +108,10 @@ public:
             for (long f = 0; f < frames; ++f) {
                 for (int c = 0; c < channels; ++c) {
                     if (static_cast<unsigned int>(c) < ch_out)
-                        samples[(written + static_cast<unsigned long long>(f)) * ch_out + c] = pcm[c][f];
+                        samples[(written + f) * ch_out + c] = pcm[c][f];
                 }
-                // Azzeri i canali extra se richiesto
                 for (unsigned int c = channels; c < ch_out; ++c) {
-                    samples[(written + static_cast<unsigned long long>(f)) * ch_out + c] = 0.0f;
+                    samples[(written + f) * ch_out + c] = 0.0f;
                 }
             }
 
@@ -100,9 +124,12 @@ public:
     int getSr() override { return sr; }
     int getChannels() override { return channels; }
     AudioFormat getFormat() override { return AudioFormat::Unknown; }
+
     void seekPcm(unsigned long long pos) override {
-        if (ov_pcm_seek(&vf, pos) != 0) throw Error("Cannot seek in Ogg file");
+        if (ov_pcm_seek(&vf, pos) != 0)
+            throw Error("Cannot seek in Ogg file");
     }
+
     bool supportsSeek() override { return stream->supportsSeek(); }
     bool supportsSampleAccurateSeek() override { return supportsSeek(); }
     unsigned long long getLength() override { return frame_count; }
@@ -119,11 +146,6 @@ private:
 
 std::shared_ptr<AudioDecoder> decodeOgg(std::shared_ptr<LookaheadByteStream> stream) {
     try {
-        char header[4] = {0};
-        auto actuallyRead = stream->read(4, header);
-        if (actuallyRead != 4 || std::memcmp(header, "OggS", 4) != 0)
-            return nullptr;
-        stream->reset();
         return std::make_shared<ogg_detail::OggDecoder>(stream);
     } catch (...) {
         logDebug("OGG decoder: error creating decoder");

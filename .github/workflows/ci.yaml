@@ -420,23 +420,6 @@ jobs:
             echo "🔍 Specifically checking for op_read_float:"
             nm "${VCPKG_INSTALLED_PATH}/lib/libopusfile.a" | grep "op_read_float" || echo "❌ op_read_float symbol NOT found in static library"
             
-            # Test if we can compile a simple test with op_read_float
-            echo "🧪 Testing op_read_float compilation..."
-            cat > test_opusfile.c << 'TESTEOF'
-          #include <opusfile.h>
-          int main() {
-              float dummy[1]; 
-              OggOpusFile *of = NULL;
-              op_read_float(of, dummy, 1, NULL);
-              return 0;
-          }
-          TESTEOF
-            if gcc -I"${VCPKG_INSTALLED_PATH}/include" -L"${VCPKG_INSTALLED_PATH}/lib" test_opusfile.c -lopusfile -lopus -logg -o test_opusfile 2>&1; then
-              echo "✅ op_read_float compilation test PASSED"
-            else
-              echo "❌ op_read_float compilation test FAILED - will use fallback"
-            fi
-            rm -f test_opusfile.c test_opusfile
           else
             echo "❌ libopusfile.a not found"
           fi

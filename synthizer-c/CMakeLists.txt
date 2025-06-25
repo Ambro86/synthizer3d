@@ -22,12 +22,13 @@ enable_testing()
 
 find_package(Threads REQUIRED)
 
-# --- VCPKG Packages: libvorbis, libogg, opus, opusfile, soundtouch ---
+# --- VCPKG Packages: libvorbis, libogg, opus, opusfile, soundtouch, faad2 ---
 find_package(Vorbis REQUIRED)
 find_package(Ogg REQUIRED)
 find_package(Opus REQUIRED)
 find_package(OpusFile REQUIRED)
 find_package(SoundTouch REQUIRED)
+find_package(faad2 REQUIRED)
 
 
 # Check if op_read_float is available
@@ -137,6 +138,7 @@ add_library(synthizer ${SYNTHIZER_LIB_TYPE}
   src/streams/memory_stream.cpp
   include/synthizer/decoders/ogg.cpp
   include/synthizer/decoders/opus.cpp
+  include/synthizer/decoders/aac.cpp
   $<TARGET_OBJECTS:wdl_objlib>
   $<TARGET_OBJECTS:synthizer_single_file_libs>
 )
@@ -161,6 +163,7 @@ if(WIN32)
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/opusfile.lib"
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/vorbisenc.lib"
     "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/SoundTouch.lib"
+    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib/faad2.lib"
   )
 elseif(UNIX AND NOT APPLE)
   # Linux-specific linking for static libraries with whole-archive
@@ -176,6 +179,7 @@ elseif(UNIX AND NOT APPLE)
       "$ENV{VCPKG_INSTALLED_PATH}/lib/libvorbis.a"
       "$ENV{VCPKG_INSTALLED_PATH}/lib/libvorbisfile.a"
       "$ENV{VCPKG_INSTALLED_PATH}/lib/libSoundTouch.a"
+      "$ENV{VCPKG_INSTALLED_PATH}/lib/libfaad.a"
       m  # Math library
       dl  # Dynamic loading library
     )
@@ -190,6 +194,7 @@ elseif(UNIX AND NOT APPLE)
       Vorbis::vorbis
       Vorbis::vorbisfile
       SoundTouch::SoundTouch
+      faad2::faad2
       m  # Math library
       dl  # Dynamic loading library
     )
@@ -206,6 +211,7 @@ elseif(APPLE)
       "$ENV{VCPKG_INSTALLED_PATH}/lib/libvorbis.a"
       "$ENV{VCPKG_INSTALLED_PATH}/lib/libvorbisfile.a"
       "$ENV{VCPKG_INSTALLED_PATH}/lib/libSoundTouch.a"
+      "$ENV{VCPKG_INSTALLED_PATH}/lib/libfaad.a"
       m  # Math library
     )
   else()
@@ -217,6 +223,7 @@ elseif(APPLE)
       Vorbis::vorbisfile
       OpusFile::opusfile
       SoundTouch::SoundTouch
+      faad2::faad2
       m  # Math library
     )
   endif()

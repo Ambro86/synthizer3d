@@ -118,7 +118,7 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
     if system == "Windows":
         # Windows uses dynamic linking with individual libraries
         extension_args["libraries"].extend([
-            "ogg", "opus", "vorbis", "vorbisenc", "opusfile", "vorbisfile", "SoundTouch"
+            "ogg", "opus", "vorbis", "vorbisenc", "opusfile", "vorbisfile", "SoundTouch", "faad2"
         ])
         print("Windows: Using dynamic library linking")
     else:
@@ -130,7 +130,8 @@ if vcpkg_lib_dir and os.path.isdir(vcpkg_lib_dir):
             os.path.join(vcpkg_lib_dir, "libvorbisenc.a"),
             os.path.join(vcpkg_lib_dir, "libopusfile.a"),
             os.path.join(vcpkg_lib_dir, "libvorbisfile.a"),
-            os.path.join(vcpkg_lib_dir, "libSoundTouch.a")
+            os.path.join(vcpkg_lib_dir, "libSoundTouch.a"),
+            os.path.join(vcpkg_lib_dir, "libfaad.a")
         ]
         
         # Filter out non-existent files

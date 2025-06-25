@@ -10,7 +10,9 @@
       "Bash(git push:*)",
       "Bash(sed:*)",
       "Bash(rm:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(make:*)",
+      "Bash(g++:*)"
     ],
     "deny": []
   }

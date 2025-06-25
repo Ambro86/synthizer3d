@@ -28,6 +28,7 @@ enum class AudioFormat : int {
   Wav,
   Flac,
   Mp3,
+  Aac,
   Raw,
 };
 

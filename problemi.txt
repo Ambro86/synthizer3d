@@ -1,8 +1,0 @@
-La versione corretta più semplice sarebbe sostituire l'intera funzione generateSpeedTransition con:
-Copia negli appunti
-cpp
-inline void BufferGenerator::generateSpeedTransition(float *output, FadeDriver *gd) const {
-  // Usa sempre SoundTouch per preservare il pitch durante i cambiamenti di velocità
-  this->generateTimeStretchSpeed(output, gd);
-}
-Questo garantirà che il pitch rimanga costante quando cambi solo la velocità!

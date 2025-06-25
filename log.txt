@@ -1,180 +1,1408 @@
-2025-06-25T02:02:48.6638665Z Current runner version: '2.325.0'
-2025-06-25T02:02:48.6667452Z ##[group]Runner Image Provisioner
-2025-06-25T02:02:48.6668215Z Hosted Compute Agent
-2025-06-25T02:02:48.6668687Z Version: 20250620.352
-2025-06-25T02:02:48.6669175Z Commit: f262f3aba23b10ea191b2a62bdee1ca4c3d344da
-2025-06-25T02:02:48.6669810Z Build Date: 2025-06-20T19:27:17Z
-2025-06-25T02:02:48.6670299Z ##[endgroup]
-2025-06-25T02:02:48.6670741Z ##[group]Operating System
-2025-06-25T02:02:48.6671286Z Microsoft Windows Server 2022
-2025-06-25T02:02:48.6671762Z 10.0.20348
-2025-06-25T02:02:48.6672171Z Datacenter
-2025-06-25T02:02:48.6672566Z ##[endgroup]
-2025-06-25T02:02:48.6673030Z ##[group]Runner Image
-2025-06-25T02:02:48.6673455Z Image: windows-2022
-2025-06-25T02:02:48.6674236Z Version: 20250602.1.0
-2025-06-25T02:02:48.6675184Z Included Software: https://github.com/actions/runner-images/blob/win22/20250602.1/images/windows/Windows2022-Readme.md
-2025-06-25T02:02:48.6676684Z Image Release: https://github.com/actions/runner-images/releases/tag/win22%2F20250602.1
-2025-06-25T02:02:48.6677584Z ##[endgroup]
-2025-06-25T02:02:48.6679880Z ##[group]GITHUB_TOKEN Permissions
-2025-06-25T02:02:48.6681885Z Actions: write
-2025-06-25T02:02:48.6682377Z Attestations: write
-2025-06-25T02:02:48.6682792Z Checks: write
-2025-06-25T02:02:48.6683245Z Contents: write
-2025-06-25T02:02:48.6683661Z Deployments: write
-2025-06-25T02:02:48.6684075Z Discussions: write
-2025-06-25T02:02:48.6684511Z Issues: write
-2025-06-25T02:02:48.6684918Z Metadata: read
-2025-06-25T02:02:48.6685323Z Models: read
-2025-06-25T02:02:48.6685743Z Packages: write
-2025-06-25T02:02:48.6686178Z Pages: write
-2025-06-25T02:02:48.6686581Z PullRequests: write
-2025-06-25T02:02:48.6687055Z RepositoryProjects: write
-2025-06-25T02:02:48.6687506Z SecurityEvents: write
-2025-06-25T02:02:48.6688003Z Statuses: write
-2025-06-25T02:02:48.6688441Z ##[endgroup]
-2025-06-25T02:02:48.6690369Z Secret source: Actions
-2025-06-25T02:02:48.6691111Z Prepare workflow directory
-2025-06-25T02:02:48.7233413Z Prepare all required actions
-2025-06-25T02:02:48.7271013Z Getting action download info
-2025-06-25T02:02:49.0724409Z ##[group]Download immutable action package 'actions/checkout@v4'
-2025-06-25T02:02:49.0725421Z Version: 4.2.2
-2025-06-25T02:02:49.0726313Z Digest: sha256:ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1
-2025-06-25T02:02:49.0727503Z Source commit SHA: 11bd71901bbe5b1630ceea73d27597364c9af683
-2025-06-25T02:02:49.0728194Z ##[endgroup]
-2025-06-25T02:02:49.1884836Z ##[group]Download immutable action package 'actions/setup-python@v5'
-2025-06-25T02:02:49.1885604Z Version: 5.6.0
-2025-06-25T02:02:49.1886299Z Digest: sha256:0b35a0c11c97499e4e0576589036d450b9f5f9da74b7774225b3614b57324404
-2025-06-25T02:02:49.1887249Z Source commit SHA: a26af69be951a213d495a4c3e4e4022e16d87065
-2025-06-25T02:02:49.1887911Z ##[endgroup]
-2025-06-25T02:02:49.5239865Z ##[group]Download immutable action package 'actions/cache@v4'
-2025-06-25T02:02:49.5240624Z Version: 4.2.3
-2025-06-25T02:02:49.5241325Z Digest: sha256:c8a3bb963e1f1826d8fcc8d1354f0dd29d8ac1db1d4f6f20247055ae11b81ed9
-2025-06-25T02:02:49.5242334Z Source commit SHA: 5a3ec84eff668545956fd18022155c47e93e2684
-2025-06-25T02:02:49.5242982Z ##[endgroup]
-2025-06-25T02:02:49.6554415Z Download action repository 'ilammy/msvc-dev-cmd@v1' (SHA:0b201ec74fa43914dc39ae48a89fd1d8cb592756)
-2025-06-25T02:02:50.0270074Z Download action repository 'lukka/run-vcpkg@v11' (SHA:7d259227a1fb6471a0253dd5ab7419835228f7d7)
-2025-06-25T02:02:50.3932178Z ##[group]Download immutable action package 'actions/upload-artifact@v4'
-2025-06-25T02:02:50.3933666Z Version: 4.6.2
-2025-06-25T02:02:50.3935021Z Digest: sha256:290722aa3281d5caf23d0acdc3dbeb3424786a1a01a9cc97e72f147225e37c38
-2025-06-25T02:02:50.3936974Z Source commit SHA: ea165f8d65b6e75b540449e92b4886f43607fa02
-2025-06-25T02:02:50.3938357Z ##[endgroup]
-2025-06-25T02:02:50.7744443Z Complete job name: Build Windows (x64) Python 3.9
-2025-06-25T02:02:50.9346472Z ##[group]Run actions/checkout@v4
-2025-06-25T02:02:50.9349393Z with:
-2025-06-25T02:02:50.9350297Z   submodules: recursive
-2025-06-25T02:02:50.9351341Z   repository: Ambro86/synthizer3d
-2025-06-25T02:02:50.9352781Z   token: ***
-2025-06-25T02:02:50.9353640Z   ssh-strict: true
-2025-06-25T02:02:50.9354572Z   ssh-user: git
-2025-06-25T02:02:50.9355534Z   persist-credentials: true
-2025-06-25T02:02:50.9356538Z   clean: true
-2025-06-25T02:02:50.9357484Z   sparse-checkout-cone-mode: true
-2025-06-25T02:02:50.9358513Z   fetch-depth: 1
-2025-06-25T02:02:50.9359248Z   fetch-tags: false
-2025-06-25T02:02:50.9359988Z   show-progress: true
-2025-06-25T02:02:50.9360792Z   lfs: false
-2025-06-25T02:02:50.9361491Z   set-safe-directory: true
-2025-06-25T02:02:50.9362508Z env:
-2025-06-25T02:02:50.9363209Z   PYVERSION: 3.9
-2025-06-25T02:02:50.9363928Z   CI_ARCH_LOWER: x64
-2025-06-25T02:02:50.9364665Z   CI_WINDOWS: 1
-2025-06-25T02:02:50.9365382Z   CI_ARCH_ENV: x64
-2025-06-25T02:02:50.9366259Z   VCPKG_DEFAULT_TRIPLET: x64-windows
-2025-06-25T02:02:50.9367601Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: D:\a\synthizer3d\synthizer3d\vcpkg_installed
-2025-06-25T02:02:50.9368902Z ##[endgroup]
-2025-06-25T02:02:51.1053271Z Syncing repository: Ambro86/synthizer3d
-2025-06-25T02:02:51.1055742Z ##[group]Getting Git version info
-2025-06-25T02:02:51.1056861Z Working directory is 'D:\a\synthizer3d\synthizer3d'
-2025-06-25T02:02:51.2159822Z [command]"C:\Program Files\Git\bin\git.exe" version
-2025-06-25T02:02:51.5331914Z git version 2.49.0.windows.1
-2025-06-25T02:02:51.5378866Z ##[endgroup]
-2025-06-25T02:02:51.5398147Z Temporarily overriding HOME='D:\a\_temp\061fe904-6103-43ca-884e-d4b6dd715d8a' before making global git config changes
-2025-06-25T02:02:51.5400382Z Adding repository directory to the temporary git global config as a safe directory
-2025-06-25T02:02:51.5409632Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\synthizer3d\synthizer3d
-2025-06-25T02:02:51.5919588Z Deleting the contents of 'D:\a\synthizer3d\synthizer3d'
-2025-06-25T02:02:51.5924740Z ##[group]Initializing the repository
-2025-06-25T02:02:51.5934945Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\synthizer3d\synthizer3d
-2025-06-25T02:02:51.6644427Z Initialized empty Git repository in D:/a/synthizer3d/synthizer3d/.git/
-2025-06-25T02:02:51.6689022Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/Ambro86/synthizer3d
-2025-06-25T02:02:51.7135257Z ##[endgroup]
-2025-06-25T02:02:51.7136605Z ##[group]Disabling automatic garbage collection
-2025-06-25T02:02:51.7146420Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
-2025-06-25T02:02:51.7392100Z ##[endgroup]
-2025-06-25T02:02:51.7393287Z ##[group]Setting up auth
-2025-06-25T02:02:51.7411873Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
-2025-06-25T02:02:51.7655408Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
-2025-06-25T02:02:52.9592527Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
-2025-06-25T02:02:52.9832907Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
-2025-06-25T02:02:53.4474484Z [command]"C:\Program Files\Git\bin\git.exe" config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
-2025-06-25T02:02:53.4716087Z ##[endgroup]
-2025-06-25T02:02:53.4717005Z ##[group]Fetching the repository
-2025-06-25T02:02:53.4740893Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +1fe123896f2c988a55995a85f624d9c14231c156:refs/remotes/origin/master
-2025-06-25T02:02:55.1035131Z From https://github.com/Ambro86/synthizer3d
-2025-06-25T02:02:55.1037095Z  * [new ref]         1fe123896f2c988a55995a85f624d9c14231c156 -> origin/master
-2025-06-25T02:02:55.1217557Z ##[endgroup]
-2025-06-25T02:02:55.1218125Z ##[group]Determining the checkout info
-2025-06-25T02:02:55.1222045Z ##[endgroup]
-2025-06-25T02:02:55.1233273Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
-2025-06-25T02:02:55.1531099Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
-2025-06-25T02:02:55.1745163Z ##[group]Checking out the ref
-2025-06-25T02:02:55.1757854Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B master refs/remotes/origin/master
-2025-06-25T02:02:55.9280140Z branch 'master' set up to track 'origin/master'.
-2025-06-25T02:02:55.9284639Z Reset branch 'master'
-2025-06-25T02:02:55.9331840Z ##[endgroup]
-2025-06-25T02:02:55.9332392Z ##[group]Setting up auth for fetching submodules
-2025-06-25T02:02:55.9342176Z [command]"C:\Program Files\Git\bin\git.exe" config --global http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
-2025-06-25T02:02:55.9565130Z [command]"C:\Program Files\Git\bin\git.exe" config --global --unset-all url.https://github.com/.insteadOf
-2025-06-25T02:02:55.9774400Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add url.https://github.com/.insteadOf git@github.com:
-2025-06-25T02:02:55.9984953Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add url.https://github.com/.insteadOf org-58132298@github.com:
-2025-06-25T02:02:56.0201098Z ##[endgroup]
-2025-06-25T02:02:56.0201460Z ##[group]Fetching submodules
-2025-06-25T02:02:56.0210383Z [command]"C:\Program Files\Git\bin\git.exe" submodule sync --recursive
-2025-06-25T02:02:56.4319947Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 submodule update --init --force --depth=1 --recursive
-2025-06-25T02:02:56.8187135Z ##[error]fatal: No url found for submodule path 'Builder' in .gitmodules
-2025-06-25T02:02:56.8248544Z ##[error]The process 'C:\Program Files\Git\bin\git.exe' failed with exit code 128
-2025-06-25T02:02:56.8525993Z ##[group]Run echo "🔄 Retrying vcpkg install due to network issues..."
-2025-06-25T02:02:56.8526562Z [36;1mecho "🔄 Retrying vcpkg install due to network issues..."[0m
-2025-06-25T02:02:56.8526880Z [36;1msleep 30[0m
-2025-06-25T02:02:56.8527044Z [36;1m[0m
-2025-06-25T02:02:56.8527205Z [36;1mfor i in {1..3}; do[0m
-2025-06-25T02:02:56.8527409Z [36;1m  echo "📦 Attempt $i of 3..."[0m
-2025-06-25T02:02:56.8527821Z [36;1m  if "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions; then[0m
-2025-06-25T02:02:56.8528263Z [36;1m    echo "✅ vcpkg install succeeded on attempt $i"[0m
-2025-06-25T02:02:56.8528512Z [36;1m    break[0m
-2025-06-25T02:02:56.8528674Z [36;1m  else[0m
-2025-06-25T02:02:56.8528829Z [36;1m    if [ $i -lt 3 ]; then[0m
-2025-06-25T02:02:56.8529108Z [36;1m      echo "❌ Attempt $i failed, waiting $(($i * 60)) seconds..."[0m
-2025-06-25T02:02:56.8529409Z [36;1m      sleep $(($i * 60))[0m
-2025-06-25T02:02:56.8529668Z [36;1m    else[0m
-2025-06-25T02:02:56.8529854Z [36;1m      echo "❌ All retry attempts failed"[0m
-2025-06-25T02:02:56.8530090Z [36;1m      exit 1[0m
-2025-06-25T02:02:56.8530241Z [36;1m    fi[0m
-2025-06-25T02:02:56.8530389Z [36;1m  fi[0m
-2025-06-25T02:02:56.8530527Z [36;1mdone[0m
-2025-06-25T02:02:56.8620225Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
-2025-06-25T02:02:56.8620559Z env:
-2025-06-25T02:02:56.8620710Z   PYVERSION: 3.9
-2025-06-25T02:02:56.8620874Z   CI_ARCH_LOWER: x64
-2025-06-25T02:02:56.8621045Z   CI_WINDOWS: 1
-2025-06-25T02:02:56.8621193Z   CI_ARCH_ENV: x64
-2025-06-25T02:02:56.8621370Z   VCPKG_DEFAULT_TRIPLET: x64-windows
-2025-06-25T02:02:56.8621728Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: D:\a\synthizer3d\synthizer3d\vcpkg_installed
-2025-06-25T02:02:56.8622077Z ##[endgroup]
-2025-06-25T02:03:02.6784494Z [31;1mParserError: [0mD:\a\_temp\e726dae7-d362-4e31-81c8-b54486ef3e54.ps1:5[0m
-2025-06-25T02:03:02.6785919Z [31;1m[0m[36;1mLine |[0m
-2025-06-25T02:03:02.6786633Z [31;1m[0m[36;1m[36;1m   5 | [0m for[36;1m [0mi in {1..3}; do[0m
-2025-06-25T02:03:02.6787399Z [31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m     | [31;1m    ~[0m
-2025-06-25T02:03:02.6788387Z [31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m[31;1m[31;1m[36;1m     | [31;1mMissing opening '(' after keyword 'for'.[0m
-2025-06-25T02:03:02.7629576Z ##[error]Process completed with exit code 1.
-2025-06-25T02:03:02.7794523Z Post job cleanup.
-2025-06-25T02:03:02.9863646Z [command]"C:\Program Files\Git\bin\git.exe" version
-2025-06-25T02:03:03.0068165Z git version 2.49.0.windows.1
-2025-06-25T02:03:03.0133972Z Temporarily overriding HOME='D:\a\_temp\bc2b37bd-9477-459f-8339-80a8d91bd9b7' before making global git config changes
-2025-06-25T02:03:03.0134609Z Adding repository directory to the temporary git global config as a safe directory
-2025-06-25T02:03:03.0144415Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\synthizer3d\synthizer3d
-2025-06-25T02:03:03.0362242Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
-2025-06-25T02:03:03.0575285Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
-2025-06-25T02:03:03.4683090Z fatal: No url found for submodule path 'Builder' in .gitmodules
-2025-06-25T02:03:03.4768511Z ##[warning]The process 'C:\Program Files\Git\bin\git.exe' failed with exit code 128
-2025-06-25T02:03:03.4882598Z Cleaning up orphan processes
+2025-06-25T02:33:18.6967276Z Current runner version: '2.325.0'
+2025-06-25T02:33:18.6990933Z ##[group]Runner Image Provisioner
+2025-06-25T02:33:18.6991695Z Hosted Compute Agent
+2025-06-25T02:33:18.6992234Z Version: 20250620.352
+2025-06-25T02:33:18.6992744Z Commit: f262f3aba23b10ea191b2a62bdee1ca4c3d344da
+2025-06-25T02:33:18.6993379Z Build Date: 2025-06-20T19:27:17Z
+2025-06-25T02:33:18.6993895Z ##[endgroup]
+2025-06-25T02:33:18.6994315Z ##[group]Operating System
+2025-06-25T02:33:18.6994848Z Microsoft Windows Server 2022
+2025-06-25T02:33:18.6995322Z 10.0.20348
+2025-06-25T02:33:18.6995730Z Datacenter
+2025-06-25T02:33:18.6996365Z ##[endgroup]
+2025-06-25T02:33:18.6996832Z ##[group]Runner Image
+2025-06-25T02:33:18.6997270Z Image: windows-2022
+2025-06-25T02:33:18.6997708Z Version: 20250602.1.0
+2025-06-25T02:33:18.6998678Z Included Software: https://github.com/actions/runner-images/blob/win22/20250602.1/images/windows/Windows2022-Readme.md
+2025-06-25T02:33:18.7000123Z Image Release: https://github.com/actions/runner-images/releases/tag/win22%2F20250602.1
+2025-06-25T02:33:18.7000984Z ##[endgroup]
+2025-06-25T02:33:18.7003282Z ##[group]GITHUB_TOKEN Permissions
+2025-06-25T02:33:18.7005318Z Actions: write
+2025-06-25T02:33:18.7005845Z Attestations: write
+2025-06-25T02:33:18.7006260Z Checks: write
+2025-06-25T02:33:18.7006728Z Contents: write
+2025-06-25T02:33:18.7007139Z Deployments: write
+2025-06-25T02:33:18.7007604Z Discussions: write
+2025-06-25T02:33:18.7008061Z Issues: write
+2025-06-25T02:33:18.7008441Z Metadata: read
+2025-06-25T02:33:18.7008843Z Models: read
+2025-06-25T02:33:18.7009260Z Packages: write
+2025-06-25T02:33:18.7009696Z Pages: write
+2025-06-25T02:33:18.7010118Z PullRequests: write
+2025-06-25T02:33:18.7010573Z RepositoryProjects: write
+2025-06-25T02:33:18.7011031Z SecurityEvents: write
+2025-06-25T02:33:18.7011553Z Statuses: write
+2025-06-25T02:33:18.7011986Z ##[endgroup]
+2025-06-25T02:33:18.7014052Z Secret source: Actions
+2025-06-25T02:33:18.7014684Z Prepare workflow directory
+2025-06-25T02:33:18.7575976Z Prepare all required actions
+2025-06-25T02:33:18.7613233Z Getting action download info
+2025-06-25T02:33:19.1250837Z ##[group]Download immutable action package 'actions/checkout@v4'
+2025-06-25T02:33:19.1252090Z Version: 4.2.2
+2025-06-25T02:33:19.1253172Z Digest: sha256:ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1
+2025-06-25T02:33:19.1254571Z Source commit SHA: 11bd71901bbe5b1630ceea73d27597364c9af683
+2025-06-25T02:33:19.1255351Z ##[endgroup]
+2025-06-25T02:33:19.2459114Z ##[group]Download immutable action package 'actions/setup-python@v5'
+2025-06-25T02:33:19.2459940Z Version: 5.6.0
+2025-06-25T02:33:19.2460660Z Digest: sha256:0b35a0c11c97499e4e0576589036d450b9f5f9da74b7774225b3614b57324404
+2025-06-25T02:33:19.2461599Z Source commit SHA: a26af69be951a213d495a4c3e4e4022e16d87065
+2025-06-25T02:33:19.2462255Z ##[endgroup]
+2025-06-25T02:33:19.5929410Z ##[group]Download immutable action package 'actions/cache@v4'
+2025-06-25T02:33:19.5930184Z Version: 4.2.3
+2025-06-25T02:33:19.5930899Z Digest: sha256:c8a3bb963e1f1826d8fcc8d1354f0dd29d8ac1db1d4f6f20247055ae11b81ed9
+2025-06-25T02:33:19.5931869Z Source commit SHA: 5a3ec84eff668545956fd18022155c47e93e2684
+2025-06-25T02:33:19.5932550Z ##[endgroup]
+2025-06-25T02:33:19.7551697Z Download action repository 'ilammy/msvc-dev-cmd@v1' (SHA:0b201ec74fa43914dc39ae48a89fd1d8cb592756)
+2025-06-25T02:33:20.0811151Z Download action repository 'lukka/run-vcpkg@v11' (SHA:7d259227a1fb6471a0253dd5ab7419835228f7d7)
+2025-06-25T02:33:20.4958493Z ##[group]Download immutable action package 'actions/upload-artifact@v4'
+2025-06-25T02:33:20.4959909Z Version: 4.6.2
+2025-06-25T02:33:20.4961160Z Digest: sha256:290722aa3281d5caf23d0acdc3dbeb3424786a1a01a9cc97e72f147225e37c38
+2025-06-25T02:33:20.4962985Z Source commit SHA: ea165f8d65b6e75b540449e92b4886f43607fa02
+2025-06-25T02:33:20.4964126Z ##[endgroup]
+2025-06-25T02:33:20.8550219Z Complete job name: Build Windows (x86) Python 3.8
+2025-06-25T02:33:21.1388584Z ##[group]Run actions/checkout@v4
+2025-06-25T02:33:21.1392064Z with:
+2025-06-25T02:33:21.1392777Z   submodules: recursive
+2025-06-25T02:33:21.1393624Z   repository: Ambro86/synthizer3d
+2025-06-25T02:33:21.1394841Z   token: ***
+2025-06-25T02:33:21.1395534Z   ssh-strict: true
+2025-06-25T02:33:21.1396294Z   ssh-user: git
+2025-06-25T02:33:21.1397044Z   persist-credentials: true
+2025-06-25T02:33:21.1397877Z   clean: true
+2025-06-25T02:33:21.1398625Z   sparse-checkout-cone-mode: true
+2025-06-25T02:33:21.1399536Z   fetch-depth: 1
+2025-06-25T02:33:21.1400238Z   fetch-tags: false
+2025-06-25T02:33:21.1401032Z   show-progress: true
+2025-06-25T02:33:21.1401792Z   lfs: false
+2025-06-25T02:33:21.1402485Z   set-safe-directory: true
+2025-06-25T02:33:21.1403513Z env:
+2025-06-25T02:33:21.1404257Z   PYVERSION: 3.8
+2025-06-25T02:33:21.1404974Z   CI_ARCH_LOWER: x86
+2025-06-25T02:33:21.1405710Z   CI_WINDOWS: 1
+2025-06-25T02:33:21.1406445Z   CI_ARCH_ENV: x86
+2025-06-25T02:33:21.1407334Z   VCPKG_DEFAULT_TRIPLET: x86-windows
+2025-06-25T02:33:21.1408645Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: D:\a\synthizer3d\synthizer3d\vcpkg_installed
+2025-06-25T02:33:21.1409969Z ##[endgroup]
+2025-06-25T02:33:21.3150112Z Syncing repository: Ambro86/synthizer3d
+2025-06-25T02:33:21.3152462Z ##[group]Getting Git version info
+2025-06-25T02:33:21.3153573Z Working directory is 'D:\a\synthizer3d\synthizer3d'
+2025-06-25T02:33:21.5785851Z [command]"C:\Program Files\Git\bin\git.exe" version
+2025-06-25T02:33:22.6078241Z git version 2.49.0.windows.1
+2025-06-25T02:33:22.6123681Z ##[endgroup]
+2025-06-25T02:33:22.6143460Z Temporarily overriding HOME='D:\a\_temp\49ce2fe7-b2c4-4f37-a82d-3e25d903526c' before making global git config changes
+2025-06-25T02:33:22.6144430Z Adding repository directory to the temporary git global config as a safe directory
+2025-06-25T02:33:22.6155652Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\synthizer3d\synthizer3d
+2025-06-25T02:33:22.7200113Z Deleting the contents of 'D:\a\synthizer3d\synthizer3d'
+2025-06-25T02:33:22.7278908Z ##[group]Initializing the repository
+2025-06-25T02:33:22.7280346Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\synthizer3d\synthizer3d
+2025-06-25T02:33:22.9728436Z Initialized empty Git repository in D:/a/synthizer3d/synthizer3d/.git/
+2025-06-25T02:33:22.9768192Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/Ambro86/synthizer3d
+2025-06-25T02:33:23.0514023Z ##[endgroup]
+2025-06-25T02:33:23.0514666Z ##[group]Disabling automatic garbage collection
+2025-06-25T02:33:23.0524252Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+2025-06-25T02:33:23.0817849Z ##[endgroup]
+2025-06-25T02:33:23.0818411Z ##[group]Setting up auth
+2025-06-25T02:33:23.0832704Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2025-06-25T02:33:23.1061582Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2025-06-25T02:33:26.4058163Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-06-25T02:33:26.4301330Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2025-06-25T02:33:26.8411553Z [command]"C:\Program Files\Git\bin\git.exe" config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+2025-06-25T02:33:26.8647903Z ##[endgroup]
+2025-06-25T02:33:26.8648628Z ##[group]Fetching the repository
+2025-06-25T02:33:26.8671193Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +68f6db06c2fd92c42909109c0839302731944162:refs/remotes/origin/master
+2025-06-25T02:33:29.2165030Z From https://github.com/Ambro86/synthizer3d
+2025-06-25T02:33:29.2166946Z  * [new ref]         68f6db06c2fd92c42909109c0839302731944162 -> origin/master
+2025-06-25T02:33:29.2442020Z ##[endgroup]
+2025-06-25T02:33:29.2442982Z ##[group]Determining the checkout info
+2025-06-25T02:33:29.2445848Z ##[endgroup]
+2025-06-25T02:33:29.2456958Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+2025-06-25T02:33:29.2888719Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+2025-06-25T02:33:29.3107894Z ##[group]Checking out the ref
+2025-06-25T02:33:29.3118079Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B master refs/remotes/origin/master
+2025-06-25T02:33:30.0841022Z branch 'master' set up to track 'origin/master'.
+2025-06-25T02:33:30.0847089Z Reset branch 'master'
+2025-06-25T02:33:30.0908949Z ##[endgroup]
+2025-06-25T02:33:30.0909515Z ##[group]Setting up auth for fetching submodules
+2025-06-25T02:33:30.0922800Z [command]"C:\Program Files\Git\bin\git.exe" config --global http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+2025-06-25T02:33:30.1163779Z [command]"C:\Program Files\Git\bin\git.exe" config --global --unset-all url.https://github.com/.insteadOf
+2025-06-25T02:33:30.1384022Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add url.https://github.com/.insteadOf git@github.com:
+2025-06-25T02:33:30.1647017Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add url.https://github.com/.insteadOf org-58132298@github.com:
+2025-06-25T02:33:30.1867725Z ##[endgroup]
+2025-06-25T02:33:30.1868042Z ##[group]Fetching submodules
+2025-06-25T02:33:30.1883629Z [command]"C:\Program Files\Git\bin\git.exe" submodule sync --recursive
+2025-06-25T02:33:30.5784598Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 submodule update --init --force --depth=1 --recursive
+2025-06-25T02:33:30.9699268Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local gc.auto 0"
+2025-06-25T02:33:31.3598459Z ##[endgroup]
+2025-06-25T02:33:31.3598800Z ##[group]Persisting credentials for submodules
+2025-06-25T02:33:31.3616114Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'url\.https\:\/\/github\.com\/\.insteadOf' && git config --local --unset-all 'url.https://github.com/.insteadOf' || :\""
+2025-06-25T02:33:31.8113310Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local 'http.https://github.com/.extraheader' 'AUTHORIZATION: basic ***' && git config --local --show-origin --name-only --get-regexp remote.origin.url\""
+2025-06-25T02:33:32.3660569Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --add 'url.https://github.com/.insteadOf' 'git@github.com:'"
+2025-06-25T02:33:32.7800997Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --add 'url.https://github.com/.insteadOf' 'org-58132298@github.com:'"
+2025-06-25T02:33:33.2168877Z ##[endgroup]
+2025-06-25T02:33:33.2421008Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+2025-06-25T02:33:33.2620449Z 68f6db06c2fd92c42909109c0839302731944162
+2025-06-25T02:33:33.2955986Z ##[group]Run actions/setup-python@v5
+2025-06-25T02:33:33.2956289Z with:
+2025-06-25T02:33:33.2956446Z   python-version: 3.8
+2025-06-25T02:33:33.2956625Z   architecture: x86
+2025-06-25T02:33:33.2956797Z   check-latest: false
+2025-06-25T02:33:33.2957108Z   token: ***
+2025-06-25T02:33:33.2957278Z   update-environment: true
+2025-06-25T02:33:33.2957469Z   allow-prereleases: false
+2025-06-25T02:33:33.2957653Z   freethreaded: false
+2025-06-25T02:33:33.2957825Z env:
+2025-06-25T02:33:33.2957961Z   PYVERSION: 3.8
+2025-06-25T02:33:33.2958111Z   CI_ARCH_LOWER: x86
+2025-06-25T02:33:33.2958269Z   CI_WINDOWS: 1
+2025-06-25T02:33:33.2958426Z   CI_ARCH_ENV: x86
+2025-06-25T02:33:33.2958593Z   VCPKG_DEFAULT_TRIPLET: x86-windows
+2025-06-25T02:33:33.2959118Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: D:\a\synthizer3d\synthizer3d\vcpkg_installed
+2025-06-25T02:33:33.2959447Z ##[endgroup]
+2025-06-25T02:33:33.5289259Z ##[group]Installed versions
+2025-06-25T02:33:33.5481676Z Successfully set up CPython (3.8.10)
+2025-06-25T02:33:33.5483610Z ##[endgroup]
+2025-06-25T02:33:33.5729072Z ##[group]Run python -m pip install --upgrade pip
+2025-06-25T02:33:33.5729477Z [36;1mpython -m pip install --upgrade pip[0m
+2025-06-25T02:33:33.5850379Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+2025-06-25T02:33:33.5850683Z env:
+2025-06-25T02:33:33.5850826Z   PYVERSION: 3.8
+2025-06-25T02:33:33.5850992Z   CI_ARCH_LOWER: x86
+2025-06-25T02:33:33.5851150Z   CI_WINDOWS: 1
+2025-06-25T02:33:33.5851305Z   CI_ARCH_ENV: x86
+2025-06-25T02:33:33.5851473Z   VCPKG_DEFAULT_TRIPLET: x86-windows
+2025-06-25T02:33:33.5851828Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: D:\a\synthizer3d\synthizer3d\vcpkg_installed
+2025-06-25T02:33:33.5852254Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:33.5852682Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.8.10\x86/lib/pkgconfig
+2025-06-25T02:33:33.5853068Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:33.5853449Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:33.5853795Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:33.5854067Z ##[endgroup]
+2025-06-25T02:33:43.5292345Z Requirement already satisfied: pip in c:\hostedtoolcache\windows\python\3.8.10\x86\lib\site-packages (25.0.1)
+2025-06-25T02:33:44.9366526Z ##[group]Run python synthizer-c/vendor.py synthizer-vendored
+2025-06-25T02:33:44.9366976Z [36;1mpython synthizer-c/vendor.py synthizer-vendored[0m
+2025-06-25T02:33:44.9397038Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+2025-06-25T02:33:44.9397325Z env:
+2025-06-25T02:33:44.9397470Z   PYVERSION: 3.8
+2025-06-25T02:33:44.9397630Z   CI_ARCH_LOWER: x86
+2025-06-25T02:33:44.9397803Z   CI_WINDOWS: 1
+2025-06-25T02:33:44.9397950Z   CI_ARCH_ENV: x86
+2025-06-25T02:33:44.9398113Z   VCPKG_DEFAULT_TRIPLET: x86-windows
+2025-06-25T02:33:44.9398448Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: D:\a\synthizer3d\synthizer3d\vcpkg_installed
+2025-06-25T02:33:44.9398866Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:44.9399245Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.8.10\x86/lib/pkgconfig
+2025-06-25T02:33:44.9399610Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:44.9399980Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:44.9400311Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:44.9400577Z ##[endgroup]
+2025-06-25T02:33:47.1369020Z ##[group]Run actions/cache@v4
+2025-06-25T02:33:47.1369300Z with:
+2025-06-25T02:33:47.1369485Z   path: ~\AppData\Local\pip\Cache
+2025-06-25T02:33:47.1369882Z   key: Windows-pip-3.8-x86-470e26d8c339f4cb295c177bbb5909b619dd6bdba5ca1bff895a6b5f9833e984
+2025-06-25T02:33:47.1370355Z   restore-keys: Windows-pip-3.8-x86-
+
+2025-06-25T02:33:47.1370602Z   enableCrossOsArchive: false
+2025-06-25T02:33:47.1370804Z   fail-on-cache-miss: false
+2025-06-25T02:33:47.1371003Z   lookup-only: false
+2025-06-25T02:33:47.1371166Z   save-always: false
+2025-06-25T02:33:47.1371318Z env:
+2025-06-25T02:33:47.1371449Z   PYVERSION: 3.8
+2025-06-25T02:33:47.1371603Z   CI_ARCH_LOWER: x86
+2025-06-25T02:33:47.1371747Z   CI_WINDOWS: 1
+2025-06-25T02:33:47.1371895Z   CI_ARCH_ENV: x86
+2025-06-25T02:33:47.1372055Z   VCPKG_DEFAULT_TRIPLET: x86-windows
+2025-06-25T02:33:47.1372398Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: D:\a\synthizer3d\synthizer3d\vcpkg_installed
+2025-06-25T02:33:47.1372857Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:47.1373246Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.8.10\x86/lib/pkgconfig
+2025-06-25T02:33:47.1373627Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:47.1374136Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:47.1374502Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:47.1374777Z ##[endgroup]
+2025-06-25T02:33:47.6859057Z Cache hit for: Windows-pip-3.8-x86-470e26d8c339f4cb295c177bbb5909b619dd6bdba5ca1bff895a6b5f9833e984
+2025-06-25T02:33:48.5977382Z Received 36981788 of 36981788 (100.0%), 46.4 MBs/sec
+2025-06-25T02:33:48.5980498Z Cache Size: ~35 MB (36981788 B)
+2025-06-25T02:33:48.6014417Z [command]"C:\Program Files\Git\usr\bin\tar.exe" -xf D:/a/_temp/b6ad4dd9-2ca5-49cc-8f6d-a73927b5e49c/cache.tzst -P -C D:/a/synthizer3d/synthizer3d --force-local --use-compress-program "zstd -d"
+2025-06-25T02:33:49.0974307Z Cache restored successfully
+2025-06-25T02:33:49.1117975Z Cache restored from key: Windows-pip-3.8-x86-8a5360e709d265c27a24e0a96851fc7e96b08d87f422f96956a8f56e44f06135
+2025-06-25T02:33:49.1329469Z ##[group]Run ilammy/msvc-dev-cmd@v1
+2025-06-25T02:33:49.1329787Z with:
+2025-06-25T02:33:49.1329945Z   arch: x86
+2025-06-25T02:33:49.1330092Z env:
+2025-06-25T02:33:49.1330236Z   PYVERSION: 3.8
+2025-06-25T02:33:49.1330407Z   CI_ARCH_LOWER: x86
+2025-06-25T02:33:49.1330579Z   CI_WINDOWS: 1
+2025-06-25T02:33:49.1330727Z   CI_ARCH_ENV: x86
+2025-06-25T02:33:49.1330909Z   VCPKG_DEFAULT_TRIPLET: x86-windows
+2025-06-25T02:33:49.1331280Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: D:\a\synthizer3d\synthizer3d\vcpkg_installed
+2025-06-25T02:33:49.1331710Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:49.1332114Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.8.10\x86/lib/pkgconfig
+2025-06-25T02:33:49.1332507Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:49.1332858Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:49.1333237Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:49.1333506Z ##[endgroup]
+2025-06-25T02:33:49.5375903Z Found with vswhere: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat
+2025-06-25T02:33:52.8625259Z ##[group]Environment variables
+2025-06-25T02:33:52.8625670Z Setting CommandPromptType
+2025-06-25T02:33:52.8640351Z Setting DevEnvDir
+2025-06-25T02:33:52.8644312Z Setting ExtensionSdkDir
+2025-06-25T02:33:52.8646998Z Setting EXTERNAL_INCLUDE
+2025-06-25T02:33:52.8653482Z Setting Framework40Version
+2025-06-25T02:33:52.8655786Z Setting FrameworkDir
+2025-06-25T02:33:52.8658215Z Setting FrameworkDir32
+2025-06-25T02:33:52.8661624Z Setting FrameworkVersion
+2025-06-25T02:33:52.8664267Z Setting FrameworkVersion32
+2025-06-25T02:33:52.8667883Z Setting FSHARPINSTALLDIR
+2025-06-25T02:33:52.8672406Z Setting HTMLHelpDir
+2025-06-25T02:33:52.8675322Z Setting IFCPATH
+2025-06-25T02:33:52.8679436Z Setting INCLUDE
+2025-06-25T02:33:52.8691748Z Setting LIB
+2025-06-25T02:33:52.8693922Z Setting LIBPATH
+2025-06-25T02:33:52.8696430Z Setting NETFXSDKDir
+2025-06-25T02:33:52.8698922Z Setting Path
+2025-06-25T02:33:52.8704006Z Setting Platform
+2025-06-25T02:33:52.8707435Z Setting UCRTVersion
+2025-06-25T02:33:52.8709966Z Setting UniversalCRTSdkDir
+2025-06-25T02:33:52.8712972Z Setting VCIDEInstallDir
+2025-06-25T02:33:52.8715011Z Setting VCINSTALLDIR
+2025-06-25T02:33:52.8718018Z Setting VCPKG_ROOT
+2025-06-25T02:33:52.8720002Z Setting VCToolsInstallDir
+2025-06-25T02:33:52.8721882Z Setting VCToolsRedistDir
+2025-06-25T02:33:52.8723695Z Setting VCToolsVersion
+2025-06-25T02:33:52.8725496Z Setting VisualStudioVersion
+2025-06-25T02:33:52.8727307Z Setting VS170COMNTOOLS
+2025-06-25T02:33:52.8729119Z Setting VSCMD_ARG_app_plat
+2025-06-25T02:33:52.8730921Z Setting VSCMD_ARG_HOST_ARCH
+2025-06-25T02:33:52.8732777Z Setting VSCMD_ARG_TGT_ARCH
+2025-06-25T02:33:52.8734697Z Setting VSCMD_VER
+2025-06-25T02:33:52.8736697Z Setting VSINSTALLDIR
+2025-06-25T02:33:52.8738496Z Setting VSSDK150INSTALL
+2025-06-25T02:33:52.8740120Z Setting VSSDKINSTALL
+2025-06-25T02:33:52.8741650Z Setting WindowsLibPath
+2025-06-25T02:33:52.8743522Z Setting WindowsSdkBinPath
+2025-06-25T02:33:52.8744971Z Setting WindowsSdkDir
+2025-06-25T02:33:52.8746543Z Setting WindowsSDKLibVersion
+2025-06-25T02:33:52.8748036Z Setting WindowsSdkVerBinPath
+2025-06-25T02:33:52.8749520Z Setting WindowsSDKVersion
+2025-06-25T02:33:52.8750994Z Setting WindowsSDK_ExecutablePath_x64
+2025-06-25T02:33:52.8752491Z Setting WindowsSDK_ExecutablePath_x86
+2025-06-25T02:33:52.8753967Z Setting __DOTNET_ADD_32BIT
+2025-06-25T02:33:52.8755570Z Setting __DOTNET_PREFERRED_BITNESS
+2025-06-25T02:33:52.8757076Z Setting __VSCMD_PREINIT_PATH
+2025-06-25T02:33:52.8759579Z ##[endgroup]
+2025-06-25T02:33:52.8759912Z Configured Developer Command Prompt
+2025-06-25T02:33:52.8951893Z ##[group]Run lukka/run-vcpkg@v11
+2025-06-25T02:33:52.8952184Z with:
+2025-06-25T02:33:52.8952350Z   vcpkgJsonGlob: vcpkg.json
+2025-06-25T02:33:52.8952583Z   runVcpkgInstall: true
+2025-06-25T02:33:52.8952815Z   vcpkgDirectory: D:\a\synthizer3d\synthizer3d/vcpkg
+2025-06-25T02:33:52.8953172Z   vcpkgGitURL: https://github.com/microsoft/vcpkg.git
+2025-06-25T02:33:52.8953458Z   doNotUpdateVcpkg: false
+2025-06-25T02:33:52.8953653Z   doNotCache: true
+2025-06-25T02:33:52.8953826Z   vcpkgJsonIgnores: ['**/vcpkg/**']
+2025-06-25T02:33:52.8954115Z   vcpkgConfigurationJsonGlob: **/vcpkg-configuration.json
+2025-06-25T02:33:52.8954741Z   runVcpkgFormatString: [`install`, `--recurse`, `--clean-after-build`, `--x-install-root`, `$[env.VCPKG_INSTALLED_DIR]`, `--triplet`, `$[env.VCPKG_DEFAULT_TRIPLET]`]
+2025-06-25T02:33:52.8955287Z   useShell: true
+2025-06-25T02:33:52.8955721Z   logCollectionRegExps: \s*"(.+CMakeOutput\.log)"\.\s*;\s*"(.+CMakeError\.log)"\.\s*;\s*(.+out\.log)\s*;\s+(.+err\.log)\s*;\s*(.+vcpkg.+\.log)\s*
+2025-06-25T02:33:52.8956148Z env:
+2025-06-25T02:33:52.8956289Z   PYVERSION: 3.8
+2025-06-25T02:33:52.8956457Z   CI_ARCH_LOWER: x86
+2025-06-25T02:33:52.8956690Z   CI_WINDOWS: 1
+2025-06-25T02:33:52.8956867Z   CI_ARCH_ENV: x86
+2025-06-25T02:33:52.8957045Z   VCPKG_DEFAULT_TRIPLET: x86-windows
+2025-06-25T02:33:52.8957404Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: D:\a\synthizer3d\synthizer3d\vcpkg_installed
+2025-06-25T02:33:52.8957825Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:52.8958209Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.8.10\x86/lib/pkgconfig
+2025-06-25T02:33:52.8958603Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:52.8958949Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:52.8959298Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:33:52.8959576Z   CommandPromptType: Native
+2025-06-25T02:33:52.8959904Z   DevEnvDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\
+2025-06-25T02:33:52.8960385Z   ExtensionSdkDir: C:\Program Files (x86)\Microsoft SDKs\Windows Kits\10\ExtensionSDKs
+2025-06-25T02:33:52.8962374Z   EXTERNAL_INCLUDE: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\include;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ATLMFC\include;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\VS\include;C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\shared;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\winrt;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um
+2025-06-25T02:33:52.8964250Z   Framework40Version: v4.0
+2025-06-25T02:33:52.8964488Z   FrameworkDir: C:\Windows\Microsoft.NET\Framework\
+2025-06-25T02:33:52.8964786Z   FrameworkDir32: C:\Windows\Microsoft.NET\Framework\
+2025-06-25T02:33:52.8965048Z   FrameworkVersion: v4.0.30319
+2025-06-25T02:33:52.8965257Z   FrameworkVersion32: v4.0.30319
+2025-06-25T02:33:52.8965726Z   FSHARPINSTALLDIR: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\FSharp\Tools
+2025-06-25T02:33:52.8966398Z   HTMLHelpDir: C:\Program Files (x86)\HTML Help Workshop
+2025-06-25T02:33:52.8966826Z   IFCPATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ifc\x86
+2025-06-25T02:33:52.8970120Z   INCLUDE: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\include;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ATLMFC\include;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\VS\include;C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\shared;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\winrt;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um
+2025-06-25T02:33:52.8972897Z   LIB: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ATLMFC\lib\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\lib\x86;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\lib\um\x86;C:\Program Files (x86)\Windows Kits\10\lib\10.0.26100.0\ucrt\x86;C:\Program Files (x86)\Windows Kits\10\\lib\10.0.26100.0\\um\x86
+2025-06-25T02:33:52.8975105Z   LIBPATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ATLMFC\lib\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\lib\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\lib\x86\store\references;C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.26100.0;C:\Program Files (x86)\Windows Kits\10\References\10.0.26100.0;C:\Windows\Microsoft.NET\Framework\v4.0.30319
+2025-06-25T02:33:52.8976551Z   NETFXSDKDir: C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\
+2025-06-25T02:33:52.8989940Z   Path: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\bin\HostX86\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\VC\VCPackages;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\bin\Roslyn;C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\;C:\Program Files (x86)\HTML Help Workshop;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\FSharp\Tools;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Team Tools\DiagnosticsHub\Collector;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\Extensions\Microsoft\CodeCoverage.Console;C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\\x86;C:\Program Files (x86)\Windows Kits\10\bin\\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\\MSBuild\Current\Bin\amd64;C:\Windows\Microsoft.NET\Framework\v4.0.30319;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\;C:\Users\runneradmin\AppData\Roaming\Python\Python38\Scripts;C:\hostedtoolcache\windows\Python\3.8.10\x86\Scripts;C:\hostedtoolcache\windows\Python\3.8.10\x86;C:\Program Files\MongoDB\Server\5.0\bin;C:\aliyun-cli;C:\vcpkg;C:\Program Files (x86)\NSIS\;C:\tools\zstd;C:\Program Files\Mercurial\;C:\hostedtoolcache\windows\stack\3.5.1\x64;C:\cabal\bin;C:\\ghcup\bin;C:\mingw64\bin;C:\Program Files\dotnet;C:\Program Files\MySQL\MySQL Server 8.0\bin;C:\Program Files\R\R-4.4.2\bin\x64;C:\SeleniumWebDrivers\GeckoDriver;C:\SeleniumWebDrivers\EdgeDriver\;C:\SeleniumWebDrivers\ChromeDriver;C:\Program Files (x86)\sbt\bin;C:\Program Files (x86)\GitHub CLI;C:\Program Files\Git\bin;C:\Program Files (x86)\pipx_bin;C:\npm\prefix;C:\hostedtoolcache\windows\go\1.24.3\x64\bin;C:\hostedtoolcache\windows\Python\3.9.13\x64\Scripts;C:\hostedtoolcache\windows\Python\3.9.13\x64;C:\hostedtoolcache\windows\Ruby\3.3.8\x64\bin;C:\Program Files\OpenSSL\bin;C:\tools\kotlinc\bin;C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\8.0.452-9\x64\bin;C:\Program Files\ImageMagick-7.1.1-Q16-HDRI;C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin;C:\ProgramData\kind;C:\ProgramData\Chocolatey\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\PowerShell\7\;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files\TortoiseSVN\bin;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\WiX Toolset v3.14\bin;C:\Program Files\Microsoft SQL Server\130\DTS\Binn\;C:\Program Files\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files\Microsoft SQL Server\150\DTS\Binn\;C:\Program Files\Microsoft SQL Server\160\DTS\Binn\;C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\ProgramData\chocolatey\lib\pulumi\tools\Pulumi\bin;C:\Program Files\CMake\bin;C:\ProgramData\chocolatey\lib\maven\apache-maven-3.9.9\bin;C:\Program Files\Microsoft Service Fabric\bin\Fabric\Fabric.Code;C:\Program Files\Microsoft SDKs\Service Fabric\Tools\ServiceFabricLocalClusterManager;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Program Files\GitHub CLI\;c:\tools\php;C:\Program Files\Amazon\AWSCLIV2\;C:\Program Files\Amazon\SessionManagerPlugin\bin\;C:\Program Files\Amazon\AWSSAMCLI\bin\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\LLVM\bin;C:\Users\runneradmin\.dotnet\tools;C:\Users\runneradmin\.cargo\bin;C:\Users\runneradmin\AppData\Local\Microsoft\WindowsApps;C:\Program Files (x86)\Microsoft Visual Studio\Installer;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\Llvm\bin;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\VC\Linux\bin\ConnectionManagerExe;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\vcpkg
+2025-06-25T02:33:52.9002921Z   Platform: x86
+2025-06-25T02:33:52.9003086Z   UCRTVersion: 10.0.26100.0
+2025-06-25T02:33:52.9003346Z   UniversalCRTSdkDir: C:\Program Files (x86)\Windows Kits\10\
+2025-06-25T02:33:52.9003781Z   VCIDEInstallDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\VC\
+2025-06-25T02:33:52.9004252Z   VCINSTALLDIR: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\
+2025-06-25T02:33:52.9004673Z   VCPKG_ROOT: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\vcpkg
+2025-06-25T02:33:52.9005178Z   VCToolsInstallDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\
+2025-06-25T02:33:52.9005763Z   VCToolsRedistDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Redist\MSVC\14.42.34433\
+2025-06-25T02:33:52.9006166Z   VCToolsVersion: 14.43.34808
+2025-06-25T02:33:52.9006364Z   VisualStudioVersion: 17.0
+2025-06-25T02:33:52.9006699Z   VS170COMNTOOLS: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\
+2025-06-25T02:33:52.9007061Z   VSCMD_ARG_app_plat: Desktop
+2025-06-25T02:33:52.9007258Z   VSCMD_ARG_HOST_ARCH: x86
+2025-06-25T02:33:52.9007441Z   VSCMD_ARG_TGT_ARCH: x86
+2025-06-25T02:33:52.9007614Z   VSCMD_VER: 17.13.2
+2025-06-25T02:33:52.9007880Z   VSINSTALLDIR: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
+2025-06-25T02:33:52.9008305Z   VSSDK150INSTALL: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VSSDK
+2025-06-25T02:33:52.9008731Z   VSSDKINSTALL: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VSSDK
+2025-06-25T02:33:52.9009405Z   WindowsLibPath: C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.26100.0;C:\Program Files (x86)\Windows Kits\10\References\10.0.26100.0
+2025-06-25T02:33:52.9009972Z   WindowsSdkBinPath: C:\Program Files (x86)\Windows Kits\10\bin\
+2025-06-25T02:33:52.9010303Z   WindowsSdkDir: C:\Program Files (x86)\Windows Kits\10\
+2025-06-25T02:33:52.9010576Z   WindowsSDKLibVersion: 10.0.26100.0\
+2025-06-25T02:33:52.9010903Z   WindowsSdkVerBinPath: C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\
+2025-06-25T02:33:52.9011237Z   WindowsSDKVersion: 10.0.26100.0\
+2025-06-25T02:33:52.9011693Z   WindowsSDK_ExecutablePath_x64: C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\x64\
+2025-06-25T02:33:52.9012281Z   WindowsSDK_ExecutablePath_x86: C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\
+2025-06-25T02:33:52.9012673Z   __DOTNET_ADD_32BIT: 1
+2025-06-25T02:33:52.9012859Z   __DOTNET_PREFERRED_BITNESS: 32
+2025-06-25T02:33:52.9020638Z   __VSCMD_PREINIT_PATH: C:\Users\runneradmin\AppData\Roaming\Python\Python38\Scripts;C:\hostedtoolcache\windows\Python\3.8.10\x86\Scripts;C:\hostedtoolcache\windows\Python\3.8.10\x86;C:\Program Files\MongoDB\Server\5.0\bin;C:\aliyun-cli;C:\vcpkg;C:\Program Files (x86)\NSIS\;C:\tools\zstd;C:\Program Files\Mercurial\;C:\hostedtoolcache\windows\stack\3.5.1\x64;C:\cabal\bin;C:\\ghcup\bin;C:\mingw64\bin;C:\Program Files\dotnet;C:\Program Files\MySQL\MySQL Server 8.0\bin;C:\Program Files\R\R-4.4.2\bin\x64;C:\SeleniumWebDrivers\GeckoDriver;C:\SeleniumWebDrivers\EdgeDriver\;C:\SeleniumWebDrivers\ChromeDriver;C:\Program Files (x86)\sbt\bin;C:\Program Files (x86)\GitHub CLI;C:\Program Files\Git\bin;C:\Program Files (x86)\pipx_bin;C:\npm\prefix;C:\hostedtoolcache\windows\go\1.24.3\x64\bin;C:\hostedtoolcache\windows\Python\3.9.13\x64\Scripts;C:\hostedtoolcache\windows\Python\3.9.13\x64;C:\hostedtoolcache\windows\Ruby\3.3.8\x64\bin;C:\Program Files\OpenSSL\bin;C:\tools\kotlinc\bin;C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\8.0.452-9\x64\bin;C:\Program Files\ImageMagick-7.1.1-Q16-HDRI;C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin;C:\ProgramData\kind;C:\ProgramData\Chocolatey\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\PowerShell\7\;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files\TortoiseSVN\bin;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\WiX Toolset v3.14\bin;C:\Program Files\Microsoft SQL Server\130\DTS\Binn\;C:\Program Files\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files\Microsoft SQL Server\150\DTS\Binn\;C:\Program Files\Microsoft SQL Server\160\DTS\Binn\;C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\ProgramData\chocolatey\lib\pulumi\tools\Pulumi\bin;C:\Program Files\CMake\bin;C:\ProgramData\chocolatey\lib\maven\apache-maven-3.9.9\bin;C:\Program Files\Microsoft Service Fabric\bin\Fabric\Fabric.Code;C:\Program Files\Microsoft SDKs\Service Fabric\Tools\ServiceFabricLocalClusterManager;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Program Files\GitHub CLI\;c:\tools\php;C:\Program Files (x86)\sbt\bin;C:\Program Files\Amazon\AWSCLIV2\;C:\Program Files\Amazon\SessionManagerPlugin\bin\;C:\Program Files\Amazon\AWSSAMCLI\bin\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\LLVM\bin;C:\Users\runneradmin\.dotnet\tools;C:\Users\runneradmin\.cargo\bin;C:\Users\runneradmin\AppData\Local\Microsoft\WindowsApps;C:\Program Files (x86)\Microsoft Visual Studio\Installer
+2025-06-25T02:33:52.9028572Z ##[endgroup]
+2025-06-25T02:33:53.1399012Z ##[group]Prepare output directories
+2025-06-25T02:33:53.1402047Z The vpckg root directory: 'D:\a\synthizer3d\synthizer3d\vcpkg'
+2025-06-25T02:33:53.1447061Z ##[endgroup]
+2025-06-25T02:33:53.1447724Z ⏱ elapsed: 0.005 seconds
+2025-06-25T02:33:53.2787461Z Running command '"C:\Program Files\Git\bin\git.exe"' with args '^"submodule^",^"status^",^"D:\a\synthizer3d\synthizer3d\vcpkg^"' in current directory 'D:\a\synthizer3d\synthizer3d'.
+2025-06-25T02:33:53.6753783Z error: pathspec 'D:\a\synthizer3d\synthizer3d\vcpkg' did not match any file(s) known to git
+2025-06-25T02:33:53.6836633Z ##[group]Searching for vcpkg.json with glob expression 'vcpkg.json'
+2025-06-25T02:33:53.6912223Z Found vcpkg.json at 'vcpkg.json'.
+2025-06-25T02:33:53.6915102Z ##[endgroup]
+2025-06-25T02:33:53.6915661Z ⏱ elapsed: 0.008 seconds
+2025-06-25T02:33:53.6916963Z ##[group]The vcpkgCommitId is not provided, searching for a vcpkg-configuration.json using **/vcpkg-configuration.json
+2025-06-25T02:33:53.6920326Z Searching for 'vcpkg-configuration.json' using: '**/vcpkg-configuration.json'
+2025-06-25T02:33:53.7368985Z The file 'vcpkg-configuration.json' was not found with glob expression '**/vcpkg-configuration.json'.
+2025-06-25T02:33:53.7369784Z A vcpkg-configuration.json is not found.
+2025-06-25T02:33:53.7393549Z ##[endgroup]
+2025-06-25T02:33:53.7393957Z ⏱ elapsed: 0.048 seconds
+2025-06-25T02:33:53.7394974Z Found baseline '8f63c9ed5897d7367a92a442a79f91721e0fd38f', this is the Git commit id going to be used to fetch vcpkg from the repository
+2025-06-25T02:33:53.7419718Z ##[group]Setup to run on GitHub Action runners
+2025-06-25T02:33:53.7420658Z Set the workflow environment variable 'VCPKG_BINARY_SOURCES' to value 'clear;x-gha,readwrite'
+2025-06-25T02:33:53.7421973Z Set the workflow environment variable 'ACTIONS_CACHE_URL' to value 'https://acghubeus2.actions.githubusercontent.com/bwbzopuV3oKlbowlUKWdOnf6KF0vjv7EYqCB3ZHqukKhTVgy74/'
+2025-06-25T02:33:53.7459400Z Set the workflow environment variable 'ACTIONS_RUNTIME_TOKEN' to value '***'
+2025-06-25T02:33:53.7460071Z ##[endgroup]
+2025-06-25T02:33:53.7460435Z ⏱ elapsed: 0.003 seconds
+2025-06-25T02:33:53.7460882Z ##[group]Retrieving the vcpkg Git commit id at: 'D:\a\synthizer3d\synthizer3d\vcpkg'
+2025-06-25T02:33:53.8576568Z Fetching the Git commit id at 'D:\a\synthizer3d\synthizer3d\vcpkg' ...
+2025-06-25T02:33:53.8581104Z Running command '"C:\Program Files\Git\bin\git.exe"' with args '^"rev-parse^",^"HEAD^"' in current directory 'D:\a\synthizer3d\synthizer3d\vcpkg'.
+2025-06-25T02:33:53.8859931Z 68f6db06c2fd92c42909109c0839302731944162
+2025-06-25T02:33:53.8894950Z ##[endgroup]
+2025-06-25T02:33:53.8895620Z ⏱ elapsed: 0.146 seconds
+2025-06-25T02:33:53.8896655Z ##[group]Check whether vcpkg repository is up to date
+2025-06-25T02:33:53.8898891Z Checking whether vcpkg's repository is updated to commit id '68f6db06c2fd92c42909109c0839302731944162' ...
+2025-06-25T02:33:53.8901455Z Current commit id of vcpkg: '68f6db06c2fd92c42909109c0839302731944162'.
+2025-06-25T02:33:53.8902064Z Is vcpkg repository updated? No
+2025-06-25T02:33:53.8902416Z ##[endgroup]
+2025-06-25T02:33:53.8902726Z ⏱ elapsed: 0.001 seconds
+2025-06-25T02:33:53.8903096Z ##[group]Download vcpkg source code repository
+2025-06-25T02:33:53.8904559Z Cloning vcpkg in 'D:\a\synthizer3d\synthizer3d\vcpkg'...
+2025-06-25T02:33:53.9903094Z Running command '"C:\Program Files\Git\bin\git.exe"' with args '^"clone^",^"https://github.com/microsoft/vcpkg.git^",^"-n^",^".^"' in current directory 'D:\a\synthizer3d\synthizer3d\vcpkg'.
+2025-06-25T02:33:54.0265151Z Cloning into '.'...
+2025-06-25T02:34:04.0399500Z Running command '"C:\Program Files\Git\bin\git.exe"' with args '^"checkout^",^"--force^",^"8f63c9ed5897d7367a92a442a79f91721e0fd38f^"' in current directory 'D:\a\synthizer3d\synthizer3d\vcpkg'.
+2025-06-25T02:34:06.0068658Z Note: switching to '8f63c9ed5897d7367a92a442a79f91721e0fd38f'.
+2025-06-25T02:34:06.0068923Z 
+2025-06-25T02:34:06.0069203Z You are in 'detached HEAD' state. You can look around, make experimental
+2025-06-25T02:34:06.0069711Z changes and commit them, and you can discard any commits you make in this
+2025-06-25T02:34:06.0070199Z state without impacting any branches by switching back to a branch.
+2025-06-25T02:34:06.0070990Z 
+2025-06-25T02:34:06.0071264Z If you want to create a new branch to retain commits you create, you may
+2025-06-25T02:34:06.0071736Z do so (now or later) by using -c with the switch command. Example:
+2025-06-25T02:34:06.0071958Z 
+2025-06-25T02:34:06.0072119Z   git switch -c <new-branch-name>
+2025-06-25T02:34:06.0072283Z 
+2025-06-25T02:34:06.0072404Z Or undo this operation with:
+2025-06-25T02:34:06.0072543Z 
+2025-06-25T02:34:06.0072626Z   git switch -
+2025-06-25T02:34:06.0072728Z 
+2025-06-25T02:34:06.0072998Z Turn off this advice by setting config variable advice.detachedHead to false
+2025-06-25T02:34:06.0074526Z 
+2025-06-25T02:34:06.0074962Z HEAD is now at 8f63c9ed58 [tree-sitter-c] update to 0.24.1 (#45715)
+2025-06-25T02:34:06.0125085Z Clone vcpkg in 'D:\a\synthizer3d\synthizer3d\vcpkg'.
+2025-06-25T02:34:06.0126335Z ##[endgroup]
+2025-06-25T02:34:06.0126869Z ⏱ elapsed: 12.122 seconds
+2025-06-25T02:34:06.0127245Z ##[group]Build vcpkg executable
+2025-06-25T02:34:06.1508430Z Running command '"C:\Windows\system32\cmd.exe"' with args '^"/c^",^"D:\a\synthizer3d\synthizer3d\vcpkg\bootstrap-vcpkg.bat^"' in current directory 'D:\a\synthizer3d\synthizer3d\vcpkg'.
+2025-06-25T02:34:06.7457962Z Downloading https://github.com/microsoft/vcpkg-tool/releases/download/2025-05-19/vcpkg.exe -> D:\a\synthizer3d\synthizer3d\vcpkg\vcpkg.exe... done.
+2025-06-25T02:34:06.8621405Z Validating signature... done.
+2025-06-25T02:34:06.8715916Z 
+2025-06-25T02:34:06.8889637Z vcpkg package management program version 2025-05-19-ece4c0f6b8fae9e94513d544c7aa753dd2c82337
+2025-06-25T02:34:06.8890234Z 
+2025-06-25T02:34:06.8890539Z See LICENSE.txt for license information.
+2025-06-25T02:34:06.8913356Z Telemetry
+2025-06-25T02:34:06.8913614Z ---------
+2025-06-25T02:34:06.8914209Z vcpkg collects usage data in order to help us improve your experience.
+2025-06-25T02:34:06.8914878Z The data collected by Microsoft is anonymous.
+2025-06-25T02:34:06.8916008Z You can opt-out of telemetry by re-running the bootstrap-vcpkg script with -disableMetrics,
+2025-06-25T02:34:06.8916839Z passing --disable-metrics to vcpkg on the command line,
+2025-06-25T02:34:06.8917565Z or by setting the VCPKG_DISABLE_METRICS environment variable.
+2025-06-25T02:34:06.8917914Z 
+2025-06-25T02:34:06.8919141Z Read more about vcpkg telemetry at docs/about/privacy.md
+2025-06-25T02:34:07.0181695Z Fetching the Git commit id at 'D:\a\synthizer3d\synthizer3d\vcpkg' ...
+2025-06-25T02:34:07.0183039Z Running command '"C:\Program Files\Git\bin\git.exe"' with args '^"rev-parse^",^"HEAD^"' in current directory 'D:\a\synthizer3d\synthizer3d\vcpkg'.
+2025-06-25T02:34:07.0457015Z 8f63c9ed5897d7367a92a442a79f91721e0fd38f
+2025-06-25T02:34:07.0495733Z Stored last built vcpkg commit id '8f63c9ed5897d7367a92a442a79f91721e0fd38f' in file 'D:\a\synthizer3d\synthizer3d\vcpkg\vcpkgLastBuiltCommitId'.
+2025-06-25T02:34:07.0496571Z ##[endgroup]
+2025-06-25T02:34:07.0497080Z ⏱ elapsed: 1.037 seconds
+2025-06-25T02:34:07.0497509Z ##[group]Add to PATH vcpkg at 'D:\a\synthizer3d\synthizer3d\vcpkg'
+2025-06-25T02:34:07.0500949Z ##[endgroup]
+2025-06-25T02:34:07.0502336Z ⏱ elapsed: 0.001 seconds
+2025-06-25T02:34:07.0503930Z ##[group]Install/Update ports using vcpkg.json
+2025-06-25T02:34:07.0507277Z Running 'vcpkg install,--recurse,--clean-after-build,--x-install-root,D:/a/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed,--triplet,x86-windows' in directory 'D:\a\synthizer3d\synthizer3d' ...
+2025-06-25T02:34:07.0509789Z Running command '"D:\a\synthizer3d\synthizer3d\vcpkg\vcpkg.exe"' with args '^"install^",^"--recurse^",^"--clean-after-build^",^"--x-install-root^",^"D:/a/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_installed^",^"--triplet^",^"x86-windows^"' in current directory 'D:\a\synthizer3d\synthizer3d'.
+2025-06-25T02:34:07.0681664Z warning: The vcpkg D:\a\synthizer3d\synthizer3d\vcpkg\vcpkg.exe is using detected vcpkg root D:\a\synthizer3d\synthizer3d\vcpkg and ignoring mismatched VCPKG_ROOT environment value C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\vcpkg. To suppress this message, unset the environment variable or use the --vcpkg-root command line switch.
+2025-06-25T02:34:08.5194697Z Detecting compiler hash for triplet x64-windows...
+2025-06-25T02:34:16.7041508Z Compiler found: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.43.34808/bin/Hostx64/x64/cl.exe
+2025-06-25T02:34:16.7098061Z Detecting compiler hash for triplet x86-windows...
+2025-06-25T02:34:22.3126717Z Compiler found: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.43.34808/bin/Hostx64/x86/cl.exe
+2025-06-25T02:34:22.3206297Z The following packages will be built and installed:
+2025-06-25T02:34:22.3206925Z   * atl:x86-windows@0
+2025-06-25T02:34:22.3207307Z   * atlmfc:x86-windows@0#3
+2025-06-25T02:34:22.3207700Z     faad2:x86-windows@2.11.1
+2025-06-25T02:34:22.3208106Z     libogg:x86-windows@1.3.5#2
+2025-06-25T02:34:22.3208531Z     libvorbis:x86-windows@1.3.7#4
+2025-06-25T02:34:22.3208929Z     opus:x86-windows@1.5.2
+2025-06-25T02:34:22.3209355Z     opusfile:x86-windows@0.12+20221121#1
+2025-06-25T02:34:22.3209794Z     soundtouch:x86-windows@2.3.3
+2025-06-25T02:34:22.3210250Z   * vcpkg-cmake:x64-windows@2024-04-23
+2025-06-25T02:34:22.3210759Z   * vcpkg-cmake-config:x64-windows@2024-05-23
+2025-06-25T02:34:22.3211469Z Additional packages (*) will be modified to complete this operation.
+2025-06-25T02:34:22.3215548Z %VCPKG_BINARY_SOURCES%: warning: The 'x-gha' binary caching backend has been removed. Consider using a NuGet-based binary caching provider instead, see extended documentation at https://learn.microsoft.com/vcpkg/users/binarycaching?WT.mc_id=vcpkg_inproduct_cli.
+2025-06-25T02:34:22.3217219Z   on expression: clear;x-gha,readwrite
+2025-06-25T02:34:22.3217696Z                                       ^
+2025-06-25T02:34:22.3218255Z Installing 1/10 vcpkg-cmake:x64-windows@2024-04-23...
+2025-06-25T02:34:22.3218853Z Building vcpkg-cmake:x64-windows@2024-04-23...
+2025-06-25T02:34:22.3507013Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-windows/share/vcpkg-cmake/vcpkg_cmake_configure.cmake
+2025-06-25T02:34:22.3519085Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-windows/share/vcpkg-cmake/vcpkg_cmake_build.cmake
+2025-06-25T02:34:22.3526874Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-windows/share/vcpkg-cmake/vcpkg_cmake_install.cmake
+2025-06-25T02:34:22.3527917Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-windows/share/vcpkg-cmake/vcpkg-port-config.cmake
+2025-06-25T02:34:22.3528840Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-windows/share/vcpkg-cmake/copyright
+2025-06-25T02:34:22.3574359Z -- Performing post-build validation
+2025-06-25T02:34:22.3631538Z Elapsed time to handle vcpkg-cmake:x64-windows: 42.4 ms
+2025-06-25T02:34:22.3632630Z vcpkg-cmake:x64-windows package ABI: a500b93f9e0b831ca946128005613d551eeb943040c8f073dc3184f7e15c9834
+2025-06-25T02:34:22.3638252Z Installing 2/10 faad2:x86-windows@2.11.1...
+2025-06-25T02:34:22.3638735Z Building faad2:x86-windows@2.11.1...
+2025-06-25T02:34:22.4034506Z Downloading https://github.com/knik0/faad2/archive/2.11.1.tar.gz -> knik0-faad2-2.11.1.tar.gz
+2025-06-25T02:34:22.6409250Z Successfully downloaded knik0-faad2-2.11.1.tar.gz
+2025-06-25T02:34:22.6464191Z -- Extracting source D:/a/synthizer3d/synthizer3d/vcpkg/downloads/knik0-faad2-2.11.1.tar.gz
+2025-06-25T02:34:22.8480391Z -- Applying patch fix-install.patch
+2025-06-25T02:34:22.8723086Z -- Using source at D:/a/synthizer3d/synthizer3d/vcpkg/buildtrees/faad2/src/2.11.1-55f3ec09c2.clean
+2025-06-25T02:34:22.8831548Z -- Found external ninja('1.12.1').
+2025-06-25T02:34:22.8864026Z -- Configuring x86-windows
+2025-06-25T02:34:25.9122095Z -- Building x86-windows-dbg
+2025-06-25T02:34:30.9059137Z -- Building x86-windows-rel
+2025-06-25T02:34:38.5438719Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/faad2_x86-windows/lib/pkgconfig/faad2.pc
+2025-06-25T02:34:38.5634313Z Downloading msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst, trying https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:34:39.3894774Z Successfully downloaded msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:34:39.4014989Z Downloading msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst, trying https://mirror.msys2.org/msys/x86_64/msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:34:40.5705549Z Successfully downloaded msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:34:40.6359624Z -- Using msys root at D:/a/synthizer3d/synthizer3d/vcpkg/downloads/tools/msys2/21caed2f81ec917b
+2025-06-25T02:34:40.6459301Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/faad2_x86-windows/debug/lib/pkgconfig/faad2.pc
+2025-06-25T02:34:42.5337097Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/faad2_x86-windows/share/faad2/copyright
+2025-06-25T02:34:42.5402317Z -- Performing post-build validation
+2025-06-25T02:34:42.5785559Z Elapsed time to handle faad2:x86-windows: 20 s
+2025-06-25T02:34:42.5786410Z faad2:x86-windows package ABI: 23837328d138d8b4696175cd295c9d214821d4fe92a41ad9c904c20279624bc1
+2025-06-25T02:34:42.5787297Z Installing 3/10 vcpkg-cmake-config:x64-windows@2024-05-23...
+2025-06-25T02:34:42.5787816Z Building vcpkg-cmake-config:x64-windows@2024-05-23...
+2025-06-25T02:34:42.6096462Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake-config_x64-windows/share/vcpkg-cmake-config/vcpkg_cmake_config_fixup.cmake
+2025-06-25T02:34:42.6106200Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake-config_x64-windows/share/vcpkg-cmake-config/vcpkg-port-config.cmake
+2025-06-25T02:34:42.6115148Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake-config_x64-windows/share/vcpkg-cmake-config/copyright
+2025-06-25T02:34:42.6162148Z -- Skipping post-build validation due to VCPKG_POLICY_EMPTY_PACKAGE
+2025-06-25T02:34:42.6190899Z Elapsed time to handle vcpkg-cmake-config:x64-windows: 40.6 ms
+2025-06-25T02:34:42.6192046Z vcpkg-cmake-config:x64-windows package ABI: 842797583f0500a3cabbedf03fb083636fe11e4fd3fd19d9a475485e484445fb
+2025-06-25T02:34:42.6192951Z Installing 4/10 libogg:x86-windows@1.3.5#2...
+2025-06-25T02:34:42.6196052Z Building libogg:x86-windows@1.3.5#2...
+2025-06-25T02:34:42.6609836Z Downloading https://gitlab.xiph.org/xiph/ogg/-/archive/v1.3.5/ogg-v1.3.5.tar.gz -> xiph-ogg-v1.3.5.tar.gz
+2025-06-25T02:34:43.2474210Z Successfully downloaded xiph-ogg-v1.3.5.tar.gz
+2025-06-25T02:34:43.2512690Z -- Extracting source D:/a/synthizer3d/synthizer3d/vcpkg/downloads/xiph-ogg-v1.3.5.tar.gz
+2025-06-25T02:34:43.3885696Z -- Using source at D:/a/synthizer3d/synthizer3d/vcpkg/buildtrees/libogg/src/v1.3.5-1a4243fef9.clean
+2025-06-25T02:34:43.3998537Z -- Found external ninja('1.12.1').
+2025-06-25T02:34:43.4038021Z -- Configuring x86-windows
+2025-06-25T02:34:49.6135186Z -- Building x86-windows-dbg
+2025-06-25T02:34:49.9234154Z -- Building x86-windows-rel
+2025-06-25T02:34:50.2391950Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libogg_x86-windows/lib/pkgconfig/ogg.pc
+2025-06-25T02:34:50.2589131Z Downloading msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst, trying https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:34:51.0139404Z Successfully downloaded msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:34:51.0276732Z Downloading msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst, trying https://mirror.msys2.org/msys/x86_64/msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:34:52.6268893Z Successfully downloaded msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:34:52.6301608Z -- Using msys root at D:/a/synthizer3d/synthizer3d/vcpkg/downloads/tools/msys2/21caed2f81ec917b
+2025-06-25T02:34:52.6384630Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libogg_x86-windows/debug/lib/pkgconfig/ogg.pc
+2025-06-25T02:34:52.6459903Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libogg_x86-windows/share/libogg/copyright
+2025-06-25T02:34:52.6524715Z -- Performing post-build validation
+2025-06-25T02:34:52.6767627Z Elapsed time to handle libogg:x86-windows: 10 s
+2025-06-25T02:34:52.6768509Z libogg:x86-windows package ABI: 9d3116e61295141536d65bb41b5ea55c2d7e70816845fe2fcdb939f844d32951
+2025-06-25T02:34:52.6769062Z Installing 5/10 libvorbis:x86-windows@1.3.7#4...
+2025-06-25T02:34:52.6769392Z Building libvorbis:x86-windows@1.3.7#4...
+2025-06-25T02:34:52.7201877Z Downloading https://github.com/xiph/vorbis/archive/v1.3.7.tar.gz -> xiph-vorbis-v1.3.7.tar.gz
+2025-06-25T02:34:53.0764196Z Successfully downloaded xiph-vorbis-v1.3.7.tar.gz
+2025-06-25T02:34:53.0863762Z -- Extracting source D:/a/synthizer3d/synthizer3d/vcpkg/downloads/xiph-vorbis-v1.3.7.tar.gz
+2025-06-25T02:34:53.2872284Z -- Applying patch 0001-Dont-export-vorbisenc-functions.patch
+2025-06-25T02:34:53.3106223Z -- Applying patch 0002-Fixup-pkgconfig-libs.patch
+2025-06-25T02:34:53.3330530Z -- Applying patch 0003-def-mingw-compat.patch
+2025-06-25T02:34:53.3553640Z -- Applying patch 0004-ogg-find-dependency.patch
+2025-06-25T02:34:53.3783587Z -- Using source at D:/a/synthizer3d/synthizer3d/vcpkg/buildtrees/libvorbis/src/v1.3.7-c32164610e.clean
+2025-06-25T02:34:53.3953433Z -- Found external ninja('1.12.1').
+2025-06-25T02:34:53.4010519Z -- Configuring x86-windows
+2025-06-25T02:34:57.9781902Z -- Building x86-windows-dbg
+2025-06-25T02:34:59.4521121Z -- Building x86-windows-rel
+2025-06-25T02:35:01.4293098Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x86-windows/lib/pkgconfig/vorbis.pc
+2025-06-25T02:35:01.4297328Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x86-windows/lib/pkgconfig/vorbisenc.pc
+2025-06-25T02:35:01.4301272Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x86-windows/lib/pkgconfig/vorbisfile.pc
+2025-06-25T02:35:01.4500745Z Downloading msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst, trying https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:35:02.1925073Z Successfully downloaded msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:35:02.2051936Z Downloading msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst, trying https://mirror.msys2.org/msys/x86_64/msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:35:03.1972646Z Successfully downloaded msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:35:03.1999904Z -- Using msys root at D:/a/synthizer3d/synthizer3d/vcpkg/downloads/tools/msys2/21caed2f81ec917b
+2025-06-25T02:35:03.2191428Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x86-windows/debug/lib/pkgconfig/vorbis.pc
+2025-06-25T02:35:03.2198267Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x86-windows/debug/lib/pkgconfig/vorbisenc.pc
+2025-06-25T02:35:03.2204046Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x86-windows/debug/lib/pkgconfig/vorbisfile.pc
+2025-06-25T02:35:03.3544445Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x86-windows/share/libvorbis/usage
+2025-06-25T02:35:03.3549286Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x86-windows/share/libvorbis/copyright
+2025-06-25T02:35:03.3609178Z -- Performing post-build validation
+2025-06-25T02:35:03.4027530Z Elapsed time to handle libvorbis:x86-windows: 11 s
+2025-06-25T02:35:03.4029004Z libvorbis:x86-windows package ABI: adab93becfac965458b82252da84893d8ac078e2f991ea5f3087e5b9a3a939e0
+2025-06-25T02:35:03.4029641Z Installing 6/10 opus:x86-windows@1.5.2...
+2025-06-25T02:35:03.4030015Z Building opus:x86-windows@1.5.2...
+2025-06-25T02:35:03.4448913Z Downloading https://github.com/xiph/opus/archive/v1.5.2.tar.gz -> xiph-opus-v1.5.2.tar.gz
+2025-06-25T02:35:03.8064169Z Successfully downloaded xiph-opus-v1.5.2.tar.gz
+2025-06-25T02:35:03.8239210Z -- Extracting source D:/a/synthizer3d/synthizer3d/vcpkg/downloads/xiph-opus-v1.5.2.tar.gz
+2025-06-25T02:35:04.0769648Z -- Applying patch fix-pkgconfig-version.patch
+2025-06-25T02:35:04.1002232Z -- Using source at D:/a/synthizer3d/synthizer3d/vcpkg/buildtrees/opus/src/v1.5.2-81ed242155.clean
+2025-06-25T02:35:04.1131870Z -- Found external ninja('1.12.1').
+2025-06-25T02:35:04.1166964Z -- Configuring x86-windows
+2025-06-25T02:35:10.0420167Z -- Building x86-windows-dbg
+2025-06-25T02:35:15.3127244Z -- Building x86-windows-rel
+2025-06-25T02:35:22.6551069Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/opus_x86-windows/lib/pkgconfig/opus.pc
+2025-06-25T02:35:22.6755165Z Downloading msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst, trying https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:35:23.4091508Z Successfully downloaded msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:35:23.4209920Z Downloading msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst, trying https://mirror.msys2.org/msys/x86_64/msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:35:24.7950245Z Successfully downloaded msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:35:24.7977865Z -- Using msys root at D:/a/synthizer3d/synthizer3d/vcpkg/downloads/tools/msys2/21caed2f81ec917b
+2025-06-25T02:35:24.8047144Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/opus_x86-windows/debug/lib/pkgconfig/opus.pc
+2025-06-25T02:35:24.8117581Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/opus_x86-windows/share/opus/copyright
+2025-06-25T02:35:24.8174273Z -- Performing post-build validation
+2025-06-25T02:35:24.8811052Z Elapsed time to handle opus:x86-windows: 21 s
+2025-06-25T02:35:24.8812265Z opus:x86-windows package ABI: 83e5b95bc9fc04c66845576db4b179fe11bca26089260af25c339303740be4b4
+2025-06-25T02:35:24.8816903Z Installing 7/10 opusfile:x86-windows@0.12+20221121#1...
+2025-06-25T02:35:24.8817563Z Building opusfile:x86-windows@0.12+20221121#1...
+2025-06-25T02:35:24.9117097Z -- Note: opusfile only supports static library linkage. Building static library.
+2025-06-25T02:35:24.9209946Z Downloading https://github.com/xiph/opusfile/archive/9d718345ce03b2fad5d7d28e0bcd1cc69ab2b166.tar.gz -> xiph-opusfile-9d718345ce03b2fad5d7d28e0bcd1cc69ab2b166.tar.gz
+2025-06-25T02:35:25.1897206Z Successfully downloaded xiph-opusfile-9d718345ce03b2fad5d7d28e0bcd1cc69ab2b166.tar.gz
+2025-06-25T02:35:25.1928676Z -- Extracting source D:/a/synthizer3d/synthizer3d/vcpkg/downloads/xiph-opusfile-9d718345ce03b2fad5d7d28e0bcd1cc69ab2b166.tar.gz
+2025-06-25T02:35:25.3278962Z -- Using source at D:/a/synthizer3d/synthizer3d/vcpkg/buildtrees/opusfile/src/c69ab2b166-6cc7de23ec.clean
+2025-06-25T02:35:25.3400231Z -- Found external ninja('1.12.1').
+2025-06-25T02:35:25.3439897Z -- Configuring x86-windows
+2025-06-25T02:35:26.5371793Z -- Building x86-windows-dbg
+2025-06-25T02:35:26.8136820Z -- Building x86-windows-rel
+2025-06-25T02:35:27.2541406Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/opusfile_x86-windows/lib/pkgconfig/opusfile.pc
+2025-06-25T02:35:27.2737896Z Downloading msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst, trying https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:35:27.9945524Z Successfully downloaded msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:35:28.0067508Z Downloading msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst, trying https://mirror.msys2.org/msys/x86_64/msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:35:28.9225646Z Successfully downloaded msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:35:28.9255824Z -- Using msys root at D:/a/synthizer3d/synthizer3d/vcpkg/downloads/tools/msys2/21caed2f81ec917b
+2025-06-25T02:35:28.9329291Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/opusfile_x86-windows/debug/lib/pkgconfig/opusfile.pc
+2025-06-25T02:35:28.9423096Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/opusfile_x86-windows/share/opusfile/copyright
+2025-06-25T02:35:28.9431231Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/opusfile_x86-windows/share/opusfile/usage
+2025-06-25T02:35:28.9485086Z -- Performing post-build validation
+2025-06-25T02:35:28.9636776Z Elapsed time to handle opusfile:x86-windows: 4.1 s
+2025-06-25T02:35:28.9637773Z opusfile:x86-windows package ABI: 558f8d0c1725b77c6cd28062f718be9e4baef5d64a4d6297e504b882d2ce8a04
+2025-06-25T02:35:28.9638588Z Installing 8/10 atl:x86-windows@0...
+2025-06-25T02:35:28.9643347Z Building atl:x86-windows@0...
+2025-06-25T02:35:28.9998241Z -- Skipping post-build validation due to VCPKG_POLICY_EMPTY_PACKAGE
+2025-06-25T02:35:29.0024889Z Elapsed time to handle atl:x86-windows: 38.8 ms
+2025-06-25T02:35:29.0025526Z atl:x86-windows package ABI: 342d8acf1d4b00c8d8f5437e477585b33bd67c023be49b90ef63dc559637cb14
+2025-06-25T02:35:29.0026045Z Installing 9/10 atlmfc:x86-windows@0#3...
+2025-06-25T02:35:29.0026350Z Building atlmfc:x86-windows@0#3...
+2025-06-25T02:35:29.0466838Z -- Skipping post-build validation due to VCPKG_POLICY_EMPTY_PACKAGE
+2025-06-25T02:35:29.0496139Z Elapsed time to handle atlmfc:x86-windows: 47.2 ms
+2025-06-25T02:35:29.0497223Z atlmfc:x86-windows package ABI: a0ff26a5f4a3e69d6e49f9851c85c9537d1d5ce7c541b6be746af6ec50c22239
+2025-06-25T02:35:29.0499790Z Installing 10/10 soundtouch:x86-windows@2.3.3...
+2025-06-25T02:35:29.0500232Z Building soundtouch:x86-windows@2.3.3...
+2025-06-25T02:35:29.0896070Z Downloading https://codeberg.org/soundtouch/soundtouch/archive/2.3.3.tar.gz -> soundtouch-soundtouch-2.3.3.tar.gz
+2025-06-25T02:35:30.2486455Z Successfully downloaded soundtouch-soundtouch-2.3.3.tar.gz
+2025-06-25T02:35:30.2538275Z -- Extracting source D:/a/synthizer3d/synthizer3d/vcpkg/downloads/soundtouch-soundtouch-2.3.3.tar.gz
+2025-06-25T02:35:30.3932778Z -- Using source at D:/a/synthizer3d/synthizer3d/vcpkg/buildtrees/soundtouch/src/2.3.3-309213044d.clean
+2025-06-25T02:35:30.4051245Z -- Found external ninja('1.12.1').
+2025-06-25T02:35:30.4089369Z -- Configuring x86-windows
+2025-06-25T02:35:31.9103657Z -- Building x86-windows-dbg
+2025-06-25T02:35:34.4640070Z -- Building x86-windows-rel
+2025-06-25T02:35:36.8026729Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/soundtouch_x86-windows/lib/pkgconfig/soundtouch.pc
+2025-06-25T02:35:36.8223946Z Downloading msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst, trying https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:35:37.5612582Z Successfully downloaded msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:35:37.5734045Z Downloading msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst, trying https://mirror.msys2.org/msys/x86_64/msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:35:38.4741695Z Successfully downloaded msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:35:38.4767824Z -- Using msys root at D:/a/synthizer3d/synthizer3d/vcpkg/downloads/tools/msys2/21caed2f81ec917b
+2025-06-25T02:35:38.4836703Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/soundtouch_x86-windows/debug/lib/pkgconfig/soundtouch.pc
+2025-06-25T02:35:38.5288124Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/soundtouch_x86-windows/share/soundtouch/copyright
+2025-06-25T02:35:38.5349194Z -- Performing post-build validation
+2025-06-25T02:35:38.5581812Z Elapsed time to handle soundtouch:x86-windows: 9.5 s
+2025-06-25T02:35:38.5582977Z soundtouch:x86-windows package ABI: a4eae149255f87cebc15fabf8773d05c612b36e615eedb07f38d5b9c01102cba
+2025-06-25T02:35:38.5602219Z faad2 provides pkg-config modules:
+2025-06-25T02:35:38.5602536Z 
+2025-06-25T02:35:38.5602826Z   # Freeware Advanced Audio (AAC) Decoder
+2025-06-25T02:35:38.5603219Z   faad2
+2025-06-25T02:35:38.5603375Z 
+2025-06-25T02:35:38.5607509Z libogg provides CMake targets:
+2025-06-25T02:35:38.5608066Z 
+2025-06-25T02:35:38.5608428Z   # this is heuristically generated, and may not be correct
+2025-06-25T02:35:38.5608933Z   find_package(Ogg CONFIG REQUIRED)
+2025-06-25T02:35:38.5609450Z   target_link_libraries(main PRIVATE Ogg::ogg)
+2025-06-25T02:35:38.5610173Z 
+2025-06-25T02:35:38.5610424Z libogg provides pkg-config modules:
+2025-06-25T02:35:38.5610713Z 
+2025-06-25T02:35:38.5611008Z   # ogg is a library for manipulating ogg bitstreams
+2025-06-25T02:35:38.5611417Z   ogg
+2025-06-25T02:35:38.5611778Z 
+2025-06-25T02:35:38.5612093Z The package libvorbis provides CMake targets:
+2025-06-25T02:35:38.5612430Z 
+2025-06-25T02:35:38.5612983Z     # Vorbis reference encoder and decoder, low-level API
+2025-06-25T02:35:38.5613555Z     find_package(Vorbis CONFIG REQUIRED)
+2025-06-25T02:35:38.5614139Z     target_link_libraries(main PRIVATE Vorbis::vorbis)
+2025-06-25T02:35:38.5614482Z 
+2025-06-25T02:35:38.5614882Z     # Audio stream decoding and basic manipulation, high-level API
+2025-06-25T02:35:38.5615626Z     find_package(Vorbis CONFIG REQUIRED)
+2025-06-25T02:35:38.5616229Z     target_link_libraries(main PRIVATE Vorbis::vorbisfile)
+2025-06-25T02:35:38.5616666Z 
+2025-06-25T02:35:38.5617068Z     # Convenience API for setting up an encoding environment
+2025-06-25T02:35:38.5617803Z     find_package(Vorbis CONFIG REQUIRED)
+2025-06-25T02:35:38.5618495Z     target_link_libraries(main PRIVATE Vorbis::vorbisenc)
+2025-06-25T02:35:38.5618860Z 
+2025-06-25T02:35:38.5619125Z opus provides CMake targets:
+2025-06-25T02:35:38.5619416Z 
+2025-06-25T02:35:38.5619829Z   # this is heuristically generated, and may not be correct
+2025-06-25T02:35:38.5620445Z   find_package(Opus CONFIG REQUIRED)
+2025-06-25T02:35:38.5621064Z   target_link_libraries(main PRIVATE Opus::opus)
+2025-06-25T02:35:38.5621411Z 
+2025-06-25T02:35:38.5621688Z opus provides pkg-config modules:
+2025-06-25T02:35:38.5621954Z 
+2025-06-25T02:35:38.5622204Z   # Opus IETF audio codec ( build)
+2025-06-25T02:35:38.5638023Z   opus
+2025-06-25T02:35:38.5638189Z 
+2025-06-25T02:35:38.5638471Z The package opusfile provides CMake targets:
+2025-06-25T02:35:38.5638789Z 
+2025-06-25T02:35:38.5639206Z     find_package(OpusFile CONFIG REQUIRED)
+2025-06-25T02:35:38.5639869Z     target_link_libraries(main PRIVATE OpusFile::opusfile)
+2025-06-25T02:35:38.5640222Z 
+2025-06-25T02:35:38.5640421Z     # To use the opusurl API
+2025-06-25T02:35:38.5640960Z     target_link_libraries(main PRIVATE OpusFile::opusurl)
+2025-06-25T02:35:38.5641308Z 
+2025-06-25T02:35:38.5641536Z soundtouch provides CMake targets:
+2025-06-25T02:35:38.5641797Z 
+2025-06-25T02:35:38.5642113Z   # this is heuristically generated, and may not be correct
+2025-06-25T02:35:38.5642733Z   find_package(SoundTouch CONFIG REQUIRED)
+2025-06-25T02:35:38.5643404Z   target_link_libraries(main PRIVATE SoundTouch::SoundTouch)
+2025-06-25T02:35:38.5643786Z 
+2025-06-25T02:35:38.5644025Z soundtouch provides pkg-config modules:
+2025-06-25T02:35:38.5644307Z 
+2025-06-25T02:35:38.5645155Z   # SoundTouch is an open-source audio processing library for changing the Tempo, Pitch and Playback Rates of audio streams or files
+2025-06-25T02:35:38.5646477Z   soundtouch
+2025-06-25T02:35:38.5646643Z 
+2025-06-25T02:35:38.5647035Z All requested installations completed successfully in: 1.3 min
+2025-06-25T02:35:38.5655163Z ##[endgroup]
+2025-06-25T02:35:38.5656232Z ⏱ elapsed: 91.515 seconds
+2025-06-25T02:35:38.5656776Z ##[group]Set output environment variables
+2025-06-25T02:35:38.5657705Z Set the workflow environment variable 'RUNVCPKG_VCPKG_ROOT' to value 'D:\a\synthizer3d\synthizer3d\vcpkg'
+2025-06-25T02:35:38.5660497Z Set the workflow environment variable 'VCPKG_ROOT' to value 'D:\a\synthizer3d\synthizer3d\vcpkg'
+2025-06-25T02:35:38.5663860Z Set the step output variable 'RUNVCPKG_VCPKG_ROOT_OUT' to value 'D:\a\synthizer3d\synthizer3d\vcpkg''
+2025-06-25T02:35:38.5668143Z Set the workflow environment variable 'VCPKG_DEFAULT_TRIPLET' to value 'x86-windows'
+2025-06-25T02:35:38.5671560Z Set the step output variable 'RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT' to value 'x86-windows''
+2025-06-25T02:35:38.5674565Z ##[endgroup]
+2025-06-25T02:35:38.5675193Z ⏱ elapsed: 0.002 seconds
+2025-06-25T02:35:38.5679040Z run-vcpkg action execution succeeded
+2025-06-25T02:35:38.5873597Z ##[group]Run Write-Host "VCPKG_ROOT (tool directory from lukka/run-vcpkg) is $env:VCPKG_ROOT"
+2025-06-25T02:35:38.5874274Z [36;1mWrite-Host "VCPKG_ROOT (tool directory from lukka/run-vcpkg) is $env:VCPKG_ROOT"[0m
+2025-06-25T02:35:38.5874741Z [36;1mWrite-Host "VCPKG_DEFAULT_TRIPLET is $env:VCPKG_DEFAULT_TRIPLET"[0m
+2025-06-25T02:35:38.5875152Z [36;1mWrite-Host "GITHUB_WORKSPACE is $env:GITHUB_WORKSPACE"[0m
+2025-06-25T02:35:38.5875754Z [36;1mWrite-Host "Initial EFFECTIVE_VCPKG_INSTALLED_DIR_BASE (from job env, target for manifest install) is $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE"[0m
+2025-06-25T02:35:38.5876278Z [36;1m[0m
+2025-06-25T02:35:38.5876443Z [36;1mif (-not $env:VCPKG_ROOT) {[0m
+2025-06-25T02:35:38.5876805Z [36;1m  Write-Error "VCPKG_ROOT not set. This should be set by the lukka/run-vcpkg action."[0m
+2025-06-25T02:35:38.5877158Z [36;1m  exit 1[0m
+2025-06-25T02:35:38.5877311Z [36;1m}[0m
+2025-06-25T02:35:38.5877448Z [36;1m[0m
+2025-06-25T02:35:38.5877743Z [36;1m# Esegui vcpkg install. Se vcpkg.json è in $env:GITHUB_WORKSPACE (CWD),[0m
+2025-06-25T02:35:38.5878279Z [36;1m# installerà in $env:GITHUB_WORKSPACE/vcpkg_installed/$env:VCPKG_DEFAULT_TRIPLET[0m
+2025-06-25T02:35:38.5878781Z [36;1m# che corrisponde a $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE/$env:VCPKG_DEFAULT_TRIPLET[0m
+2025-06-25T02:35:38.5879295Z [36;1m# La CurrentWorkingDirectory per gli script eseguiti da 'run:' è $GITHUB_WORKSPACE.[0m
+2025-06-25T02:35:38.5879778Z [36;1m& "$env:VCPKG_ROOT\vcpkg.exe" install --triplet $env:VCPKG_DEFAULT_TRIPLET[0m
+2025-06-25T02:35:38.5880147Z [36;1mWrite-Host "Finished vcpkg install command."[0m
+2025-06-25T02:35:38.5880389Z [36;1m[0m
+2025-06-25T02:35:38.5880690Z [36;1m# CMAKE_PREFIX_PATH deve puntare a dove vcpkg ha effettivamente installato i pacchetti.[0m
+2025-06-25T02:35:38.5881263Z [36;1m# Con la modalità manifest, questo è $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE/$env:VCPKG_DEFAULT_TRIPLET.[0m
+2025-06-25T02:35:38.5881891Z [36;1m$cmakePrefixPathValue = Join-Path $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE $env:VCPKG_DEFAULT_TRIPLET[0m
+2025-06-25T02:35:38.5882305Z [36;1m[0m
+2025-06-25T02:35:38.5882606Z [36;1mWrite-Host "Verifying existence of target CMAKE_PREFIX_PATH: $cmakePrefixPathValue"[0m
+2025-06-25T02:35:38.5883079Z [36;1mif (-not (Test-Path $cmakePrefixPathValue -PathType Container)) {[0m
+2025-06-25T02:35:38.5883669Z [36;1m  Write-Warning "ATTENZIONE: La directory $cmakePrefixPathValue (target per CMAKE_PREFIX_PATH) NON esiste dopo vcpkg install."[0m
+2025-06-25T02:35:38.5884329Z [36;1m  Write-Warning "Questo indica che vcpkg non ha installato nella posizione manifest attesa."[0m
+2025-06-25T02:35:38.5884840Z [36;1m  Write-Warning "Contenuto di $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE per debug:"[0m
+2025-06-25T02:35:38.5885632Z [36;1m  Get-ChildItem -Path $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE -ErrorAction SilentlyContinue -Depth 1 || Write-Warning "$env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE non esiste o è vuoto."[0m
+2025-06-25T02:35:38.5886268Z [36;1m  [0m
+2025-06-25T02:35:38.5886545Z [36;1m  # Fallback per debug: controlla la directory di installazione classica di vcpkg[0m
+2025-06-25T02:35:38.5887111Z [36;1m  $classicVcpkgInstalledPath = Join-Path (Join-Path $env:VCPKG_ROOT "installed") $env:VCPKG_DEFAULT_TRIPLET[0m
+2025-06-25T02:35:38.5887779Z [36;1m  Write-Warning "Controllo del percorso di installazione classico di vcpkg per debug: $classicVcpkgInstalledPath"[0m
+2025-06-25T02:35:38.5888330Z [36;1m  if(Test-Path $classicVcpkgInstalledPath -PathType Container){[0m
+2025-06-25T02:35:38.5888964Z [36;1m      Write-Warning "Il percorso classico $classicVcpkgInstalledPath ESISTE. Questo è fonte di confusione se era prevista la modalità manifest."[0m
+2025-06-25T02:35:38.5889499Z [36;1m  } else {[0m
+2025-06-25T02:35:38.5889976Z [36;1m      Write-Warning "Anche il percorso classico $classicVcpkgInstalledPath NON esiste."[0m
+2025-06-25T02:35:38.5890330Z [36;1m  }[0m
+2025-06-25T02:35:38.5891795Z [36;1m} else {[0m
+2025-06-25T02:35:38.5892216Z [36;1m  Write-Host "Confermato: La directory target per CMAKE_PREFIX_PATH esiste: $cmakePrefixPathValue"[0m
+2025-06-25T02:35:38.5892622Z [36;1m}[0m
+2025-06-25T02:35:38.5892759Z [36;1m[0m
+2025-06-25T02:35:38.5893142Z [36;1mecho "CMAKE_PREFIX_PATH=$cmakePrefixPathValue" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append[0m
+2025-06-25T02:35:38.5893697Z [36;1mWrite-Host "CMAKE_PREFIX_PATH impostato a $cmakePrefixPathValue"[0m
+2025-06-25T02:35:38.5894252Z [36;1m# EFFECTIVE_VCPKG_INSTALLED_DIR_BASE è già corretto dall'env del job, non serve aggiornarlo di nuovo in GITHUB_ENV[0m
+2025-06-25T02:35:38.5894761Z [36;1m# se la nostra assunzione sulla modalità manifest è corretta.[0m
+2025-06-25T02:35:38.5927696Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+2025-06-25T02:35:38.5928008Z env:
+2025-06-25T02:35:38.5928151Z   PYVERSION: 3.8
+2025-06-25T02:35:38.5928317Z   CI_ARCH_LOWER: x86
+2025-06-25T02:35:38.5928486Z   CI_WINDOWS: 1
+2025-06-25T02:35:38.5928631Z   CI_ARCH_ENV: x86
+2025-06-25T02:35:38.5928804Z   VCPKG_DEFAULT_TRIPLET: x86-windows
+2025-06-25T02:35:38.5929148Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: D:\a\synthizer3d\synthizer3d\vcpkg_installed
+2025-06-25T02:35:38.5929567Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:35:38.5929944Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.8.10\x86/lib/pkgconfig
+2025-06-25T02:35:38.5930319Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:35:38.5930664Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:35:38.5930999Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:35:38.5931280Z   CommandPromptType: Native
+2025-06-25T02:35:38.5931601Z   DevEnvDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\
+2025-06-25T02:35:38.5932060Z   ExtensionSdkDir: C:\Program Files (x86)\Microsoft SDKs\Windows Kits\10\ExtensionSDKs
+2025-06-25T02:35:38.5934035Z   EXTERNAL_INCLUDE: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\include;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ATLMFC\include;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\VS\include;C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\shared;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\winrt;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um
+2025-06-25T02:35:38.5935903Z   Framework40Version: v4.0
+2025-06-25T02:35:38.5936132Z   FrameworkDir: C:\Windows\Microsoft.NET\Framework\
+2025-06-25T02:35:38.5936425Z   FrameworkDir32: C:\Windows\Microsoft.NET\Framework\
+2025-06-25T02:35:38.5936687Z   FrameworkVersion: v4.0.30319
+2025-06-25T02:35:38.5936900Z   FrameworkVersion32: v4.0.30319
+2025-06-25T02:35:38.5937360Z   FSHARPINSTALLDIR: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\FSharp\Tools
+2025-06-25T02:35:38.5937901Z   HTMLHelpDir: C:\Program Files (x86)\HTML Help Workshop
+2025-06-25T02:35:38.5938335Z   IFCPATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ifc\x86
+2025-06-25T02:35:38.5940912Z   INCLUDE: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\include;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ATLMFC\include;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\VS\include;C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\shared;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\winrt;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um
+2025-06-25T02:35:38.5943766Z   LIB: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ATLMFC\lib\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\lib\x86;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\lib\um\x86;C:\Program Files (x86)\Windows Kits\10\lib\10.0.26100.0\ucrt\x86;C:\Program Files (x86)\Windows Kits\10\\lib\10.0.26100.0\\um\x86
+2025-06-25T02:35:38.5945976Z   LIBPATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ATLMFC\lib\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\lib\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\lib\x86\store\references;C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.26100.0;C:\Program Files (x86)\Windows Kits\10\References\10.0.26100.0;C:\Windows\Microsoft.NET\Framework\v4.0.30319
+2025-06-25T02:35:38.5947442Z   NETFXSDKDir: C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\
+2025-06-25T02:35:38.5960359Z   Path: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\bin\HostX86\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\VC\VCPackages;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\bin\Roslyn;C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\;C:\Program Files (x86)\HTML Help Workshop;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\FSharp\Tools;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Team Tools\DiagnosticsHub\Collector;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\Extensions\Microsoft\CodeCoverage.Console;C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\\x86;C:\Program Files (x86)\Windows Kits\10\bin\\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\\MSBuild\Current\Bin\amd64;C:\Windows\Microsoft.NET\Framework\v4.0.30319;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\;C:\Users\runneradmin\AppData\Roaming\Python\Python38\Scripts;C:\hostedtoolcache\windows\Python\3.8.10\x86\Scripts;C:\hostedtoolcache\windows\Python\3.8.10\x86;C:\Program Files\MongoDB\Server\5.0\bin;C:\aliyun-cli;C:\vcpkg;C:\Program Files (x86)\NSIS\;C:\tools\zstd;C:\Program Files\Mercurial\;C:\hostedtoolcache\windows\stack\3.5.1\x64;C:\cabal\bin;C:\\ghcup\bin;C:\mingw64\bin;C:\Program Files\dotnet;C:\Program Files\MySQL\MySQL Server 8.0\bin;C:\Program Files\R\R-4.4.2\bin\x64;C:\SeleniumWebDrivers\GeckoDriver;C:\SeleniumWebDrivers\EdgeDriver\;C:\SeleniumWebDrivers\ChromeDriver;C:\Program Files (x86)\sbt\bin;C:\Program Files (x86)\GitHub CLI;C:\Program Files\Git\bin;C:\Program Files (x86)\pipx_bin;C:\npm\prefix;C:\hostedtoolcache\windows\go\1.24.3\x64\bin;C:\hostedtoolcache\windows\Python\3.9.13\x64\Scripts;C:\hostedtoolcache\windows\Python\3.9.13\x64;C:\hostedtoolcache\windows\Ruby\3.3.8\x64\bin;C:\Program Files\OpenSSL\bin;C:\tools\kotlinc\bin;C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\8.0.452-9\x64\bin;C:\Program Files\ImageMagick-7.1.1-Q16-HDRI;C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin;C:\ProgramData\kind;C:\ProgramData\Chocolatey\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\PowerShell\7\;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files\TortoiseSVN\bin;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\WiX Toolset v3.14\bin;C:\Program Files\Microsoft SQL Server\130\DTS\Binn\;C:\Program Files\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files\Microsoft SQL Server\150\DTS\Binn\;C:\Program Files\Microsoft SQL Server\160\DTS\Binn\;C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\ProgramData\chocolatey\lib\pulumi\tools\Pulumi\bin;C:\Program Files\CMake\bin;C:\ProgramData\chocolatey\lib\maven\apache-maven-3.9.9\bin;C:\Program Files\Microsoft Service Fabric\bin\Fabric\Fabric.Code;C:\Program Files\Microsoft SDKs\Service Fabric\Tools\ServiceFabricLocalClusterManager;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Program Files\GitHub CLI\;c:\tools\php;C:\Program Files\Amazon\AWSCLIV2\;C:\Program Files\Amazon\SessionManagerPlugin\bin\;C:\Program Files\Amazon\AWSSAMCLI\bin\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\LLVM\bin;C:\Users\runneradmin\.dotnet\tools;C:\Users\runneradmin\.cargo\bin;C:\Users\runneradmin\AppData\Local\Microsoft\WindowsApps;C:\Program Files (x86)\Microsoft Visual Studio\Installer;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\Llvm\bin;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\VC\Linux\bin\ConnectionManagerExe;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\vcpkg
+2025-06-25T02:35:38.5973826Z   Platform: x86
+2025-06-25T02:35:38.5974005Z   UCRTVersion: 10.0.26100.0
+2025-06-25T02:35:38.5974268Z   UniversalCRTSdkDir: C:\Program Files (x86)\Windows Kits\10\
+2025-06-25T02:35:38.5974711Z   VCIDEInstallDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\VC\
+2025-06-25T02:35:38.5975179Z   VCINSTALLDIR: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\
+2025-06-25T02:35:38.5975555Z   VCPKG_ROOT: D:\a\synthizer3d\synthizer3d\vcpkg
+2025-06-25T02:35:38.5976000Z   VCToolsInstallDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\
+2025-06-25T02:35:38.5976584Z   VCToolsRedistDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Redist\MSVC\14.42.34433\
+2025-06-25T02:35:38.5976980Z   VCToolsVersion: 14.43.34808
+2025-06-25T02:35:38.5977177Z   VisualStudioVersion: 17.0
+2025-06-25T02:35:38.5977514Z   VS170COMNTOOLS: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\
+2025-06-25T02:35:38.5977887Z   VSCMD_ARG_app_plat: Desktop
+2025-06-25T02:35:38.5978080Z   VSCMD_ARG_HOST_ARCH: x86
+2025-06-25T02:35:38.5978265Z   VSCMD_ARG_TGT_ARCH: x86
+2025-06-25T02:35:38.5978436Z   VSCMD_VER: 17.13.2
+2025-06-25T02:35:38.5978708Z   VSINSTALLDIR: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
+2025-06-25T02:35:38.5979129Z   VSSDK150INSTALL: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VSSDK
+2025-06-25T02:35:38.5979567Z   VSSDKINSTALL: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VSSDK
+2025-06-25T02:35:38.5980163Z   WindowsLibPath: C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.26100.0;C:\Program Files (x86)\Windows Kits\10\References\10.0.26100.0
+2025-06-25T02:35:38.5980726Z   WindowsSdkBinPath: C:\Program Files (x86)\Windows Kits\10\bin\
+2025-06-25T02:35:38.5981059Z   WindowsSdkDir: C:\Program Files (x86)\Windows Kits\10\
+2025-06-25T02:35:38.5981333Z   WindowsSDKLibVersion: 10.0.26100.0\
+2025-06-25T02:35:38.5981659Z   WindowsSdkVerBinPath: C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\
+2025-06-25T02:35:38.5981982Z   WindowsSDKVersion: 10.0.26100.0\
+2025-06-25T02:35:38.5982387Z   WindowsSDK_ExecutablePath_x64: C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\x64\
+2025-06-25T02:35:38.5983088Z   WindowsSDK_ExecutablePath_x86: C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\
+2025-06-25T02:35:38.5983547Z   __DOTNET_ADD_32BIT: 1
+2025-06-25T02:35:38.5983728Z   __DOTNET_PREFERRED_BITNESS: 32
+2025-06-25T02:35:38.5991536Z   __VSCMD_PREINIT_PATH: C:\Users\runneradmin\AppData\Roaming\Python\Python38\Scripts;C:\hostedtoolcache\windows\Python\3.8.10\x86\Scripts;C:\hostedtoolcache\windows\Python\3.8.10\x86;C:\Program Files\MongoDB\Server\5.0\bin;C:\aliyun-cli;C:\vcpkg;C:\Program Files (x86)\NSIS\;C:\tools\zstd;C:\Program Files\Mercurial\;C:\hostedtoolcache\windows\stack\3.5.1\x64;C:\cabal\bin;C:\\ghcup\bin;C:\mingw64\bin;C:\Program Files\dotnet;C:\Program Files\MySQL\MySQL Server 8.0\bin;C:\Program Files\R\R-4.4.2\bin\x64;C:\SeleniumWebDrivers\GeckoDriver;C:\SeleniumWebDrivers\EdgeDriver\;C:\SeleniumWebDrivers\ChromeDriver;C:\Program Files (x86)\sbt\bin;C:\Program Files (x86)\GitHub CLI;C:\Program Files\Git\bin;C:\Program Files (x86)\pipx_bin;C:\npm\prefix;C:\hostedtoolcache\windows\go\1.24.3\x64\bin;C:\hostedtoolcache\windows\Python\3.9.13\x64\Scripts;C:\hostedtoolcache\windows\Python\3.9.13\x64;C:\hostedtoolcache\windows\Ruby\3.3.8\x64\bin;C:\Program Files\OpenSSL\bin;C:\tools\kotlinc\bin;C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\8.0.452-9\x64\bin;C:\Program Files\ImageMagick-7.1.1-Q16-HDRI;C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin;C:\ProgramData\kind;C:\ProgramData\Chocolatey\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\PowerShell\7\;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files\TortoiseSVN\bin;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\WiX Toolset v3.14\bin;C:\Program Files\Microsoft SQL Server\130\DTS\Binn\;C:\Program Files\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files\Microsoft SQL Server\150\DTS\Binn\;C:\Program Files\Microsoft SQL Server\160\DTS\Binn\;C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\ProgramData\chocolatey\lib\pulumi\tools\Pulumi\bin;C:\Program Files\CMake\bin;C:\ProgramData\chocolatey\lib\maven\apache-maven-3.9.9\bin;C:\Program Files\Microsoft Service Fabric\bin\Fabric\Fabric.Code;C:\Program Files\Microsoft SDKs\Service Fabric\Tools\ServiceFabricLocalClusterManager;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Program Files\GitHub CLI\;c:\tools\php;C:\Program Files (x86)\sbt\bin;C:\Program Files\Amazon\AWSCLIV2\;C:\Program Files\Amazon\SessionManagerPlugin\bin\;C:\Program Files\Amazon\AWSSAMCLI\bin\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\LLVM\bin;C:\Users\runneradmin\.dotnet\tools;C:\Users\runneradmin\.cargo\bin;C:\Users\runneradmin\AppData\Local\Microsoft\WindowsApps;C:\Program Files (x86)\Microsoft Visual Studio\Installer
+2025-06-25T02:35:38.5999744Z   VCPKG_DEFAULT_BINARY_CACHE: D:/a/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_cache
+2025-06-25T02:35:38.6000187Z   VCPKG_BINARY_SOURCES: clear;x-gha,readwrite
+2025-06-25T02:35:38.6000726Z   ACTIONS_CACHE_URL: https://acghubeus2.actions.githubusercontent.com/bwbzopuV3oKlbowlUKWdOnf6KF0vjv7EYqCB3ZHqukKhTVgy74/
+2025-06-25T02:35:38.6032330Z   ACTIONS_RUNTIME_TOKEN: ***
+2025-06-25T02:35:38.6032592Z   RUNVCPKG_VCPKG_ROOT: D:\a\synthizer3d\synthizer3d\vcpkg
+2025-06-25T02:35:38.6032866Z ##[endgroup]
+2025-06-25T02:35:38.8826321Z VCPKG_ROOT (tool directory from lukka/run-vcpkg) is D:\a\synthizer3d\synthizer3d\vcpkg
+2025-06-25T02:35:38.8831948Z VCPKG_DEFAULT_TRIPLET is x86-windows
+2025-06-25T02:35:38.8837151Z GITHUB_WORKSPACE is D:\a\synthizer3d\synthizer3d
+2025-06-25T02:35:38.8843313Z Initial EFFECTIVE_VCPKG_INSTALLED_DIR_BASE (from job env, target for manifest install) is D:\a\synthizer3d\synthizer3d\vcpkg_installed
+2025-06-25T02:35:39.0999786Z Detecting compiler hash for triplet x64-windows...
+2025-06-25T02:35:41.0637466Z Compiler found: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.43.34808/bin/Hostx64/x64/cl.exe
+2025-06-25T02:35:41.0702453Z Detecting compiler hash for triplet x86-windows...
+2025-06-25T02:35:42.8103440Z Compiler found: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.43.34808/bin/Hostx64/x86/cl.exe
+2025-06-25T02:35:42.8162662Z The following packages will be built and installed:
+2025-06-25T02:35:42.8163128Z   * atl:x86-windows@0
+2025-06-25T02:35:42.8163418Z   * atlmfc:x86-windows@0#3
+2025-06-25T02:35:42.8163717Z     faad2:x86-windows@2.11.1
+2025-06-25T02:35:42.8164011Z     libogg:x86-windows@1.3.5#2
+2025-06-25T02:35:42.8164324Z     libvorbis:x86-windows@1.3.7#4
+2025-06-25T02:35:42.8164634Z     opus:x86-windows@1.5.2
+2025-06-25T02:35:42.8165033Z     opusfile:x86-windows@0.12+20221121#1
+2025-06-25T02:35:42.8165602Z     soundtouch:x86-windows@2.3.3
+2025-06-25T02:35:42.8166146Z   * vcpkg-cmake:x64-windows@2024-04-23
+2025-06-25T02:35:42.8166859Z   * vcpkg-cmake-config:x64-windows@2024-05-23
+2025-06-25T02:35:42.8167750Z Additional packages (*) will be modified to complete this operation.
+2025-06-25T02:35:42.8170390Z %VCPKG_BINARY_SOURCES%: warning: The 'x-gha' binary caching backend has been removed. Consider using a NuGet-based binary caching provider instead, see extended documentation at https://learn.microsoft.com/vcpkg/users/binarycaching?WT.mc_id=vcpkg_inproduct_cli.
+2025-06-25T02:35:42.8171653Z   on expression: clear;x-gha,readwrite
+2025-06-25T02:35:42.8172011Z                                       ^
+2025-06-25T02:35:42.8172422Z Installing 1/10 vcpkg-cmake:x64-windows@2024-04-23...
+2025-06-25T02:35:42.8172853Z Building vcpkg-cmake:x64-windows@2024-04-23...
+2025-06-25T02:35:42.8454583Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-windows/share/vcpkg-cmake/vcpkg_cmake_configure.cmake
+2025-06-25T02:35:42.8459997Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-windows/share/vcpkg-cmake/vcpkg_cmake_build.cmake
+2025-06-25T02:35:42.8464300Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-windows/share/vcpkg-cmake/vcpkg_cmake_install.cmake
+2025-06-25T02:35:42.8468366Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-windows/share/vcpkg-cmake/vcpkg-port-config.cmake
+2025-06-25T02:35:42.8472763Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake_x64-windows/share/vcpkg-cmake/copyright
+2025-06-25T02:35:42.8512978Z -- Performing post-build validation
+2025-06-25T02:35:42.8561411Z Elapsed time to handle vcpkg-cmake:x64-windows: 39.4 ms
+2025-06-25T02:35:42.8562335Z vcpkg-cmake:x64-windows package ABI: a500b93f9e0b831ca946128005613d551eeb943040c8f073dc3184f7e15c9834
+2025-06-25T02:35:42.8562959Z Installing 2/10 faad2:x86-windows@2.11.1...
+2025-06-25T02:35:42.8563361Z Building faad2:x86-windows@2.11.1...
+2025-06-25T02:35:42.8944521Z Downloading https://github.com/knik0/faad2/archive/2.11.1.tar.gz -> knik0-faad2-2.11.1.tar.gz
+2025-06-25T02:35:43.2305183Z Successfully downloaded knik0-faad2-2.11.1.tar.gz
+2025-06-25T02:35:43.4878511Z -- Extracting source D:/a/synthizer3d/synthizer3d/vcpkg/downloads/knik0-faad2-2.11.1.tar.gz
+2025-06-25T02:35:43.6350168Z -- Applying patch fix-install.patch
+2025-06-25T02:35:43.6555798Z -- Using source at D:/a/synthizer3d/synthizer3d/vcpkg/buildtrees/faad2/src/2.11.1-55f3ec09c2.clean
+2025-06-25T02:35:43.6661799Z -- Found external ninja('1.12.1').
+2025-06-25T02:35:43.6693976Z -- Configuring x86-windows
+2025-06-25T02:35:45.0525793Z -- Building x86-windows-dbg
+2025-06-25T02:35:48.9536709Z -- Building x86-windows-rel
+2025-06-25T02:35:56.5388472Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/faad2_x86-windows/lib/pkgconfig/faad2.pc
+2025-06-25T02:35:56.5590761Z Downloading msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst, trying https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:35:57.2999656Z Successfully downloaded msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:35:57.3209956Z Downloading msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst, trying https://mirror.msys2.org/msys/x86_64/msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:35:58.2212411Z Successfully downloaded msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:35:58.2309657Z -- Using msys root at D:/a/synthizer3d/synthizer3d/vcpkg/downloads/tools/msys2/21caed2f81ec917b
+2025-06-25T02:35:58.2379625Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/faad2_x86-windows/debug/lib/pkgconfig/faad2.pc
+2025-06-25T02:35:59.8123739Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/faad2_x86-windows/share/faad2/copyright
+2025-06-25T02:35:59.8191448Z -- Performing post-build validation
+2025-06-25T02:35:59.8264263Z Elapsed time to handle faad2:x86-windows: 17 s
+2025-06-25T02:35:59.8264957Z faad2:x86-windows package ABI: 23837328d138d8b4696175cd295c9d214821d4fe92a41ad9c904c20279624bc1
+2025-06-25T02:35:59.8265539Z Installing 3/10 vcpkg-cmake-config:x64-windows@2024-05-23...
+2025-06-25T02:35:59.8265942Z Building vcpkg-cmake-config:x64-windows@2024-05-23...
+2025-06-25T02:35:59.8566402Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake-config_x64-windows/share/vcpkg-cmake-config/vcpkg_cmake_config_fixup.cmake
+2025-06-25T02:35:59.8571969Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake-config_x64-windows/share/vcpkg-cmake-config/vcpkg-port-config.cmake
+2025-06-25T02:35:59.8575848Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/vcpkg-cmake-config_x64-windows/share/vcpkg-cmake-config/copyright
+2025-06-25T02:35:59.8621026Z -- Skipping post-build validation due to VCPKG_POLICY_EMPTY_PACKAGE
+2025-06-25T02:35:59.8643045Z Elapsed time to handle vcpkg-cmake-config:x64-windows: 37.9 ms
+2025-06-25T02:35:59.8643898Z vcpkg-cmake-config:x64-windows package ABI: 842797583f0500a3cabbedf03fb083636fe11e4fd3fd19d9a475485e484445fb
+2025-06-25T02:35:59.8644575Z Installing 4/10 libogg:x86-windows@1.3.5#2...
+2025-06-25T02:35:59.8644973Z Building libogg:x86-windows@1.3.5#2...
+2025-06-25T02:35:59.9056205Z Downloading https://gitlab.xiph.org/xiph/ogg/-/archive/v1.3.5/ogg-v1.3.5.tar.gz -> xiph-ogg-v1.3.5.tar.gz
+2025-06-25T02:36:00.4915349Z Successfully downloaded xiph-ogg-v1.3.5.tar.gz
+2025-06-25T02:36:00.5030516Z -- Extracting source D:/a/synthizer3d/synthizer3d/vcpkg/downloads/xiph-ogg-v1.3.5.tar.gz
+2025-06-25T02:36:00.6455718Z -- Using source at D:/a/synthizer3d/synthizer3d/vcpkg/buildtrees/libogg/src/v1.3.5-1a4243fef9.clean
+2025-06-25T02:36:00.6575114Z -- Found external ninja('1.12.1').
+2025-06-25T02:36:00.6609623Z -- Configuring x86-windows
+2025-06-25T02:36:07.0519441Z -- Building x86-windows-dbg
+2025-06-25T02:36:07.3433540Z -- Building x86-windows-rel
+2025-06-25T02:36:07.6538584Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libogg_x86-windows/lib/pkgconfig/ogg.pc
+2025-06-25T02:36:07.6645362Z -- Using cached msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:36:07.6714896Z -- Using cached msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:36:07.6719143Z -- Using msys root at D:/a/synthizer3d/synthizer3d/vcpkg/downloads/tools/msys2/21caed2f81ec917b
+2025-06-25T02:36:07.6788684Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libogg_x86-windows/debug/lib/pkgconfig/ogg.pc
+2025-06-25T02:36:07.6858590Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libogg_x86-windows/share/libogg/copyright
+2025-06-25T02:36:07.6912511Z -- Performing post-build validation
+2025-06-25T02:36:07.6985815Z Elapsed time to handle libogg:x86-windows: 7.8 s
+2025-06-25T02:36:07.6987007Z libogg:x86-windows package ABI: 9d3116e61295141536d65bb41b5ea55c2d7e70816845fe2fcdb939f844d32951
+2025-06-25T02:36:07.6988033Z Installing 5/10 libvorbis:x86-windows@1.3.7#4...
+2025-06-25T02:36:07.6988699Z Building libvorbis:x86-windows@1.3.7#4...
+2025-06-25T02:36:07.7389349Z Downloading https://github.com/xiph/vorbis/archive/v1.3.7.tar.gz -> xiph-vorbis-v1.3.7.tar.gz
+2025-06-25T02:36:08.0462206Z Successfully downloaded xiph-vorbis-v1.3.7.tar.gz
+2025-06-25T02:36:08.0625965Z -- Extracting source D:/a/synthizer3d/synthizer3d/vcpkg/downloads/xiph-vorbis-v1.3.7.tar.gz
+2025-06-25T02:36:08.2457627Z -- Applying patch 0001-Dont-export-vorbisenc-functions.patch
+2025-06-25T02:36:08.2669974Z -- Applying patch 0002-Fixup-pkgconfig-libs.patch
+2025-06-25T02:36:08.2872882Z -- Applying patch 0003-def-mingw-compat.patch
+2025-06-25T02:36:08.3076071Z -- Applying patch 0004-ogg-find-dependency.patch
+2025-06-25T02:36:08.3276602Z -- Using source at D:/a/synthizer3d/synthizer3d/vcpkg/buildtrees/libvorbis/src/v1.3.7-c32164610e.clean
+2025-06-25T02:36:08.3385910Z -- Found external ninja('1.12.1').
+2025-06-25T02:36:08.3418289Z -- Configuring x86-windows
+2025-06-25T02:36:10.1650634Z -- Building x86-windows-dbg
+2025-06-25T02:36:11.4603476Z -- Building x86-windows-rel
+2025-06-25T02:36:13.4125514Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x86-windows/lib/pkgconfig/vorbis.pc
+2025-06-25T02:36:13.4130285Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x86-windows/lib/pkgconfig/vorbisenc.pc
+2025-06-25T02:36:13.4135266Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x86-windows/lib/pkgconfig/vorbisfile.pc
+2025-06-25T02:36:13.4242590Z -- Using cached msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:36:13.4312263Z -- Using cached msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:36:13.4316609Z -- Using msys root at D:/a/synthizer3d/synthizer3d/vcpkg/downloads/tools/msys2/21caed2f81ec917b
+2025-06-25T02:36:13.4507564Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x86-windows/debug/lib/pkgconfig/vorbis.pc
+2025-06-25T02:36:13.4513122Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x86-windows/debug/lib/pkgconfig/vorbisenc.pc
+2025-06-25T02:36:13.4518227Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x86-windows/debug/lib/pkgconfig/vorbisfile.pc
+2025-06-25T02:36:13.5807784Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x86-windows/share/libvorbis/usage
+2025-06-25T02:36:13.5811795Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/libvorbis_x86-windows/share/libvorbis/copyright
+2025-06-25T02:36:13.5867054Z -- Performing post-build validation
+2025-06-25T02:36:13.5967170Z Elapsed time to handle libvorbis:x86-windows: 5.9 s
+2025-06-25T02:36:13.5967898Z libvorbis:x86-windows package ABI: adab93becfac965458b82252da84893d8ac078e2f991ea5f3087e5b9a3a939e0
+2025-06-25T02:36:13.5968423Z Installing 6/10 opus:x86-windows@1.5.2...
+2025-06-25T02:36:13.5968729Z Building opus:x86-windows@1.5.2...
+2025-06-25T02:36:13.6357949Z Downloading https://github.com/xiph/opus/archive/v1.5.2.tar.gz -> xiph-opus-v1.5.2.tar.gz
+2025-06-25T02:36:13.9299193Z Successfully downloaded xiph-opus-v1.5.2.tar.gz
+2025-06-25T02:36:13.9549955Z -- Extracting source D:/a/synthizer3d/synthizer3d/vcpkg/downloads/xiph-opus-v1.5.2.tar.gz
+2025-06-25T02:36:14.2071400Z -- Applying patch fix-pkgconfig-version.patch
+2025-06-25T02:36:14.2286580Z -- Using source at D:/a/synthizer3d/synthizer3d/vcpkg/buildtrees/opus/src/v1.5.2-81ed242155.clean
+2025-06-25T02:36:14.2406829Z -- Found external ninja('1.12.1').
+2025-06-25T02:36:14.2440329Z -- Configuring x86-windows
+2025-06-25T02:36:19.6474971Z -- Building x86-windows-dbg
+2025-06-25T02:36:24.8977141Z -- Building x86-windows-rel
+2025-06-25T02:36:32.2743685Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/opus_x86-windows/lib/pkgconfig/opus.pc
+2025-06-25T02:36:32.2851220Z -- Using cached msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:36:32.2920434Z -- Using cached msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:36:32.2924823Z -- Using msys root at D:/a/synthizer3d/synthizer3d/vcpkg/downloads/tools/msys2/21caed2f81ec917b
+2025-06-25T02:36:32.2992945Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/opus_x86-windows/debug/lib/pkgconfig/opus.pc
+2025-06-25T02:36:32.3065253Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/opus_x86-windows/share/opus/copyright
+2025-06-25T02:36:32.3119459Z -- Performing post-build validation
+2025-06-25T02:36:32.3193677Z Elapsed time to handle opus:x86-windows: 19 s
+2025-06-25T02:36:32.3194361Z opus:x86-windows package ABI: 83e5b95bc9fc04c66845576db4b179fe11bca26089260af25c339303740be4b4
+2025-06-25T02:36:32.3194952Z Installing 7/10 opusfile:x86-windows@0.12+20221121#1...
+2025-06-25T02:36:32.3195347Z Building opusfile:x86-windows@0.12+20221121#1...
+2025-06-25T02:36:32.3497183Z -- Note: opusfile only supports static library linkage. Building static library.
+2025-06-25T02:36:32.3591813Z Downloading https://github.com/xiph/opusfile/archive/9d718345ce03b2fad5d7d28e0bcd1cc69ab2b166.tar.gz -> xiph-opusfile-9d718345ce03b2fad5d7d28e0bcd1cc69ab2b166.tar.gz
+2025-06-25T02:36:32.5643364Z Successfully downloaded xiph-opusfile-9d718345ce03b2fad5d7d28e0bcd1cc69ab2b166.tar.gz
+2025-06-25T02:36:32.5754368Z -- Extracting source D:/a/synthizer3d/synthizer3d/vcpkg/downloads/xiph-opusfile-9d718345ce03b2fad5d7d28e0bcd1cc69ab2b166.tar.gz
+2025-06-25T02:36:32.7135137Z -- Using source at D:/a/synthizer3d/synthizer3d/vcpkg/buildtrees/opusfile/src/c69ab2b166-6cc7de23ec.clean
+2025-06-25T02:36:32.7261340Z -- Found external ninja('1.12.1').
+2025-06-25T02:36:32.7294671Z -- Configuring x86-windows
+2025-06-25T02:36:33.9365023Z -- Building x86-windows-dbg
+2025-06-25T02:36:34.1934375Z -- Building x86-windows-rel
+2025-06-25T02:36:34.6366924Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/opusfile_x86-windows/lib/pkgconfig/opusfile.pc
+2025-06-25T02:36:34.6473314Z -- Using cached msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:36:34.6543519Z -- Using cached msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:36:34.6547734Z -- Using msys root at D:/a/synthizer3d/synthizer3d/vcpkg/downloads/tools/msys2/21caed2f81ec917b
+2025-06-25T02:36:34.6621997Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/opusfile_x86-windows/debug/lib/pkgconfig/opusfile.pc
+2025-06-25T02:36:34.6719966Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/opusfile_x86-windows/share/opusfile/copyright
+2025-06-25T02:36:34.6729362Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/opusfile_x86-windows/share/opusfile/usage
+2025-06-25T02:36:34.6783330Z -- Performing post-build validation
+2025-06-25T02:36:34.6851879Z Elapsed time to handle opusfile:x86-windows: 2.4 s
+2025-06-25T02:36:34.6852588Z opusfile:x86-windows package ABI: 558f8d0c1725b77c6cd28062f718be9e4baef5d64a4d6297e504b882d2ce8a04
+2025-06-25T02:36:34.6853064Z Installing 8/10 atl:x86-windows@0...
+2025-06-25T02:36:34.6853366Z Building atl:x86-windows@0...
+2025-06-25T02:36:34.7210205Z -- Skipping post-build validation due to VCPKG_POLICY_EMPTY_PACKAGE
+2025-06-25T02:36:34.7232709Z Elapsed time to handle atl:x86-windows: 38 ms
+2025-06-25T02:36:34.7233509Z atl:x86-windows package ABI: 342d8acf1d4b00c8d8f5437e477585b33bd67c023be49b90ef63dc559637cb14
+2025-06-25T02:36:34.7234100Z Installing 9/10 atlmfc:x86-windows@0#3...
+2025-06-25T02:36:34.7234468Z Building atlmfc:x86-windows@0#3...
+2025-06-25T02:36:34.7589617Z -- Skipping post-build validation due to VCPKG_POLICY_EMPTY_PACKAGE
+2025-06-25T02:36:34.7612321Z Elapsed time to handle atlmfc:x86-windows: 37.9 ms
+2025-06-25T02:36:34.7613081Z atlmfc:x86-windows package ABI: a0ff26a5f4a3e69d6e49f9851c85c9537d1d5ce7c541b6be746af6ec50c22239
+2025-06-25T02:36:34.7613716Z Installing 10/10 soundtouch:x86-windows@2.3.3...
+2025-06-25T02:36:34.7614110Z Building soundtouch:x86-windows@2.3.3...
+2025-06-25T02:36:34.8023728Z Downloading https://codeberg.org/soundtouch/soundtouch/archive/2.3.3.tar.gz -> soundtouch-soundtouch-2.3.3.tar.gz
+2025-06-25T02:36:35.8685633Z Successfully downloaded soundtouch-soundtouch-2.3.3.tar.gz
+2025-06-25T02:36:35.8806048Z -- Extracting source D:/a/synthizer3d/synthizer3d/vcpkg/downloads/soundtouch-soundtouch-2.3.3.tar.gz
+2025-06-25T02:36:36.0281718Z -- Using source at D:/a/synthizer3d/synthizer3d/vcpkg/buildtrees/soundtouch/src/2.3.3-309213044d.clean
+2025-06-25T02:36:36.0397424Z -- Found external ninja('1.12.1').
+2025-06-25T02:36:36.0430402Z -- Configuring x86-windows
+2025-06-25T02:36:37.4549993Z -- Building x86-windows-dbg
+2025-06-25T02:36:39.5789894Z -- Building x86-windows-rel
+2025-06-25T02:36:41.7982836Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/soundtouch_x86-windows/lib/pkgconfig/soundtouch.pc
+2025-06-25T02:36:41.8087604Z -- Using cached msys2-mingw-w64-x86_64-pkgconf-1~2.3.0-1-any.pkg.tar.zst
+2025-06-25T02:36:41.8156789Z -- Using cached msys2-msys2-runtime-3.5.4-2-x86_64.pkg.tar.zst
+2025-06-25T02:36:41.8160825Z -- Using msys root at D:/a/synthizer3d/synthizer3d/vcpkg/downloads/tools/msys2/21caed2f81ec917b
+2025-06-25T02:36:41.8228050Z -- Fixing pkgconfig file: D:/a/synthizer3d/synthizer3d/vcpkg/packages/soundtouch_x86-windows/debug/lib/pkgconfig/soundtouch.pc
+2025-06-25T02:36:41.8679208Z -- Installing: D:/a/synthizer3d/synthizer3d/vcpkg/packages/soundtouch_x86-windows/share/soundtouch/copyright
+2025-06-25T02:36:41.8737911Z -- Performing post-build validation
+2025-06-25T02:36:41.8836580Z Elapsed time to handle soundtouch:x86-windows: 7.1 s
+2025-06-25T02:36:41.8837457Z soundtouch:x86-windows package ABI: a4eae149255f87cebc15fabf8773d05c612b36e615eedb07f38d5b9c01102cba
+2025-06-25T02:36:41.8857270Z faad2 provides pkg-config modules:
+2025-06-25T02:36:41.8857491Z 
+2025-06-25T02:36:41.8857683Z   # Freeware Advanced Audio (AAC) Decoder
+2025-06-25T02:36:41.8857978Z   faad2
+2025-06-25T02:36:41.8858085Z 
+2025-06-25T02:36:41.8859591Z libogg provides CMake targets:
+2025-06-25T02:36:41.8859779Z 
+2025-06-25T02:36:41.8860069Z   # this is heuristically generated, and may not be correct
+2025-06-25T02:36:41.8860939Z   find_package(Ogg CONFIG REQUIRED)
+2025-06-25T02:36:41.8861466Z   target_link_libraries(main PRIVATE Ogg::ogg)
+2025-06-25T02:36:41.8861703Z 
+2025-06-25T02:36:41.8861869Z libogg provides pkg-config modules:
+2025-06-25T02:36:41.8862060Z 
+2025-06-25T02:36:41.8862283Z   # ogg is a library for manipulating ogg bitstreams
+2025-06-25T02:36:41.8862577Z   ogg
+2025-06-25T02:36:41.8862691Z 
+2025-06-25T02:36:41.8862867Z The package libvorbis provides CMake targets:
+2025-06-25T02:36:41.8863051Z 
+2025-06-25T02:36:41.8863239Z     # Vorbis reference encoder and decoder, low-level API
+2025-06-25T02:36:41.8863569Z     find_package(Vorbis CONFIG REQUIRED)
+2025-06-25T02:36:41.8864073Z     target_link_libraries(main PRIVATE Vorbis::vorbis)
+2025-06-25T02:36:41.8864674Z 
+2025-06-25T02:36:41.8864933Z     # Audio stream decoding and basic manipulation, high-level API
+2025-06-25T02:36:41.8865300Z     find_package(Vorbis CONFIG REQUIRED)
+2025-06-25T02:36:41.8865684Z     target_link_libraries(main PRIVATE Vorbis::vorbisfile)
+2025-06-25T02:36:41.8865885Z 
+2025-06-25T02:36:41.8866086Z     # Convenience API for setting up an encoding environment
+2025-06-25T02:36:41.8866422Z     find_package(Vorbis CONFIG REQUIRED)
+2025-06-25T02:36:41.8866770Z     target_link_libraries(main PRIVATE Vorbis::vorbisenc)
+2025-06-25T02:36:41.8866965Z 
+2025-06-25T02:36:41.8867085Z opus provides CMake targets:
+2025-06-25T02:36:41.8867223Z 
+2025-06-25T02:36:41.8867417Z   # this is heuristically generated, and may not be correct
+2025-06-25T02:36:41.8867756Z   find_package(Opus CONFIG REQUIRED)
+2025-06-25T02:36:41.8868084Z   target_link_libraries(main PRIVATE Opus::opus)
+2025-06-25T02:36:41.8868266Z 
+2025-06-25T02:36:41.8868398Z opus provides pkg-config modules:
+2025-06-25T02:36:41.8868547Z 
+2025-06-25T02:36:41.8868669Z   # Opus IETF audio codec ( build)
+2025-06-25T02:36:41.8868896Z   opus
+2025-06-25T02:36:41.8869030Z 
+2025-06-25T02:36:41.8869319Z The package opusfile provides CMake targets:
+2025-06-25T02:36:41.8870398Z 
+2025-06-25T02:36:41.8870602Z     find_package(OpusFile CONFIG REQUIRED)
+2025-06-25T02:36:41.8871140Z     target_link_libraries(main PRIVATE OpusFile::opusfile)
+2025-06-25T02:36:41.8871361Z 
+2025-06-25T02:36:41.8871478Z     # To use the opusurl API
+2025-06-25T02:36:41.8871811Z     target_link_libraries(main PRIVATE OpusFile::opusurl)
+2025-06-25T02:36:41.8872010Z 
+2025-06-25T02:36:41.8872143Z soundtouch provides CMake targets:
+2025-06-25T02:36:41.8872470Z 
+2025-06-25T02:36:41.8872690Z   # this is heuristically generated, and may not be correct
+2025-06-25T02:36:41.8873047Z   find_package(SoundTouch CONFIG REQUIRED)
+2025-06-25T02:36:41.8873436Z   target_link_libraries(main PRIVATE SoundTouch::SoundTouch)
+2025-06-25T02:36:41.8873652Z 
+2025-06-25T02:36:41.8873794Z soundtouch provides pkg-config modules:
+2025-06-25T02:36:41.8873957Z 
+2025-06-25T02:36:41.8874454Z   # SoundTouch is an open-source audio processing library for changing the Tempo, Pitch and Playback Rates of audio streams or files
+2025-06-25T02:36:41.8874949Z   soundtouch
+2025-06-25T02:36:41.8875047Z 
+2025-06-25T02:36:41.8875266Z All requested installations completed successfully in: 59 s
+2025-06-25T02:36:41.8980672Z Finished vcpkg install command.
+2025-06-25T02:36:41.9272850Z Verifying existence of target CMAKE_PREFIX_PATH: D:\a\synthizer3d\synthizer3d\vcpkg_installed\x86-windows
+2025-06-25T02:36:41.9306179Z Confermato: La directory target per CMAKE_PREFIX_PATH esiste: D:\a\synthizer3d\synthizer3d\vcpkg_installed\x86-windows
+2025-06-25T02:36:41.9444613Z CMAKE_PREFIX_PATH impostato a D:\a\synthizer3d\synthizer3d\vcpkg_installed\x86-windows
+2025-06-25T02:36:41.9798099Z ##[group]Run python -m pip install --upgrade pip
+2025-06-25T02:36:41.9798598Z [36;1mpython -m pip install --upgrade pip[0m
+2025-06-25T02:36:41.9799587Z [36;1mpip install ninja cmake wheel tomli setuptools packaging distro scikit-build cython build delvewheel[0m
+2025-06-25T02:36:41.9834555Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+2025-06-25T02:36:41.9834854Z env:
+2025-06-25T02:36:41.9835004Z   PYVERSION: 3.8
+2025-06-25T02:36:41.9835169Z   CI_ARCH_LOWER: x86
+2025-06-25T02:36:41.9835335Z   CI_WINDOWS: 1
+2025-06-25T02:36:41.9835488Z   CI_ARCH_ENV: x86
+2025-06-25T02:36:41.9835668Z   VCPKG_DEFAULT_TRIPLET: x86-windows
+2025-06-25T02:36:41.9836013Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: D:\a\synthizer3d\synthizer3d\vcpkg_installed
+2025-06-25T02:36:41.9836431Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:36:41.9836818Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.8.10\x86/lib/pkgconfig
+2025-06-25T02:36:41.9837275Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:36:41.9837612Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:36:41.9837960Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:36:41.9838244Z   CommandPromptType: Native
+2025-06-25T02:36:41.9838570Z   DevEnvDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\
+2025-06-25T02:36:41.9839033Z   ExtensionSdkDir: C:\Program Files (x86)\Microsoft SDKs\Windows Kits\10\ExtensionSDKs
+2025-06-25T02:36:41.9841024Z   EXTERNAL_INCLUDE: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\include;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ATLMFC\include;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\VS\include;C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\shared;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\winrt;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um
+2025-06-25T02:36:41.9842889Z   Framework40Version: v4.0
+2025-06-25T02:36:41.9843123Z   FrameworkDir: C:\Windows\Microsoft.NET\Framework\
+2025-06-25T02:36:41.9843573Z   FrameworkDir32: C:\Windows\Microsoft.NET\Framework\
+2025-06-25T02:36:41.9843829Z   FrameworkVersion: v4.0.30319
+2025-06-25T02:36:41.9844035Z   FrameworkVersion32: v4.0.30319
+2025-06-25T02:36:41.9844501Z   FSHARPINSTALLDIR: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\FSharp\Tools
+2025-06-25T02:36:41.9845033Z   HTMLHelpDir: C:\Program Files (x86)\HTML Help Workshop
+2025-06-25T02:36:41.9845454Z   IFCPATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ifc\x86
+2025-06-25T02:36:41.9847444Z   INCLUDE: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\include;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ATLMFC\include;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\VS\include;C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\shared;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\winrt;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um
+2025-06-25T02:36:41.9851743Z   LIB: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ATLMFC\lib\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\lib\x86;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\lib\um\x86;C:\Program Files (x86)\Windows Kits\10\lib\10.0.26100.0\ucrt\x86;C:\Program Files (x86)\Windows Kits\10\\lib\10.0.26100.0\\um\x86
+2025-06-25T02:36:41.9854028Z   LIBPATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ATLMFC\lib\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\lib\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\lib\x86\store\references;C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.26100.0;C:\Program Files (x86)\Windows Kits\10\References\10.0.26100.0;C:\Windows\Microsoft.NET\Framework\v4.0.30319
+2025-06-25T02:36:41.9855481Z   NETFXSDKDir: C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\
+2025-06-25T02:36:41.9868834Z   Path: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\bin\HostX86\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\VC\VCPackages;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\bin\Roslyn;C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\;C:\Program Files (x86)\HTML Help Workshop;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\FSharp\Tools;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Team Tools\DiagnosticsHub\Collector;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\Extensions\Microsoft\CodeCoverage.Console;C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\\x86;C:\Program Files (x86)\Windows Kits\10\bin\\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\\MSBuild\Current\Bin\amd64;C:\Windows\Microsoft.NET\Framework\v4.0.30319;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\;C:\Users\runneradmin\AppData\Roaming\Python\Python38\Scripts;C:\hostedtoolcache\windows\Python\3.8.10\x86\Scripts;C:\hostedtoolcache\windows\Python\3.8.10\x86;C:\Program Files\MongoDB\Server\5.0\bin;C:\aliyun-cli;C:\vcpkg;C:\Program Files (x86)\NSIS\;C:\tools\zstd;C:\Program Files\Mercurial\;C:\hostedtoolcache\windows\stack\3.5.1\x64;C:\cabal\bin;C:\\ghcup\bin;C:\mingw64\bin;C:\Program Files\dotnet;C:\Program Files\MySQL\MySQL Server 8.0\bin;C:\Program Files\R\R-4.4.2\bin\x64;C:\SeleniumWebDrivers\GeckoDriver;C:\SeleniumWebDrivers\EdgeDriver\;C:\SeleniumWebDrivers\ChromeDriver;C:\Program Files (x86)\sbt\bin;C:\Program Files (x86)\GitHub CLI;C:\Program Files\Git\bin;C:\Program Files (x86)\pipx_bin;C:\npm\prefix;C:\hostedtoolcache\windows\go\1.24.3\x64\bin;C:\hostedtoolcache\windows\Python\3.9.13\x64\Scripts;C:\hostedtoolcache\windows\Python\3.9.13\x64;C:\hostedtoolcache\windows\Ruby\3.3.8\x64\bin;C:\Program Files\OpenSSL\bin;C:\tools\kotlinc\bin;C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\8.0.452-9\x64\bin;C:\Program Files\ImageMagick-7.1.1-Q16-HDRI;C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin;C:\ProgramData\kind;C:\ProgramData\Chocolatey\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\PowerShell\7\;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files\TortoiseSVN\bin;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\WiX Toolset v3.14\bin;C:\Program Files\Microsoft SQL Server\130\DTS\Binn\;C:\Program Files\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files\Microsoft SQL Server\150\DTS\Binn\;C:\Program Files\Microsoft SQL Server\160\DTS\Binn\;C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\ProgramData\chocolatey\lib\pulumi\tools\Pulumi\bin;C:\Program Files\CMake\bin;C:\ProgramData\chocolatey\lib\maven\apache-maven-3.9.9\bin;C:\Program Files\Microsoft Service Fabric\bin\Fabric\Fabric.Code;C:\Program Files\Microsoft SDKs\Service Fabric\Tools\ServiceFabricLocalClusterManager;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Program Files\GitHub CLI\;c:\tools\php;C:\Program Files\Amazon\AWSCLIV2\;C:\Program Files\Amazon\SessionManagerPlugin\bin\;C:\Program Files\Amazon\AWSSAMCLI\bin\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\LLVM\bin;C:\Users\runneradmin\.dotnet\tools;C:\Users\runneradmin\.cargo\bin;C:\Users\runneradmin\AppData\Local\Microsoft\WindowsApps;C:\Program Files (x86)\Microsoft Visual Studio\Installer;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\Llvm\bin;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\VC\Linux\bin\ConnectionManagerExe;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\vcpkg
+2025-06-25T02:36:41.9881908Z   Platform: x86
+2025-06-25T02:36:41.9882077Z   UCRTVersion: 10.0.26100.0
+2025-06-25T02:36:41.9882338Z   UniversalCRTSdkDir: C:\Program Files (x86)\Windows Kits\10\
+2025-06-25T02:36:41.9882779Z   VCIDEInstallDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\VC\
+2025-06-25T02:36:41.9883249Z   VCINSTALLDIR: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\
+2025-06-25T02:36:41.9883601Z   VCPKG_ROOT: D:\a\synthizer3d\synthizer3d\vcpkg
+2025-06-25T02:36:41.9884024Z   VCToolsInstallDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\
+2025-06-25T02:36:41.9884608Z   VCToolsRedistDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Redist\MSVC\14.42.34433\
+2025-06-25T02:36:41.9885015Z   VCToolsVersion: 14.43.34808
+2025-06-25T02:36:41.9885210Z   VisualStudioVersion: 17.0
+2025-06-25T02:36:41.9885552Z   VS170COMNTOOLS: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\
+2025-06-25T02:36:41.9885912Z   VSCMD_ARG_app_plat: Desktop
+2025-06-25T02:36:41.9886104Z   VSCMD_ARG_HOST_ARCH: x86
+2025-06-25T02:36:41.9886290Z   VSCMD_ARG_TGT_ARCH: x86
+2025-06-25T02:36:41.9886471Z   VSCMD_VER: 17.13.2
+2025-06-25T02:36:41.9886827Z   VSINSTALLDIR: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
+2025-06-25T02:36:41.9887249Z   VSSDK150INSTALL: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VSSDK
+2025-06-25T02:36:41.9887681Z   VSSDKINSTALL: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VSSDK
+2025-06-25T02:36:41.9888274Z   WindowsLibPath: C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.26100.0;C:\Program Files (x86)\Windows Kits\10\References\10.0.26100.0
+2025-06-25T02:36:41.9888840Z   WindowsSdkBinPath: C:\Program Files (x86)\Windows Kits\10\bin\
+2025-06-25T02:36:41.9889176Z   WindowsSdkDir: C:\Program Files (x86)\Windows Kits\10\
+2025-06-25T02:36:41.9889443Z   WindowsSDKLibVersion: 10.0.26100.0\
+2025-06-25T02:36:41.9889766Z   WindowsSdkVerBinPath: C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\
+2025-06-25T02:36:41.9890095Z   WindowsSDKVersion: 10.0.26100.0\
+2025-06-25T02:36:41.9890486Z   WindowsSDK_ExecutablePath_x64: C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\x64\
+2025-06-25T02:36:41.9891072Z   WindowsSDK_ExecutablePath_x86: C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\
+2025-06-25T02:36:41.9891468Z   __DOTNET_ADD_32BIT: 1
+2025-06-25T02:36:41.9891644Z   __DOTNET_PREFERRED_BITNESS: 32
+2025-06-25T02:36:41.9899511Z   __VSCMD_PREINIT_PATH: C:\Users\runneradmin\AppData\Roaming\Python\Python38\Scripts;C:\hostedtoolcache\windows\Python\3.8.10\x86\Scripts;C:\hostedtoolcache\windows\Python\3.8.10\x86;C:\Program Files\MongoDB\Server\5.0\bin;C:\aliyun-cli;C:\vcpkg;C:\Program Files (x86)\NSIS\;C:\tools\zstd;C:\Program Files\Mercurial\;C:\hostedtoolcache\windows\stack\3.5.1\x64;C:\cabal\bin;C:\\ghcup\bin;C:\mingw64\bin;C:\Program Files\dotnet;C:\Program Files\MySQL\MySQL Server 8.0\bin;C:\Program Files\R\R-4.4.2\bin\x64;C:\SeleniumWebDrivers\GeckoDriver;C:\SeleniumWebDrivers\EdgeDriver\;C:\SeleniumWebDrivers\ChromeDriver;C:\Program Files (x86)\sbt\bin;C:\Program Files (x86)\GitHub CLI;C:\Program Files\Git\bin;C:\Program Files (x86)\pipx_bin;C:\npm\prefix;C:\hostedtoolcache\windows\go\1.24.3\x64\bin;C:\hostedtoolcache\windows\Python\3.9.13\x64\Scripts;C:\hostedtoolcache\windows\Python\3.9.13\x64;C:\hostedtoolcache\windows\Ruby\3.3.8\x64\bin;C:\Program Files\OpenSSL\bin;C:\tools\kotlinc\bin;C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\8.0.452-9\x64\bin;C:\Program Files\ImageMagick-7.1.1-Q16-HDRI;C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin;C:\ProgramData\kind;C:\ProgramData\Chocolatey\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\PowerShell\7\;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files\TortoiseSVN\bin;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\WiX Toolset v3.14\bin;C:\Program Files\Microsoft SQL Server\130\DTS\Binn\;C:\Program Files\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files\Microsoft SQL Server\150\DTS\Binn\;C:\Program Files\Microsoft SQL Server\160\DTS\Binn\;C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\ProgramData\chocolatey\lib\pulumi\tools\Pulumi\bin;C:\Program Files\CMake\bin;C:\ProgramData\chocolatey\lib\maven\apache-maven-3.9.9\bin;C:\Program Files\Microsoft Service Fabric\bin\Fabric\Fabric.Code;C:\Program Files\Microsoft SDKs\Service Fabric\Tools\ServiceFabricLocalClusterManager;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Program Files\GitHub CLI\;c:\tools\php;C:\Program Files (x86)\sbt\bin;C:\Program Files\Amazon\AWSCLIV2\;C:\Program Files\Amazon\SessionManagerPlugin\bin\;C:\Program Files\Amazon\AWSSAMCLI\bin\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\LLVM\bin;C:\Users\runneradmin\.dotnet\tools;C:\Users\runneradmin\.cargo\bin;C:\Users\runneradmin\AppData\Local\Microsoft\WindowsApps;C:\Program Files (x86)\Microsoft Visual Studio\Installer
+2025-06-25T02:36:41.9907725Z   VCPKG_DEFAULT_BINARY_CACHE: D:/a/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_cache
+2025-06-25T02:36:41.9908168Z   VCPKG_BINARY_SOURCES: clear;x-gha,readwrite
+2025-06-25T02:36:41.9908704Z   ACTIONS_CACHE_URL: https://acghubeus2.actions.githubusercontent.com/bwbzopuV3oKlbowlUKWdOnf6KF0vjv7EYqCB3ZHqukKhTVgy74/
+2025-06-25T02:36:41.9940380Z   ACTIONS_RUNTIME_TOKEN: ***
+2025-06-25T02:36:41.9940643Z   RUNVCPKG_VCPKG_ROOT: D:\a\synthizer3d\synthizer3d\vcpkg
+2025-06-25T02:36:41.9941017Z   CMAKE_PREFIX_PATH: D:\a\synthizer3d\synthizer3d\vcpkg_installed\x86-windows
+2025-06-25T02:36:41.9941325Z ##[endgroup]
+2025-06-25T02:36:43.1592704Z Requirement already satisfied: pip in c:\hostedtoolcache\windows\python\3.8.10\x86\lib\site-packages (25.0.1)
+2025-06-25T02:36:44.2885752Z Collecting ninja
+2025-06-25T02:36:44.2917708Z   Using cached ninja-1.11.1.4-py3-none-win32.whl.metadata (5.0 kB)
+2025-06-25T02:36:44.4385387Z Collecting cmake
+2025-06-25T02:36:44.4418413Z   Using cached cmake-4.0.3-py3-none-win32.whl.metadata (6.3 kB)
+2025-06-25T02:36:44.4810203Z Collecting wheel
+2025-06-25T02:36:44.4841887Z   Using cached wheel-0.45.1-py3-none-any.whl.metadata (2.3 kB)
+2025-06-25T02:36:44.5128721Z Collecting tomli
+2025-06-25T02:36:44.5160882Z   Using cached tomli-2.2.1-py3-none-any.whl.metadata (10 kB)
+2025-06-25T02:36:44.5183842Z Requirement already satisfied: setuptools in c:\hostedtoolcache\windows\python\3.8.10\x86\lib\site-packages (56.0.0)
+2025-06-25T02:36:44.5464974Z Collecting packaging
+2025-06-25T02:36:44.5496617Z   Using cached packaging-25.0-py3-none-any.whl.metadata (3.3 kB)
+2025-06-25T02:36:44.5739105Z Collecting distro
+2025-06-25T02:36:44.5771003Z   Using cached distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+2025-06-25T02:36:44.6076586Z Collecting scikit-build
+2025-06-25T02:36:44.6098032Z   Using cached scikit_build-0.18.1-py3-none-any.whl.metadata (18 kB)
+2025-06-25T02:36:44.8649718Z Collecting cython
+2025-06-25T02:36:44.8683639Z   Using cached cython-3.1.2-cp38-cp38-win32.whl.metadata (5.8 kB)
+2025-06-25T02:36:44.9284321Z Collecting build
+2025-06-25T02:36:44.9316226Z   Using cached build-1.2.2.post1-py3-none-any.whl.metadata (6.5 kB)
+2025-06-25T02:36:44.9914980Z Collecting delvewheel
+2025-06-25T02:36:44.9946173Z   Using cached delvewheel-1.10.0-py3-none-any.whl.metadata (17 kB)
+2025-06-25T02:36:45.0426508Z Collecting pyproject_hooks (from build)
+2025-06-25T02:36:45.0458357Z   Using cached pyproject_hooks-1.2.0-py3-none-any.whl.metadata (1.3 kB)
+2025-06-25T02:36:45.0776565Z Collecting colorama (from build)
+2025-06-25T02:36:45.0809187Z   Using cached colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)
+2025-06-25T02:36:45.1299680Z Collecting importlib-metadata>=4.6 (from build)
+2025-06-25T02:36:45.1354823Z   Using cached importlib_metadata-8.5.0-py3-none-any.whl.metadata (4.8 kB)
+2025-06-25T02:36:45.1685052Z Collecting pefile>=2024.8.26 (from delvewheel)
+2025-06-25T02:36:45.1717060Z   Using cached pefile-2024.8.26-py3-none-any.whl.metadata (1.4 kB)
+2025-06-25T02:36:45.2203770Z Collecting zipp>=3.20 (from importlib-metadata>=4.6->build)
+2025-06-25T02:36:45.2235126Z   Using cached zipp-3.20.2-py3-none-any.whl.metadata (3.7 kB)
+2025-06-25T02:36:45.2384213Z Using cached ninja-1.11.1.4-py3-none-win32.whl (255 kB)
+2025-06-25T02:36:45.2416363Z Using cached cmake-4.0.3-py3-none-win32.whl (33.7 MB)
+2025-06-25T02:36:45.2606874Z Using cached wheel-0.45.1-py3-none-any.whl (72 kB)
+2025-06-25T02:36:45.2668165Z Using cached tomli-2.2.1-py3-none-any.whl (14 kB)
+2025-06-25T02:36:45.2699937Z Using cached packaging-25.0-py3-none-any.whl (66 kB)
+2025-06-25T02:36:45.2731785Z Using cached distro-1.9.0-py3-none-any.whl (20 kB)
+2025-06-25T02:36:45.2763578Z Using cached scikit_build-0.18.1-py3-none-any.whl (85 kB)
+2025-06-25T02:36:45.2795706Z Using cached cython-3.1.2-cp38-cp38-win32.whl (2.5 MB)
+2025-06-25T02:36:45.2839080Z Using cached build-1.2.2.post1-py3-none-any.whl (22 kB)
+2025-06-25T02:36:45.2871452Z Using cached delvewheel-1.10.0-py3-none-any.whl (58 kB)
+2025-06-25T02:36:45.2905401Z Using cached importlib_metadata-8.5.0-py3-none-any.whl (26 kB)
+2025-06-25T02:36:45.2937462Z Using cached pefile-2024.8.26-py3-none-any.whl (74 kB)
+2025-06-25T02:36:45.2970075Z Using cached colorama-0.4.6-py2.py3-none-any.whl (25 kB)
+2025-06-25T02:36:45.3001926Z Using cached pyproject_hooks-1.2.0-py3-none-any.whl (10 kB)
+2025-06-25T02:36:45.3033668Z Using cached zipp-3.20.2-py3-none-any.whl (9.2 kB)
+2025-06-25T02:36:45.7999065Z Installing collected packages: zipp, wheel, tomli, pyproject_hooks, pefile, packaging, ninja, distro, cython, colorama, cmake, scikit-build, importlib-metadata, delvewheel, build
+2025-06-25T02:36:57.4296048Z Successfully installed build-1.2.2.post1 cmake-4.0.3 colorama-0.4.6 cython-3.1.2 delvewheel-1.10.0 distro-1.9.0 importlib-metadata-8.5.0 ninja-1.11.1.4 packaging-25.0 pefile-2024.8.26 pyproject_hooks-1.2.0 scikit-build-0.18.1 tomli-2.2.1 wheel-0.45.1 zipp-3.20.2
+2025-06-25T02:36:57.5712055Z ##[group]Run Set-Location $Env:GITHUB_WORKSPACE
+2025-06-25T02:36:57.5712461Z [36;1mSet-Location $Env:GITHUB_WORKSPACE[0m
+2025-06-25T02:36:57.5712717Z [36;1mWrite-Host "Arch: x86"[0m
+2025-06-25T02:36:57.5713080Z [36;1mWrite-Host "Current CMAKE_PREFIX_PATH for build is: $env:CMAKE_PREFIX_PATH"[0m
+2025-06-25T02:36:57.5713643Z [36;1mWrite-Host "EFFECTIVE_VCPKG_INSTALLED_DIR_BASE for build is: $env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE"[0m
+2025-06-25T02:36:57.5714310Z [36;1mWrite-Host "Synthizer expects vcpkg path (for debug/verification): $env:SYNTHIZER_EXPECTED_VCPKG_PATH_FOR_DEBUG"[0m
+2025-06-25T02:36:57.5714804Z [36;1mpython -m build --wheel --no-isolation[0m
+2025-06-25T02:36:57.5748082Z shell: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.EXE -command ". '{0}'"
+2025-06-25T02:36:57.5748456Z env:
+2025-06-25T02:36:57.5748612Z   PYVERSION: 3.8
+2025-06-25T02:36:57.5748778Z   CI_ARCH_LOWER: x86
+2025-06-25T02:36:57.5748953Z   CI_WINDOWS: 1
+2025-06-25T02:36:57.5749283Z   CI_ARCH_ENV: x86
+2025-06-25T02:36:57.5749600Z   VCPKG_DEFAULT_TRIPLET: x86-windows
+2025-06-25T02:36:57.5749985Z   EFFECTIVE_VCPKG_INSTALLED_DIR_BASE: D:\a\synthizer3d\synthizer3d\vcpkg_installed
+2025-06-25T02:36:57.5750425Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:36:57.5750826Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.8.10\x86/lib/pkgconfig
+2025-06-25T02:36:57.5751217Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:36:57.5751572Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:36:57.5751923Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.8.10\x86
+2025-06-25T02:36:57.5752212Z   CommandPromptType: Native
+2025-06-25T02:36:57.5752527Z   DevEnvDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\
+2025-06-25T02:36:57.5752994Z   ExtensionSdkDir: C:\Program Files (x86)\Microsoft SDKs\Windows Kits\10\ExtensionSDKs
+2025-06-25T02:36:57.5754995Z   EXTERNAL_INCLUDE: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\include;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ATLMFC\include;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\VS\include;C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\shared;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\winrt;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um
+2025-06-25T02:36:57.5756875Z   Framework40Version: v4.0
+2025-06-25T02:36:57.5757121Z   FrameworkDir: C:\Windows\Microsoft.NET\Framework\
+2025-06-25T02:36:57.5757424Z   FrameworkDir32: C:\Windows\Microsoft.NET\Framework\
+2025-06-25T02:36:57.5757677Z   FrameworkVersion: v4.0.30319
+2025-06-25T02:36:57.5757887Z   FrameworkVersion32: v4.0.30319
+2025-06-25T02:36:57.5759213Z   FSHARPINSTALLDIR: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\FSharp\Tools
+2025-06-25T02:36:57.5759759Z   HTMLHelpDir: C:\Program Files (x86)\HTML Help Workshop
+2025-06-25T02:36:57.5760193Z   IFCPATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ifc\x86
+2025-06-25T02:36:57.5763637Z   INCLUDE: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\include;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ATLMFC\include;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\VS\include;C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\shared;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\winrt;C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um
+2025-06-25T02:36:57.5766429Z   LIB: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ATLMFC\lib\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\lib\x86;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\lib\um\x86;C:\Program Files (x86)\Windows Kits\10\lib\10.0.26100.0\ucrt\x86;C:\Program Files (x86)\Windows Kits\10\\lib\10.0.26100.0\\um\x86
+2025-06-25T02:36:57.5768671Z   LIBPATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\ATLMFC\lib\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\lib\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\lib\x86\store\references;C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.26100.0;C:\Program Files (x86)\Windows Kits\10\References\10.0.26100.0;C:\Windows\Microsoft.NET\Framework\v4.0.30319
+2025-06-25T02:36:57.5770106Z   NETFXSDKDir: C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\
+2025-06-25T02:36:57.5783392Z   Path: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\bin\HostX86\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\VC\VCPackages;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\bin\Roslyn;C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\;C:\Program Files (x86)\HTML Help Workshop;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\FSharp\Tools;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Team Tools\DiagnosticsHub\Collector;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\Extensions\Microsoft\CodeCoverage.Console;C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\\x86;C:\Program Files (x86)\Windows Kits\10\bin\\x86;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\\MSBuild\Current\Bin\amd64;C:\Windows\Microsoft.NET\Framework\v4.0.30319;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\;C:\Users\runneradmin\AppData\Roaming\Python\Python38\Scripts;C:\hostedtoolcache\windows\Python\3.8.10\x86\Scripts;C:\hostedtoolcache\windows\Python\3.8.10\x86;C:\Program Files\MongoDB\Server\5.0\bin;C:\aliyun-cli;C:\vcpkg;C:\Program Files (x86)\NSIS\;C:\tools\zstd;C:\Program Files\Mercurial\;C:\hostedtoolcache\windows\stack\3.5.1\x64;C:\cabal\bin;C:\\ghcup\bin;C:\mingw64\bin;C:\Program Files\dotnet;C:\Program Files\MySQL\MySQL Server 8.0\bin;C:\Program Files\R\R-4.4.2\bin\x64;C:\SeleniumWebDrivers\GeckoDriver;C:\SeleniumWebDrivers\EdgeDriver\;C:\SeleniumWebDrivers\ChromeDriver;C:\Program Files (x86)\sbt\bin;C:\Program Files (x86)\GitHub CLI;C:\Program Files\Git\bin;C:\Program Files (x86)\pipx_bin;C:\npm\prefix;C:\hostedtoolcache\windows\go\1.24.3\x64\bin;C:\hostedtoolcache\windows\Python\3.9.13\x64\Scripts;C:\hostedtoolcache\windows\Python\3.9.13\x64;C:\hostedtoolcache\windows\Ruby\3.3.8\x64\bin;C:\Program Files\OpenSSL\bin;C:\tools\kotlinc\bin;C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\8.0.452-9\x64\bin;C:\Program Files\ImageMagick-7.1.1-Q16-HDRI;C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin;C:\ProgramData\kind;C:\ProgramData\Chocolatey\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\PowerShell\7\;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files\TortoiseSVN\bin;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\WiX Toolset v3.14\bin;C:\Program Files\Microsoft SQL Server\130\DTS\Binn\;C:\Program Files\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files\Microsoft SQL Server\150\DTS\Binn\;C:\Program Files\Microsoft SQL Server\160\DTS\Binn\;C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\ProgramData\chocolatey\lib\pulumi\tools\Pulumi\bin;C:\Program Files\CMake\bin;C:\ProgramData\chocolatey\lib\maven\apache-maven-3.9.9\bin;C:\Program Files\Microsoft Service Fabric\bin\Fabric\Fabric.Code;C:\Program Files\Microsoft SDKs\Service Fabric\Tools\ServiceFabricLocalClusterManager;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Program Files\GitHub CLI\;c:\tools\php;C:\Program Files\Amazon\AWSCLIV2\;C:\Program Files\Amazon\SessionManagerPlugin\bin\;C:\Program Files\Amazon\AWSSAMCLI\bin\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\LLVM\bin;C:\Users\runneradmin\.dotnet\tools;C:\Users\runneradmin\.cargo\bin;C:\Users\runneradmin\AppData\Local\Microsoft\WindowsApps;C:\Program Files (x86)\Microsoft Visual Studio\Installer;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\Llvm\bin;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\VC\Linux\bin\ConnectionManagerExe;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\vcpkg
+2025-06-25T02:36:57.5796477Z   Platform: x86
+2025-06-25T02:36:57.5796646Z   UCRTVersion: 10.0.26100.0
+2025-06-25T02:36:57.5796916Z   UniversalCRTSdkDir: C:\Program Files (x86)\Windows Kits\10\
+2025-06-25T02:36:57.5797356Z   VCIDEInstallDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\VC\
+2025-06-25T02:36:57.5797820Z   VCINSTALLDIR: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\
+2025-06-25T02:36:57.5798188Z   VCPKG_ROOT: D:\a\synthizer3d\synthizer3d\vcpkg
+2025-06-25T02:36:57.5798619Z   VCToolsInstallDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.43.34808\
+2025-06-25T02:36:57.5799207Z   VCToolsRedistDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Redist\MSVC\14.42.34433\
+2025-06-25T02:36:57.5799606Z   VCToolsVersion: 14.43.34808
+2025-06-25T02:36:57.5799819Z   VisualStudioVersion: 17.0
+2025-06-25T02:36:57.5800158Z   VS170COMNTOOLS: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\
+2025-06-25T02:36:57.5800526Z   VSCMD_ARG_app_plat: Desktop
+2025-06-25T02:36:57.5800725Z   VSCMD_ARG_HOST_ARCH: x86
+2025-06-25T02:36:57.5800911Z   VSCMD_ARG_TGT_ARCH: x86
+2025-06-25T02:36:57.5801088Z   VSCMD_VER: 17.13.2
+2025-06-25T02:36:57.5801353Z   VSINSTALLDIR: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
+2025-06-25T02:36:57.5801785Z   VSSDK150INSTALL: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VSSDK
+2025-06-25T02:36:57.5802311Z   VSSDKINSTALL: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VSSDK
+2025-06-25T02:36:57.5802915Z   WindowsLibPath: C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.26100.0;C:\Program Files (x86)\Windows Kits\10\References\10.0.26100.0
+2025-06-25T02:36:57.5803476Z   WindowsSdkBinPath: C:\Program Files (x86)\Windows Kits\10\bin\
+2025-06-25T02:36:57.5803818Z   WindowsSdkDir: C:\Program Files (x86)\Windows Kits\10\
+2025-06-25T02:36:57.5804097Z   WindowsSDKLibVersion: 10.0.26100.0\
+2025-06-25T02:36:57.5804423Z   WindowsSdkVerBinPath: C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\
+2025-06-25T02:36:57.5804765Z   WindowsSDKVersion: 10.0.26100.0\
+2025-06-25T02:36:57.5805171Z   WindowsSDK_ExecutablePath_x64: C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\x64\
+2025-06-25T02:36:57.5805764Z   WindowsSDK_ExecutablePath_x86: C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\
+2025-06-25T02:36:57.5806155Z   __DOTNET_ADD_32BIT: 1
+2025-06-25T02:36:57.5806594Z   __DOTNET_PREFERRED_BITNESS: 32
+2025-06-25T02:36:57.5814412Z   __VSCMD_PREINIT_PATH: C:\Users\runneradmin\AppData\Roaming\Python\Python38\Scripts;C:\hostedtoolcache\windows\Python\3.8.10\x86\Scripts;C:\hostedtoolcache\windows\Python\3.8.10\x86;C:\Program Files\MongoDB\Server\5.0\bin;C:\aliyun-cli;C:\vcpkg;C:\Program Files (x86)\NSIS\;C:\tools\zstd;C:\Program Files\Mercurial\;C:\hostedtoolcache\windows\stack\3.5.1\x64;C:\cabal\bin;C:\\ghcup\bin;C:\mingw64\bin;C:\Program Files\dotnet;C:\Program Files\MySQL\MySQL Server 8.0\bin;C:\Program Files\R\R-4.4.2\bin\x64;C:\SeleniumWebDrivers\GeckoDriver;C:\SeleniumWebDrivers\EdgeDriver\;C:\SeleniumWebDrivers\ChromeDriver;C:\Program Files (x86)\sbt\bin;C:\Program Files (x86)\GitHub CLI;C:\Program Files\Git\bin;C:\Program Files (x86)\pipx_bin;C:\npm\prefix;C:\hostedtoolcache\windows\go\1.24.3\x64\bin;C:\hostedtoolcache\windows\Python\3.9.13\x64\Scripts;C:\hostedtoolcache\windows\Python\3.9.13\x64;C:\hostedtoolcache\windows\Ruby\3.3.8\x64\bin;C:\Program Files\OpenSSL\bin;C:\tools\kotlinc\bin;C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\8.0.452-9\x64\bin;C:\Program Files\ImageMagick-7.1.1-Q16-HDRI;C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin;C:\ProgramData\kind;C:\ProgramData\Chocolatey\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\PowerShell\7\;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files\TortoiseSVN\bin;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\WiX Toolset v3.14\bin;C:\Program Files\Microsoft SQL Server\130\DTS\Binn\;C:\Program Files\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files\Microsoft SQL Server\150\DTS\Binn\;C:\Program Files\Microsoft SQL Server\160\DTS\Binn\;C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\ProgramData\chocolatey\lib\pulumi\tools\Pulumi\bin;C:\Program Files\CMake\bin;C:\ProgramData\chocolatey\lib\maven\apache-maven-3.9.9\bin;C:\Program Files\Microsoft Service Fabric\bin\Fabric\Fabric.Code;C:\Program Files\Microsoft SDKs\Service Fabric\Tools\ServiceFabricLocalClusterManager;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Program Files\GitHub CLI\;c:\tools\php;C:\Program Files (x86)\sbt\bin;C:\Program Files\Amazon\AWSCLIV2\;C:\Program Files\Amazon\SessionManagerPlugin\bin\;C:\Program Files\Amazon\AWSSAMCLI\bin\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\LLVM\bin;C:\Users\runneradmin\.dotnet\tools;C:\Users\runneradmin\.cargo\bin;C:\Users\runneradmin\AppData\Local\Microsoft\WindowsApps;C:\Program Files (x86)\Microsoft Visual Studio\Installer
+2025-06-25T02:36:57.5822561Z   VCPKG_DEFAULT_BINARY_CACHE: D:/a/synthizer3d/synthizer3d/969f6665-88a2-4c98-938e-ca9259871fec/vcpkg_cache
+2025-06-25T02:36:57.5823087Z   VCPKG_BINARY_SOURCES: clear;x-gha,readwrite
+2025-06-25T02:36:57.5823635Z   ACTIONS_CACHE_URL: https://acghubeus2.actions.githubusercontent.com/bwbzopuV3oKlbowlUKWdOnf6KF0vjv7EYqCB3ZHqukKhTVgy74/
+2025-06-25T02:36:57.5855281Z   ACTIONS_RUNTIME_TOKEN: ***
+2025-06-25T02:36:57.5855549Z   RUNVCPKG_VCPKG_ROOT: D:\a\synthizer3d\synthizer3d\vcpkg
+2025-06-25T02:36:57.5855921Z   CMAKE_PREFIX_PATH: D:\a\synthizer3d\synthizer3d\vcpkg_installed\x86-windows
+2025-06-25T02:36:57.5856405Z   SYNTHIZER_EXPECTED_VCPKG_PATH_FOR_DEBUG: D:\a\synthizer3d\synthizer3d\vcpkg_installed\x86-windows
+2025-06-25T02:36:57.5856789Z ##[endgroup]
+2025-06-25T02:36:58.7037640Z Arch: x86
+2025-06-25T02:36:58.7055458Z Current CMAKE_PREFIX_PATH for build is: D:\a\synthizer3d\synthizer3d\vcpkg_installed\x86-windows
+2025-06-25T02:36:58.7062907Z EFFECTIVE_VCPKG_INSTALLED_DIR_BASE for build is: D:\a\synthizer3d\synthizer3d\vcpkg_installed
+2025-06-25T02:36:58.7071109Z Synthizer expects vcpkg path (for debug/verification): D:\a\synthizer3d\synthizer3d\vcpkg_installed\x86-windows
+2025-06-25T02:36:58.8306800Z * Getting build dependencies for wheel...
+2025-06-25T02:36:59.8011486Z Generating grammar tables from C:\hostedtoolcache\windows\Python\3.8.10\x86\lib\lib2to3\Grammar.txt
+2025-06-25T02:36:59.8297552Z Writing grammar tables to C:\hostedtoolcache\windows\Python\3.8.10\x86\lib\lib2to3\Grammar3.8.10.final.0.pickle
+2025-06-25T02:36:59.8308636Z Generating grammar tables from C:\hostedtoolcache\windows\Python\3.8.10\x86\lib\lib2to3\PatternGrammar.txt
+2025-06-25T02:36:59.8377232Z Writing grammar tables to C:\hostedtoolcache\windows\Python\3.8.10\x86\lib\lib2to3\PatternGrammar3.8.10.final.0.pickle
+2025-06-25T02:37:19.7169436Z Set VCPKG_INSTALLED_PATH to D:\a\synthizer3d\synthizer3d\vcpkg_installed\x86-windows
+2025-06-25T02:37:19.7170117Z 
+2025-06-25T02:37:19.7170140Z 
+2025-06-25T02:37:19.7170636Z --------------------------------------------------------------------------------
+2025-06-25T02:37:19.7171529Z -- Trying 'Ninja (Visual Studio 17 2022 Win32 v144)' generator
+2025-06-25T02:37:19.7172061Z --------------------------------
+2025-06-25T02:37:19.7172365Z ---------------------------
+2025-06-25T02:37:19.7172643Z ----------------------
+2025-06-25T02:37:19.7172890Z -----------------
+2025-06-25T02:37:19.7173076Z ------------
+2025-06-25T02:37:19.7173259Z -------
+2025-06-25T02:37:19.7173434Z --
+2025-06-25T02:37:19.7321345Z Not searching for unused variables given on the command line.
+2025-06-25T02:37:19.8362605Z CMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):
+2025-06-25T02:37:19.8363556Z   Compatibility with CMake < 3.10 will be removed from a future version of
+2025-06-25T02:37:19.8364044Z   CMake.
+2025-06-25T02:37:19.8364179Z 
+2025-06-25T02:37:19.8364583Z   Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+2025-06-25T02:37:19.8365357Z   to tell CMake that the project requires at least <min> but has been updated
+2025-06-25T02:37:19.8366027Z   to work with policies introduced by <max> or earlier.
+2025-06-25T02:37:19.8366322Z 
+2025-06-25T02:37:19.8366329Z 
+2025-06-25T02:37:22.3281360Z -- The C compiler identification is MSVC 19.43.34808.0
+2025-06-25T02:37:22.4352277Z -- Detecting C compiler ABI info
+2025-06-25T02:37:24.5733782Z -- Detecting C compiler ABI info - done
+2025-06-25T02:37:24.6073789Z -- Check for working C compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.43.34808/bin/Hostx86/x86/cl.exe - skipped
+2025-06-25T02:37:24.6077933Z -- Detecting C compile features
+2025-06-25T02:37:24.6085628Z -- Detecting C compile features - done
+2025-06-25T02:37:26.6024737Z -- The CXX compiler identification is MSVC 19.43.34808.0
+2025-06-25T02:37:26.6117013Z -- Detecting CXX compiler ABI info
+2025-06-25T02:37:27.0086217Z -- Detecting CXX compiler ABI info - done
+2025-06-25T02:37:27.0229713Z -- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.43.34808/bin/Hostx86/x86/cl.exe - skipped
+2025-06-25T02:37:27.0234012Z -- Detecting CXX compile features
+2025-06-25T02:37:27.0247742Z -- Detecting CXX compile features - done
+2025-06-25T02:37:27.0281469Z -- Configuring done (7.3s)
+2025-06-25T02:37:27.0468873Z -- Generating done (0.0s)
+2025-06-25T02:37:27.0477962Z -- Build files have been written to: D:/a/synthizer3d/synthizer3d/_cmake_test_compile/build
+2025-06-25T02:37:27.0539852Z --
+2025-06-25T02:37:27.0540064Z -------
+2025-06-25T02:37:27.0540220Z ------------
+2025-06-25T02:37:27.0540436Z -----------------
+2025-06-25T02:37:27.0540655Z ----------------------
+2025-06-25T02:37:27.0540882Z ---------------------------
+2025-06-25T02:37:27.0541136Z --------------------------------
+2025-06-25T02:37:27.0541548Z -- Trying 'Ninja (Visual Studio 17 2022 Win32 v144)' generator - success
+2025-06-25T02:37:27.0542020Z --------------------------------------------------------------------------------
+2025-06-25T02:37:27.0542237Z 
+2025-06-25T02:37:27.0777922Z Configuring Project
+2025-06-25T02:37:27.0779678Z   Working directory:
+2025-06-25T02:37:27.0780551Z     D:\a\synthizer3d\synthizer3d\_skbuild\win32-3.8\cmake-build
+2025-06-25T02:37:27.0781166Z   Command:
+2025-06-25T02:37:27.0793662Z     'C:\hostedtoolcache\windows\Python\3.8.10\x86\Lib\site-packages\cmake\data\bin/cmake.exe' 'D:\a\synthizer3d\synthizer3d\synthizer-vendored' -G Ninja '-DCMAKE_MAKE_PROGRAM:FILEPATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\Scripts\ninja' -D_SKBUILD_FORCE_MSVC=1930 --no-warn-unused-cli '-DCMAKE_INSTALL_PREFIX:PATH=D:\a\synthizer3d\synthizer3d\_skbuild\win32-3.8\cmake-install' -DPYTHON_VERSION_STRING:STRING=3.8.10 -DSKBUILD:INTERNAL=TRUE '-DCMAKE_MODULE_PATH:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\lib\site-packages\skbuild\resources\cmake' '-DPYTHON_EXECUTABLE:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\python.exe' '-DPYTHON_INCLUDE_DIR:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\Include' '-DPYTHON_LIBRARY:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\libs\python38.lib' '-DPython_EXECUTABLE:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\python.exe' '-DPython_ROOT_DIR:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86' -DPython_FIND_REGISTRY:STRING=NEVER '-DPython_INCLUDE_DIR:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\Include' '-DPython_LIBRARY:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\libs\python38.lib' '-DPython3_EXECUTABLE:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\python.exe' '-DPython3_ROOT_DIR:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86' -DPython3_FIND_REGISTRY:STRING=NEVER '-DPython3_INCLUDE_DIR:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\Include' '-DPython3_LIBRARY:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\libs\python38.lib' '-DCMAKE_MAKE_PROGRAM:FILEPATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\Scripts\ninja' -DCMAKE_BUILD_TYPE=Release -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL -DSYZ_STATIC_RUNTIME=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DSYZ_INTEGRATING=ON
+2025-06-25T02:37:27.0801990Z 
+2025-06-25T02:37:27.0953111Z Not searching for unused variables given on the command line.
+2025-06-25T02:37:27.4787453Z -- The C compiler identification is MSVC 19.43.34808.0
+2025-06-25T02:37:27.7970348Z -- The CXX compiler identification is MSVC 19.43.34808.0
+2025-06-25T02:37:27.8435626Z -- Detecting C compiler ABI info
+2025-06-25T02:37:28.2439451Z -- Detecting C compiler ABI info - done
+2025-06-25T02:37:28.2575763Z -- Check for working C compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.43.34808/bin/Hostx86/x86/cl.exe - skipped
+2025-06-25T02:37:28.2579655Z -- Detecting C compile features
+2025-06-25T02:37:28.2586198Z -- Detecting C compile features - done
+2025-06-25T02:37:28.2685749Z -- Detecting CXX compiler ABI info
+2025-06-25T02:37:28.6403216Z -- Detecting CXX compiler ABI info - done
+2025-06-25T02:37:28.6540229Z -- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.43.34808/bin/Hostx86/x86/cl.exe - skipped
+2025-06-25T02:37:28.6544198Z -- Detecting CXX compile features
+2025-06-25T02:37:28.6556678Z -- Detecting CXX compile features - done
+2025-06-25T02:37:29.0349345Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2025-06-25T02:37:29.1340418Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+2025-06-25T02:37:29.1341009Z -- Looking for pthread_create in pthreads
+2025-06-25T02:37:29.2891753Z -- Looking for pthread_create in pthreads - not found
+2025-06-25T02:37:29.2892717Z -- Looking for pthread_create in pthread
+2025-06-25T02:37:29.4369610Z -- Looking for pthread_create in pthread - not found
+2025-06-25T02:37:29.4382910Z -- Found Threads: TRUE
+2025-06-25T02:37:29.5486630Z -- Found SoundTouch: D:/a/synthizer3d/synthizer3d/vcpkg_installed/x86-windows/debug/bin/SoundTouch.dll
+2025-06-25T02:37:30.4734084Z CMake Error at D:/a/synthizer3d/synthizer3d/vcpkg/scripts/buildsystems/vcpkg.cmake:893 (_find_package):
+2025-06-25T02:37:30.4757450Z ##[error]  By not providing "Findfaad2.cmake" in CMAKE_MODULE_PATH this project has
+2025-06-25T02:37:30.4763555Z   asked CMake to find a package configuration file provided by "faad2", but
+2025-06-25T02:37:30.4763970Z   CMake did not find one.
+2025-06-25T02:37:30.4764108Z 
+2025-06-25T02:37:30.4764395Z   Could not find a package configuration file provided by "faad2" with any of
+2025-06-25T02:37:30.4764766Z   the following names:
+2025-06-25T02:37:30.4764896Z 
+2025-06-25T02:37:30.4764999Z     faad2Config.cmake
+2025-06-25T02:37:30.4765221Z     faad2-config.cmake
+2025-06-25T02:37:30.4765338Z 
+2025-06-25T02:37:30.4765577Z   Add the installation prefix of "faad2" to CMAKE_PREFIX_PATH or set
+2025-06-25T02:37:30.4766074Z   "faad2_DIR" to a directory containing one of the above files.  If "faad2"
+2025-06-25T02:37:30.4766575Z   provides a separate development package or SDK, be sure it has been
+2025-06-25T02:37:30.4766879Z   installed.
+2025-06-25T02:37:30.4767098Z Call Stack (most recent call first):
+2025-06-25T02:37:30.4767383Z   CMakeLists.txt:31 (find_package)
+2025-06-25T02:37:30.4767529Z 
+2025-06-25T02:37:30.4767542Z 
+2025-06-25T02:37:30.4767750Z -- Configuring incomplete, errors occurred!
+2025-06-25T02:37:30.5092491Z Traceback (most recent call last):
+2025-06-25T02:37:30.5093492Z   File "C:\hostedtoolcache\windows\Python\3.8.10\x86\lib\site-packages\pyproject_hooks\_in_process\_in_process.py", line 389, in <module>
+2025-06-25T02:37:30.5094078Z     main()
+2025-06-25T02:37:30.5094831Z   File "C:\hostedtoolcache\windows\Python\3.8.10\x86\lib\site-packages\pyproject_hooks\_in_process\_in_process.py", line 373, in main
+2025-06-25T02:37:30.5095510Z     json_out["return_val"] = hook(**hook_input["kwargs"])
+2025-06-25T02:37:30.5096438Z   File "C:\hostedtoolcache\windows\Python\3.8.10\x86\lib\site-packages\pyproject_hooks\_in_process\_in_process.py", line 143, in get_requires_for_build_wheel
+2025-06-25T02:37:30.5097142Z     return hook(config_settings)
+2025-06-25T02:37:30.5097918Z   File "C:\hostedtoolcache\windows\Python\3.8.10\x86\lib\site-packages\setuptools\build_meta.py", line 154, in get_requires_for_build_wheel
+2025-06-25T02:37:30.5098588Z     return self._get_build_requires(
+2025-06-25T02:37:30.5099362Z   File "C:\hostedtoolcache\windows\Python\3.8.10\x86\lib\site-packages\setuptools\build_meta.py", line 135, in _get_build_requires
+2025-06-25T02:37:30.5099946Z     self.run_setup()
+2025-06-25T02:37:30.5100633Z   File "C:\hostedtoolcache\windows\Python\3.8.10\x86\lib\site-packages\setuptools\build_meta.py", line 258, in run_setup
+2025-06-25T02:37:30.5101199Z     super(_BuildMetaLegacyBackend,
+2025-06-25T02:37:30.5101908Z   File "C:\hostedtoolcache\windows\Python\3.8.10\x86\lib\site-packages\setuptools\build_meta.py", line 150, in run_setup
+2025-06-25T02:37:30.5102523Z     exec(compile(code, __file__, 'exec'), locals())
+2025-06-25T02:37:30.5102889Z   File "setup.py", line 57, in <module>
+2025-06-25T02:37:30.5103174Z     cmake.configure(
+2025-06-25T02:37:30.5103767Z   File "C:\hostedtoolcache\windows\Python\3.8.10\x86\lib\site-packages\skbuild\cmaker.py", line 354, in configure
+2025-06-25T02:37:30.5104513Z     raise SKBuildError(msg)
+2025-06-25T02:37:30.5105003Z skbuild.exceptions.SKBuildError: An error occurred while configuring with CMake.
+2025-06-25T02:37:30.5105401Z   Command:
+2025-06-25T02:37:30.5113209Z     'C:\hostedtoolcache\windows\Python\3.8.10\x86\Lib\site-packages\cmake\data\bin/cmake.exe' 'D:\a\synthizer3d\synthizer3d\synthizer-vendored' -G Ninja '-DCMAKE_MAKE_PROGRAM:FILEPATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\Scripts\ninja' -D_SKBUILD_FORCE_MSVC=1930 --no-warn-unused-cli '-DCMAKE_INSTALL_PREFIX:PATH=D:\a\synthizer3d\synthizer3d\_skbuild\win32-3.8\cmake-install' -DPYTHON_VERSION_STRING:STRING=3.8.10 -DSKBUILD:INTERNAL=TRUE '-DCMAKE_MODULE_PATH:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\lib\site-packages\skbuild\resources\cmake' '-DPYTHON_EXECUTABLE:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\python.exe' '-DPYTHON_INCLUDE_DIR:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\Include' '-DPYTHON_LIBRARY:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\libs\python38.lib' '-DPython_EXECUTABLE:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\python.exe' '-DPython_ROOT_DIR:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86' -DPython_FIND_REGISTRY:STRING=NEVER '-DPython_INCLUDE_DIR:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\Include' '-DPython_LIBRARY:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\libs\python38.lib' '-DPython3_EXECUTABLE:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\python.exe' '-DPython3_ROOT_DIR:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86' -DPython3_FIND_REGISTRY:STRING=NEVER '-DPython3_INCLUDE_DIR:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\Include' '-DPython3_LIBRARY:PATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\libs\python38.lib' '-DCMAKE_MAKE_PROGRAM:FILEPATH=C:\hostedtoolcache\windows\Python\3.8.10\x86\Scripts\ninja' -DCMAKE_BUILD_TYPE=Release -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL -DSYZ_STATIC_RUNTIME=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DSYZ_INTEGRATING=ON
+2025-06-25T02:37:30.5118540Z   Source directory:
+2025-06-25T02:37:30.5118828Z     D:\a\synthizer3d\synthizer3d\synthizer-vendored
+2025-06-25T02:37:30.5119105Z   Working directory:
+2025-06-25T02:37:30.5119435Z     D:\a\synthizer3d\synthizer3d\_skbuild\win32-3.8\cmake-build
+2025-06-25T02:37:30.5119814Z Please see CMake's output for more information.
+2025-06-25T02:37:30.5119997Z 
+2025-06-25T02:37:30.5343356Z 
+2025-06-25T02:37:30.5344331Z ERROR Backend subprocess exited when trying to invoke get_requires_for_build_wheel
+2025-06-25T02:37:30.5985424Z ##[error]Process completed with exit code 1.
+2025-06-25T02:37:30.6135073Z Post job cleanup.
+2025-06-25T02:37:30.8766567Z [command]"C:\Program Files\Git\bin\git.exe" version
+2025-06-25T02:37:30.8987841Z git version 2.49.0.windows.1
+2025-06-25T02:37:30.9054953Z Temporarily overriding HOME='D:\a\_temp\f4a9454a-5973-4f83-b7e9-153feb3e7dc7' before making global git config changes
+2025-06-25T02:37:30.9055716Z Adding repository directory to the temporary git global config as a safe directory
+2025-06-25T02:37:30.9067660Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\synthizer3d\synthizer3d
+2025-06-25T02:37:30.9312733Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2025-06-25T02:37:30.9548418Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2025-06-25T02:37:31.4539955Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-06-25T02:37:31.4759252Z http.https://github.com/.extraheader
+2025-06-25T02:37:31.4797063Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all http.https://github.com/.extraheader
+2025-06-25T02:37:31.5055028Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2025-06-25T02:37:32.4172238Z Cleaning up orphan processes
+2025-06-25T02:37:32.4354742Z Terminate orphan process: pid (6660) (vctip)
+2025-06-25T02:37:32.4544282Z Terminate orphan process: pid (6972) (mspdbsrv)

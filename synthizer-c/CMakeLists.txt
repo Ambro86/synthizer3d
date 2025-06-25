@@ -28,7 +28,8 @@ find_package(Ogg REQUIRED)
 find_package(Opus REQUIRED)
 find_package(OpusFile REQUIRED)
 find_package(SoundTouch REQUIRED)
-find_package(faad2 REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(FAAD2 REQUIRED faad2)
 
 
 # Check if op_read_float is available
@@ -194,7 +195,7 @@ elseif(UNIX AND NOT APPLE)
       Vorbis::vorbis
       Vorbis::vorbisfile
       SoundTouch::SoundTouch
-      faad2::faad2
+      ${FAAD2_LIBRARIES}
       m  # Math library
       dl  # Dynamic loading library
     )
@@ -223,7 +224,7 @@ elseif(APPLE)
       Vorbis::vorbisfile
       OpusFile::opusfile
       SoundTouch::SoundTouch
-      faad2::faad2
+      ${FAAD2_LIBRARIES}
       m  # Math library
     )
   endif()
@@ -231,6 +232,7 @@ endif()
 target_link_libraries(synthizer PRIVATE ${SYZ_LIBRARIES})
 
 target_include_directories(synthizer PRIVATE $<TARGET_PROPERTY:wdl_objlib,INTERFACE_INCLUDE_DIRECTORIES>)
+target_include_directories(synthizer PRIVATE ${FAAD2_INCLUDE_DIRS})
 
 # Add vcpkg include directories - unified approach for all platforms
 if(DEFINED ENV{VCPKG_INSTALLED_PATH})

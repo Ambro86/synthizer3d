@@ -212,7 +212,8 @@ jobs:
             # Delvewheel cercherà le dipendenze in queste directory.
             # Potrebbe essere necessario solo -add-path per la directory bin, o entrambe.
             # Il flag -w sovrascrive la wheel originale con quella riparata nella stessa directory (dist/)
-            delvewheel repair --add-path "$vcpkgInstalledBinDir;$vcpkgInstalledLibDir" -w "$($wheel.DirectoryName)" "$($wheel.FullName)"
+            # --exclude esclude le DLL runtime MSVC - verranno caricate dal sistema
+            delvewheel repair --add-path "$vcpkgInstalledBinDir;$vcpkgInstalledLibDir" --exclude "msvcp*.dll;vcruntime*.dll;api-ms-win-*.dll;ucrtbase.dll" -w "$($wheel.DirectoryName)" "$($wheel.FullName)"
           }
           Write-Host "Listing repaired wheels in dist/:"
           Get-ChildItem -Path dist/*.whl | ForEach-Object { Write-Host $_.Name }

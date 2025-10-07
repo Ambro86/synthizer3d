@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
         CI_ARCH: ["x64", "x86"]
     steps:
       - name: Checkout repository
@@ -231,7 +231,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
 
     container:
       image: quay.io/pypa/manylinux_2_28_x86_64
@@ -259,6 +259,8 @@ jobs:
           elif [ "${{ matrix.PYVERSION }}" = "3.11" ]; then echo "PYTHON_PATH=/opt/python/cp311-cp311" >> $GITHUB_ENV
           elif [ "${{ matrix.PYVERSION }}" = "3.12" ]; then echo "PYTHON_PATH=/opt/python/cp312-cp312" >> $GITHUB_ENV
           elif [ "${{ matrix.PYVERSION }}" = "3.13" ]; then echo "PYTHON_PATH=/opt/python/cp313-cp313" >> $GITHUB_ENV
+          elif [ "${{ matrix.PYVERSION }}" = "3.14" ]; then echo "PYTHON_PATH=/opt/python/cp314-cp314" >> $GITHUB_ENV
+
           fi
 
       - name: Install system and Python build dependencies
@@ -550,7 +552,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -738,7 +740,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

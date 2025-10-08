@@ -51,7 +51,7 @@ Synthizer is a library for game/VR audio applications, designed to handle everyt
 
 ## Supported Python Versions and Platforms
 
-Synthizer3D offers pre-built wheels for **Python 3.8 to 3.13** on all major platforms:
+Synthizer3D offers pre-built wheels for **Python 3.8 to 3.14** on all major platforms:
 
 - Windows x64
 - Windows x86 (32-bit)
@@ -145,7 +145,7 @@ For Python bindings:
 
 This fork builds on an unmaintained project. Our goals include:
 
-- Support for Python 3.8–3.13 (and future versions)
+- Support for Python 3.8–3.14 (and future versions)
 - Wheels for all major platforms (Windows x64/x86, Linux x64, macOS x64/arm64)
 - Updated CI/build scripts
 - New features and compatibility improvements

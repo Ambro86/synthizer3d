@@ -916,6 +916,40 @@ jobs:
           path: dist/*.whl
           if-no-files-found: error # Aggiunto per fallire se non ci sono wheel
 
+  # Job per costruire la source distribution
+  sdist-build:
+    name: Build Source Distribution
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python for sdist
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Run C/C++ code vendoring script
+        run: python synthizer-c/vendor.py synthizer-vendored
+
+      - name: Install build tool
+        run: python -m pip install build
+
+      - name: Build sdist
+        run: python -m build --sdist
+
+      - name: Upload source distribution artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-sdist
+          path: dist/*.tar.gz
+          if-no-files-found: error
+
   # Job per testare le wheel prima del deployment
   test-wheels:
     name: Test Wheels on ${{ matrix.os }} (${{ matrix.arch }}) Python ${{ matrix.python-version }}
@@ -1057,7 +1091,7 @@ jobs:
   # Job per il deployment su PyPI
   deploy_pypi:
     name: Deploy to PyPI
-    needs: [windows-build, linux-x64-build, macos-x64-build, macos-arm64-build, test-wheels]
+    needs: [windows-build, linux-x64-build, macos-x64-build, macos-arm64-build, sdist-build, test-wheels]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -1086,4 +1120,12 @@ jobs:
 
       - name: Upload to PyPI
         run: |
-          python -m twine upload --skip-existing ~/artifacts/*/*.whl
+          set -e
+          shopt -s nullglob
+          files=(~/artifacts/*/*.whl ~/artifacts/*/*.tar.gz)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No distributions found to upload."
+            exit 0
+          fi
+          python -m twine upload --skip-existing "${files[@]}"
+

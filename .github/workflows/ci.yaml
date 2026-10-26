@@ -60,46 +60,17 @@ jobs:
           arch: ${{ env.CI_ARCH_LOWER }}
 
       - name: Setup vcpkg with retry
+        id: vcpkg_setup
+        continue-on-error: true
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgJsonGlob: 'vcpkg.json'
           vcpkgGitCommitId: 817892b0ecbc6af994dd6df999c73faf795adbf2
           runVcpkgInstall: true
         
-      - name: Retry vcpkg install on failure
-        if: failure() && !cancelled() && env.VCPKG_ROOT != ''
-        timeout-minutes: 60
-        shell: pwsh
-        run: |
-          Write-Host "🔄 Retrying vcpkg install due to network issues..."
-          Start-Sleep 30
-          
-          # Clear any partially downloaded files
-          if (Test-Path "$env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE") {
-            Write-Host "🧹 Cleaning partial vcpkg installation..."
-            Remove-Item "$env:EFFECTIVE_VCPKG_INSTALLED_DIR_BASE" -Recurse -Force -ErrorAction SilentlyContinue
-          }
-          
-          for ($i = 1; $i -le 5; $i++) {
-            Write-Host "📦 Attempt $i of 5..."
-            # Add random delay to avoid thundering herd
-            $delay = Get-Random -Minimum 30 -Maximum 60
-            Write-Host "⏱️ Waiting $delay seconds before attempt..."
-            Start-Sleep $delay
-            
-            if (& "$env:VCPKG_ROOT/vcpkg.exe" install --triplet=$env:VCPKG_DEFAULT_TRIPLET --feature-flags=versions --clean-after-build) {
-              Write-Host "✅ vcpkg install succeeded on attempt $i"
-              break
-            } else {
-              if ($i -lt 5) {
-                Write-Host "❌ Attempt $i failed, waiting $($i * 60) seconds..."
-                Start-Sleep ($i * 60)
-              } else {
-                Write-Host "❌ All retry attempts failed"
-                exit 1
-              }
-            }
-          }
+      - name: Retry vcpkg network failures
+        if: ${{ !cancelled() && steps.vcpkg_setup.outcome == 'failure' }}
+        run: python ci/retry_vcpkg.py
 
       - name: Install dependencies and set CMAKE_PREFIX_PATH (Windows)
         shell: pwsh
@@ -227,7 +198,7 @@ jobs:
   linux-x64-build:
     name: Build Linux (x86_64) Python ${{ matrix.PYVERSION }}
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 360
     strategy:
       fail-fast: false
       matrix:
@@ -309,34 +280,19 @@ jobs:
           restore-keys: |
             vcpkg-packages-${{ env.VCPKG_DEFAULT_TRIPLET }}-
       - name: Setup vcpkg with retry
+        id: vcpkg_setup
+        continue-on-error: true
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgJsonGlob: 'vcpkg.json'
           vcpkgGitCommitId: 817892b0ecbc6af994dd6df999c73faf795adbf2
           runVcpkgInstall: true
         
-      - name: Retry vcpkg install on failure
-        if: failure() && !cancelled() && env.VCPKG_ROOT != ''
-        timeout-minutes: 45
+      - name: Retry vcpkg network failures
+        if: ${{ !cancelled() && steps.vcpkg_setup.outcome == 'failure' }}
         run: |
-          echo "🔄 Retrying vcpkg install due to network issues..."
-          sleep 30
-          
-          for i in {1..3}; do
-            echo "📦 Attempt $i of 3..."
-            if "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions; then
-              echo "✅ vcpkg install succeeded on attempt $i"
-              break
-            else
-              if [ $i -lt 3 ]; then
-                echo "❌ Attempt $i failed, waiting $(($i * 60)) seconds..."
-                sleep $(($i * 60))
-              else
-                echo "❌ All retry attempts failed"
-                exit 1
-              fi
-            fi
-          done
+          "$PYTHON_PATH/bin/python" ci/retry_vcpkg.py
+
       - name: Run C/C++ code vendoring script
         timeout-minutes: 5
         run: |
@@ -585,45 +541,17 @@ jobs:
             ${{ runner.os }}-${{ env.TARGET_ARCH }}-pip-${{ env.PYVERSION }}-
 
       - name: Setup vcpkg with retry
+        id: vcpkg_setup
+        continue-on-error: true
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgJsonGlob: 'vcpkg.json'
           vcpkgGitCommitId: 817892b0ecbc6af994dd6df999c73faf795adbf2
           runVcpkgInstall: true
         
-      - name: Retry vcpkg install on failure  
-        if: failure() && !cancelled() && env.VCPKG_ROOT != ''
-        timeout-minutes: 60
-        run: |
-          echo "🔄 Retrying vcpkg install due to network issues..."
-          sleep 30
-          
-          # Clear any partially downloaded files
-          if [ -d "$GITHUB_WORKSPACE/vcpkg_installed" ]; then
-            echo "🧹 Cleaning partial vcpkg installation..."
-            rm -rf "$GITHUB_WORKSPACE/vcpkg_installed"
-          fi
-          
-          for i in {1..5}; do
-            echo "📦 Attempt $i of 5..."
-            # Add random delay to avoid thundering herd
-            DELAY=$((RANDOM % 30 + 30))
-            echo "⏱️ Waiting $DELAY seconds before attempt..."
-            sleep $DELAY
-            
-            if "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions --clean-after-build; then
-              echo "✅ vcpkg install succeeded on attempt $i"
-              break
-            else
-              if [ $i -lt 5 ]; then
-                echo "❌ Attempt $i failed, waiting $(($i * 60)) seconds..."
-                sleep $(($i * 60))
-              else
-                echo "❌ All retry attempts failed"
-                exit 1
-              fi
-            fi
-          done
+      - name: Retry vcpkg network failures
+        if: ${{ !cancelled() && steps.vcpkg_setup.outcome == 'failure' }}
+        run: python ci/retry_vcpkg.py
 
       - name: Install dependencies using vcpkg (macOS x64)
         run: |
@@ -773,45 +701,17 @@ jobs:
             ${{ runner.os }}-${{ env.TARGET_ARCH }}-pip-${{ env.PYVERSION }}-
 
       - name: Setup vcpkg with retry
+        id: vcpkg_setup
+        continue-on-error: true
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgJsonGlob: 'vcpkg.json'
           vcpkgGitCommitId: 817892b0ecbc6af994dd6df999c73faf795adbf2
           runVcpkgInstall: true
         
-      - name: Retry vcpkg install on failure
-        if: failure() && !cancelled() && env.VCPKG_ROOT != ''
-        timeout-minutes: 60
-        run: |
-          echo "🔄 Retrying vcpkg install due to network issues..."
-          sleep 30
-          
-          # Clear any partially downloaded files
-          if [ -d "$GITHUB_WORKSPACE/vcpkg_installed" ]; then
-            echo "🧹 Cleaning partial vcpkg installation..."
-            rm -rf "$GITHUB_WORKSPACE/vcpkg_installed"
-          fi
-          
-          for i in {1..5}; do
-            echo "📦 Attempt $i of 5..."
-            # Add random delay to avoid thundering herd
-            DELAY=$((RANDOM % 30 + 30))
-            echo "⏱️ Waiting $DELAY seconds before attempt..."
-            sleep $DELAY
-            
-            if "$VCPKG_ROOT/vcpkg" install --triplet=$VCPKG_DEFAULT_TRIPLET --feature-flags=versions --clean-after-build; then
-              echo "✅ vcpkg install succeeded on attempt $i"
-              break
-            else
-              if [ $i -lt 5 ]; then
-                echo "❌ Attempt $i failed, waiting $(($i * 60)) seconds..."
-                sleep $(($i * 60))
-              else
-                echo "❌ All retry attempts failed"
-                exit 1
-              fi
-            fi
-          done
+      - name: Retry vcpkg network failures
+        if: ${{ !cancelled() && steps.vcpkg_setup.outcome == 'failure' }}
+        run: python ci/retry_vcpkg.py
 
       - name: Install dependencies using vcpkg (macOS arm64)
         run: |

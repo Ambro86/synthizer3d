@@ -18,13 +18,15 @@ class NetworkRetryTests(unittest.TestCase):
             'fatal: unable to access URL: The requested URL returned error: 503',
             'HTTP 429', 'status code 502', 'Connection reset by peer',
             'fatal: early EOF',
+            "error: curl operation failed with error code 7 (Couldn't connect to server).",
         ):
             with self.subTest(message=message):
                 self.assertRegex(message, NETWORK_ERROR)
 
     def test_permanent_errors(self):
         for message in ('error: compiler failed', 'status code 404',
-                        'SHA512 mismatch', 'HTTP 403', 'SyntaxError: invalid syntax'):
+                        'SHA512 mismatch', 'HTTP 403', 'SyntaxError: invalid syntax',
+                        'curl operation failed with error code 60 (certificate error)'):
             with self.subTest(message=message):
                 self.assertNotRegex(message, NETWORK_ERROR)
 

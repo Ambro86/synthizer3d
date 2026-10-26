@@ -15,7 +15,8 @@ NETWORK_ERROR = re.compile(
     r"unexpected disconnect|early EOF|TLS connection was non-properly terminated|"
     r"SSL_ERROR_SYSCALL|HTTP/[\d.]+ stream .*not closed cleanly|"
     r"(?:HTTP(?: error)?|status(?: code)?|returned error:)\s*[:=]?\s*(?:408|429|5\d\d)\b|"
-    r"curl:\s*\((?:5|6|7|18|28|35|52|55|56|92)\)",
+    r"curl:\s*\((?:5|6|7|18|28|35|52|55|56|92)\)|"
+    r"curl operation failed with error code (?:5|6|7|18|28|35|52|55|56|92)\b",
     re.IGNORECASE,
 )
 

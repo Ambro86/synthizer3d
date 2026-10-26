@@ -63,10 +63,11 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgJsonGlob: 'vcpkg.json'
+          vcpkgGitCommitId: 817892b0ecbc6af994dd6df999c73faf795adbf2
           runVcpkgInstall: true
         
       - name: Retry vcpkg install on failure
-        if: failure() && env.VCPKG_ROOT != ''
+        if: failure() && !cancelled() && env.VCPKG_ROOT != ''
         timeout-minutes: 60
         shell: pwsh
         run: |
@@ -311,10 +312,11 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgJsonGlob: 'vcpkg.json'
+          vcpkgGitCommitId: 817892b0ecbc6af994dd6df999c73faf795adbf2
           runVcpkgInstall: true
         
       - name: Retry vcpkg install on failure
-        if: failure() && env.VCPKG_ROOT != ''
+        if: failure() && !cancelled() && env.VCPKG_ROOT != ''
         timeout-minutes: 45
         run: |
           echo "🔄 Retrying vcpkg install due to network issues..."
@@ -586,10 +588,11 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgJsonGlob: 'vcpkg.json'
+          vcpkgGitCommitId: 817892b0ecbc6af994dd6df999c73faf795adbf2
           runVcpkgInstall: true
         
       - name: Retry vcpkg install on failure  
-        if: failure() && env.VCPKG_ROOT != ''
+        if: failure() && !cancelled() && env.VCPKG_ROOT != ''
         timeout-minutes: 60
         run: |
           echo "🔄 Retrying vcpkg install due to network issues..."
@@ -773,10 +776,11 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgJsonGlob: 'vcpkg.json'
+          vcpkgGitCommitId: 817892b0ecbc6af994dd6df999c73faf795adbf2
           runVcpkgInstall: true
         
       - name: Retry vcpkg install on failure
-        if: failure() && env.VCPKG_ROOT != ''
+        if: failure() && !cancelled() && env.VCPKG_ROOT != ''
         timeout-minutes: 60
         run: |
           echo "🔄 Retrying vcpkg install due to network issues..."

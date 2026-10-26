@@ -64,10 +64,9 @@ jobs:
         with:
           vcpkgJsonGlob: 'vcpkg.json'
           runVcpkgInstall: true
-        continue-on-error: true
         
       - name: Retry vcpkg install on failure
-        if: failure()
+        if: failure() && env.VCPKG_ROOT != ''
         timeout-minutes: 60
         shell: pwsh
         run: |
@@ -264,6 +263,9 @@ jobs:
 
           fi
 
+      - name: Ensure selected manylinux interpreter is installed
+        run: manylinux-interpreters ensure "$(basename "$PYTHON_PATH")"
+
       - name: Install system and Python build dependencies
         timeout-minutes: 45
         run: |
@@ -309,10 +311,9 @@ jobs:
         with:
           vcpkgJsonGlob: 'vcpkg.json'
           runVcpkgInstall: true
-        continue-on-error: true
         
       - name: Retry vcpkg install on failure
-        if: failure()
+        if: failure() && env.VCPKG_ROOT != ''
         timeout-minutes: 45
         run: |
           echo "🔄 Retrying vcpkg install due to network issues..."
@@ -545,7 +546,7 @@ jobs:
   # Job per costruire le wheel su macOS (x64 - Intel Runner)
   macos-x64-build:
     name: Build macOS (x64) Python ${{ matrix.PYVERSION }}
-    runs-on: macos-13 # Intel runner, o macos-latest se vuoi che scelga per x64
+    runs-on: macos-15-intel # Intel runner, o macos-latest se vuoi che scelga per x64
     env:
       PYVERSION: ${{ matrix.PYVERSION }}
       TARGET_ARCH: "x64"
@@ -585,10 +586,9 @@ jobs:
         with:
           vcpkgJsonGlob: 'vcpkg.json'
           runVcpkgInstall: true
-        continue-on-error: true
         
       - name: Retry vcpkg install on failure  
-        if: failure()
+        if: failure() && env.VCPKG_ROOT != ''
         timeout-minutes: 60
         run: |
           echo "🔄 Retrying vcpkg install due to network issues..."
@@ -773,10 +773,9 @@ jobs:
         with:
           vcpkgJsonGlob: 'vcpkg.json'
           runVcpkgInstall: true
-        continue-on-error: true
         
       - name: Retry vcpkg install on failure
-        if: failure()
+        if: failure() && env.VCPKG_ROOT != ''
         timeout-minutes: 60
         run: |
           echo "🔄 Retrying vcpkg install due to network issues..."
@@ -994,13 +993,13 @@ jobs:
             python-version: "3.15"
             arch: "x86"
           # macOS x64 (Intel)
-          - os: macos-13
+          - os: macos-15-intel
             python-version: "3.11"
             arch: "x64"
-          - os: macos-13
+          - os: macos-15-intel
             python-version: "3.13"
             arch: "x64"
-          - os: macos-13
+          - os: macos-15-intel
             python-version: "3.15"
             arch: "x64"
           # macOS arm64 (Apple Silicon)
@@ -1051,7 +1050,7 @@ jobs:
                 ARCH_PATTERN="amd64"
               fi
               ;;
-            macos-13)
+            macos-15-intel)
               PLATFORM_PATTERN="macosx"
               ARCH_PATTERN="x64"
               ;;

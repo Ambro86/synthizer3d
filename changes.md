@@ -1,3 +1,10 @@
+# 0.14.4 (2026-10-26)
+
+- Add Python 3.15 wheels for Windows, Linux and macOS (Intel and Apple Silicon).
+- Restore builds with current CI runners and dependency download tools.
+- Retry transient dependency network failures automatically.
+- Publish binary wheels and source archives in GitHub Releases as well as PyPI.
+
 # 0.12.6 (2023-05-20)
 
 - Bind the sine generators

@@ -1085,3 +1085,61 @@ jobs:
           fi
           python -m twine upload --verbose --skip-existing "${files[@]}"
 
+
+  github_release:
+    name: Publish GitHub Release
+    needs: deploy_pypi
+    if: ${{ !cancelled() && needs.deploy_pypi.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      SOURCE_RUN: ${{ inputs.artifacts_run_id || github.run_id }}
+    steps:
+      - name: Resolve source revision
+        id: source
+        run: |
+          sha=$(gh api "repos/$GH_REPO/actions/runs/$SOURCE_RUN" --jq .head_sha)
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.source.outputs.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+          github-token: ${{ github.token }}
+          run-id: ${{ env.SOURCE_RUN }}
+      - name: Prepare release notes
+        run: |
+          python - <<'PY'
+          import ast
+          import os
+          from pathlib import Path
+          tree = ast.parse(Path('setup.py').read_text())
+          version = next(ast.literal_eval(node.value) for node in tree.body
+                         if isinstance(node, ast.Assign)
+                         and any(isinstance(t, ast.Name) and t.id == 'VERSION' for t in node.targets))
+          if not list(Path('release-artifacts').rglob(f'synthizer3d-{version}.tar.gz')):
+              raise SystemExit('Source archive does not match release version')
+          changelog = Path('changes.md').read_text()
+          section = changelog.split(f'# {version} ', 1)[1].split('\n# ', 1)[0]
+          Path('release-notes.txt').write_text(section.split('\n', 1)[1].strip() + '\n')
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+              output.write(f'RELEASE_VERSION={version}\n')
+          PY
+      - name: Publish release and packages
+        env:
+          SOURCE_SHA: ${{ steps.source.outputs.sha }}
+        run: |
+          tag="v$RELEASE_VERSION"
+          shopt -s nullglob
+          files=(release-artifacts/*/*.whl release-artifacts/*/*.tar.gz)
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists; leaving it unchanged."
+          else
+            gh release create "$tag" "${files[@]}" --target "$SOURCE_SHA" \
+              --title "Synthizer3D $RELEASE_VERSION" --notes-file release-notes.txt
+          fi

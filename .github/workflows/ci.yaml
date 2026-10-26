@@ -1045,7 +1045,7 @@ jobs:
               throw new Error('Expected a completed CI push run on master');
             }
             const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {...context.repo, run_id: runId, per_page: 100});
-            const checks = jobs.filter(job => job.name !== 'Deploy to PyPI');
+            const checks = jobs.filter(job => !['Deploy to PyPI', 'Publish GitHub Release'].includes(job.name));
             if (!checks.some(job => job.name.startsWith('Test Wheels')) || checks.some(job => job.conclusion !== 'success')) {
               throw new Error('All original builds and wheel tests must have succeeded');
             }
@@ -1136,10 +1136,31 @@ jobs:
         run: |
           tag="v$RELEASE_VERSION"
           shopt -s nullglob
-          files=(release-artifacts/*/*.whl release-artifacts/*/*.tar.gz)
-          if gh release view "$tag" >/dev/null 2>&1; then
-            echo "Release $tag already exists; leaving it unchanged."
-          else
-            gh release create "$tag" "${files[@]}" --target "$SOURCE_SHA" \
+          declare -A seen
+          files=()
+          # Match Twine's artifact ordering and upload each filename only once.
+          for file in release-artifacts/*/*.whl release-artifacts/*/*.tar.gz; do
+            name=$(basename "$file")
+            if [[ -z "${seen[$name]:-}" ]]; then
+              seen[$name]=1
+              files+=("$file")
+            fi
+          done
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No release packages found." >&2
+            exit 1
+          fi
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            gh release create "$tag" --draft --target "$SOURCE_SHA" \
               --title "Synthizer3D $RELEASE_VERSION" --notes-file release-notes.txt
+          fi
+          # Resume partial uploads without overwriting existing packages.
+          existing=$(gh release view "$tag" --json assets --jq '.assets[].name')
+          for file in "${files[@]}"; do
+            if ! grep -Fxq -- "$(basename "$file")" <<< "$existing"; then
+              gh release upload "$tag" "$file"
+            fi
+          done
+          if [ "$(gh release view "$tag" --json isDraft --jq .isDraft)" = "true" ]; then
+            gh release edit "$tag" --draft=false
           fi

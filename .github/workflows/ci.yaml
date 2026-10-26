@@ -7,10 +7,16 @@ on:
     branches: [ master, main ]
   pull_request:
     branches: [ master, main ]
-  workflow_dispatch: # Permette l'avvio manuale dalla tab Azioni di GitHub
+  workflow_dispatch:
+    inputs:
+      artifacts_run_id:
+        description: 'Publish only: reuse artifacts from a tested run (leave empty to build)'
+        type: string
+        required: false
 jobs:
   # Job per costruire le wheel su Windows
   windows-build:
+    if: ${{ !inputs.artifacts_run_id }}
     name: Build Windows (${{ matrix.CI_ARCH }}) Python ${{ matrix.PYVERSION }}
     runs-on: windows-latest
     env:
@@ -196,6 +202,7 @@ jobs:
           path: dist/*.whl
   # Job per costruire le wheel su Linux x86_64
   linux-x64-build:
+    if: ${{ !inputs.artifacts_run_id }}
     name: Build Linux (x86_64) Python ${{ matrix.PYVERSION }}
     runs-on: ubuntu-latest
     timeout-minutes: 360
@@ -504,6 +511,7 @@ jobs:
 
   # Job per costruire le wheel su macOS (x64 - Intel Runner)
   macos-x64-build:
+    if: ${{ !inputs.artifacts_run_id }}
     name: Build macOS (x64) Python ${{ matrix.PYVERSION }}
     runs-on: macos-15-intel # Intel runner, o macos-latest se vuoi che scelga per x64
     env:
@@ -664,6 +672,7 @@ jobs:
 
   # Job per costruire le wheel su macOS (ARM64 - ARM Runner)
   macos-arm64-build:
+    if: ${{ !inputs.artifacts_run_id }}
     name: Build macOS (arm64) Python ${{ matrix.PYVERSION }}
     runs-on: macos-latest # Dovrebbe selezionare un runner ARM (es. macos-14)
     env:
@@ -823,6 +832,7 @@ jobs:
 
   # Job per costruire la source distribution
   sdist-build:
+    if: ${{ !inputs.artifacts_run_id }}
     name: Build Source Distribution
     runs-on: ubuntu-latest
     env:
@@ -860,6 +870,7 @@ jobs:
 
   # Job per testare le wheel prima del deployment
   test-wheels:
+    if: ${{ !inputs.artifacts_run_id }}
     name: Test Wheels on ${{ matrix.os }} (${{ matrix.arch }}) Python ${{ matrix.python-version }}
     needs: [windows-build, linux-x64-build, macos-x64-build, macos-arm64-build]
     runs-on: ${{ matrix.os }}
@@ -1018,12 +1029,32 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      actions: read
       id-token: write # Required for trusted publishing
     steps:
+      - name: Verify reused build and test results
+        if: ${{ inputs.artifacts_run_id != '' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runId = Number(context.payload.inputs.artifacts_run_id);
+            if (!Number.isSafeInteger(runId) || runId <= 0) throw new Error('Invalid run ID');
+            const {data: run} = await github.rest.actions.getWorkflowRun({...context.repo, run_id: runId});
+            if (run.status !== 'completed' || run.event !== 'push' || run.head_branch !== 'master' || run.path !== '.github/workflows/ci.yaml') {
+              throw new Error('Expected a completed CI push run on master');
+            }
+            const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {...context.repo, run_id: runId, per_page: 100});
+            const checks = jobs.filter(job => job.name !== 'Deploy to PyPI');
+            if (!checks.some(job => job.name.startsWith('Test Wheels')) || checks.some(job => job.conclusion !== 'success')) {
+              throw new Error('All original builds and wheel tests must have succeeded');
+            }
+
       - name: Download all build artifacts
         uses: actions/download-artifact@v4
         with:
           path: ~/artifacts
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.artifacts_run_id || github.run_id }}
           # pattern: python-wheels-* # Optional: if you need to be specific, otherwise downloads all
           # merge-multiple: true # If artifacts have same names from different jobs (not the case here)
 
@@ -1051,5 +1082,5 @@ jobs:
             echo "No distributions found to upload."
             exit 0
           fi
-          python -m twine upload --skip-existing "${files[@]}"
+          python -m twine upload --verbose --skip-existing "${files[@]}"
 

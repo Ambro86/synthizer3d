@@ -233,7 +233,8 @@ jobs:
         PYVERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
 
     container:
-      image: quay.io/pypa/manylinux_2_28_x86_64
+      # Python 3.8 was removed from current manylinux images.
+      image: ${{ matrix.PYVERSION == '3.8' && 'quay.io/pypa/manylinux_2_28_x86_64:2025.04.19-1' || 'quay.io/pypa/manylinux_2_28_x86_64' }}
       options: --user root
 
     env:

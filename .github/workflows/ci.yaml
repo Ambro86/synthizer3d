@@ -1025,6 +1025,7 @@ jobs:
   # Job per il deployment su PyPI
   deploy_pypi:
     name: Deploy to PyPI
+    if: ${{ !cancelled() && (needs.test-wheels.result == 'success' || (github.event_name == 'workflow_dispatch' && inputs.artifacts_run_id != '')) }}
     needs: [windows-build, linux-x64-build, macos-x64-build, macos-arm64-build, sdist-build, test-wheels]
     runs-on: ubuntu-latest
     permissions:
